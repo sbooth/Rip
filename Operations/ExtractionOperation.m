@@ -6,6 +6,7 @@
 
 #import "ExtractionOperation.h"
 #import "SectorRange.h"
+#import "SessionDescriptor.h"
 #import "BitArray.h"
 #import "Drive.h"
 
@@ -30,6 +31,7 @@
 
 @synthesize disk = _disk;
 @synthesize sectorRange = _sectorRange;
+@synthesize session = _session;
 @synthesize error = _error;
 @synthesize errors = _errors;
 @synthesize path = _path;
@@ -65,9 +67,8 @@
 		return;
 	}
 
-	NSError *error = nil;
-	if(![drive openDevice:&error]) {
-		self.error = error;
+	if(![drive openDevice]) {
+		self.error = drive.error;
 		return;
 	}
 
@@ -80,16 +81,33 @@
 	if(readOffset)
 		readOffsetInFrames = readOffset.integerValue;
 
-	// Handle positive read offsets
-	if(0 < readOffsetInFrames) {
-		NSUInteger readOffsetInBytes = 2 * sizeof(int16_t) * readOffsetInFrames;
+	// ========================================
+	// Handle positive/zero read offsets
+	if(0 <= readOffsetInFrames) {
+		// readOffsetInSectors is the additional number of sectors that must be extracted (at the end) to ensure a 
+		// complete sector will exist when the beginning of the read is adjusted by the read offset.
+		// If this value is larger than one sector, one sector less than this should be skipped at the beginning.
+		// For example, suppose the desired range is sectors 1 through 10 and the read offset is 600 frames.
+		// In this case readOffsetInSectors will be 2, and the actual read should be from sectors 1 through 12, with the 
+		// first 12 frames of sector 1 skipped and the last 12 frames of sector 12 skipped.
 		NSUInteger readOffsetInSectors = (readOffsetInFrames +  587) / 588;
+		NSUInteger readOffsetInBytes = 2 * sizeof(int16_t) * readOffsetInFrames;
 
 		// Adjust the range of sectors that will be extracted when the read offset is taken into account
-		if(1 < readOffsetInSectors)
-			self.sectorRange.firstSector = (self.sectorRange.firstSector + readOffsetInSectors);
+		if(1 < readOffsetInSectors) {
+			self.sectorRange.firstSector = (self.sectorRange.firstSector + readOffsetInSectors - 1);
+			
+			// Skipped whole sectors are taken into account above, so subtract them out here
+			while(kCDSectorSizeCDDA > readOffsetInBytes)
+				readOffsetInBytes -= kCDSectorSizeCDDA;
+		}
 		self.sectorRange.lastSector = (self.sectorRange.lastSector + readOffsetInSectors);
 
+		// Determine the last sector that can be legally read (so as not to over-read the lead out)
+		NSUInteger lastPermissibleSector = NSUIntegerMax;
+		if(self.session)
+			lastPermissibleSector = self.session.leadOut - 1;
+		
 		// Setup C2 error flag tracking
 		self.errors = [[BitArray alloc] init];
 		self.errors.bitCount = self.sectorRange.length;
@@ -113,13 +131,32 @@
 			NSUInteger sectorCount = MIN(BUFFER_SIZE_IN_SECTORS, sectorsRemaining);
 			SectorRange *readRange = [SectorRange sectorRangeWithFirstSector:startSector sectorCount:sectorCount];
 			
+			// Clamp the read range to the specified session
+			NSUInteger sectorsOfSilenceToAppend = 0;
+			if(readRange.lastSector > lastPermissibleSector) {
+				sectorsOfSilenceToAppend = readRange.lastSector - lastPermissibleSector;
+				readRange.lastSector = lastPermissibleSector;
+				sectorCount -= sectorsOfSilenceToAppend;
+			}
+			
 			// Read from the CD media
 			NSUInteger sectorsRead = [drive readAudioAndErrorFlags:buffer sectorRange:readRange];
 			
 			// Verify the requested sectors were read
-			if(sectorsRead != sectorCount) {
+			if(0 == sectorsRead) {
+				self.error = drive.error;
+				goto cleanup;
+			}
+			else if(sectorsRead != sectorCount) {
 				self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:EIO userInfo:nil];
 				goto cleanup;
+			}
+			
+			// Append silence as necessary and update the read parameters to reflect these virtual sectors
+			if(sectorsOfSilenceToAppend) {
+				memset(buffer + (sectorsRead * (kCDSectorSizeCDDA + kCDSectorSizeErrorFlags)), 0, sectorsOfSilenceToAppend * (kCDSectorSizeCDDA + kCDSectorSizeErrorFlags));
+				readRange.lastSector = readRange.lastSector + sectorsOfSilenceToAppend;
+				sectorsRead += sectorsOfSilenceToAppend;
 			}
 			
 			// Copy the audio and C2 data to their respective buffers
@@ -165,13 +202,12 @@
 				goto cleanup;
 		}
 	}
+	// ========================================
 	// Handle negative read offsets
 	else {
 //		NSInteger readOffsetInSectors = (readOffsetInFrames - 587) / 588;		
 		NSLog(@"Negative read offset of %i frames", readOffsetInFrames);
 	}
-	
-	NSLog(@"%u C2 errors during extraction", self.errors.countOfOnes);
 	
 	// Complete the MD5 calculation and store the result
 	md5_byte_t digest [16];
@@ -181,8 +217,8 @@
 
 cleanup:
 	// Close the device
-	if(![drive closeDevice:&error])
-		self.error = error;
+	if(![drive closeDevice])
+		self.error = drive.error;
 }
 
 @end
