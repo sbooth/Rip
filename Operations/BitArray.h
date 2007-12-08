@@ -21,6 +21,8 @@
 @property (readonly) NSUInteger countOfZeroes;
 @property (readonly) NSUInteger countOfOnes;
 
+- (id) initWithBitCount:(NSUInteger)bitCount;
+
 // ========================================
 // Access to the individual bits
 - (BOOL) valueAtIndex:(NSUInteger)index;

@@ -14,6 +14,13 @@
 
 @synthesize bitCount = _bitCount;
 
+- (id) initWithBitCount:(NSUInteger)bitCount
+{
+	if((self = [super init]))
+		self.bitCount = bitCount;
+	return self;
+}
+
 - (id) copyWithZone:(NSZone *)zone
 {
 	BitArray *copy = [[[self class] allocWithZone:zone] init];
