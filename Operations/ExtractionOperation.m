@@ -19,7 +19,7 @@
 
 @interface ExtractionOperation ()
 @property (copy) NSError * error;
-@property (copy) BitArray * errors;
+@property (copy) BitArray * errorFlags;
 @property (copy) NSString * md5;
 @end
 
@@ -33,7 +33,7 @@
 @synthesize sectorRange = _sectorRange;
 @synthesize session = _session;
 @synthesize error = _error;
-@synthesize errors = _errors;
+@synthesize errorFlags = _errorFlags;
 @synthesize path = _path;
 @synthesize readOffset = _readOffset;
 @synthesize md5 = _md5;
@@ -109,8 +109,7 @@
 			lastPermissibleSector = self.session.leadOut - 1;
 		
 		// Setup C2 error flag tracking
-		self.errors = [[BitArray alloc] init];
-		self.errors.bitCount = self.sectorRange.length;
+		self.errorFlags = [[BitArray alloc] initWithBitCount:self.sectorRange.length];
 		
 		// The extraction buffers
 		int8_t *buffer = NSAllocateCollectable(BUFFER_SIZE_IN_SECTORS * (kCDSectorSizeCDDA + kCDSectorSizeErrorFlags), 0);
@@ -235,7 +234,7 @@ cleanup:
 		if(errorFlags[i]) {
 			for(j = 0; j < 8; ++j) {
 				if((1 << j) & errorFlags[i])
-					[self.errors setValue:YES forIndex:(range.firstSector + ((8 * i) + j))];
+					[_errorFlags setValue:YES forIndex:(range.firstSector + ((8 * i) + j))];
 			}					
 		}
 	}
