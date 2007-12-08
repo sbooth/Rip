@@ -9,6 +9,8 @@
 #import "BitArray.h"
 #import "Drive.h"
 
+#include "md5.h"
+
 #include <IOKit/storage/IOCDTypes.h>
 
 // Keep reads to approximately 2 MB in size (2352 + 294 bytes are necessary for each sector)
@@ -17,6 +19,7 @@
 @interface ExtractionOperation ()
 @property (copy) NSError * error;
 @property (copy) BitArray * errors;
+@property (copy) NSString * md5;
 @end
 
 @interface ExtractionOperation (Private)
@@ -31,6 +34,7 @@
 @synthesize errors = _errors;
 @synthesize path = _path;
 @synthesize readOffset = _readOffset;
+@synthesize md5 = _md5;
 
 - (id) initWithDADiskRef:(DADiskRef)disk
 {
@@ -66,6 +70,10 @@
 		self.error = error;
 		return;
 	}
+
+	// Initialize the MD5
+	md5_state_t md5;
+	md5_init(&md5);
 
 	NSInteger readOffsetInFrames = 0;
 	NSNumber *readOffset = self.readOffset;
@@ -146,6 +154,9 @@
 			// Write the data to the output file
 			[fileHandle writeData:audioData];
 			
+			// Update the MD5 digest
+			md5_append(&md5, audioData.bytes, audioData.length);
+			
 			// Housekeeping
 			sectorsRemaining -= sectorsRead;
 			
@@ -162,6 +173,12 @@
 	
 	NSLog(@"%u C2 errors during extraction", self.errors.countOfOnes);
 	
+	// Complete the MD5 calculation and store the result
+	md5_byte_t digest [16];
+	md5_finish(&md5, digest);
+	
+	self.md5 = [NSString stringWithFormat:@"%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x", digest[0], digest[1], digest[2], digest[3], digest[4], digest[5], digest[6], digest[7], digest[8], digest[9], digest[10], digest[11], digest[12], digest[13], digest[14], digest[15]];
+
 cleanup:
 	// Close the device
 	if(![drive closeDevice:&error])

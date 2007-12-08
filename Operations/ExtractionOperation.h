@@ -17,6 +17,7 @@
 	NSError *_error;
 	NSString *_path;
 	NSNumber *_readOffset;
+	NSString *_md5;
 }
 
 @property (assign) DADiskRef disk;
@@ -25,6 +26,7 @@
 @property (readonly, copy) BitArray * errors;
 @property (copy) NSString * path;
 @property (copy) NSNumber * readOffset;
+@property (readonly, copy) NSString * md5;
 
 - (id) initWithDADiskRef:(DADiskRef)disk;
 
