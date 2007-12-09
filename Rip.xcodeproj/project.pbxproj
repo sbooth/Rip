@@ -23,6 +23,7 @@
 		8C8AC5740D09A16E00A90C21 /* CompactDiscDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C8AC5730D09A16E00A90C21 /* CompactDiscDocument.m */; };
 		8C8AC5820D09A22F00A90C21 /* CompactDiscDocument.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8C8AC5800D09A22F00A90C21 /* CompactDiscDocument.xib */; };
 		8C8AC5A70D0A572E00A90C21 /* md5.c in Sources */ = {isa = PBXBuildFile; fileRef = 8C8AC5A50D0A572E00A90C21 /* md5.c */; };
+		8C8AC68D0D0BB14D00A90C21 /* AccurateRipUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C8AC68C0D0BB14D00A90C21 /* AccurateRipUtilities.m */; };
 		8C9817100CF7C6AB00F45B7F /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8C98170C0CF7C6AB00F45B7F /* MainMenu.xib */; };
 		8CB209440D0507A2003A90A6 /* CompactDisc.m in Sources */ = {isa = PBXBuildFile; fileRef = 8CB2093D0D0507A2003A90A6 /* CompactDisc.m */; };
 		8CB209450D0507A2003A90A6 /* SectorRange.m in Sources */ = {isa = PBXBuildFile; fileRef = 8CB2093F0D0507A2003A90A6 /* SectorRange.m */; };
@@ -75,6 +76,8 @@
 		8C8AC5810D09A22F00A90C21 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/CompactDiscDocument.xib; sourceTree = "<group>"; };
 		8C8AC5A50D0A572E00A90C21 /* md5.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = md5.c; path = ThirdParty/md5/md5.c; sourceTree = "<group>"; };
 		8C8AC5A60D0A572E00A90C21 /* md5.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = md5.h; path = ThirdParty/md5/md5.h; sourceTree = "<group>"; };
+		8C8AC68B0D0BB14D00A90C21 /* AccurateRipUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AccurateRipUtilities.h; path = AccurateRip/AccurateRipUtilities.h; sourceTree = "<group>"; };
+		8C8AC68C0D0BB14D00A90C21 /* AccurateRipUtilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AccurateRipUtilities.m; path = AccurateRip/AccurateRipUtilities.m; sourceTree = "<group>"; };
 		8C98170D0CF7C6AB00F45B7F /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		8CB2093C0D0507A2003A90A6 /* CompactDisc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CompactDisc.h; path = CompactDisc/CompactDisc.h; sourceTree = "<group>"; };
 		8CB2093D0D0507A2003A90A6 /* CompactDisc.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CompactDisc.m; path = CompactDisc/CompactDisc.m; sourceTree = "<group>"; };
@@ -205,6 +208,8 @@
 				8C3EF83F0CFFC5AC0086181E /* AccurateRipTrack.m */,
 				8C3EF8560CFFCAC20086181E /* AccurateRipDisc.h */,
 				8C3EF8570CFFCAC20086181E /* AccurateRipDisc.m */,
+				8C8AC68B0D0BB14D00A90C21 /* AccurateRipUtilities.h */,
+				8C8AC68C0D0BB14D00A90C21 /* AccurateRipUtilities.m */,
 			);
 			name = AccurateRip;
 			sourceTree = "<group>";
@@ -377,6 +382,7 @@
 				8C8AC56E0D099D6900A90C21 /* TrackInspectorPanelController.m in Sources */,
 				8C8AC5740D09A16E00A90C21 /* CompactDiscDocument.m in Sources */,
 				8C8AC5A70D0A572E00A90C21 /* md5.c in Sources */,
+				8C8AC68D0D0BB14D00A90C21 /* AccurateRipUtilities.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
