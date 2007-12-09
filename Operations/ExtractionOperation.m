@@ -1,5 +1,4 @@
 /*
- *  $Id$
  *  Copyright (C) 2007 Stephen F. Booth <me@sbooth.org>
  *  All Rights Reserved
  */

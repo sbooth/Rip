@@ -1,5 +1,4 @@
 /*
- *  $Id$
  *  Copyright (C) 2007 Stephen F. Booth <me@sbooth.org>
  *  All Rights Reserved
  */
@@ -77,6 +76,7 @@ NSString * const	kKVOExtractionContext					= @"org.sbooth.Rip.CompactDiscDocumen
 		// Only extract one track at a time
 		[self.extractionQueue setMaxConcurrentOperationCount:1];
 		
+		// Observe changes in the extraction operations array, to be notified when extraction starts and stops
 		[self.extractionQueue addObserver:self forKeyPath:@"operations" options:(NSKeyValueObservingOptionOld |  NSKeyValueObservingOptionNew) context:kKVOExtractionContext];
 	}
 	return self;
@@ -265,6 +265,9 @@ NSString * const	kKVOExtractionContext					= @"org.sbooth.Rip.CompactDiscDocumen
 		return;
 	}
 	
+	// Limit the audio extraction to the first session
+	SessionDescriptor *session = [self.compactDisc sessionNumber:1];
+	
 	for(NSDictionary *trackDictionary in selectedTracks) {
 		SectorRange *trackSectorRange = [SectorRange sectorRangeWithFirstSector:[[trackDictionary objectForKey:@"firstSector"] integerValue]
 																	 lastSector:[[trackDictionary objectForKey:@"lastSector"] integerValue]];
@@ -273,6 +276,7 @@ NSString * const	kKVOExtractionContext					= @"org.sbooth.Rip.CompactDiscDocumen
 		
 		trackExtractionOperation.disk = self.disk;
 		trackExtractionOperation.sectorRange = trackSectorRange;
+		trackExtractionOperation.session = session;
 		trackExtractionOperation.readOffset = self.driveInformation.readOffset;
 		trackExtractionOperation.path = [NSString stringWithFormat:@"/tmp/Track %@.raw", [trackDictionary objectForKey:@"number"]];
 		
@@ -313,15 +317,15 @@ NSString * const	kKVOExtractionContext					= @"org.sbooth.Rip.CompactDiscDocumen
 	// Delete the output file if the operation was cancelled or did not succeed
 	if(operation.error || operation.isCancelled) {
 		if(operation.error)
-			[[NSApplication sharedApplication] presentError:operation.error];
+			[self presentError:operation.error];
 			
 		NSError *error = nil;
 		if(![[NSFileManager defaultManager] removeItemAtPath:operation.path error:&error])
-			[[NSApplication sharedApplication] presentError:error];
+			[self presentError:error];
 		return;
 	}
 
-	NSLog(@"Extraction to %@ finished, %u C2 errors", operation.path, operation.errors.countOfOnes);
+	NSLog(@"Extraction to %@ finished, %u C2 errors.  MD5 = %@", operation.path, operation.errorFlags.countOfOnes, operation.md5);
 }
 
 @end
