@@ -56,9 +56,9 @@ extern NSString * const		kMetadataMusicBrainzIDKey;
 // Properties
 // ========================================
 @property (assign) DADiskRef disk;
-@property (readonly, copy) CompactDisc * compactDisc;
-@property (readonly, copy) AccurateRipDisc * accurateRipDisc;
-@property (readonly, copy) DriveInformation * driveInformation;
+@property (readonly, assign) CompactDisc * compactDisc;
+@property (readonly, assign) AccurateRipDisc * accurateRipDisc;
+@property (readonly, assign) DriveInformation * driveInformation;
 @property (readonly) NSMutableDictionary * metadata;
 
 // ========================================

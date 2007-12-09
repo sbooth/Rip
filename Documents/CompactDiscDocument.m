@@ -9,10 +9,12 @@
 #import "SessionDescriptor.h"
 #import "TrackDescriptor.h"
 #import "AccurateRipDisc.h"
+#import "AccurateRipTrack.h"
 #import "DriveInformation.h"
 #import "SectorRange.h"
 #import "ExtractionOperation.h"
 #import "BitArray.h"
+#include "AccurateRipUtilities.h"
 
 // ========================================
 // KVC key names for the metadata dictionaries
@@ -42,9 +44,9 @@ NSString * const	kMetadataMusicBrainzIDKey				= @"musicBrainzID";
 NSString * const	kKVOExtractionContext					= @"org.sbooth.Rip.CompactDiscDocument.ExtractionContext";
 
 @interface CompactDiscDocument ()
-@property (copy) CompactDisc * compactDisc;
-@property (copy) AccurateRipDisc * accurateRipDisc;
-@property (copy) DriveInformation * driveInformation;
+@property (assign) CompactDisc * compactDisc;
+@property (assign) AccurateRipDisc * accurateRipDisc;
+@property (assign) DriveInformation * driveInformation;
 @end
 
 @interface CompactDiscDocument (Private)
@@ -277,6 +279,7 @@ NSString * const	kKVOExtractionContext					= @"org.sbooth.Rip.CompactDiscDocumen
 		trackExtractionOperation.disk = self.disk;
 		trackExtractionOperation.sectorRange = trackSectorRange;
 		trackExtractionOperation.session = session;
+		trackExtractionOperation.trackNumber = [trackDictionary objectForKey:@"number"];
 		trackExtractionOperation.readOffset = self.driveInformation.readOffset;
 		trackExtractionOperation.path = [NSString stringWithFormat:@"/tmp/Track %@.raw", [trackDictionary objectForKey:@"number"]];
 		
@@ -326,6 +329,39 @@ NSString * const	kKVOExtractionContext					= @"org.sbooth.Rip.CompactDiscDocumen
 	}
 
 	NSLog(@"Extraction to %@ finished, %u C2 errors.  MD5 = %@", operation.path, operation.errorFlags.countOfOnes, operation.md5);
+
+	NSMutableDictionary *extractionResult = [NSMutableDictionary dictionary];
+	
+	[extractionResult setObject:operation.path forKey:@"path"];
+	[extractionResult setObject:operation.errorFlags forKey:@"errorFlags"];
+	[extractionResult setObject:operation.md5 forKey:@"md5"];
+	
+	// If this disc was found in Accurate Rip, verify the checksum
+	if(self.accurateRipDisc.discFound) {
+		
+		// If the extraction was for a single track, determine the checksum for the entire extracted file
+		if(operation.trackNumber) {
+			NSUInteger accurateRipCRC = calculateAccurateRipCRCForFile(operation.path, 
+																	   operation.session.firstTrack == operation.trackNumber.unsignedIntegerValue,
+																	   operation.session.lastTrack == operation.trackNumber.unsignedIntegerValue);
+			
+			AccurateRipTrack *accurateRipTrack = [self.accurateRipDisc trackNumber:operation.trackNumber.unsignedIntegerValue];
+			
+			if(accurateRipTrack && accurateRipTrack.CRC == accurateRipCRC) {
+				NSLog(@"Track accurately ripped, confidence %i", accurateRipTrack.confidenceLevel);
+				[extractionResult setObject:[NSNumber numberWithUnsignedInteger:accurateRipTrack.confidenceLevel] forKey:@"confidenceLevel"];
+			}
+		}
+		// Otherwise, check 
+		else {
+			
+		}
+	}
+	// Otherwise, re-rip the track if any C2 error flags were returned
+	else if(operation.errorFlags.countOfOnes) {
+		
+	}
+	
 }
 
 @end
