@@ -15,6 +15,7 @@
 @interface Drive ()
 @property (assign) DADiskRef disk;
 @property (assign) CompactDisc * compactDisc;
+@property (copy) NSError * error;
 @property (assign) int fd;
 @end
 
@@ -26,6 +27,7 @@
 
 @synthesize disk = _disk;
 @synthesize compactDisc = _compactDisc;
+@synthesize error = _error;
 @synthesize fd = _fd;
 @synthesize cacheSize = _cacheSize;
 
@@ -45,7 +47,7 @@
 
 - (void) finalize
 {
-	[self closeDevice:NULL];
+	[self closeDevice];
 	
 	[super finalize];
 }
@@ -56,7 +58,7 @@
 	return (-1 != self.fd);
 }
 
-- (BOOL) openDevice:(NSError **)error
+- (BOOL) openDevice
 {
 	if(self.deviceIsOpen)
 		return YES;
@@ -66,17 +68,17 @@
 	
 	self.fd = opendev((char *)DADiskGetBSDName(self.disk), O_RDONLY | O_NONBLOCK, 0, NULL);
 	if(-1 == self.fd) {
-		if(NULL != error)
-			*error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:nil];
-
+#if DEBUG
 		NSLog(@"Unable to open the drive for reading.");
+#endif
+		self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:nil];
 		return NO;
 	}
 	else
 		return YES;
 }
 
-- (BOOL) closeDevice:(NSError **)error
+- (BOOL) closeDevice
 {
 	if(!self.deviceIsOpen)
 		return YES;
@@ -84,10 +86,10 @@
 	int result = close(self.fd);
 	self.fd = -1;
 	if(-1 == result) {
-		if(NULL != error)
-			*error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:nil];
-
+#if DEBUG
 		NSLog(@"Unable to close the drive.");
+#endif
+		self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:nil];
 		return NO;
 	}
 	else
@@ -102,8 +104,12 @@
 - (uint16_t) speed
 {
 	uint16_t speed = 0;
-	if(-1 == ioctl(self.fd, DKIOCCDGETSPEED, &speed))
+	if(-1 == ioctl(self.fd, DKIOCCDGETSPEED, &speed)) {
+#if DEBUG
 		NSLog(@"Unable to get the drive's speed");
+#endif
+		self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:nil];
+	}
 
 	return speed;
 }
@@ -111,7 +117,10 @@
 - (BOOL) setSpeed:(uint16_t)speed
 {
 	if(-1 == ioctl(self.fd, DKIOCCDSETSPEED, &speed)) {
+#if DEBUG
 		NSLog(@"Unable to set the drive's speed");
+#endif
+		self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:nil];
 		return NO;
 	}
 
@@ -131,14 +140,20 @@
 	NSUInteger postSectorsAvailable		= sessionLastSector - range.lastSector;
 
 	// Allocate the buffer
-	NSUInteger	bufferLen	= requiredReadSize < 1024 ? requiredReadSize : 1024;
-	int16_t		*buffer		= NSAllocateCollectable(bufferLen * kCDSectorSizeCDDA, 0);
-	NSAssert(NULL != buffer, NSLocalizedStringFromTable(@"Unable to allocate memory.", @"Exceptions", @""));
+	NSUInteger			bufferLen	= requiredReadSize < 1024 ? requiredReadSize : 1024;
+	__strong int16_t	*buffer		= NSAllocateCollectable(bufferLen * kCDSectorSizeCDDA, 0);
+	
+	if(NULL == buffer) {
+		self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:ENOMEM userInfo:nil];
+		return NO;
+	}
 
 	// Make sure there are enough sectors outside the range to fill the cache
 	if(preSectorsAvailable + postSectorsAvailable < requiredReadSize) {
+#if DEBUG
 		NSLog(@"Unable to flush the drive's cache");
-		// What to do?
+#endif
+		self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:EINVAL userInfo:nil];
 		return NO;
 	}
 
@@ -149,7 +164,9 @@
 			sectorsRead = [self readAudio:buffer
 							  startSector:sessionFirstSector + (requiredReadSize - sectorsRemaining)
 							  sectorCount:(bufferLen < sectorsRemaining ? bufferLen : sectorsRemaining)];
-			NSAssert(0 != sectorsRead, NSLocalizedStringFromTable(@"Unable to read from the disc.", @"Exceptions", @""));
+			
+			if(0 == sectorsRead)
+				return NO;
 
 			sectorsRemaining -= sectorsRead;
 		}
@@ -160,7 +177,9 @@
 			sectorsRead = [self readAudio:buffer
 							  startSector:sessionLastSector - sectorsRemaining
 							  sectorCount:(bufferLen < sectorsRemaining ? bufferLen : sectorsRemaining)];
-			NSAssert(0 != sectorsRead, NSLocalizedStringFromTable(@"Unable to read from the disc.", @"Exceptions", @""));
+
+			if(0 == sectorsRead)
+				return NO;
 
 			sectorsRemaining -= sectorsRead;
 		}
@@ -176,7 +195,9 @@
 			sectorsRead = [self readAudio:buffer
 							  startSector:sessionFirstSector + (boundary - sectorsRemaining)
 							  sectorCount:(bufferLen < sectorsRemaining ? bufferLen : sectorsRemaining)];
-			NSAssert(0 != sectorsRead, NSLocalizedStringFromTable(@"Unable to read from the disc.", @"Exceptions", @""));
+
+			if(0 == sectorsRead)
+				return NO;
 
 			sectorsRemaining -= sectorsRead;
 		}
@@ -186,15 +207,16 @@
 		sectorsRemaining	= requiredReadSize - sectorsRemaining;
 
 		// This should never happen; we tested for it above
-		if(sectorsRemaining > (sessionLastSector - boundary)) {
+		if(sectorsRemaining > (sessionLastSector - boundary))
 			NSLog(@"fnord!");
-		}
 
 		while(0 < sectorsRemaining) {
 			sectorsRead = [self readAudio:buffer
 							  startSector:sessionLastSector - sectorsRemaining
 							  sectorCount:(bufferLen < sectorsRemaining ? bufferLen : sectorsRemaining)];
-			NSAssert(0 != sectorsRead, NSLocalizedStringFromTable(@"Unable to read from the disc.", @"Exceptions", @""));
+
+			if(0 == sectorsRead)
+				return NO;
 
 			sectorsRemaining -= sectorsRead;
 		}
@@ -299,11 +321,14 @@
 	bzero(&cd_read_mcn, sizeof(cd_read_mcn));
 
 	if(-1 == ioctl(self.fd, DKIOCCDREADMCN, &cd_read_mcn)) {
+#if DEBUG
 		NSLog(@"Unable to read the disc's media catalog number (MCN)");
-	return nil;
-}
+#endif
+		// This is not an error condition
+		return nil;
+	}
 
-return [NSString stringWithCString:cd_read_mcn.mcn encoding:NSASCIIStringEncoding];
+	return [NSString stringWithCString:cd_read_mcn.mcn encoding:NSASCIIStringEncoding];
 }
 
 - (NSString *) readISRC:(NSUInteger)track
@@ -314,7 +339,10 @@ return [NSString stringWithCString:cd_read_mcn.mcn encoding:NSASCIIStringEncodin
 	cd_read_isrc.track = track;
 
 	if(-1 == ioctl(self.fd, DKIOCCDREADISRC, &cd_read_isrc)) {
+#if DEBUG
 		NSLog(@"Unable to read the international standard recording code (ISRC) for track %i", track);
+#endif
+		// This is not an error condition
 		return nil;
 	}
 
@@ -347,8 +375,10 @@ return [NSString stringWithCString:cd_read_mcn.mcn encoding:NSASCIIStringEncodin
 	cd_read.buffer			= buffer;
 	cd_read.bufferLength	= blockSize * sectorCount;
 
-	int result = ioctl(self.fd, DKIOCCDREAD, &cd_read);
-	NSAssert(-1 != result, NSLocalizedStringFromTable(@"Unable to read from the disc.", @"Exceptions", @""));
+	if(-1 == ioctl(self.fd, DKIOCCDREAD, &cd_read)) {
+		self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:nil];
+		return 0;
+	}
 
 	return cd_read.bufferLength / blockSize;
 }

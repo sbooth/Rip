@@ -27,10 +27,12 @@ enum {
 	CompactDisc *_compactDisc;
 	int _fd;
 	NSUInteger _cacheSize;
+	NSError *_error;
 }
 
 @property (readonly, assign) DADiskRef disk;
 @property (readonly, assign) CompactDisc * compactDisc;
+@property (readonly, copy) NSError * error;
 @property (assign) NSUInteger cacheSize;
 @property (readonly) NSUInteger cacheSizeInSectors;
 @property (readonly) BOOL deviceIsOpen;
@@ -41,8 +43,8 @@ enum {
 
 // ========================================
 // Device management
-- (BOOL) openDevice:(NSError **)error;
-- (BOOL) closeDevice:(NSError **)error;
+- (BOOL) openDevice;
+- (BOOL) closeDevice;
 
 // ========================================
 // Drive speed
