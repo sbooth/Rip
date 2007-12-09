@@ -4,54 +4,74 @@
  */
 
 #import "SectorRange.h"
+#import "MutableSectorRange.h"
 
 #include <IOKit/storage/IOCDTypes.h>
+
+@interface SectorRange ()
+@property (assign) NSUInteger firstSector;
+@property (assign) NSUInteger lastSector;
+@end
 
 @implementation SectorRange
 
 @synthesize firstSector = _firstSector;
 @synthesize lastSector = _lastSector;
 
++ (id) sectorRangeWithSector:(NSUInteger)sector
+{
+	return [[[self class] alloc] initWithSector:sector];
+}
+
 + (id) sectorRangeWithFirstSector:(NSUInteger)firstSector lastSector:(NSUInteger)lastSector
 {
-	NSParameterAssert(lastSector >= firstSector);
-	
-	SectorRange *range = [[SectorRange alloc] init];
-	
-	range.firstSector = firstSector;
-	range.lastSector= lastSector;
-	
-	return range;
+	return [[[self class] alloc] initWithFirstSector:firstSector lastSector:lastSector];
 }
 
 + (id) sectorRangeWithFirstSector:(NSUInteger)firstSector sectorCount:(NSUInteger)sectorCount
 {
-	NSParameterAssert(0 < sectorCount);
-
-	SectorRange *range = [[SectorRange alloc] init];
-	
-	range.firstSector = firstSector;
-	range.lastSector = firstSector + sectorCount - 1;
-	
-	return range;
+	return [[[self class] alloc] initWithFirstSector:firstSector sectorCount:sectorCount];
 }
 
-+ (id) sectorRangeWithSector:(NSUInteger)sector
+- (id) initWithSector:(NSUInteger)sector
 {
-	SectorRange *range = [[SectorRange alloc] init];
+	return [self initWithFirstSector:sector lastSector:sector];
+}
+
+- (id) initWithFirstSector:(NSUInteger)firstSector lastSector:(NSUInteger)lastSector
+{
+	NSParameterAssert(lastSector >= firstSector);
+
+	if((self = [super init])) {
+		self.firstSector = firstSector;
+		self.lastSector = lastSector;
+	}
+	return self;	
+}
+
+- (id) initWithFirstSector:(NSUInteger)firstSector sectorCount:(NSUInteger)sectorCount
+{
+	NSParameterAssert(0 < sectorCount);
 	
-	range.firstSector = sector;
-	range.lastSector = sector;
-	
-	return range;
+	return [self initWithFirstSector:firstSector lastSector:(firstSector + sectorCount - 1)];
 }
 
 - (id) copyWithZone:(NSZone *)zone
 {
-	SectorRange *copy = [[[self class] allocWithZone:zone] init];
+	SectorRange *copy = [[SectorRange allocWithZone:zone] init];
 	
 	copy.firstSector = self.firstSector;
 	copy.lastSector = self.lastSector;
+	
+	return copy;
+}
+
+- (id) mutableCopyWithZone:(NSZone *)zone
+{
+	MutableSectorRange *copy = [[MutableSectorRange allocWithZone:zone] init];
+	
+	copy.firstSector = self.firstSector;
+	copy.lastSector = self.firstSector;
 	
 	return copy;
 }

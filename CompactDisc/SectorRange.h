@@ -9,20 +9,24 @@
 // Utility class representing a contiguous, inclusive range
 // of sectors on a CDDA disc
 // ========================================
-@interface SectorRange : NSObject <NSCopying>
+@interface SectorRange : NSObject <NSCopying, NSMutableCopying>
 {
 	NSUInteger _firstSector;
 	NSUInteger _lastSector;
 }
 
-@property (assign) NSUInteger firstSector;
-@property (assign) NSUInteger lastSector;
+@property (readonly, assign) NSUInteger firstSector;
+@property (readonly, assign) NSUInteger lastSector;
 @property (readonly) NSUInteger length;
 @property (readonly) NSUInteger byteSize;
 
++ (id) sectorRangeWithSector:(NSUInteger)sector;
 + (id) sectorRangeWithFirstSector:(NSUInteger)firstSector lastSector:(NSUInteger)lastSector;
 + (id) sectorRangeWithFirstSector:(NSUInteger)firstSector sectorCount:(NSUInteger)sectorCount;
-+ (id) sectorRangeWithSector:(NSUInteger)sector;
+
+- (id) initWithSector:(NSUInteger)sector;
+- (id) initWithFirstSector:(NSUInteger)firstSector lastSector:(NSUInteger)lastSector;
+- (id) initWithFirstSector:(NSUInteger)firstSector sectorCount:(NSUInteger)sectorCount;
 
 - (NSUInteger) indexForSector:(NSUInteger)sector;
 - (NSUInteger) sectorForIndex:(NSUInteger)index;
