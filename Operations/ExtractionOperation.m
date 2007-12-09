@@ -31,6 +31,7 @@
 @synthesize disk = _disk;
 @synthesize sectorRange = _sectorRange;
 @synthesize session = _session;
+@synthesize trackNumber = _trackNumber;
 @synthesize error = _error;
 @synthesize errorFlags = _errorFlags;
 @synthesize path = _path;

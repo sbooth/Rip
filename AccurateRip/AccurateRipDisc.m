@@ -9,7 +9,7 @@
 #import "AccurateRipTrack.h"
 
 @interface AccurateRipDisc ()
-@property (copy) CompactDisc * compactDisc;
+@property (assign) CompactDisc * compactDisc;
 @property (assign) BOOL discFound;
 @property (assign) NSUInteger accurateRipID1;
 @property (assign) NSUInteger accurateRipID2;

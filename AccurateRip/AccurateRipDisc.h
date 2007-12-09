@@ -25,7 +25,7 @@
 	BOOL _discFound;
 }
 
-@property (readonly, copy) CompactDisc * compactDisc;
+@property (readonly, assign) CompactDisc * compactDisc;
 @property (readonly, assign) BOOL discFound;
 @property (readonly, assign) NSUInteger accurateRipID1;
 @property (readonly, assign) NSUInteger accurateRipID2;
