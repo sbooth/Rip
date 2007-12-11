@@ -80,142 +80,169 @@
 	md5_state_t md5;
 	md5_init(&md5);
 
+	// With no read offset, the range of sectors that will be extracted won't change
+	NSUInteger firstSectorToRead = self.sectors.firstSector;
+	NSUInteger lastSectorToRead = self.sectors.lastSector;
+
+	// Handle the read offset, if specified
 	NSInteger readOffsetInFrames = 0;
 	if(self.readOffset)
 		readOffsetInFrames = self.readOffset.integerValue;
+	
+	// Negative read offsets can easily be transformed into positive read offsets
+	// For example, suppose the desired range is sectors 10 through 20 and the read offset is -600 frames.
+	// This is equivalent to requesting sectors 8 - 18 with a read offset of 576 frames
+	if(0 > readOffsetInFrames) {
+		NSUInteger numberOfSectorsToOffset = 0;
+		do {
+			readOffsetInFrames += 588;
+			++numberOfSectorsToOffset;
+		} while(0 > readOffsetInFrames);
 
-	// ========================================
-	// Handle positive/zero read offsets
-	if(0 <= readOffsetInFrames) {
-		// readOffsetInSectors is the additional number of sectors that must be extracted (at the end) to ensure a 
-		// complete sector will exist when the beginning of the read is adjusted by the read offset.
-		// If this value is larger than one sector, one sector less than this should be skipped at the beginning.
-		// For example, suppose the desired range is sectors 1 through 10 and the read offset is 600 frames.
-		// In this case readOffsetInSectors will be 2, and the actual read should be from sectors 1 through 12, with the 
-		// first 12 frames of sector 1 skipped and the last 12 frames of sector 12 skipped.
-		NSUInteger readOffsetInSectors = (readOffsetInFrames +  587) / 588;
-		NSUInteger readOffsetInBytes = 2 * sizeof(int16_t) * readOffsetInFrames;
+		firstSectorToRead -= numberOfSectorsToOffset;
+		lastSectorToRead -= numberOfSectorsToOffset;
+	}
 
-		// With no read offset, the range of sectors that will be extracted won't change
-		NSUInteger firstSectorToRead = self.sectors.firstSector;
-		NSUInteger lastSectorToRead = self.sectors.lastSector;
+	// readOffsetInSectors is the additional number of sectors that must be extracted (at the end) to ensure a 
+	// complete sector will exist when the beginning of the read is adjusted by the read offset.
+	// If this value is larger than one sector, one sector less than this should be skipped at the beginning.
+	// For example, suppose the desired range is sectors 1 through 10 and the read offset is 600 frames.
+	// In this case readOffsetInSectors will be 2, and the actual read should be from sectors 1 through 12, with the 
+	// first 12 frames of sector 1 skipped and the last 12 frames of sector 12 skipped.
+	NSUInteger readOffsetInSectors = (readOffsetInFrames +  587) / 588;
+	NSUInteger readOffsetInBytes = 2 * sizeof(int16_t) * readOffsetInFrames;
+	
+	// Adjust the sectors for the read offset
+	if(1 < readOffsetInSectors) {
+		firstSectorToRead += readOffsetInSectors - 1;
 		
-		// Adjust the sectors for the read offset
-		if(1 < readOffsetInSectors) {
-			firstSectorToRead += readOffsetInSectors - 1;
-			
-			// Skipped whole sectors are taken into account above, so subtract them out here
-			while(kCDSectorSizeCDDA > readOffsetInBytes)
-				readOffsetInBytes -= kCDSectorSizeCDDA;
+		// Skipped whole sectors are taken into account above, so subtract them out here
+		while(kCDSectorSizeCDDA > readOffsetInBytes)
+			readOffsetInBytes -= kCDSectorSizeCDDA;
+	}
+	
+	lastSectorToRead += readOffsetInSectors;
+	
+	// Store the sectors that will actually be read
+	self.sectorsRead = [[SectorRange alloc] initWithFirstSector:firstSectorToRead lastSector:lastSectorToRead];
+
+	// Determine the first sector that can be legally read (so as not to over-read the lead in)
+	NSUInteger firstPermissibleSector = 0;
+	if(self.session)
+		firstPermissibleSector = 0;
+	
+	// Determine the last sector that can be legally read (so as not to over-read the lead out)
+	NSUInteger lastPermissibleSector = NSUIntegerMax;
+	if(self.session)
+		lastPermissibleSector = self.session.leadOut - 1;
+	
+	// Setup C2 error flag tracking
+	self.errorFlags = [[BitArray alloc] initWithBitCount:self.sectorsRead.length];
+	
+	// The extraction buffers
+	__strong int8_t *buffer = NSAllocateCollectable(BUFFER_SIZE_IN_SECTORS * (kCDSectorSizeCDDA + kCDSectorSizeErrorFlags), 0);
+	__strong int8_t *audioBuffer = NSAllocateCollectable(BUFFER_SIZE_IN_SECTORS * kCDSectorSizeCDDA, 0);
+	__strong int8_t *c2Buffer = NSAllocateCollectable(BUFFER_SIZE_IN_SECTORS * kCDSectorSizeErrorFlags, 0);
+	int8_t *alias = NULL;
+	
+	if(NULL == buffer || NULL == audioBuffer || NULL == c2Buffer) {
+		self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:ENOMEM userInfo:nil];
+		goto cleanup;
+	}
+	
+	// Iteratively extract the desired sector range
+	NSUInteger sectorsRemaining = self.sectorsRead.length;
+	while(0 < sectorsRemaining) {
+		// Set up the parameters for this read
+		NSUInteger startSector = self.sectorsRead.firstSector + self.sectorsRead.length - sectorsRemaining;
+		NSUInteger sectorCount = MIN(BUFFER_SIZE_IN_SECTORS, sectorsRemaining);
+		MutableSectorRange *readRange = [MutableSectorRange sectorRangeWithFirstSector:startSector sectorCount:sectorCount];
+		
+		// Clamp the read range to the specified session
+		NSUInteger sectorsOfSilenceToPrepend = 0;
+		if(readRange.firstSector < firstPermissibleSector) {
+			sectorsOfSilenceToPrepend = firstPermissibleSector - readRange.firstSector;
+			readRange.firstSector = firstPermissibleSector;
+			sectorCount -= sectorsOfSilenceToPrepend;
 		}
-		lastSectorToRead += readOffsetInSectors;
 		
-		// Store the sectors that will actually be read
-		self.sectorsRead = [[SectorRange alloc] initWithFirstSector:firstSectorToRead lastSector:lastSectorToRead];
-
-		// Determine the last sector that can be legally read (so as not to over-read the lead out)
-		NSUInteger lastPermissibleSector = NSUIntegerMax;
-		if(self.session)
-			lastPermissibleSector = self.session.leadOut - 1;
+		NSUInteger sectorsOfSilenceToAppend = 0;
+		if(readRange.lastSector > lastPermissibleSector) {
+			sectorsOfSilenceToAppend = readRange.lastSector - lastPermissibleSector;
+			readRange.lastSector = lastPermissibleSector;
+			sectorCount -= sectorsOfSilenceToAppend;
+		}
 		
-		// Setup C2 error flag tracking
-		self.errorFlags = [[BitArray alloc] initWithBitCount:self.sectorsRead.length];
+		// Read from the CD media
+		NSUInteger sectorsRead = [drive readAudioAndErrorFlags:buffer sectorRange:readRange];
 		
-		// The extraction buffers
-		__strong int8_t *buffer = NSAllocateCollectable(BUFFER_SIZE_IN_SECTORS * (kCDSectorSizeCDDA + kCDSectorSizeErrorFlags), 0);
-		__strong int8_t *audioBuffer = NSAllocateCollectable(BUFFER_SIZE_IN_SECTORS * kCDSectorSizeCDDA, 0);
-		__strong int8_t *c2Buffer = NSAllocateCollectable(BUFFER_SIZE_IN_SECTORS * kCDSectorSizeErrorFlags, 0);
-		int8_t *alias = NULL;
-		
-		if(NULL == buffer || NULL == audioBuffer || NULL == c2Buffer) {
-			self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:ENOMEM userInfo:nil];
+		// Verify the requested sectors were read
+		if(0 == sectorsRead) {
+			self.error = drive.error;
+			goto cleanup;
+		}
+		else if(sectorsRead != sectorCount) {
+			self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:EIO userInfo:nil];
 			goto cleanup;
 		}
 		
-		// Iteratively extract the desired sector range
-		NSUInteger sectorsRemaining = self.sectorsRead.length;
-		while(0 < sectorsRemaining) {
-			// Set up the parameters for this read
-			NSUInteger startSector = self.sectorsRead.firstSector + self.sectorsRead.length - sectorsRemaining;
-			NSUInteger sectorCount = MIN(BUFFER_SIZE_IN_SECTORS, sectorsRemaining);
-			MutableSectorRange *readRange = [MutableSectorRange sectorRangeWithFirstSector:startSector sectorCount:sectorCount];
-			
-			// Clamp the read range to the specified session
-			NSUInteger sectorsOfSilenceToAppend = 0;
-			if(readRange.lastSector > lastPermissibleSector) {
-				sectorsOfSilenceToAppend = readRange.lastSector - lastPermissibleSector;
-				readRange.lastSector = lastPermissibleSector;
-				sectorCount -= sectorsOfSilenceToAppend;
-			}
-			
-			// Read from the CD media
-			NSUInteger sectorsRead = [drive readAudioAndErrorFlags:buffer sectorRange:readRange];
-			
-			// Verify the requested sectors were read
-			if(0 == sectorsRead) {
-				self.error = drive.error;
-				goto cleanup;
-			}
-			else if(sectorsRead != sectorCount) {
-				self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:EIO userInfo:nil];
-				goto cleanup;
-			}
-			
-			// Append silence as necessary and update the read parameters to reflect these virtual sectors
-			if(sectorsOfSilenceToAppend) {
-				memset(buffer + (sectorsRead * (kCDSectorSizeCDDA + kCDSectorSizeErrorFlags)), 0, sectorsOfSilenceToAppend * (kCDSectorSizeCDDA + kCDSectorSizeErrorFlags));
-				readRange.lastSector = readRange.lastSector + sectorsOfSilenceToAppend;
-				sectorsRead += sectorsOfSilenceToAppend;
-			}
-			
-			// Copy the audio and C2 data to their respective buffers
-			NSUInteger i;
-			for(i = 0; i < sectorsRead; ++i) {
-				alias = buffer + (i * (kCDSectorSizeCDDA + kCDSectorSizeErrorFlags));
-				
-				memcpy(audioBuffer + (i * kCDSectorSizeCDDA), alias, kCDSectorSizeCDDA);
-				memcpy(c2Buffer + (i * kCDSectorSizeErrorFlags), alias + kCDSectorSizeCDDA, kCDSectorSizeErrorFlags);				
-				//memcpy(qBuffer + (i * kCDSectorSizeQSubchannel), alias + kCDSectorSizeCDDA + kCDSectorSizeErrorFlags, kCDSectorSizeQSubchannel);
-			}
-
-			// Store the error flags
-			[self setErrorFlags:c2Buffer forSectorRange:readRange];
-
-			NSData *audioData = nil;
-			
-			// Adjust the data read for the read offset
-			if(readRange.firstSector == self.sectorsRead.firstSector)
-				audioData = [NSData dataWithBytesNoCopy:(audioBuffer + readOffsetInBytes)
-												 length:((kCDSectorSizeCDDA * sectorsRead) - readOffsetInBytes)
-										   freeWhenDone:NO];
-			else if(readRange.lastSector == self.sectorsRead.lastSector)
-				audioData = [NSData dataWithBytesNoCopy:audioBuffer
-												 length:((kCDSectorSizeCDDA * (sectorsRead - readOffsetInSectors)) + readOffsetInBytes)
-										   freeWhenDone:NO];
-			else
-				audioData = [NSData dataWithBytesNoCopy:audioBuffer 
-												 length:(kCDSectorSizeCDDA * sectorsRead) 
-										   freeWhenDone:NO];
-			
-			// Write the data to the output file
-			[fileHandle writeData:audioData];
-			
-			// Update the MD5 digest
-			md5_append(&md5, audioData.bytes, audioData.length);
-			
-			// Housekeeping
-			sectorsRemaining -= sectorsRead;
-			
-			// Stop if requested
-			if(self.isCancelled)
-				goto cleanup;
+		// Append silence as necessary and update the read parameters to reflect these virtual sectors
+		if(sectorsOfSilenceToPrepend) {
+			// First slide the data that was read over to make room for the silence
+			memmove(buffer + (sectorsOfSilenceToPrepend * (kCDSectorSizeCDDA + kCDSectorSizeErrorFlags)), buffer, sectorsRead * (kCDSectorSizeCDDA + kCDSectorSizeErrorFlags));
+			memset(buffer, 0, sectorsOfSilenceToPrepend * (kCDSectorSizeCDDA + kCDSectorSizeErrorFlags));
+			readRange.firstSector = readRange.firstSector - sectorsOfSilenceToPrepend;
+			sectorsRead += sectorsOfSilenceToPrepend;
 		}
-	}
-	// ========================================
-	// Handle negative read offsets
-	else {
-//		NSInteger readOffsetInSectors = (readOffsetInFrames - 587) / 588;		
-		NSLog(@"Negative read offset of %i frames", readOffsetInFrames);
+
+		// Append silence as necessary and update the read parameters to reflect these virtual sectors
+		if(sectorsOfSilenceToAppend) {
+			memset(buffer + (sectorsRead * (kCDSectorSizeCDDA + kCDSectorSizeErrorFlags)), 0, sectorsOfSilenceToAppend * (kCDSectorSizeCDDA + kCDSectorSizeErrorFlags));
+			readRange.lastSector = readRange.lastSector + sectorsOfSilenceToAppend;
+			sectorsRead += sectorsOfSilenceToAppend;
+		}
+		
+		// Copy the audio and C2 data to their respective buffers
+		NSUInteger i;
+		for(i = 0; i < sectorsRead; ++i) {
+			alias = buffer + (i * (kCDSectorSizeCDDA + kCDSectorSizeErrorFlags));
+			
+			memcpy(audioBuffer + (i * kCDSectorSizeCDDA), alias, kCDSectorSizeCDDA);
+			memcpy(c2Buffer + (i * kCDSectorSizeErrorFlags), alias + kCDSectorSizeCDDA, kCDSectorSizeErrorFlags);				
+			//memcpy(qBuffer + (i * kCDSectorSizeQSubchannel), alias + kCDSectorSizeCDDA + kCDSectorSizeErrorFlags, kCDSectorSizeQSubchannel);
+		}
+
+		// Store the error flags
+		[self setErrorFlags:c2Buffer forSectorRange:readRange];
+
+		NSData *audioData = nil;
+		
+		// Adjust the data read for the read offset
+		if(readRange.firstSector == self.sectorsRead.firstSector)
+			audioData = [NSData dataWithBytesNoCopy:(audioBuffer + readOffsetInBytes)
+											 length:((kCDSectorSizeCDDA * sectorsRead) - readOffsetInBytes)
+									   freeWhenDone:NO];
+		else if(readRange.lastSector == self.sectorsRead.lastSector)
+			audioData = [NSData dataWithBytesNoCopy:audioBuffer
+											 length:((kCDSectorSizeCDDA * (sectorsRead - readOffsetInSectors)) + readOffsetInBytes)
+									   freeWhenDone:NO];
+		else
+			audioData = [NSData dataWithBytesNoCopy:audioBuffer 
+											 length:(kCDSectorSizeCDDA * sectorsRead) 
+									   freeWhenDone:NO];
+		
+		// Write the data to the output file
+		[fileHandle writeData:audioData];
+		
+		// Update the MD5 digest
+		md5_append(&md5, audioData.bytes, audioData.length);
+		
+		// Housekeeping
+		sectorsRemaining -= sectorsRead;
+		
+		// Stop if requested
+		if(self.isCancelled)
+			goto cleanup;
 	}
 	
 	// Complete the MD5 calculation and store the result
