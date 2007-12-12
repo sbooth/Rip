@@ -81,8 +81,8 @@
 	md5_init(&md5);
 
 	// With no read offset, the range of sectors that will be extracted won't change
-	NSUInteger firstSectorToRead = self.sectors.firstSector;
-	NSUInteger lastSectorToRead = self.sectors.lastSector;
+	NSInteger firstSectorToRead = self.sectors.firstSector;
+	NSInteger lastSectorToRead = self.sectors.lastSector;
 
 	// Handle the read offset, if specified
 	NSInteger readOffsetInFrames = 0;
@@ -92,15 +92,10 @@
 	// Negative read offsets can easily be transformed into positive read offsets
 	// For example, suppose the desired range is sectors 10 through 20 and the read offset is -600 frames.
 	// This is equivalent to requesting sectors 8 - 18 with a read offset of 576 frames
-	if(0 > readOffsetInFrames) {
-		NSUInteger numberOfSectorsToOffset = 0;
-		do {
-			readOffsetInFrames += 588;
-			++numberOfSectorsToOffset;
-		} while(0 > readOffsetInFrames);
-
-		firstSectorToRead -= numberOfSectorsToOffset;
-		lastSectorToRead -= numberOfSectorsToOffset;
+	while(0 > readOffsetInFrames) {
+		readOffsetInFrames += 588;
+		--firstSectorToRead;
+		--lastSectorToRead;
 	}
 
 	// readOffsetInSectors is the additional number of sectors that must be extracted (at the end) to ensure a 
