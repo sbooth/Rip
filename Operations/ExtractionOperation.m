@@ -13,9 +13,36 @@
 #include "md5.h"
 
 #include <IOKit/storage/IOCDTypes.h>
+#include <AudioToolbox/AudioFile.h>
+
+// Useful macros
+#define FRAMES_PER_SECTOR 588u
 
 // Keep reads to approximately 2 MB in size (2352 + 294 bytes are necessary for each sector)
 #define BUFFER_SIZE_IN_SECTORS 775u
+
+// ========================================
+// Create an AudioStreamBasicDescription that describes CDDA audio
+// ========================================
+static AudioStreamBasicDescription
+getStreamDescriptionForCDDA()
+{
+	AudioStreamBasicDescription cddaASBD;
+	
+	cddaASBD.mFormatID = kAudioFormatLinearPCM;
+	cddaASBD.mFormatFlags = kAudioFormatFlagIsSignedInteger | kAudioFormatFlagIsPacked;
+	cddaASBD.mReserved = 0;
+	
+	cddaASBD.mSampleRate = 44100;
+	cddaASBD.mChannelsPerFrame = 2;
+	cddaASBD.mBitsPerChannel = 16;
+	
+	cddaASBD.mBytesPerFrame = cddaASBD.mChannelsPerFrame * (cddaASBD.mBitsPerChannel / 8);
+	cddaASBD.mFramesPerPacket = 1;
+	cddaASBD.mBytesPerPacket = cddaASBD.mBytesPerFrame * cddaASBD.mFramesPerPacket;
+	
+	return cddaASBD;
+}
 
 @interface ExtractionOperation ()
 @property (copy) SectorRange * sectorsRead;
@@ -56,23 +83,21 @@
 	NSAssert(nil != self.sectors, @"self.sectors may not be nil");
 	NSAssert(nil != self.path, @"self.path may not be nil");
 
-	// Create the output file if it doesn't exists
-	if(![[NSFileManager defaultManager] fileExistsAtPath:self.path] && ![[NSFileManager defaultManager] createFileAtPath:self.path contents:nil attributes:nil]) {
-		self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:ENOENT userInfo:nil];
-		return;
-	}
-	
+	// Open the CD media for reading
 	Drive *drive = [[Drive alloc] initWithDADiskRef:self.disk];
-	NSFileHandle *fileHandle = [NSFileHandle fileHandleForWritingAtPath:self.path];
-	
-	if(nil == fileHandle) {
-		self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:ENOENT userInfo:nil];
+	if(![drive openDevice]) {
+		self.error = drive.error;
 		return;
 	}
 
-	// Open the CD media for reading
-	if(![drive openDevice]) {
-		self.error = drive.error;
+	// Set up the ASBD for CDDA audio
+	const AudioStreamBasicDescription cddaASBD = getStreamDescriptionForCDDA();
+	
+	// Create and open the output file, overwriting if it exists
+	AudioFileID file = NULL;
+	OSStatus status = AudioFileCreateWithURL((CFURLRef)[NSURL fileURLWithPath:self.path], kAudioFileWAVEType, &cddaASBD, kAudioFileFlags_EraseFile, &file);
+	if(noErr != status) {
+		self.error = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
 		return;
 	}
 
@@ -93,7 +118,7 @@
 	// For example, suppose the desired range is sectors 10 through 20 and the read offset is -600 frames.
 	// This is equivalent to requesting sectors 8 - 18 with a read offset of 576 frames
 	while(0 > readOffsetInFrames) {
-		readOffsetInFrames += 588;
+		readOffsetInFrames += FRAMES_PER_SECTOR;
 		--firstSectorToRead;
 		--lastSectorToRead;
 	}
@@ -104,7 +129,7 @@
 	// For example, suppose the desired range is sectors 1 through 10 and the read offset is 600 frames.
 	// In this case readOffsetInSectors will be 2, and the actual read should be from sectors 1 through 12, with the 
 	// first 12 frames of sector 1 skipped and the last 12 frames of sector 12 skipped.
-	NSUInteger readOffsetInSectors = (readOffsetInFrames +  587) / 588;
+	NSUInteger readOffsetInSectors = (readOffsetInFrames +  (FRAMES_PER_SECTOR - 1)) / FRAMES_PER_SECTOR;
 	NSUInteger readOffsetInBytes = 2 * sizeof(int16_t) * readOffsetInFrames;
 	
 	// Adjust the sectors for the read offset
@@ -117,7 +142,7 @@
 	}
 	
 	lastSectorToRead += readOffsetInSectors;
-	
+
 	// Store the sectors that will actually be read
 	self.sectorsRead = [[SectorRange alloc] initWithFirstSector:firstSectorToRead lastSector:lastSectorToRead];
 
@@ -145,6 +170,9 @@
 		goto cleanup;
 	}
 	
+	// The current byte offset into the file for writing
+	SInt64 byteOffset = 0;
+	
 	// Iteratively extract the desired sector range
 	NSUInteger sectorsRemaining = self.sectorsRead.length;
 	while(0 < sectorsRemaining) {
@@ -152,7 +180,7 @@
 		NSUInteger startSector = self.sectorsRead.firstSector + self.sectorsRead.length - sectorsRemaining;
 		NSUInteger sectorCount = MIN(BUFFER_SIZE_IN_SECTORS, sectorsRemaining);
 		MutableSectorRange *readRange = [MutableSectorRange sectorRangeWithFirstSector:startSector sectorCount:sectorCount];
-		
+
 		// Clamp the read range to the specified session
 		NSUInteger sectorsOfSilenceToPrepend = 0;
 		if(readRange.firstSector < firstPermissibleSector) {
@@ -225,15 +253,25 @@
 			audioData = [NSData dataWithBytesNoCopy:audioBuffer 
 											 length:(kCDSectorSizeCDDA * sectorsRead) 
 									   freeWhenDone:NO];
-		
+
 		// Write the data to the output file
-		[fileHandle writeData:audioData];
+		UInt32 byteCount = audioData.length;
+		status = AudioFileWriteBytes(file, NO, byteOffset, &byteCount, audioData.bytes);
+		if(noErr != status) {
+			self.error = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
+			goto cleanup;
+		}
+		else if(byteCount != audioData.length) {
+			self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:EIO userInfo:nil];
+			goto cleanup;
+		}
 		
 		// Update the MD5 digest
 		md5_append(&md5, audioData.bytes, audioData.length);
 		
 		// Housekeeping
 		sectorsRemaining -= sectorsRead;
+		byteOffset += audioData.length;
 		
 		// Stop if requested
 		if(self.isCancelled)
@@ -250,6 +288,11 @@ cleanup:
 	// Close the device
 	if(![drive closeDevice])
 		self.error = drive.error;
+	
+	// Close the output file
+	status = AudioFileClose(file);
+	if(noErr != status)
+		self.error = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
 }
 
 @end
