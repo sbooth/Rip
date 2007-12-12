@@ -18,7 +18,7 @@
 @end
 
 @interface AccurateRipDisc (Private)
-- (void) calculateDiscIDsAndPerformAccurateRipRequest;
+- (void) calculateDiscIDs;
 - (void) parseAccurateRipResponse;
 @end
 
@@ -38,7 +38,7 @@
 	
 	if((self = [super init])) {
 		self.compactDisc = compactDisc;
-		[self calculateDiscIDsAndPerformAccurateRipRequest];
+		[self calculateDiscIDs];
 	}
 	return self;
 }
@@ -53,6 +53,45 @@
 	copy.accurateRipID2 = self.accurateRipID2;
 	
 	return copy;
+}
+
+- (IBAction) performAccurateRipQuery:(id)sender
+{
+	
+#pragma unused(sender)
+	
+	NSUInteger discID1 = self.accurateRipID1;
+	NSUInteger discID2 = self.accurateRipID2;
+	
+	// Use the first session
+	NSArray *sessionTracks = [self.compactDisc tracksForSession:1];
+
+	// Build the URL
+	NSURL *accurateRipURL = [NSURL URLWithString:[NSString stringWithFormat:@"http://www.accuraterip.com/accuraterip/%.1x/%.1x/%.1x/dBAR-%.3d-%.8x-%.8x-%.8x.bin",
+												  discID1 & 0x0F,
+												  (discID1 >> 4) & 0x0F,
+												  (discID1 >> 8) & 0x0F,
+												  sessionTracks.count,
+												  discID1,
+												  discID2,
+												  self.compactDisc.freeDBID]];
+	
+	// Create a request for the URL with a 1 minute timeout
+	NSURLRequest *request = [NSURLRequest requestWithURL:accurateRipURL
+											 cachePolicy:NSURLRequestUseProtocolCachePolicy
+										 timeoutInterval:60.0];
+	
+	if(self.connection)
+		[self.connection cancel];
+	
+	// Create the connection with the request and start loading the data
+	self.connection = [NSURLConnection connectionWithRequest:request delegate:self];
+	if(self.connection)
+		self.responseData = [[NSMutableData alloc] init];
+	else {
+		// inform the user that the download could not be made
+		NSLog(@"Unable to establish connection to %@", accurateRipURL);
+	}		
 }
 
 - (AccurateRipTrack *) trackNumber:(NSUInteger)trackNumber
@@ -126,7 +165,7 @@
 
 @implementation AccurateRipDisc (Private)
 
-- (void) calculateDiscIDsAndPerformAccurateRipRequest
+- (void) calculateDiscIDs
 {
 	// Calculate the disc IDs used by Accurate Rip
 	// ID 1 is the sum of all the disc's offsets
@@ -150,31 +189,7 @@
 	
 	// Save the disc IDs for later
 	self.accurateRipID1 = discID1;
-	self.accurateRipID2 = discID2;
-	
-	// Build the URL
-	NSURL *accurateRipURL = [NSURL URLWithString:[NSString stringWithFormat:@"http://www.accuraterip.com/accuraterip/%.1x/%.1x/%.1x/dBAR-%.3d-%.8x-%.8x-%.8x.bin",
-												  discID1 & 0x0F,
-												  (discID1 >> 4) & 0x0F,
-												  (discID1 >> 8) & 0x0F,
-												  sessionTracks.count,
-												  discID1,
-												  discID2,
-												  self.compactDisc.freeDBID]];
-	
-	// Create a request for the URL with a 1 minute timeout
-	NSURLRequest *request = [NSURLRequest requestWithURL:accurateRipURL
-											 cachePolicy:NSURLRequestUseProtocolCachePolicy
-										 timeoutInterval:60.0];
-	
-	// Create the connection with the request and start loading the data
-	self.connection = [NSURLConnection connectionWithRequest:request delegate:self];
-	if(self.connection)
-		self.responseData = [[NSMutableData alloc] init];
-	else {
-		// inform the user that the download could not be made
-		NSLog(@"Unable to establish connection to %@", accurateRipURL);
-	}		
+	self.accurateRipID2 = discID2;	
 }
 
 - (void) parseAccurateRipResponse

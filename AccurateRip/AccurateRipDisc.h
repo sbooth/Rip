@@ -33,6 +33,8 @@
 
 - (id) initWithCompactDisc:(CompactDisc *)compactDisc;
 
+- (IBAction) performAccurateRipQuery:(id)sender;
+
 - (AccurateRipTrack *) trackNumber:(NSUInteger)trackNumber;
 
 @end
