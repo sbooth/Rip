@@ -11,6 +11,7 @@
 @interface AccurateRipDisc ()
 @property (assign) CompactDisc * compactDisc;
 @property (assign) BOOL discFound;
+@property (copy) NSError * error;
 @property (assign) NSUInteger accurateRipID1;
 @property (assign) NSUInteger accurateRipID2;
 @property (assign) NSURLConnection * connection;
@@ -26,6 +27,7 @@
 
 @synthesize compactDisc = _compactDisc;
 @synthesize discFound = _discFound;
+@synthesize error = _error;
 @synthesize accurateRipID1 = _accurateRipID1;
 @synthesize accurateRipID2 = _accurateRipID2;
 @synthesize tracks = _tracks;
@@ -84,13 +86,19 @@
 	if(self.connection)
 		[self.connection cancel];
 	
+	self.error = nil;
+	self.responseData = nil;
+	
 	// Create the connection with the request and start loading the data
 	self.connection = [NSURLConnection connectionWithRequest:request delegate:self];
 	if(self.connection)
 		self.responseData = [[NSMutableData alloc] init];
 	else {
-		// inform the user that the download could not be made
+#if DEBUG
 		NSLog(@"Unable to establish connection to %@", accurateRipURL);
+#endif
+		
+		self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:ENOMEM userInfo:nil];
 	}		
 }
 
@@ -147,8 +155,11 @@
 	self.connection = nil;
 	self.responseData = nil;
 
-	// inform the user
-	NSLog(@"Connection failed! Error - %@ %@", [error localizedDescription], [[error userInfo] objectForKey:NSErrorFailingURLStringKey]);
+#if DEBUG
+	NSLog(@"Connection to AccurateRip failed: %@ %@", [error localizedDescription], [[error userInfo] objectForKey:NSErrorFailingURLStringKey]);
+#endif
+	
+	self.error = error;	
 }
 
 - (void) connectionDidFinishLoading:(NSURLConnection *)connection

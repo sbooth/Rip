@@ -21,12 +21,14 @@
 	
 	NSURLConnection *_connection;
 	NSMutableData *_responseData;
+	NSError *_error;
 	
 	BOOL _discFound;
 }
 
 @property (readonly, assign) CompactDisc * compactDisc;
 @property (readonly, assign) BOOL discFound;
+@property (readonly, copy) NSError * error;
 @property (readonly, assign) NSUInteger accurateRipID1;
 @property (readonly, assign) NSUInteger accurateRipID2;
 @property (readonly) NSArray * tracks;
