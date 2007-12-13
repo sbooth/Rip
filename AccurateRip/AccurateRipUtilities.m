@@ -3,41 +3,11 @@
  *  All Rights Reserved
  */
 
-#include "AccurateRipUtilities.h"
+#import "AccurateRipUtilities.h"
+#import "CDDAUtilities.h"
 
 #include <AudioToolbox/ExtendedAudioFile.h>
 #include <IOKit/storage/IOCDTypes.h>
-
-// A block of CDDA audio consists of 2352 bytes and contains 588 frames of 16-bit 2  (!! or 4) channel audio
-#define FRAMES_PER_SECTOR	588u
-#define BYTES_PER_SAMPLE	(16 / 8)
-#define FRAMES_PER_BLOCK	(kCDSectorSizeCDDA / (2 * BYTES_PER_SAMPLE))
-
-// ========================================
-// Verify an AudioStreamBasicDescription describes CDDA audio
-// ========================================
-static BOOL
-streamDescriptionIsCDDA(const AudioStreamBasicDescription *asbd)
-{
-	NSCParameterAssert(NULL != asbd);
-	
-	if(kAudioFormatLinearPCM != asbd->mFormatID)
-		return NO;
-
-	if(!(kAudioFormatFlagIsSignedInteger & asbd->mFormatFlags) || !((kAudioFormatFlagIsPacked & asbd->mFormatFlags)))
-		return NO;
-	
-	if(44100 != asbd->mSampleRate)
-		return NO;
-
-	if(2 != asbd->mChannelsPerFrame)
-		return NO;
-	
-	if(16 != asbd->mBitsPerChannel)
-		return NO;
-	
-	return YES;
-}
 
 // ========================================
 // Calculate and AccurateRip CRC for the file at path (must be raw 16-bit little-endian signed PCM)
@@ -73,7 +43,7 @@ calculateAccurateRipCRCForFile(NSString *path, BOOL firstTrack, BOOL lastTrack)
 		goto cleanup;
 	
 	// Convert the number of frames to the number of blocks (CDDA sectors)
-	NSUInteger totalBlocks = (NSUInteger)(totalFrames / FRAMES_PER_BLOCK);
+	NSUInteger totalBlocks = (NSUInteger)(totalFrames / AUDIO_FRAMES_PER_CDDA_SECTOR);
 	NSUInteger blockNumber = 0;
 
 	// Set up extraction buffers
@@ -87,12 +57,12 @@ calculateAccurateRipCRCForFile(NSString *path, BOOL firstTrack, BOOL lastTrack)
 	for(;;) {
 		bufferList.mBuffers[0].mDataByteSize = kCDSectorSizeCDDA;
 		
-		UInt32 frameCount = FRAMES_PER_SECTOR;
+		UInt32 frameCount = AUDIO_FRAMES_PER_CDDA_SECTOR;
 		status = ExtAudioFileRead(file, &frameCount, &bufferList);
 		
 		if(noErr != status)
 			break;
-		else if(FRAMES_PER_SECTOR != frameCount)
+		else if(AUDIO_FRAMES_PER_CDDA_SECTOR != frameCount)
 			break;
 		
 		crc += calculateAccurateRipCRCForBlock(buffer, blockNumber++, totalBlocks, firstTrack, lastTrack);

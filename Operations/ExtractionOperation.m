@@ -9,40 +9,15 @@
 #import "SessionDescriptor.h"
 #import "BitArray.h"
 #import "Drive.h"
+#import "CDDAUtilities.h"
 
 #include "md5.h"
 
 #include <IOKit/storage/IOCDTypes.h>
-#include <AudioToolbox/AudioFile.h>
-
-// Useful macros
-#define FRAMES_PER_SECTOR 588u
+#include <AudioToolbox/ExtendedAudioFile.h>
 
 // Keep reads to approximately 2 MB in size (2352 + 294 bytes are necessary for each sector)
 #define BUFFER_SIZE_IN_SECTORS 775u
-
-// ========================================
-// Create an AudioStreamBasicDescription that describes CDDA audio
-// ========================================
-static AudioStreamBasicDescription
-getStreamDescriptionForCDDA()
-{
-	AudioStreamBasicDescription cddaASBD;
-	
-	cddaASBD.mFormatID = kAudioFormatLinearPCM;
-	cddaASBD.mFormatFlags = kAudioFormatFlagIsSignedInteger | kAudioFormatFlagIsPacked;
-	cddaASBD.mReserved = 0;
-	
-	cddaASBD.mSampleRate = 44100;
-	cddaASBD.mChannelsPerFrame = 2;
-	cddaASBD.mBitsPerChannel = 16;
-	
-	cddaASBD.mBytesPerFrame = cddaASBD.mChannelsPerFrame * (cddaASBD.mBitsPerChannel / 8);
-	cddaASBD.mFramesPerPacket = 1;
-	cddaASBD.mBytesPerPacket = cddaASBD.mBytesPerFrame * cddaASBD.mFramesPerPacket;
-	
-	return cddaASBD;
-}
 
 @interface ExtractionOperation ()
 @property (copy) SectorRange * sectorsRead;
@@ -94,8 +69,8 @@ getStreamDescriptionForCDDA()
 	const AudioStreamBasicDescription cddaASBD = getStreamDescriptionForCDDA();
 	
 	// Create and open the output file, overwriting if it exists
-	AudioFileID file = NULL;
-	OSStatus status = AudioFileCreateWithURL((CFURLRef)[NSURL fileURLWithPath:self.path], kAudioFileWAVEType, &cddaASBD, kAudioFileFlags_EraseFile, &file);
+	ExtAudioFileRef file = NULL;
+	OSStatus status = ExtAudioFileCreateWithURL((CFURLRef)[NSURL fileURLWithPath:self.path], kAudioFileWAVEType, &cddaASBD, NULL, kAudioFileFlags_EraseFile, &file);
 	if(noErr != status) {
 		self.error = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
 		return;
@@ -118,7 +93,7 @@ getStreamDescriptionForCDDA()
 	// For example, suppose the desired range is sectors 10 through 20 and the read offset is -600 frames.
 	// This is equivalent to requesting sectors 8 - 18 with a read offset of 576 frames
 	while(0 > readOffsetInFrames) {
-		readOffsetInFrames += FRAMES_PER_SECTOR;
+		readOffsetInFrames += AUDIO_FRAMES_PER_CDDA_SECTOR;
 		--firstSectorToRead;
 		--lastSectorToRead;
 	}
@@ -129,7 +104,7 @@ getStreamDescriptionForCDDA()
 	// For example, suppose the desired range is sectors 1 through 10 and the read offset is 600 frames.
 	// In this case readOffsetInSectors will be 2, and the actual read should be from sectors 1 through 12, with the 
 	// first 12 frames of sector 1 skipped and the last 12 frames of sector 12 skipped.
-	NSUInteger readOffsetInSectors = (readOffsetInFrames +  (FRAMES_PER_SECTOR - 1)) / FRAMES_PER_SECTOR;
+	NSUInteger readOffsetInSectors = (readOffsetInFrames +  (AUDIO_FRAMES_PER_CDDA_SECTOR - 1)) / AUDIO_FRAMES_PER_CDDA_SECTOR;
 	NSUInteger readOffsetInBytes = 2 * sizeof(int16_t) * readOffsetInFrames;
 	
 	// Adjust the sectors for the read offset
@@ -169,9 +144,6 @@ getStreamDescriptionForCDDA()
 		self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:ENOMEM userInfo:nil];
 		goto cleanup;
 	}
-	
-	// The current byte offset into the file for writing
-	SInt64 byteOffset = 0;
 	
 	// Iteratively extract the desired sector range
 	NSUInteger sectorsRemaining = self.sectorsRead.length;
@@ -254,15 +226,17 @@ getStreamDescriptionForCDDA()
 											 length:(kCDSectorSizeCDDA * sectorsRead) 
 									   freeWhenDone:NO];
 
+		// Stuff the data in an AudioBufferList
+		AudioBufferList audioBuffer;
+		audioBuffer.mNumberBuffers = 1;
+		audioBuffer.mBuffers[0].mNumberChannels = cddaASBD.mChannelsPerFrame;
+		audioBuffer.mBuffers[0].mData = (void *)audioData.bytes;
+		audioBuffer.mBuffers[0].mDataByteSize = audioData.length;
+		
 		// Write the data to the output file
-		UInt32 byteCount = audioData.length;
-		status = AudioFileWriteBytes(file, NO, byteOffset, &byteCount, audioData.bytes);
+		status = ExtAudioFileWrite(file, (audioData.length / cddaASBD.mBytesPerFrame), &audioBuffer);
 		if(noErr != status) {
 			self.error = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
-			goto cleanup;
-		}
-		else if(byteCount != audioData.length) {
-			self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:EIO userInfo:nil];
 			goto cleanup;
 		}
 		
@@ -271,7 +245,6 @@ getStreamDescriptionForCDDA()
 		
 		// Housekeeping
 		sectorsRemaining -= sectorsRead;
-		byteOffset += audioData.length;
 		
 		// Stop if requested
 		if(self.isCancelled)
@@ -290,7 +263,7 @@ cleanup:
 		self.error = drive.error;
 	
 	// Close the output file
-	status = AudioFileClose(file);
+	status = ExtAudioFileDispose(file);
 	if(noErr != status)
 		self.error = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
 }
