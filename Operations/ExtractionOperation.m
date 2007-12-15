@@ -58,6 +58,9 @@
 	NSAssert(nil != self.sectors, @"self.sectors may not be nil");
 	NSAssert(nil != self.path, @"self.path may not be nil");
 
+	// ========================================
+	// GENERAL SETUP
+
 	// Open the CD media for reading
 	Drive *drive = [[Drive alloc] initWithDADiskRef:self.disk];
 	if(![drive openDevice]) {
@@ -73,13 +76,27 @@
 	OSStatus status = ExtAudioFileCreateWithURL((CFURLRef)[NSURL fileURLWithPath:self.path], kAudioFileWAVEType, &cddaASBD, NULL, kAudioFileFlags_EraseFile, &file);
 	if(noErr != status) {
 		self.error = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
-		return;
+		goto cleanup;
 	}
 
+	// Allocate the extraction buffers
+	__strong int8_t *buffer = NSAllocateCollectable(BUFFER_SIZE_IN_SECTORS * (kCDSectorSizeCDDA + kCDSectorSizeErrorFlags), 0);
+	__strong int8_t *audioBuffer = NSAllocateCollectable(BUFFER_SIZE_IN_SECTORS * kCDSectorSizeCDDA, 0);
+	__strong int8_t *c2Buffer = NSAllocateCollectable(BUFFER_SIZE_IN_SECTORS * kCDSectorSizeErrorFlags, 0);
+	int8_t *alias = NULL;
+	
+	if(NULL == buffer || NULL == audioBuffer || NULL == c2Buffer) {
+		self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:ENOMEM userInfo:nil];
+		goto cleanup;
+	}
+	
 	// Initialize the MD5
 	md5_state_t md5;
 	md5_init(&md5);
 
+	// ========================================
+	// SETUP FOR READ OFFSET HANDLING
+	
 	// With no read offset, the range of sectors that will be extracted won't change
 	NSInteger firstSectorToRead = self.sectors.firstSector;
 	NSInteger lastSectorToRead = self.sectors.lastSector;
@@ -118,33 +135,67 @@
 	
 	lastSectorToRead += readOffsetInSectors;
 
-	// Store the sectors that will actually be read
-	self.sectorsRead = [[SectorRange alloc] initWithFirstSector:firstSectorToRead lastSector:lastSectorToRead];
-
 	// Determine the first sector that can be legally read (so as not to over-read the lead in)
-	NSUInteger firstPermissibleSector = 0;
+	NSInteger firstPermissibleSector = 0;
 	if(self.session)
 		firstPermissibleSector = 0;
 	
 	// Determine the last sector that can be legally read (so as not to over-read the lead out)
-	NSUInteger lastPermissibleSector = NSUIntegerMax;
+	NSInteger lastPermissibleSector = NSUIntegerMax;
 	if(self.session)
 		lastPermissibleSector = self.session.leadOut - 1;
+	
+	// Clamp the read range to the specified sector limititations
+	NSUInteger sectorsOfSilenceToPrepend = 0;
+	if(firstSectorToRead < firstPermissibleSector) {
+		sectorsOfSilenceToPrepend = firstPermissibleSector - firstSectorToRead;
+		firstSectorToRead = firstPermissibleSector;
+	}
+	
+	NSUInteger sectorsOfSilenceToAppend = 0;
+	if(lastSectorToRead > lastPermissibleSector) {
+		sectorsOfSilenceToAppend = lastSectorToRead - lastPermissibleSector;
+		lastSectorToRead = lastPermissibleSector;
+	}
+
+	// Store the sectors that will actually be read
+	self.sectorsRead = [[SectorRange alloc] initWithFirstSector:firstSectorToRead lastSector:lastSectorToRead];
 	
 	// Setup C2 error flag tracking
 	self.errorFlags = [[BitArray alloc] initWithBitCount:self.sectorsRead.length];
 	
-	// The extraction buffers
-	__strong int8_t *buffer = NSAllocateCollectable(BUFFER_SIZE_IN_SECTORS * (kCDSectorSizeCDDA + kCDSectorSizeErrorFlags), 0);
-	__strong int8_t *audioBuffer = NSAllocateCollectable(BUFFER_SIZE_IN_SECTORS * kCDSectorSizeCDDA, 0);
-	__strong int8_t *c2Buffer = NSAllocateCollectable(BUFFER_SIZE_IN_SECTORS * kCDSectorSizeErrorFlags, 0);
-	int8_t *alias = NULL;
+	// ========================================
+	// EXTRACTION PHASE 1: PREPEND SILENCE AS NECESSARY
 	
-	if(NULL == buffer || NULL == audioBuffer || NULL == c2Buffer) {
-		self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:ENOMEM userInfo:nil];
-		goto cleanup;
+	// Prepend silence, adjusted for the read offset, if required
+	if(sectorsOfSilenceToPrepend) {
+		memset(buffer, 0, sectorsOfSilenceToPrepend * kCDSectorSizeCDDA);
+
+		NSData *audioData = [NSData dataWithBytesNoCopy:(buffer + readOffsetInBytes)
+												 length:((kCDSectorSizeCDDA * sectorsOfSilenceToPrepend) - readOffsetInBytes)
+										   freeWhenDone:NO];
+
+		// Stuff the silence in an AudioBufferList
+		AudioBufferList audioBuffer;
+		audioBuffer.mNumberBuffers = 1;
+		audioBuffer.mBuffers[0].mNumberChannels = cddaASBD.mChannelsPerFrame;
+		audioBuffer.mBuffers[0].mData = (void *)audioData.bytes;
+		audioBuffer.mBuffers[0].mDataByteSize = audioData.length;
+		
+		// Write the silence to the output file
+		status = ExtAudioFileWrite(file, (audioData.length / cddaASBD.mBytesPerFrame), &audioBuffer);
+		if(noErr != status) {
+			self.error = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
+			goto cleanup;
+		}
+
+		// Update the MD5 digest
+		md5_append(&md5, audioData.bytes, audioData.length);
 	}
 	
+	// ========================================
+	// EXTRACTION PHASE 2: ITERATIVE READS FROM CD MEDIA
+
 	// Iteratively extract the desired sector range
 	NSUInteger sectorsRemaining = self.sectorsRead.length;
 	while(0 < sectorsRemaining) {
@@ -153,21 +204,6 @@
 		NSUInteger sectorCount = MIN(BUFFER_SIZE_IN_SECTORS, sectorsRemaining);
 		MutableSectorRange *readRange = [MutableSectorRange sectorRangeWithFirstSector:startSector sectorCount:sectorCount];
 
-		// Clamp the read range to the specified session
-		NSUInteger sectorsOfSilenceToPrepend = 0;
-		if(readRange.firstSector < firstPermissibleSector) {
-			sectorsOfSilenceToPrepend = firstPermissibleSector - readRange.firstSector;
-			readRange.firstSector = firstPermissibleSector;
-			sectorCount -= sectorsOfSilenceToPrepend;
-		}
-		
-		NSUInteger sectorsOfSilenceToAppend = 0;
-		if(readRange.lastSector > lastPermissibleSector) {
-			sectorsOfSilenceToAppend = readRange.lastSector - lastPermissibleSector;
-			readRange.lastSector = lastPermissibleSector;
-			sectorCount -= sectorsOfSilenceToAppend;
-		}
-		
 		// Read from the CD media
 		NSUInteger sectorsRead = [drive readAudioAndErrorFlags:buffer sectorRange:readRange];
 		
@@ -179,22 +215,6 @@
 		else if(sectorsRead != sectorCount) {
 			self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:EIO userInfo:nil];
 			goto cleanup;
-		}
-		
-		// Append silence as necessary and update the read parameters to reflect these virtual sectors
-		if(sectorsOfSilenceToPrepend) {
-			// First slide the data that was read over to make room for the silence
-			memmove(buffer + (sectorsOfSilenceToPrepend * (kCDSectorSizeCDDA + kCDSectorSizeErrorFlags)), buffer, sectorsRead * (kCDSectorSizeCDDA + kCDSectorSizeErrorFlags));
-			memset(buffer, 0, sectorsOfSilenceToPrepend * (kCDSectorSizeCDDA + kCDSectorSizeErrorFlags));
-			readRange.firstSector = readRange.firstSector - sectorsOfSilenceToPrepend;
-			sectorsRead += sectorsOfSilenceToPrepend;
-		}
-
-		// Append silence as necessary and update the read parameters to reflect these virtual sectors
-		if(sectorsOfSilenceToAppend) {
-			memset(buffer + (sectorsRead * (kCDSectorSizeCDDA + kCDSectorSizeErrorFlags)), 0, sectorsOfSilenceToAppend * (kCDSectorSizeCDDA + kCDSectorSizeErrorFlags));
-			readRange.lastSector = readRange.lastSector + sectorsOfSilenceToAppend;
-			sectorsRead += sectorsOfSilenceToAppend;
 		}
 		
 		// Copy the audio and C2 data to their respective buffers
@@ -213,11 +233,12 @@
 		NSData *audioData = nil;
 		
 		// Adjust the data read for the read offset
-		if(readRange.firstSector == self.sectorsRead.firstSector)
+		// If sectors of silence were prepended or will be appended, the read offset is taken into account there
+		if(!sectorsOfSilenceToPrepend && readRange.firstSector == self.sectorsRead.firstSector)
 			audioData = [NSData dataWithBytesNoCopy:(audioBuffer + readOffsetInBytes)
 											 length:((kCDSectorSizeCDDA * sectorsRead) - readOffsetInBytes)
 									   freeWhenDone:NO];
-		else if(readRange.lastSector == self.sectorsRead.lastSector)
+		else if(!sectorsOfSilenceToAppend && readRange.lastSector == self.sectorsRead.lastSector)
 			audioData = [NSData dataWithBytesNoCopy:audioBuffer
 											 length:((kCDSectorSizeCDDA * (sectorsRead - readOffsetInSectors)) + readOffsetInBytes)
 									   freeWhenDone:NO];
@@ -251,11 +272,46 @@
 			goto cleanup;
 	}
 	
+	// ========================================
+	// EXTRACTION PHASE 3: APPEND SILENCE AS NECESSARY
+
+	// Append silence, adjusted for the read offset, if required
+	if(sectorsOfSilenceToAppend) {
+		memset(buffer, 0, sectorsOfSilenceToAppend * kCDSectorSizeCDDA);
+		
+		NSData *audioData = [NSData dataWithBytesNoCopy:(buffer + readOffsetInBytes)
+												 length:((kCDSectorSizeCDDA * sectorsOfSilenceToAppend) - readOffsetInBytes)
+										   freeWhenDone:NO];
+		
+		// Stuff the silence in an AudioBufferList
+		AudioBufferList audioBuffer;
+		audioBuffer.mNumberBuffers = 1;
+		audioBuffer.mBuffers[0].mNumberChannels = cddaASBD.mChannelsPerFrame;
+		audioBuffer.mBuffers[0].mData = (void *)audioData.bytes;
+		audioBuffer.mBuffers[0].mDataByteSize = audioData.length;
+		
+		// Write the silence to the output file
+		status = ExtAudioFileWrite(file, (audioData.length / cddaASBD.mBytesPerFrame), &audioBuffer);
+		if(noErr != status) {
+			self.error = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
+			goto cleanup;
+		}
+
+		// Update the MD5 digest
+		md5_append(&md5, audioData.bytes, audioData.length);
+	}
+
+	// ========================================
+	// COMPLETE EXTRACTION
+	
 	// Complete the MD5 calculation and store the result
 	md5_byte_t digest [16];
 	md5_finish(&md5, digest);
 	
 	self.md5 = [NSString stringWithFormat:@"%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x", digest[0], digest[1], digest[2], digest[3], digest[4], digest[5], digest[6], digest[7], digest[8], digest[9], digest[10], digest[11], digest[12], digest[13], digest[14], digest[15]];
+
+	// ========================================
+	// CLEAN UP
 
 cleanup:
 	// Close the device
