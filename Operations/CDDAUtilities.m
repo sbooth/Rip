@@ -51,4 +51,3 @@ BOOL streamDescriptionIsCDDA(const AudioStreamBasicDescription *asbd)
 	
 	return YES;
 }
-

@@ -8,7 +8,7 @@
 // ========================================
 // Useful macros
 // ========================================
-#define AUDIO_FRAMES_PER_CDDA_SECTOR	588u
+#define AUDIO_FRAMES_PER_CDDA_SECTOR	588
 
 // ========================================
 // Create an AudioStreamBasicDescription that describes CDDA audio
