@@ -7,8 +7,11 @@
 
 #include <Foundation/Foundation.h>
 
-// Calculate and AccurateRip CRC for the file at path (must be raw 16-bit little-endian signed PCM)
+// Calculate the AccurateRip CRC for the file at path
 uint32 calculateAccurateRipCRCForFile(NSString *path, BOOL firstTrack, BOOL lastTrack);
 
-// Generate an AccurateRip CRC for a sector (2352 bytes) of CDDA audio
+// Calculate the AccurateRip CRC for the specified range of CDDA sectors file at path
+uint32 calculateAccurateRipCRCForFileRegion(NSString *path, NSUInteger firstSector, NSUInteger lastSector, BOOL firstTrack, BOOL lastTrack);
+
+// Generate the AccurateRip CRC for a sector (2352 bytes) of CDDA audio
 uint32_t calculateAccurateRipCRCForBlock(const void *block, NSUInteger blockNumber, NSUInteger totalBlocks, BOOL firstTrack, BOOL lastTrack);

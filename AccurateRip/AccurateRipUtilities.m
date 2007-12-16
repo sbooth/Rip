@@ -10,7 +10,7 @@
 #include <IOKit/storage/IOCDTypes.h>
 
 // ========================================
-// Calculate and AccurateRip CRC for the file at path (must be raw 16-bit little-endian signed PCM)
+// Calculate the AccurateRip CRC for the file at path
 // ========================================
 uint32 
 calculateAccurateRipCRCForFile(NSString *path, BOOL firstTrack, BOOL lastTrack)
@@ -77,7 +77,74 @@ cleanup:
 }
 
 // ========================================
-// Generate an AccurateRip crc for a sector of CDDA audio
+// Calculate the AccurateRip CRC for the specified range of CDDA sectors file at path
+// ========================================
+uint32 
+calculateAccurateRipCRCForFileRegion(NSString *path, NSUInteger firstSector, NSUInteger lastSector, BOOL firstTrack, BOOL lastTrack)
+{
+	NSCParameterAssert(nil != path);
+	NSCParameterAssert(lastSector > firstSector);
+	
+	uint32_t crc = 0;
+	
+	// Open the file for reading
+	ExtAudioFileRef file = NULL;
+	OSStatus status = ExtAudioFileOpenURL((CFURLRef)[NSURL fileURLWithPath:path], &file);
+	if(noErr != status)
+		return 0;
+	
+	// Verify the file contains CDDA audio
+	AudioStreamBasicDescription fileFormat;
+	UInt32 dataSize = sizeof(fileFormat);
+	status = ExtAudioFileGetProperty(file, kExtAudioFileProperty_FileDataFormat, &dataSize, &fileFormat);
+	if(noErr != status)
+		goto cleanup;
+	
+	if(!streamDescriptionIsCDDA(&fileFormat))
+		goto cleanup;
+	
+	// Seek to the desired starting sector
+	status = ExtAudioFileSeek(file, AUDIO_FRAMES_PER_CDDA_SECTOR * firstSector);
+	if(noErr != status)
+		goto cleanup;
+	
+	// 
+	NSUInteger totalBlocks = lastSector - firstSector;
+	NSUInteger blockNumber = 0;
+	
+	// Set up extraction buffers
+	int8_t buffer [kCDSectorSizeCDDA];
+	AudioBufferList bufferList;
+	bufferList.mNumberBuffers = 1;
+	bufferList.mBuffers[0].mNumberChannels = fileFormat.mChannelsPerFrame;
+	bufferList.mBuffers[0].mData = (void *)buffer;	
+	
+	// Iteratively process each CDDA sector in the file
+	NSUInteger sectorCount = totalBlocks;
+	while(sectorCount--) {
+		bufferList.mBuffers[0].mDataByteSize = kCDSectorSizeCDDA;
+		
+		UInt32 frameCount = AUDIO_FRAMES_PER_CDDA_SECTOR;
+		status = ExtAudioFileRead(file, &frameCount, &bufferList);
+		
+		if(noErr != status)
+			break;
+		else if(AUDIO_FRAMES_PER_CDDA_SECTOR != frameCount)
+			break;
+		
+		crc += calculateAccurateRipCRCForBlock(buffer, blockNumber++, totalBlocks, firstTrack, lastTrack);
+	}
+	
+cleanup:
+	status = ExtAudioFileDispose(file);
+/*	if(noErr != status)
+		return 0;*/
+	
+	return crc;
+}
+
+// ========================================
+// Generate the AccurateRip CRC for a sector of CDDA audio
 // ========================================
 uint32_t
 calculateAccurateRipCRCForBlock(const void *block, NSUInteger blockNumber, NSUInteger totalBlocks, BOOL firstTrack, BOOL lastTrack)
@@ -90,16 +157,16 @@ calculateAccurateRipCRCForBlock(const void *block, NSUInteger blockNumber, NSUIn
 		return 0;
 	else if(firstTrack && 4 == blockNumber) {
 		const uint32_t *buffer = (const uint32_t *)block;
-		uint32_t sample = OSSwapHostToLittleInt32(buffer[587]);
-		return 588 * (4 + 1) * sample;
+		uint32_t sample = OSSwapHostToLittleInt32(buffer[AUDIO_FRAMES_PER_CDDA_SECTOR - 1]);
+		return AUDIO_FRAMES_PER_CDDA_SECTOR * (4 + 1) * sample;
 	}
 	else {
 		const uint32_t *buffer = (const uint32_t *)block;
 		uint32_t crc = 0;
-		NSUInteger blockOffset = 588 * blockNumber;
+		NSUInteger blockOffset = AUDIO_FRAMES_PER_CDDA_SECTOR * blockNumber;
 		
 		NSUInteger i;
-		for(i = 0; i < 588; ++i)
+		for(i = 0; i < AUDIO_FRAMES_PER_CDDA_SECTOR; ++i)
 			crc += OSSwapHostToLittleInt32(*buffer++) * ++blockOffset;
 		
 		return crc;
