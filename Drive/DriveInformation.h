@@ -20,7 +20,7 @@
 @property (readonly, assign) DADiskRef disk;
 @property (readonly, copy) NSDictionary * deviceProperties;
 
-@property (readonly) NSData * deviceIdentifier;
+@property (readonly) NSString * deviceIdentifier;
 @property (copy) NSNumber * readOffset;
 
 // ========================================

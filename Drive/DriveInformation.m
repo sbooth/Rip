@@ -105,12 +105,21 @@ NSString * const	kConfiguredDrivesDefaultsKey			= @"Configured Drives";
 	return copy;
 }
 
-- (NSData *) deviceIdentifier
+- (NSString *) deviceIdentifier
 {
-	// For CD/DVD authoring devices, use the GUID as the drive identifier
-	return [self.deviceProperties objectForKey:@ kIOPropertySCSITaskUserClientInstanceGUID];
-
-	// TODO: For non-authoring capable devices, use the IOPath as the drive identifier since they won't have a GUID
+	CFDictionaryRef description = DADiskCopyDescription(self.disk);
+	
+	// Extract the IOPath for the device containing this DADiskRef
+	CFStringRef ioPath = CFDictionaryGetValue(description, kDADiskDescriptionDevicePathKey);
+	if(NULL == ioPath) {
+		NSLog(@"No value for kDADiskDescriptionDevicePathKey in DADiskRef description");
+		
+		CFRelease(description);
+		
+		return nil;
+	}
+	
+	return [NSString stringWithString:(NSString *)ioPath];
 }
 
 // Device Characteristics
@@ -151,7 +160,7 @@ NSString * const	kConfiguredDrivesDefaultsKey			= @"Configured Drives";
 // Protocol Characteristics
 - (NSString *) physicalInterconnectType
 {
-	NSString *physicalInterconnectType =  [self valueInProtocolCharacteristicsDictionaryForKey:@ kIOPropertyPhysicalInterconnectTypeKey];
+	NSString *physicalInterconnectType = [self valueInProtocolCharacteristicsDictionaryForKey:@ kIOPropertyPhysicalInterconnectTypeKey];
 	
 	if(physicalInterconnectType) {
 		if([physicalInterconnectType isEqualToString:@ kIOPropertyPhysicalInterconnectTypeATA])
@@ -204,13 +213,8 @@ NSString * const	kConfiguredDrivesDefaultsKey			= @"Configured Drives";
 
 - (NSNumber *) readOffset
 {
-	NSDictionary *configuredDrives = nil;
-	NSData *configuredDrivesData = [[NSUserDefaults standardUserDefaults] dataForKey:kConfiguredDrivesDefaultsKey];
-	
-	if(nil != configuredDrivesData)
-		configuredDrives = (NSDictionary *)[NSUnarchiver unarchiveObjectWithData:configuredDrivesData];
-	
-	NSData *deviceIdentifier = self.deviceIdentifier;
+	NSDictionary *configuredDrives = [[NSUserDefaults standardUserDefaults] dictionaryForKey:kConfiguredDrivesDefaultsKey];
+	NSString *deviceIdentifier = self.deviceIdentifier;
 	
 	if(nil == configuredDrives || nil == deviceIdentifier)
 		return nil;
@@ -220,25 +224,20 @@ NSString * const	kConfiguredDrivesDefaultsKey			= @"Configured Drives";
 
 - (void) setReadOffset:(NSNumber *)readOffset
 {
-	NSData *deviceIdentifier = self.deviceIdentifier;
+	NSString *deviceIdentifier = self.deviceIdentifier;
 	
 	if(nil == deviceIdentifier)
 		return;
 
 	NSMutableDictionary *configuredDrives = [NSMutableDictionary dictionary];
-	NSData *configuredDrivesData = [[NSUserDefaults standardUserDefaults] dataForKey:kConfiguredDrivesDefaultsKey];
-	
-	if(nil != configuredDrivesData)
-		[configuredDrives addEntriesFromDictionary:(NSDictionary *)[NSUnarchiver unarchiveObjectWithData:configuredDrivesData]];
+	[configuredDrives addEntriesFromDictionary:[[NSUserDefaults standardUserDefaults] dictionaryForKey:kConfiguredDrivesDefaultsKey]];
 	
 	[configuredDrives removeObjectForKey:deviceIdentifier];
 	
 	if(readOffset)
 		[configuredDrives setObject:readOffset forKey:deviceIdentifier];
 	
-	// Since NSData was used as a key, store the drive configuration information as data
-	configuredDrivesData = [NSArchiver archivedDataWithRootObject:configuredDrives];
-	[[NSUserDefaults standardUserDefaults] setObject:configuredDrivesData forKey:kConfiguredDrivesDefaultsKey];
+	[[NSUserDefaults standardUserDefaults] setObject:configuredDrives forKey:kConfiguredDrivesDefaultsKey];
 }
 
 @end
