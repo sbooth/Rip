@@ -103,13 +103,19 @@ calculateAccurateRipCRCForFileRegion(NSString *path, NSUInteger firstSector, NSU
 	if(!streamDescriptionIsCDDA(&fileFormat))
 		goto cleanup;
 	
+	// For some reason seeking fails if the client data format is not set
+	AudioStreamBasicDescription cddaDescription = getStreamDescriptionForCDDA();
+	status = ExtAudioFileSetProperty(file, kExtAudioFileProperty_ClientDataFormat, sizeof(cddaDescription), &cddaDescription);
+	if(noErr != status)
+		goto cleanup;
+	
 	// Seek to the desired starting sector
 	status = ExtAudioFileSeek(file, AUDIO_FRAMES_PER_CDDA_SECTOR * firstSector);
 	if(noErr != status)
 		goto cleanup;
 	
-	// 
-	NSUInteger totalBlocks = lastSector - firstSector;
+	// The block range is inclusive
+	NSUInteger totalBlocks = lastSector - firstSector + 1;
 	NSUInteger blockNumber = 0;
 	
 	// Set up extraction buffers
