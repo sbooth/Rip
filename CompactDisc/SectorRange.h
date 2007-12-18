@@ -6,10 +6,9 @@
 #import <Cocoa/Cocoa.h>
 
 // ========================================
-// Utility class representing a contiguous, inclusive range
-// of sectors on a CDDA disc
+// Utility class representing a contiguous, inclusive range of sectors on a CDDA disc
 // ========================================
-@interface SectorRange : NSObject <NSCopying, NSMutableCopying>
+@interface SectorRange : NSObject <NSCopying>
 {
 	NSUInteger _firstSector;
 	NSUInteger _lastSector;

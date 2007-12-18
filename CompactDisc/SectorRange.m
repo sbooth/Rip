@@ -4,7 +4,6 @@
  */
 
 #import "SectorRange.h"
-#import "MutableSectorRange.h"
 
 #include <IOKit/storage/IOCDTypes.h>
 
@@ -20,17 +19,17 @@
 
 + (id) sectorRangeWithSector:(NSUInteger)sector
 {
-	return [[[self class] alloc] initWithSector:sector];
+	return [[SectorRange alloc] initWithSector:sector];
 }
 
 + (id) sectorRangeWithFirstSector:(NSUInteger)firstSector lastSector:(NSUInteger)lastSector
 {
-	return [[[self class] alloc] initWithFirstSector:firstSector lastSector:lastSector];
+	return [[SectorRange alloc] initWithFirstSector:firstSector lastSector:lastSector];
 }
 
 + (id) sectorRangeWithFirstSector:(NSUInteger)firstSector sectorCount:(NSUInteger)sectorCount
 {
-	return [[[self class] alloc] initWithFirstSector:firstSector sectorCount:sectorCount];
+	return [[SectorRange alloc] initWithFirstSector:firstSector sectorCount:sectorCount];
 }
 
 - (id) initWithSector:(NSUInteger)sector
@@ -62,16 +61,6 @@
 	
 	copy.firstSector = self.firstSector;
 	copy.lastSector = self.lastSector;
-	
-	return copy;
-}
-
-- (id) mutableCopyWithZone:(NSZone *)zone
-{
-	MutableSectorRange *copy = [[MutableSectorRange allocWithZone:zone] init];
-	
-	copy.firstSector = self.firstSector;
-	copy.lastSector = self.firstSector;
 	
 	return copy;
 }
