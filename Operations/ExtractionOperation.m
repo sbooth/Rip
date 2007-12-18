@@ -5,7 +5,6 @@
 
 #import "ExtractionOperation.h"
 #import "SectorRange.h"
-#import "MutableSectorRange.h"
 #import "SessionDescriptor.h"
 #import "BitArray.h"
 #import "Drive.h"
@@ -39,7 +38,7 @@
 @synthesize trackNumber = _trackNumber;
 @synthesize error = _error;
 @synthesize errorFlags = _errorFlags;
-@synthesize path = _path;
+@synthesize url = _url;
 @synthesize readOffset = _readOffset;
 @synthesize md5 = _md5;
 
@@ -56,7 +55,7 @@
 {
 	NSAssert(NULL != self.disk, @"self.disk may not be NULL");
 	NSAssert(nil != self.sectors, @"self.sectors may not be nil");
-	NSAssert(nil != self.path, @"self.path may not be nil");
+	NSAssert(nil != self.url, @"self.url may not be nil");
 
 	// ========================================
 	// GENERAL SETUP
@@ -73,7 +72,7 @@
 	
 	// Create and open the output file, overwriting if it exists
 	ExtAudioFileRef file = NULL;
-	OSStatus status = ExtAudioFileCreateWithURL((CFURLRef)[NSURL fileURLWithPath:self.path], kAudioFileWAVEType, &cddaASBD, NULL, kAudioFileFlags_EraseFile, &file);
+	OSStatus status = ExtAudioFileCreateWithURL((CFURLRef)self.url, kAudioFileWAVEType, &cddaASBD, NULL, kAudioFileFlags_EraseFile, &file);
 	if(noErr != status) {
 		self.error = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
 		goto cleanup;
@@ -119,8 +118,8 @@
 	// complete sector will exist when the beginning of the read is adjusted by the read offset.
 	// If this value is larger than one sector, one sector less than this should be skipped at the beginning.
 	// For example, suppose the desired range is sectors 1 through 10 and the read offset is 600 frames.
-	// In this case readOffsetInSectors will be 2, and the actual read should be from sectors 1 through 12, with the 
-	// first 12 frames of sector 1 skipped and the last 12 frames of sector 12 skipped.
+	// In this case readOffsetInSectors will be 2, and the actual read should be from sectors 2 through 12, with the 
+	// first 12 frames of sector 2 skipped and the last 12 frames of sector 12 skipped.
 	NSUInteger readOffsetInSectors = (readOffsetInFrames +  (AUDIO_FRAMES_PER_CDDA_SECTOR - 1)) / AUDIO_FRAMES_PER_CDDA_SECTOR;
 	NSUInteger readOffsetInBytes = 2 * sizeof(int16_t) * readOffsetInFrames;
 	
@@ -141,11 +140,11 @@
 		firstPermissibleSector = 0;
 	
 	// Determine the last sector that can be legally read (so as not to over-read the lead out)
-	NSInteger lastPermissibleSector = NSUIntegerMax;
+	NSInteger lastPermissibleSector = NSIntegerMax;
 	if(self.session)
 		lastPermissibleSector = self.session.leadOut - 1;
 	
-	// Clamp the read range to the specified sector limititations
+	// Clamp the read range to the specified sector limitations
 	NSUInteger sectorsOfSilenceToPrepend = 0;
 	if(firstSectorToRead < firstPermissibleSector) {
 		sectorsOfSilenceToPrepend = firstPermissibleSector - firstSectorToRead;
@@ -202,7 +201,7 @@
 		// Set up the parameters for this read
 		NSUInteger startSector = self.sectorsRead.firstSector + self.sectorsRead.length - sectorsRemaining;
 		NSUInteger sectorCount = MIN(BUFFER_SIZE_IN_SECTORS, sectorsRemaining);
-		MutableSectorRange *readRange = [MutableSectorRange sectorRangeWithFirstSector:startSector sectorCount:sectorCount];
+		SectorRange *readRange = [SectorRange sectorRangeWithFirstSector:startSector sectorCount:sectorCount];
 
 		// Read from the CD media
 		NSUInteger sectorsRead = [drive readAudioAndErrorFlags:buffer sectorRange:readRange];
@@ -279,7 +278,7 @@
 	if(sectorsOfSilenceToAppend) {
 		memset(buffer, 0, sectorsOfSilenceToAppend * kCDSectorSizeCDDA);
 		
-		NSData *audioData = [NSData dataWithBytesNoCopy:(buffer + readOffsetInBytes)
+		NSData *audioData = [NSData dataWithBytesNoCopy:buffer
 												 length:((kCDSectorSizeCDDA * sectorsOfSilenceToAppend) - readOffsetInBytes)
 										   freeWhenDone:NO];
 		
@@ -319,9 +318,11 @@ cleanup:
 		self.error = drive.error;
 	
 	// Close the output file
-	status = ExtAudioFileDispose(file);
-	if(noErr != status)
-		self.error = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
+	if(file) {
+		status = ExtAudioFileDispose(file);
+		if(noErr != status)
+			self.error = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
+	}
 }
 
 @end

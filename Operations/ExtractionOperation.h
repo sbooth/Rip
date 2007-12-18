@@ -17,7 +17,7 @@
 {
 	DADiskRef _disk;				// The DADiskRef holding the CD from which to extract
 	SectorRange *_sectors;			// The sectors to be extracted (not adjusted for read offset) 
-	NSString *_path;				// The pathname of the output file
+	NSURL *_url;					// The URL of the output file
 	NSNumber *_readOffset;			// The read offset (in audio frames) to use for extraction
 	SessionDescriptor *_session;	// The CD session that will limit extraction
 	NSNumber *_trackNumber;			// The CD track number (if applicable)
@@ -32,7 +32,7 @@
 // Properties affecting extraction
 @property (assign) DADiskRef disk;
 @property (copy) SectorRange * sectors;
-@property (copy) NSString * path;
+@property (copy) NSURL * url;
 @property (copy) NSNumber * readOffset;
 @property (copy) SessionDescriptor * session;
 @property (copy) NSNumber * trackNumber;
