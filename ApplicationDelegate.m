@@ -125,12 +125,18 @@ diskDisappearedCallback(DADiskRef disk, void *context)
 {
 	NSParameterAssert(NULL != disk);
 
+	NSDocument *matchingDocument = nil;
+	
 	// Iterate through open documents and determine which one matches this disk
 	for(NSDocument *document in [[NSDocumentController sharedDocumentController] documents]) {
 		if([document isKindOfClass:[CompactDiscDocument class]] && CFEqual(((CompactDiscDocument *)document).disk, disk)) {
-			NSLog(@"Disk matches document: %@", document);
+			matchingDocument = document;
+			break;
 		}
 	}
+	
+	if(matchingDocument)
+		[matchingDocument close];
 }
 
 @end
