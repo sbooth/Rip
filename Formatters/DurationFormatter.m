@@ -18,7 +18,7 @@
 	CDMSF msf = CDConvertLBAToMSF(offset - 150);
 	
 	// Round to nearest second
-	if(37 > msf.frame) {
+	if(37 < msf.frame) {
 		msf.second += 1;
 		if(60 < msf.second) {
 			msf.minute += 1;
