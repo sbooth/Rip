@@ -22,10 +22,12 @@
 + (id) sectorRangeWithSector:(NSUInteger)sector;
 + (id) sectorRangeWithFirstSector:(NSUInteger)firstSector lastSector:(NSUInteger)lastSector;
 + (id) sectorRangeWithFirstSector:(NSUInteger)firstSector sectorCount:(NSUInteger)sectorCount;
++ (id) sectorRangeWithLastSector:(NSUInteger)lastSector sectorCount:(NSUInteger)sectorCount;
 
 - (id) initWithSector:(NSUInteger)sector;
 - (id) initWithFirstSector:(NSUInteger)firstSector lastSector:(NSUInteger)lastSector;
 - (id) initWithFirstSector:(NSUInteger)firstSector sectorCount:(NSUInteger)sectorCount;
+- (id) initWithLastSector:(NSUInteger)lastSector sectorCount:(NSUInteger)sectorCount;
 
 - (NSUInteger) indexForSector:(NSUInteger)sector;
 - (NSUInteger) sectorForIndex:(NSUInteger)index;

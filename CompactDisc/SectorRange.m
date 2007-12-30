@@ -32,6 +32,11 @@
 	return [[SectorRange alloc] initWithFirstSector:firstSector sectorCount:sectorCount];
 }
 
++ (id) sectorRangeWithLastSector:(NSUInteger)lastSector sectorCount:(NSUInteger)sectorCount
+{
+	return [[SectorRange alloc] initWithLastSector:lastSector sectorCount:sectorCount];
+}
+
 - (id) initWithSector:(NSUInteger)sector
 {
 	return [self initWithFirstSector:sector lastSector:sector];
@@ -53,6 +58,14 @@
 	NSParameterAssert(0 < sectorCount);
 	
 	return [self initWithFirstSector:firstSector lastSector:(firstSector + sectorCount - 1)];
+}
+
+- (id) initWithLastSector:(NSUInteger)lastSector sectorCount:(NSUInteger)sectorCount
+{
+	NSParameterAssert(0 < sectorCount);
+	NSParameterAssert(0 < lastSector - sectorCount);
+	
+	return [self initWithFirstSector:(lastSector - sectorCount + 1) sectorCount:sectorCount];
 }
 
 - (id) copyWithZone:(NSZone *)zone
