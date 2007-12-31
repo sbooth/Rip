@@ -61,18 +61,6 @@ enum {
 - (NSUInteger) readAudio:(void *)buffer startSector:(NSUInteger)startSector sectorCount:(NSUInteger)sectorCount;
 
 // ========================================
-// Read Q sub-channel (buffer should be kCDSectorSizeQSubchannel * sectorCount bytes)
-- (NSUInteger) readQSubchannel:(void *)buffer sector:(NSUInteger)sector;
-- (NSUInteger) readQSubchannel:(void *)buffer sectorRange:(SectorRange *)range;
-- (NSUInteger) readQSubchannel:(void *)buffer startSector:(NSUInteger)startSector sectorCount:(NSUInteger)sectorCount;
-
-// ========================================
-// Read error flags (buffer should be kCDSectorSizeErrorFlags * sectorCount bytes)
-- (NSUInteger) readErrorFlags:(void *)buffer sector:(NSUInteger)sector;
-- (NSUInteger) readErrorFlags:(void *)buffer sectorRange:(SectorRange *)range;
-- (NSUInteger) readErrorFlags:(void *)buffer startSector:(NSUInteger)startSector sectorCount:(NSUInteger)sectorCount;
-
-// ========================================
 // Read a chunk of CD-DA data, with Q sub-channel (buffer should be (kCDSectorSizeCDDA + kCDSectorSizeQSubchannel) * sectorCount bytes)
 - (NSUInteger) readAudioAndQSubchannel:(void *)buffer sector:(NSUInteger)sector;
 - (NSUInteger) readAudioAndQSubchannel:(void *)buffer sectorRange:(SectorRange *)range;

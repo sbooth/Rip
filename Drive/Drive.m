@@ -239,36 +239,6 @@
 	return [self readCD:buffer sectorAreas:kCDSectorAreaUser startSector:startSector sectorCount:sectorCount];
 }
 
-- (NSUInteger) readQSubchannel:(void *)buffer sector:(NSUInteger)sector
-{
-	return [self readQSubchannel:buffer startSector:sector sectorCount:1];
-}
-
-- (NSUInteger) readQSubchannel:(void *)buffer sectorRange:(SectorRange *)range
-{
-	return [self readQSubchannel:buffer startSector:[range firstSector] sectorCount:[range length]];
-}
-
-- (NSUInteger) readQSubchannel:(void *)buffer startSector:(NSUInteger)startSector sectorCount:(NSUInteger)sectorCount
-{
-	return [self readCD:buffer sectorAreas:kCDSectorAreaSubChannelQ startSector:startSector sectorCount:sectorCount];
-}
-
-- (NSUInteger) readErrorFlags:(void *)buffer sector:(NSUInteger)sector
-{
-	return [self readErrorFlags:buffer startSector:sector sectorCount:1];
-}
-
-- (NSUInteger) readErrorFlags:(void *)buffer sectorRange:(SectorRange *)range
-{
-	return [self readErrorFlags:buffer startSector:[range firstSector] sectorCount:[range length]];
-}
-
-- (NSUInteger) readErrorFlags:(void *)buffer startSector:(NSUInteger)startSector sectorCount:(NSUInteger)sectorCount
-{
-	return [self readCD:buffer sectorAreas:kCDSectorAreaErrorFlags startSector:startSector sectorCount:sectorCount];
-}
-
 - (NSUInteger) readAudioAndQSubchannel:(void *)buffer sector:(NSUInteger)sector
 {
 	return [self readAudioAndQSubchannel:buffer startSector:sector sectorCount:1];
