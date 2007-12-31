@@ -103,6 +103,8 @@ convertQSubChannelDataFromBCDToDecimal(struct QSubChannelData *qData)
 
 		if(0 != [compactDisc firstSectorForTrack:1])
 		   self.preGap = [NSNumber numberWithUnsignedInteger:[compactDisc firstSectorForTrack:1]];
+		else
+			self.preGap = [NSNumber numberWithUnsignedInteger:150];
 		   
 		return;
 	}
