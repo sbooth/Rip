@@ -15,7 +15,7 @@
 #include <IOKit/storage/IOCDTypes.h>
 #include <AudioToolbox/ExtendedAudioFile.h>
 
-// Keep reads to approximately 2 MB in size (2352 + 294 bytes are necessary for each sector)
+// Keep reads to approximately 2 MB in size (2352 + 294 + 16 bytes are necessary for each sector)
 #define BUFFER_SIZE_IN_SECTORS 775u
 
 @interface ExtractionOperation ()
@@ -79,12 +79,13 @@
 	}
 
 	// Allocate the extraction buffers
-	__strong int8_t *buffer = NSAllocateCollectable(BUFFER_SIZE_IN_SECTORS * (kCDSectorSizeCDDA + kCDSectorSizeErrorFlags), 0);
+	__strong int8_t *buffer = NSAllocateCollectable(BUFFER_SIZE_IN_SECTORS * (kCDSectorSizeCDDA + kCDSectorSizeErrorFlags/* + kCDSectorSizeQSubchannel*/), 0);
 	__strong int8_t *audioBuffer = NSAllocateCollectable(BUFFER_SIZE_IN_SECTORS * kCDSectorSizeCDDA, 0);
 	__strong int8_t *c2Buffer = NSAllocateCollectable(BUFFER_SIZE_IN_SECTORS * kCDSectorSizeErrorFlags, 0);
+//	__strong int8_t *qBuffer = NSAllocateCollectable(BUFFER_SIZE_IN_SECTORS * kCDSectorSizeQSubchannel, 0);
 	int8_t *alias = NULL;
 	
-	if(NULL == buffer || NULL == audioBuffer || NULL == c2Buffer) {
+	if(NULL == buffer || NULL == audioBuffer || NULL == c2Buffer/* || NULL == qBuffer*/) {
 		self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:ENOMEM userInfo:nil];
 		goto cleanup;
 	}
