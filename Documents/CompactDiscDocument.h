@@ -30,7 +30,7 @@ extern NSString * const		kMetadataMusicBrainzIDKey;
 
 @class CompactDisc, AccurateRipDisc, DriveInformation;
 
-@interface CompactDiscDocument : NSDocument
+@interface CompactDiscDocument : NSPersistentDocument
 {
 	IBOutlet NSArrayController *_trackController;
 	IBOutlet NSObjectController *_driveInformationController;
@@ -43,13 +43,13 @@ extern NSString * const		kMetadataMusicBrainzIDKey;
 	NSMutableArray *_tracks;
 	NSMutableDictionary *_metadata;
 	
-	NSOperationQueue *_extractionQueue;
+	NSOperationQueue *_compactDiscOperationQueue;
 	NSOperationQueue *_encodingQueue;
 }
 
 @property (readonly) NSArrayController * trackController;
 @property (readonly) NSObjectController * driveInformationController;
-@property (readonly) NSOperationQueue * extractionQueue;
+@property (readonly) NSOperationQueue * compactDiscOperationQueue;
 @property (readonly) NSOperationQueue * encodingQueue;
 
 // ========================================
@@ -60,12 +60,15 @@ extern NSString * const		kMetadataMusicBrainzIDKey;
 @property (readonly, assign) AccurateRipDisc * accurateRipDisc;
 @property (readonly, assign) DriveInformation * driveInformation;
 @property (readonly) NSMutableDictionary * metadata;
+@property (readonly) NSArray * tracks;
 
 // ========================================
 // Action Methods
 // ========================================
 - (IBAction) copySelectedTracks:(id)sender;
 - (IBAction) copyImage:(id)sender;
+
+- (IBAction) detectPreGaps:(id)sender;
 
 - (IBAction) ejectDisc:(id)sender;
 

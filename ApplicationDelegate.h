@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2007 Stephen F. Booth <me@sbooth.org>
+ *  Copyright (C) 2007 - 2008 Stephen F. Booth <me@sbooth.org>
  *  All Rights Reserved
  */
 
@@ -8,7 +8,16 @@
 	
 @interface ApplicationDelegate : NSObject
 {
-	DASessionRef _session;
+	DASessionRef _diskArbitrationSession;
+	NSPersistentStoreCoordinator *_persistentStoreCoordinator;
+	NSManagedObjectModel *_managedObjectModel;
+	NSManagedObjectContext *_managedObjectContext;
 }
+
+@property (readonly) NSString * applicationSupportFolder;
+@property (readonly) NSURL * applicationLogURL;
+@property (readonly, assign) NSPersistentStoreCoordinator * persistentStoreCoordinator;
+@property (readonly, assign) NSManagedObjectModel * managedObjectModel;
+@property (readonly, assign) NSManagedObjectContext * managedObjectContext;
 
 @end

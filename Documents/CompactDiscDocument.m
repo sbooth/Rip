@@ -13,8 +13,11 @@
 #import "DriveInformation.h"
 #import "SectorRange.h"
 #import "ExtractionOperation.h"
+#import "ExternalCodecEncodeOperation.h"
+#import "PreGapDetectionOperation.h"
 #import "BitArray.h"
 #include "AccurateRipUtilities.h"
+#include "ExtractionConfigurationSheetController.h"
 
 // ========================================
 // KVC key names for the metadata dictionaries
@@ -50,15 +53,39 @@ NSString * const	kKVOExtractionContext					= @"org.sbooth.Rip.CompactDiscDocumen
 @end
 
 @interface CompactDiscDocument (Private)
-- (void) extractionStartedForOperation:(ExtractionOperation *)operation;
-- (void) extractionStoppedForOperation:(ExtractionOperation *)operation;
+- (void) extractionOperationStarted:(ExtractionOperation *)operation;
+- (void) extractionOperationStopped:(ExtractionOperation *)operation;
+- (void) preGapDetectionOperationStarted:(PreGapDetectionOperation *)operation;
+- (void) preGapDetectionOperationStopped:(PreGapDetectionOperation *)operation;
+- (void) diskWasEjected;
 @end
+
+// ========================================
+// DiskArbitration eject callback
+// ========================================
+void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context);
+void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
+{
+	
+#pragma unused(disk)
+	
+	NSCParameterAssert(NULL != context);
+	
+	CompactDiscDocument *document = (CompactDiscDocument *)context;
+
+	// If there is a dissenter, the ejection did not succeed
+	if(dissenter)
+		[document presentError:[NSError errorWithDomain:NSMachErrorDomain code:DADissenterGetStatus(dissenter) userInfo:nil]];
+	// The disk was successfully ejected
+	else
+		[document diskWasEjected];
+}
 
 @implementation CompactDiscDocument
 
 @synthesize trackController = _trackController;
 @synthesize driveInformationController = _driveInformationController;
-@synthesize extractionQueue = _extractionQueue;
+@synthesize compactDiscOperationQueue = _compactDiscOperationQueue;
 @synthesize encodingQueue = _encodingQueue;
 
 @synthesize disk = _disk;
@@ -66,20 +93,21 @@ NSString * const	kKVOExtractionContext					= @"org.sbooth.Rip.CompactDiscDocumen
 @synthesize accurateRipDisc = _accurateRipDisc;
 @synthesize driveInformation = _driveInformation;
 @synthesize metadata = _metadata;
+@synthesize tracks = _tracks;
 
 - (id) init
 {
 	if((self = [super init])) {
 		_tracks = [[NSMutableArray alloc] init];
 		_metadata = [[NSMutableDictionary alloc] init];
-		_extractionQueue = [[NSOperationQueue alloc] init];
+		_compactDiscOperationQueue = [[NSOperationQueue alloc] init];
 		_encodingQueue = [[NSOperationQueue alloc] init];
 
-		// Only extract one track at a time
-		[self.extractionQueue setMaxConcurrentOperationCount:1];
+		// Only allow one compact disc operation at a time
+		[self.compactDiscOperationQueue setMaxConcurrentOperationCount:1];
 		
-		// Observe changes in the extraction operations array, to be notified when extraction starts and stops
-		[self.extractionQueue addObserver:self forKeyPath:@"operations" options:(NSKeyValueObservingOptionOld |  NSKeyValueObservingOptionNew) context:kKVOExtractionContext];
+		// Observe changes in the compact disc operations array, to be notified when each operation starts and stops
+		[self.compactDiscOperationQueue addObserver:self forKeyPath:@"operations" options:(NSKeyValueObservingOptionOld |  NSKeyValueObservingOptionNew) context:kKVOExtractionContext];
 	}
 	return self;
 }
@@ -103,11 +131,16 @@ NSString * const	kKVOExtractionContext					= @"org.sbooth.Rip.CompactDiscDocumen
 {
 	if([menuItem action] == @selector(copySelectedTracks:)) {
 		NSPredicate *selectedTracksPredicate = [NSPredicate predicateWithFormat:@"selected == 1"];
-		NSArray *selectedTracks = [_tracks filteredArrayUsingPredicate:selectedTracksPredicate];
+		NSArray *selectedTracks = [self.tracks filteredArrayUsingPredicate:selectedTracksPredicate];
 		return (0 != selectedTracks.count);
 	}
 	else if([menuItem action] == @selector(copyImage:))
 		return YES;
+	else if([menuItem action] == @selector(detectPreGaps:)) {
+		NSPredicate *selectedTracksPredicate = [NSPredicate predicateWithFormat:@"selected == 1"];
+		NSArray *selectedTracks = [self.tracks filteredArrayUsingPredicate:selectedTracksPredicate];
+		return (0 != selectedTracks.count);
+	}
 	else
 		return [super validateMenuItem:menuItem];
 }
@@ -116,11 +149,16 @@ NSString * const	kKVOExtractionContext					= @"org.sbooth.Rip.CompactDiscDocumen
 {
 	if([toolbarItem action] == @selector(copySelectedTracks:)) {
 		NSPredicate *selectedTracksPredicate = [NSPredicate predicateWithFormat:@"selected == 1"];
-		NSArray *selectedTracks = [_tracks filteredArrayUsingPredicate:selectedTracksPredicate];
+		NSArray *selectedTracks = [self.tracks filteredArrayUsingPredicate:selectedTracksPredicate];
 		return (0 != selectedTracks.count);
 	}
 	else if([toolbarItem action] == @selector(copyImage:))
 		return YES;
+	else if([toolbarItem action] == @selector(detectPreGaps:)) {
+		NSPredicate *selectedTracksPredicate = [NSPredicate predicateWithFormat:@"selected == 1"];
+		NSArray *selectedTracks = [self.tracks filteredArrayUsingPredicate:selectedTracksPredicate];
+		return (0 != selectedTracks.count);
+	}
 	else
 		return [super validateToolbarItem:toolbarItem];
 }
@@ -131,18 +169,36 @@ NSString * const	kKVOExtractionContext					= @"org.sbooth.Rip.CompactDiscDocumen
 		NSInteger changeKind = [[change objectForKey:NSKeyValueChangeKindKey] integerValue];
 		
 		if(NSKeyValueChangeInsertion == changeKind) {
-			NSArray *startedOperations = [[change objectForKey:NSKeyValueChangeNewKey] objectsAtIndexes:[change objectForKey:NSKeyValueChangeIndexesKey]];
-			for(ExtractionOperation *operation in startedOperations)
-				[self extractionStartedForOperation:operation];
+			for(NSOperation *operation in [change objectForKey:NSKeyValueChangeNewKey]) {
+				if([operation isKindOfClass:[ExtractionOperation class]])
+					[self extractionOperationStarted:(ExtractionOperation *)operation];
+				else if([operation isKindOfClass:[PreGapDetectionOperation class]])
+					[self preGapDetectionOperationStarted:(PreGapDetectionOperation *)operation];
+			}
 		}
 		else if(NSKeyValueChangeRemoval == changeKind) {
-			NSArray *stoppedOperations = [[change objectForKey:NSKeyValueChangeOldKey] objectsAtIndexes:[change objectForKey:NSKeyValueChangeIndexesKey]];
-			for(ExtractionOperation *operation in stoppedOperations)
-				[self extractionStoppedForOperation:operation];
+			for(NSOperation *operation in [change objectForKey:NSKeyValueChangeOldKey])
+				if([operation isKindOfClass:[ExtractionOperation class]])
+					[self extractionOperationStopped:(ExtractionOperation *)operation];
+				else if([operation isKindOfClass:[PreGapDetectionOperation class]])
+					[self preGapDetectionOperationStopped:(PreGapDetectionOperation *)operation];
 		}
 	}
 	else
 		[super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
+}
+
+#pragma mark Core Data
+
+// All instances of this class share the application's ManagedObjectContext and ManagedObjectModel
+- (NSManagedObjectContext *) managedObjectContext
+{
+	return [[[NSApplication sharedApplication] delegate] managedObjectContext];
+}
+
+- (id) managedObjectModel
+{
+	return [[[NSApplication sharedApplication] delegate] managedObjectModel];
 }
 
 - (void) setDisk:(DADiskRef)disk
@@ -160,6 +216,13 @@ NSString * const	kKVOExtractionContext					= @"org.sbooth.Rip.CompactDiscDocumen
 			self.compactDisc = [[CompactDisc alloc] initWithDADiskRef:self.disk];
 			self.accurateRipDisc = [[AccurateRipDisc alloc] initWithCompactDisc:self.compactDisc];
 			self.driveInformation = [[DriveInformation alloc] initWithDADiskRef:self.disk];
+
+			if(!self.driveInformation.readOffset)
+				NSLog(@"Read offset is not configured for drive %@", self.driveInformation.deviceIdentifier);
+			
+			self.driveInformation.readOffset = [NSNumber numberWithInt:102];
+			
+			[self.accurateRipDisc performAccurateRipQuery:self];
 		}
 	}
 }
@@ -184,22 +247,13 @@ NSString * const	kKVOExtractionContext					= @"org.sbooth.Rip.CompactDiscDocumen
 
 			[trackDictionary setObject:[NSNumber numberWithBool:NO] forKey:@"selected"];
 			[trackDictionary setObject:[NSNumber numberWithInteger:track.number] forKey:@"number"];
-			[trackDictionary setObject:[NSNumber numberWithInteger:track.firstSector] forKey:@"firstSector"];
 			[trackDictionary setObject:[NSNumber numberWithInteger:track.channels] forKey:@"channels"];
 			[trackDictionary setObject:[NSNumber numberWithBool:track.preEmphasis] forKey:@"preEmphasis"];
 			[trackDictionary setObject:[NSNumber numberWithBool:track.copyPermitted] forKey:@"copyPermitted"];
 
-			// Flesh out lastSector and sectorCount
-			if(track.number != session.firstTrack) {
-				NSMutableDictionary *previousTrackDictionary = [_tracks lastObject];
-				[previousTrackDictionary setObject:[NSNumber numberWithInteger:(track.firstSector - 1)] forKey:@"lastSector"];
-				[previousTrackDictionary setObject:[NSNumber numberWithInteger:([[previousTrackDictionary objectForKey:@"lastSector"] integerValue] - [[previousTrackDictionary objectForKey:@"firstSector"] integerValue])] forKey:@"sectorCount"];
-			}
-			
-			if(track.number == session.lastTrack) {
-				[trackDictionary setObject:[NSNumber numberWithInteger:(session.leadOut - 1)] forKey:@"lastSector"];
-				[trackDictionary setObject:[NSNumber numberWithInteger:([[trackDictionary objectForKey:@"lastSector"] integerValue] - [[trackDictionary objectForKey:@"firstSector"] integerValue])] forKey:@"sectorCount"];
-			}
+			[trackDictionary setObject:[NSNumber numberWithInteger:[self.compactDisc firstSectorForTrack:trackNumber]] forKey:@"firstSector"];
+			[trackDictionary setObject:[NSNumber numberWithInteger:[self.compactDisc lastSectorForTrack:trackNumber]] forKey:@"lastSector"];
+			[trackDictionary setObject:[NSNumber numberWithInteger:([self.compactDisc lastSectorForTrack:trackNumber] - [self.compactDisc firstSectorForTrack:trackNumber] + 1)] forKey:@"sectorCount"];
 			
 			[_tracks addObject:trackDictionary];
 		}
@@ -218,12 +272,12 @@ NSString * const	kKVOExtractionContext					= @"org.sbooth.Rip.CompactDiscDocumen
 	[super windowControllerDidLoadNib:aController];
 }
 
-- (NSData *) dataOfType:(NSString *)typeName error:(NSError **)outError
+/*- (NSData *) dataOfType:(NSString *)typeName error:(NSError **)outError
 {
 	
 #pragma unused(typeName)
 	
-	if(NULL !=  outError)
+	if(NULL != outError)
 		*outError = [NSError errorWithDomain:NSOSStatusErrorDomain code:unimpErr userInfo:NULL];
 
 	return nil;
@@ -235,11 +289,11 @@ NSString * const	kKVOExtractionContext					= @"org.sbooth.Rip.CompactDiscDocumen
 #pragma unused(data)
 #pragma unused(typeName)
 
-	if(NULL !=  outError)
+	if(NULL != outError)
 		*outError = [NSError errorWithDomain:NSOSStatusErrorDomain code:unimpErr userInfo:NULL];
 
 	return YES;
-}
+}*/
 
 - (void) tableView:(NSTableView *)aTableView willDisplayCell:(id)aCell forTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex
 {
@@ -254,13 +308,15 @@ NSString * const	kKVOExtractionContext					= @"org.sbooth.Rip.CompactDiscDocumen
 
 #pragma mark Action Methods
 
+// ========================================
+// Copy the selected tracks to intermediate WAV files, then to the encoder
 - (IBAction) copySelectedTracks:(id)sender
 {
 	
 #pragma unused(sender)
 	
 	NSPredicate *selectedTracksPredicate = [NSPredicate predicateWithFormat:@"selected == 1"];
-	NSArray *selectedTracks = [_tracks filteredArrayUsingPredicate:selectedTracksPredicate];
+	NSArray *selectedTracks = [self.tracks filteredArrayUsingPredicate:selectedTracksPredicate];
 	
 	if(0 == selectedTracks.count) {
 		NSBeep();
@@ -270,21 +326,28 @@ NSString * const	kKVOExtractionContext					= @"org.sbooth.Rip.CompactDiscDocumen
 	// Limit the audio extraction to the first session
 	SessionDescriptor *session = [self.compactDisc sessionNumber:1];
 	
-	for(NSDictionary *trackDictionary in selectedTracks) {
+	for(NSDictionary *trackDictionary in selectedTracks) {		
 		SectorRange *trackSectorRange = [SectorRange sectorRangeWithFirstSector:[[trackDictionary objectForKey:@"firstSector"] integerValue]
 																	 lastSector:[[trackDictionary objectForKey:@"lastSector"] integerValue]];
-		
+
 		ExtractionOperation *trackExtractionOperation = [[ExtractionOperation alloc] init];
 		
 		trackExtractionOperation.disk = self.disk;
-		trackExtractionOperation.sectorRange = trackSectorRange;
+		trackExtractionOperation.sectors = trackSectorRange;
 		trackExtractionOperation.session = session;
 		trackExtractionOperation.trackNumber = [trackDictionary objectForKey:@"number"];
 		trackExtractionOperation.readOffset = self.driveInformation.readOffset;
-		trackExtractionOperation.path = [NSString stringWithFormat:@"/tmp/Track %@.raw", [trackDictionary objectForKey:@"number"]];
+		trackExtractionOperation.url = [NSURL fileURLWithPath:[NSString stringWithFormat:@"/tmp/Track %@.wav", [trackDictionary objectForKey:@"number"]]];
 		
-		[self.extractionQueue addOperation:trackExtractionOperation];
+		[self.compactDiscOperationQueue addOperation:trackExtractionOperation];
 	}
+}
+
+- (void) showStreamInformationSheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode contextInfo:(void *)contextInfo
+{
+	NSLog(@"showStreamInformationSheetDidEnd");
+
+	[sheet orderOut:self];
 }
 
 - (IBAction) copyImage:(id)sender
@@ -292,7 +355,51 @@ NSString * const	kKVOExtractionContext					= @"org.sbooth.Rip.CompactDiscDocumen
 
 #pragma unused(sender)
 
+	ExtractionConfigurationSheetController *extractionConfigurationSheetController = [[ExtractionConfigurationSheetController alloc] init];
 	
+	[[NSApplication sharedApplication] beginSheet:[extractionConfigurationSheetController window] 
+								   modalForWindow:[self windowForSheet] 
+									modalDelegate:self 
+								   didEndSelector:@selector(showStreamInformationSheetDidEnd:returnCode:contextInfo:) 
+									  contextInfo:extractionConfigurationSheetController];
+
+	/*
+	SectorRange *imageSectorRange = [SectorRange sectorRangeWithFirstSector:[self.compactDisc firstSectorForSession:1]
+																 lastSector:[self.compactDisc lastSectorForSession:1]];
+	
+	ExtractionOperation *imageExtractionOperation = [[ExtractionOperation alloc] init];
+	
+	imageExtractionOperation.disk = self.disk;
+	imageExtractionOperation.sectors = imageSectorRange;
+	imageExtractionOperation.session = [self.compactDisc sessionNumber:1];
+	imageExtractionOperation.readOffset = self.driveInformation.readOffset;
+	imageExtractionOperation.url = [NSURL fileURLWithPath:@"/tmp/Disc Image.wav"];
+	
+	[self.compactDiscOperationQueue addOperation:imageExtractionOperation];
+	 */
+}
+
+- (IBAction) detectPreGaps:(id)sender
+{
+
+#pragma unused(sender)
+	
+	NSPredicate *selectedTracksPredicate = [NSPredicate predicateWithFormat:@"selected == 1"];
+	NSArray *selectedTracks = [self.tracks filteredArrayUsingPredicate:selectedTracksPredicate];
+	
+	if(0 == selectedTracks.count) {
+		NSBeep();
+		return;
+	}
+	
+	for(NSDictionary *trackDictionary in selectedTracks) {
+		PreGapDetectionOperation *preGapDetectionOperation = [[PreGapDetectionOperation alloc] init];
+		
+		preGapDetectionOperation.disk = self.disk;
+		preGapDetectionOperation.trackNumber = [trackDictionary objectForKey:@"number"];
+		
+		[self.compactDiscOperationQueue addOperation:preGapDetectionOperation];
+	}
 }
 
 - (IBAction) ejectDisc:(id)sender
@@ -300,20 +407,45 @@ NSString * const	kKVOExtractionContext					= @"org.sbooth.Rip.CompactDiscDocumen
 
 #pragma unused(sender)
 	
+	// Don't allow ejections if extraction is in progress
+	if(self.compactDiscOperationQueue.operations.count) {
+		NSBeep();
+		return;
+	}
+	
+	// Register the eject request
+	DADiskEject(self.disk, kDADiskEjectOptionDefault, ejectCallback, self);
+}
+
+#pragma mark KVC Accessors for tracks
+
+- (NSUInteger) countOfTracks
+{
+	return [_tracks count];
+}
+
+- (TrackDescriptor *) objectInTracksAtIndex:(NSUInteger)index
+{
+	return [_tracks objectAtIndex:index];
+}
+
+- (void) getTracks:(id *)buffer range:(NSRange)range
+{
+	[_tracks getObjects:buffer range:range];
 }
 
 @end
 
 @implementation CompactDiscDocument (Private)
 
-- (void) extractionStartedForOperation:(ExtractionOperation *)operation
+- (void) extractionOperationStarted:(ExtractionOperation *)operation
 {
 	NSParameterAssert(nil != operation);
 
-	NSLog(@"Extraction to %@ started", operation.path);
+	NSLog(@"Extraction to %@ started", operation.url.path);
 }
 
-- (void) extractionStoppedForOperation:(ExtractionOperation *)operation
+- (void) extractionOperationStopped:(ExtractionOperation *)operation
 {
 	NSParameterAssert(nil != operation);
 	
@@ -323,16 +455,16 @@ NSString * const	kKVOExtractionContext					= @"org.sbooth.Rip.CompactDiscDocumen
 			[self presentError:operation.error];
 			
 		NSError *error = nil;
-		if(![[NSFileManager defaultManager] removeItemAtPath:operation.path error:&error])
+		if(![[NSFileManager defaultManager] removeItemAtPath:operation.url.path error:&error])
 			[self presentError:error];
 		return;
 	}
 
-	NSLog(@"Extraction to %@ finished, %u C2 errors.  MD5 = %@", operation.path, operation.errorFlags.countOfOnes, operation.md5);
+	NSLog(@"Extraction to %@ finished, %u C2 errors.  MD5 = %@", operation.url.path, operation.errorFlags.countOfOnes, operation.md5);
 
 	NSMutableDictionary *extractionResult = [NSMutableDictionary dictionary];
 	
-	[extractionResult setObject:operation.path forKey:@"path"];
+	[extractionResult setObject:operation.url forKey:@"url"];
 	[extractionResult setObject:operation.errorFlags forKey:@"errorFlags"];
 	[extractionResult setObject:operation.md5 forKey:@"md5"];
 	
@@ -341,26 +473,87 @@ NSString * const	kKVOExtractionContext					= @"org.sbooth.Rip.CompactDiscDocumen
 		
 		// If the extraction was for a single track, determine the checksum for the entire extracted file
 		if(operation.trackNumber) {
-			NSUInteger accurateRipCRC = calculateAccurateRipCRCForFile(operation.path, 
+			NSUInteger accurateRipCRC = calculateAccurateRipCRCForFile(operation.url.path, 
 																	   operation.session.firstTrack == operation.trackNumber.unsignedIntegerValue,
 																	   operation.session.lastTrack == operation.trackNumber.unsignedIntegerValue);
 			
 			AccurateRipTrack *accurateRipTrack = [self.accurateRipDisc trackNumber:operation.trackNumber.unsignedIntegerValue];
-			
+
 			if(accurateRipTrack && accurateRipTrack.CRC == accurateRipCRC) {
 				NSLog(@"Track accurately ripped, confidence %i", accurateRipTrack.confidenceLevel);
 				[extractionResult setObject:[NSNumber numberWithUnsignedInteger:accurateRipTrack.confidenceLevel] forKey:@"confidenceLevel"];
+				
+				// Since the track was accurately ripped, ship it off to the encoder(s)
+/*				ExternalCodecEncodeOperation *encodeOperation = [[ExternalCodecEncodeOperation alloc] init];
+				
+				NSMutableArray *arguments = [NSMutableArray array];
+				
+				[arguments addObject:operation.path];
+				[arguments addObject:@"-o"];
+				[arguments addObject:[[operation.path stringByDeletingPathExtension] stringByAppendingPathExtension:@"flac"]];
+
+				encodeOperation.codecPath = @"/Users/me/Development/flac-1.2.1/src/flac/flac";
+				encodeOperation.arguments = arguments;
+				
+				[self.encodingQueue addOperation:encodeOperation];*/
 			}
 		}
-		// Otherwise, check 
+		// Otherwise, the extraction was to an image and each track must be verified as a region of the file
 		else {
+			BOOL allTracksWereAccuratelyExtracted = YES;
 			
+			for(NSDictionary *trackInformation in self.tracks) {
+				NSUInteger trackNumber = [[trackInformation objectForKey:@"number"] unsignedIntegerValue];
+				
+				NSUInteger accurateRipCRC = calculateAccurateRipCRCForFileRegion(operation.url.path, 
+																				 [[trackInformation objectForKey:@"firstSector"] unsignedIntegerValue],
+																				 [[trackInformation objectForKey:@"lastSector"] unsignedIntegerValue],
+																				 operation.session.firstTrack == trackNumber,
+																				 operation.session.lastTrack == trackNumber);
+				
+				AccurateRipTrack *accurateRipTrack = [self.accurateRipDisc trackNumber:trackNumber];
+				
+				if(accurateRipTrack && accurateRipTrack.CRC == accurateRipCRC) {
+					NSLog(@"Track %i accurately ripped, confidence %i", trackNumber, accurateRipTrack.confidenceLevel);
+				}
+				else
+					allTracksWereAccuratelyExtracted = NO;
+			}
+			
+			// If all tracks were accurately ripped, ship the image off to the encoder(s)
+			if(allTracksWereAccuratelyExtracted) {
+				
+			}
 		}
 	}
 	// Otherwise, re-rip the track if any C2 error flags were returned
 	else if(operation.errorFlags.countOfOnes) {
 		
 	}
+	
+}
+
+- (void) preGapDetectionOperationStarted:(PreGapDetectionOperation *)operation
+{
+	NSParameterAssert(nil != operation);
+	
+}
+
+- (void) preGapDetectionOperationStopped:(PreGapDetectionOperation *)operation
+{
+	NSParameterAssert(nil != operation);
+
+	if(operation.error || operation.isCancelled) {
+		if(operation.error)
+			[self presentError:operation.error];		
+		return;
+	}
+	
+	NSLog(@"Pre-gap for track %@: %@", operation.trackNumber, operation.preGap);
+}
+
+- (void) diskWasEjected
+{
 	
 }
 
