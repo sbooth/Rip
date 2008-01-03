@@ -53,7 +53,7 @@
 		goto cleanup;
 	}
 	
-	AudioChannelLayout *inputChannelLayout = NULL;
+	__strong AudioChannelLayout *inputChannelLayout = NULL;
 	if(dataSize) {
 		inputChannelLayout = NSAllocateCollectable(dataSize, 0);
 		if(NULL == inputChannelLayout) {
@@ -103,7 +103,7 @@
 	}
 	
 	// Allocate the conversion buffer
-	int8_t *buffer = NSAllocateCollectable(BUFFER_SIZE, 0);
+	__strong int8_t *buffer = NSAllocateCollectable(BUFFER_SIZE, 0);
 	if(NULL == buffer) {
 		self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:ENOMEM userInfo:nil];
 		goto cleanup;
@@ -117,6 +117,8 @@
 	
 	// Iteratively read data from the input file and write it to the output file
 	for(;;) {
+		audioBuffer.mBuffers[0].mDataByteSize = BUFFER_SIZE;
+		
 		UInt32 frameCount = (audioBuffer.mBuffers[0].mDataByteSize / inputStreamDescription.mBytesPerFrame);
 		
 		// Read a chunk of input

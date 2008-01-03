@@ -7,7 +7,7 @@
 #include <AudioToolbox/AudioFile.h>
 
 // ========================================
-//
+// An NSOperation subclass that transcodes audio from one format to another
 // ========================================
 @interface CoreAudioEncodeOperation : NSOperation
 {
