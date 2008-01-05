@@ -22,7 +22,8 @@
 	NSUInteger _lastSession;
 }
 
-@property (readonly) NSInteger freeDBID;
+@property (readonly) NSInteger freeDBDiscID;
+@property (readonly) NSString * musicBrainzDiscID;
 @property (readonly, assign) NSUInteger firstSession;
 @property (readonly, assign) NSUInteger lastSession;
 @property (readonly) NSArray * sessions;

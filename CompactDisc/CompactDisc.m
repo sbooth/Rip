@@ -9,6 +9,7 @@
 #import "SessionDescriptor.h"
 #import "TrackDescriptor.h"
 
+#include <discid/discid.h>
 #include <IOKit/storage/IOCDMedia.h>
 
 // ========================================
@@ -112,7 +113,7 @@ sum_digits(NSInteger number)
 	return copy;
 }
 
-- (NSInteger) freeDBID
+- (NSInteger) freeDBDiscID
 {
 	NSInteger sumOfTrackLengthDigits = 0;
 	
@@ -130,6 +131,31 @@ sum_digits(NSInteger number)
 	NSInteger discLengthInSeconds = ((leadOut.minute * 60) + leadOut.second) - ((firstTrack.minute * 60) + firstTrack.second);
 	
 	return ((sumOfTrackLengthDigits % 0xFF) << 24 | discLengthInSeconds << 8 | (session.lastTrack - session.firstTrack + 1));
+}
+
+- (NSString *) musicBrainzDiscID
+{
+	NSString *musicBrainzDiscID = nil;
+	
+	DiscId *discID = discid_new();
+	if(NULL == discID)
+		return nil;
+	
+	// zero is lead out
+	int offsets[100];
+	offsets[0] = [self leadOutForSession:1] + 150;
+	
+	NSArray *firstSessionTracks = [self tracksForSession:1];
+	for(TrackDescriptor *trackDescriptor in firstSessionTracks)
+		offsets[trackDescriptor.number] = trackDescriptor.firstSector + 150;
+	
+	int result = discid_put(discID, 1, firstSessionTracks.count, offsets);
+	if(result)
+		musicBrainzDiscID = [NSString stringWithCString:discid_get_id(discID) encoding:NSASCIIStringEncoding];
+	
+	discid_free(discID);
+	
+	return musicBrainzDiscID;
 }
 
 // Disc track information
