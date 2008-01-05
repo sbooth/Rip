@@ -4,13 +4,14 @@
  */
 
 #import "MusicBrainz.h"
+#import "CompactDisc.h"
 
 #include <musicbrainz3/webservice.h>
 #include <musicbrainz3/query.h>
 #include <musicbrainz3/model.h>
 #include <musicbrainz3/utils.h>
 
-@implementation MusicBrainz
+@implementation MusicBrainzDatabase
 
 - (BOOL) performQuery:(NSError **)error
 {
@@ -189,6 +190,8 @@
 		
 		delete result;
 	}
+	
+	return YES;
 }
 
 @end

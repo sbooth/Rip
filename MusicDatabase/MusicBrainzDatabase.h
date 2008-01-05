@@ -7,9 +7,9 @@
 #import "MusicDatabase.h"
 
 // ========================================
-// A MusicDatabase subclass providing access to the FreeDB online database
+// A MusicDatabase subclass providing access to the MusicBrainz online database
 // ========================================
-@interface FreeDB : MusicDatabase
+@interface MusicBrainzDatabase : MusicDatabase
 {
 }
 
