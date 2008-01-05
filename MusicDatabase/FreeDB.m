@@ -15,7 +15,7 @@
 
 @implementation FreeDB
 
-- (BOOL) performQuery:(NSError **)error;
+- (BOOL) performQuery:(NSError **)error
 {
 	// Remove all previous query results
 	NSIndexSet *indexesToBeRemoved = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, self.queryResults.count)];
