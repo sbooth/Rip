@@ -3,7 +3,7 @@
  *  All Rights Reserved
  */
 
-#import "MusicBrainz.h"
+#import "MusicBrainzDatabase.h"
 #import "CompactDisc.h"
 
 #include <musicbrainz3/webservice.h>
