@@ -6,31 +6,9 @@
 #import <Cocoa/Cocoa.h>
 #include <DiskArbitration/DiskArbitration.h>
 
-// ========================================
-// KVC key names for the metadata dictionaries
-// ========================================
-extern NSString * const		kMetadataTitleKey;
-extern NSString * const		kMetadataAlbumTitleKey;
-extern NSString * const		kMetadataArtistKey;
-extern NSString * const		kMetadataAlbumArtistKey;
-extern NSString * const		kMetadataGenreKey;
-extern NSString * const		kMetadataComposerKey;
-extern NSString * const		kMetadataDateKey;
-extern NSString * const		kMetadataCompilationKey;
-extern NSString * const		kMetadataTrackNumberKey;
-extern NSString * const		kMetadataTrackTotalKey;
-extern NSString * const		kMetadataDiscNumberKey;
-extern NSString * const		kMetadataDiscTotalKey;
-extern NSString * const		kMetadataCommentKey;
-extern NSString * const		kMetadataISRCKey;
-extern NSString * const		kMetadataMCNKey;
-extern NSString * const		kMetadataBPMKey;
-extern NSString * const		kMetadataMusicDNSPUIDKey;
-extern NSString * const		kMetadataMusicBrainzIDKey;
-
 @class CompactDisc, AccurateRipDisc, DriveInformation;
 
-@interface CompactDiscDocument : NSPersistentDocument
+@interface CompactDiscWindowController : NSWindowController
 {
 	IBOutlet NSArrayController *_trackController;
 	IBOutlet NSObjectController *_driveInformationController;
@@ -69,6 +47,8 @@ extern NSString * const		kMetadataMusicBrainzIDKey;
 - (IBAction) copyImage:(id)sender;
 
 - (IBAction) detectPreGaps:(id)sender;
+
+- (IBAction) queryMusicDatabase:(id)sender;
 
 - (IBAction) ejectDisc:(id)sender;
 

@@ -3,7 +3,7 @@
  *  All Rights Reserved
  */
 
-#import "CompactDiscDocument.h"
+#import "CompactDiscWindowController.h"
 
 #import "CompactDisc.h"
 #import "SessionDescriptor.h"
@@ -18,46 +18,30 @@
 #import "BitArray.h"
 #include "AccurateRipUtilities.h"
 #include "ExtractionConfigurationSheetController.h"
-
-// ========================================
-// KVC key names for the metadata dictionaries
-// ========================================
-NSString * const	kMetadataTitleKey						= @"title";
-NSString * const	kMetadataAlbumTitleKey					= @"albumTitle";
-NSString * const	kMetadataArtistKey						= @"artist";
-NSString * const	kMetadataAlbumArtistKey					= @"albumArtist";
-NSString * const	kMetadataGenreKey						= @"genre";
-NSString * const	kMetadataComposerKey					= @"composer";
-NSString * const	kMetadataDateKey						= @"date";
-NSString * const	kMetadataCompilationKey					= @"compilation";
-NSString * const	kMetadataTrackNumberKey					= @"trackNumber";
-NSString * const	kMetadataTrackTotalKey					= @"trackTotal";
-NSString * const	kMetadataDiscNumberKey					= @"discNumber";
-NSString * const	kMetadataDiscTotalKey					= @"discTotal";
-NSString * const	kMetadataCommentKey						= @"comment";
-NSString * const	kMetadataISRCKey						= @"isrc";
-NSString * const	kMetadataMCNKey							= @"mcn";
-NSString * const	kMetadataBPMKey							= @"bpm";
-NSString * const	kMetadataMusicDNSPUIDKey				= @"musicDNSPUID";
-NSString * const	kMetadataMusicBrainzIDKey				= @"musicBrainzID";
+#include "MusicDatabase.h"
+#include "MusicDatabaseMatchesSheetController.h"
+#include "FreeDB.h"
+#include "MusicBrainzDatabase.h"
 
 // ========================================
 // Context objects for observeValueForKeyPath:ofObject:change:context:
 // ========================================
-NSString * const	kKVOExtractionContext					= @"org.sbooth.Rip.CompactDiscDocument.ExtractionContext";
+NSString * const	kKVOExtractionContext					= @"org.sbooth.Rip.CompactDiscWindowController.ExtractionContext";
 
-@interface CompactDiscDocument ()
+@interface CompactDiscWindowController ()
 @property (assign) CompactDisc * compactDisc;
 @property (assign) AccurateRipDisc * accurateRipDisc;
 @property (assign) DriveInformation * driveInformation;
 @end
 
-@interface CompactDiscDocument (Private)
+@interface CompactDiscWindowController (Private)
 - (void) extractionOperationStarted:(ExtractionOperation *)operation;
 - (void) extractionOperationStopped:(ExtractionOperation *)operation;
 - (void) preGapDetectionOperationStarted:(PreGapDetectionOperation *)operation;
 - (void) preGapDetectionOperationStopped:(PreGapDetectionOperation *)operation;
 - (void) diskWasEjected;
+- (void) showMusicDatabaseMatchesSheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode contextInfo:(void *)contextInfo;
+- (void) updateMetadataWithMusicDatabaseEntry:(id)musicDatabaseEntry;
 @end
 
 // ========================================
@@ -71,17 +55,21 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 	
 	NSCParameterAssert(NULL != context);
 	
-	CompactDiscDocument *document = (CompactDiscDocument *)context;
+	CompactDiscWindowController *compactDiscWindowController = (CompactDiscWindowController *)context;
 
 	// If there is a dissenter, the ejection did not succeed
 	if(dissenter)
-		[document presentError:[NSError errorWithDomain:NSMachErrorDomain code:DADissenterGetStatus(dissenter) userInfo:nil]];
+		[document presentError:[NSError errorWithDomain:NSMachErrorDomain code:DADissenterGetStatus(dissenter) userInfo:nil] 
+				modalForWindow:compactDiscWindowController.window 
+					  delegate:nil 
+			didPresentSelector:NULL 
+				   contextInfo:NULL];
 	// The disk was successfully ejected
 	else
-		[document diskWasEjected];
+		[compactDiscWindowController diskWasEjected];
 }
 
-@implementation CompactDiscDocument
+@implementation CompactDiscWindowController
 
 @synthesize trackController = _trackController;
 @synthesize driveInformationController = _driveInformationController;
@@ -97,7 +85,7 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 
 - (id) init
 {
-	if((self = [super init])) {
+	if((self = [super initWithWindowNibName:@"CompactDiscWindowController"])) {
 		_tracks = [[NSMutableArray alloc] init];
 		_metadata = [[NSMutableDictionary alloc] init];
 		_compactDiscOperationQueue = [[NSOperationQueue alloc] init];
@@ -136,6 +124,8 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 	}
 	else if([menuItem action] == @selector(copyImage:))
 		return YES;
+	else if([menuItem action] == @selector(queryMusicDatabase:))
+		return YES;
 	else if([menuItem action] == @selector(detectPreGaps:)) {
 		NSPredicate *selectedTracksPredicate = [NSPredicate predicateWithFormat:@"selected == 1"];
 		NSArray *selectedTracks = [self.tracks filteredArrayUsingPredicate:selectedTracksPredicate];
@@ -153,6 +143,8 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 		return (0 != selectedTracks.count);
 	}
 	else if([toolbarItem action] == @selector(copyImage:))
+		return YES;
+	else if([toolbarItem action] == @selector(queryMusicDatabase:))
 		return YES;
 	else if([toolbarItem action] == @selector(detectPreGaps:)) {
 		NSPredicate *selectedTracksPredicate = [NSPredicate predicateWithFormat:@"selected == 1"];
@@ -199,6 +191,16 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 - (id) managedObjectModel
 {
 	return [[[NSApplication sharedApplication] delegate] managedObjectModel];
+}
+
+#pragma mark NSWindow Delegate Methods
+
+- (NSUndoManager *) windowWillReturnUndoManager:(NSWindow *)window
+{
+	
+#pragma unused(window)
+	
+	return self.managedObjectContext.undoManager;
 }
 
 - (void) setDisk:(DADiskRef)disk
@@ -262,9 +264,9 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 	}
 }
 
-- (NSString *) windowNibName
+/*- (NSString *) windowNibName
 {
-	return @"CompactDiscDocument";
+	return @"CompactDiscWindowController";
 }
 
 - (void) windowControllerDidLoadNib:(NSWindowController *)aController
@@ -272,7 +274,7 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 	[super windowControllerDidLoadNib:aController];
 }
 
-/*- (NSData *) dataOfType:(NSString *)typeName error:(NSError **)outError
+- (NSData *) dataOfType:(NSString *)typeName error:(NSError **)outError
 {
 	
 #pragma unused(typeName)
@@ -343,13 +345,6 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 	}
 }
 
-- (void) showStreamInformationSheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode contextInfo:(void *)contextInfo
-{
-	NSLog(@"showStreamInformationSheetDidEnd");
-
-	[sheet orderOut:self];
-}
-
 - (IBAction) copyImage:(id)sender
 {
 
@@ -358,7 +353,7 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 	ExtractionConfigurationSheetController *extractionConfigurationSheetController = [[ExtractionConfigurationSheetController alloc] init];
 	
 	[[NSApplication sharedApplication] beginSheet:[extractionConfigurationSheetController window] 
-								   modalForWindow:[self windowForSheet] 
+								   modalForWindow:self.window 
 									modalDelegate:self 
 								   didEndSelector:@selector(showStreamInformationSheetDidEnd:returnCode:contextInfo:) 
 									  contextInfo:extractionConfigurationSheetController];
@@ -402,6 +397,49 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 	}
 }
 
+- (IBAction) queryMusicDatabase:(id)sender
+{
+	
+#pragma unused(sender)
+
+	MusicDatabase *musicDatabase = [[MusicBrainzDatabase alloc] init];
+	musicDatabase.compactDisc = self.compactDisc;
+
+	NSError *error = nil;
+	BOOL success = [musicDatabase performQuery:&error];
+	if(!success) {
+		[self presentError:error modalForWindow:self.window delegate:nil didPresentSelector:NULL contextInfo:NULL];
+		return;
+	}
+	
+	NSUInteger matchCount = musicDatabase.queryResults.count;
+	
+	if(0 == matchCount) {
+		NSBeginAlertSheet(NSLocalizedStringFromTable(@"The disc was not found.", @"MusicDatabase", @""), 
+						  NSLocalizedStringFromTable(@"OK", @"Buttons", @""),
+						  nil, /* alternateButton */
+						  nil, /* otherButton */
+						  self.window, 
+						  nil,  /* modalDelegate */
+						  NULL,  /* didEndSelector */
+						  NULL,  /* didDismissSelector */
+						  NULL,  /* contextInfo */
+						  NSLocalizedStringFromTable(@"No matching discs were found in the database.", @"MusicDatabase", @""));
+	}
+	else if(1 == matchCount)
+		[self updateMetadataWithMusicDatabaseEntry:[musicDatabase.queryResults lastObject]];
+	else {
+		MusicDatabaseMatchesSheetController *musicDatabaseMatchesSheetController = [[MusicDatabaseMatchesSheetController alloc] init];		
+		musicDatabaseMatchesSheetController.matches = musicDatabase.queryResults;
+		
+		[[NSApplication sharedApplication] beginSheet:[musicDatabaseMatchesSheetController window] 
+									   modalForWindow:self.window
+										modalDelegate:self 
+									   didEndSelector:@selector(showMusicDatabaseMatchesSheetDidEnd:returnCode:contextInfo:) 
+										  contextInfo:musicDatabaseMatchesSheetController];
+	}
+}
+
 - (IBAction) ejectDisc:(id)sender
 {
 
@@ -436,7 +474,7 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 
 @end
 
-@implementation CompactDiscDocument (Private)
+@implementation CompactDiscWindowController (Private)
 
 - (void) extractionOperationStarted:(ExtractionOperation *)operation
 {
@@ -452,11 +490,11 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 	// Delete the output file if the operation was cancelled or did not succeed
 	if(operation.error || operation.isCancelled) {
 		if(operation.error)
-			[self presentError:operation.error];
+			[self presentError:operation.error modalForWindow:self.window delegate:nil didPresentSelector:NULL contextInfo:NULL];
 			
 		NSError *error = nil;
 		if(![[NSFileManager defaultManager] removeItemAtPath:operation.url.path error:&error])
-			[self presentError:error];
+			[self presentError:error modalForWindow:self.window delegate:nil didPresentSelector:NULL contextInfo:NULL];
 		return;
 	}
 
@@ -545,7 +583,7 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 
 	if(operation.error || operation.isCancelled) {
 		if(operation.error)
-			[self presentError:operation.error];		
+			[self presentError:operation.error modalForWindow:self.window delegate:nil didPresentSelector:NULL contextInfo:NULL];
 		return;
 	}
 	
@@ -555,6 +593,34 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 - (void) diskWasEjected
 {
 	
+}
+
+- (void) showStreamInformationSheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode contextInfo:(void *)contextInfo
+{
+	NSLog(@"showStreamInformationSheetDidEnd");
+	
+	[sheet orderOut:self];
+}
+
+
+- (void) showMusicDatabaseMatchesSheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode contextInfo:(void *)contextInfo
+{
+	NSParameterAssert(nil != sheet);
+	NSParameterAssert(NULL != contextInfo);
+	
+	[sheet orderOut:self];
+
+	MusicDatabaseMatchesSheetController *musicDatabaseMatchesSheetController = (MusicDatabaseMatchesSheetController *)contextInfo;
+	
+	if(NSOKButton == returnCode)
+		[self updateMetadataWithMusicDatabaseEntry:musicDatabaseMatchesSheetController.selectedMatch];
+}
+
+- (void) updateMetadataWithMusicDatabaseEntry:(id)musicDatabaseEntry
+{
+	NSParameterAssert(nil != musicDatabaseEntry);
+
+	NSLog(@"updateMetadataWithMusicDatabaseEntry: %@", musicDatabaseEntry);
 }
 
 @end

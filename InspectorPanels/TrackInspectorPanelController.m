@@ -4,7 +4,11 @@
  */
 
 #import "TrackInspectorPanelController.h"
-#import "CompactDiscDocument.h"
+#import "CompactDiscWindowController.h"
+
+@interface TrackInspectorPanelController ()
+@property (assign) id inspectedDocument;
+@end
 
 @interface TrackInspectorPanelController (Private)
 - (void) activeDocumentChanged;
@@ -12,7 +16,7 @@
 
 @implementation TrackInspectorPanelController
 
-@synthesize inspectedDocument;
+@synthesize inspectedDocument = _inspectedDocument;
 
 - (id) init
 {
@@ -22,7 +26,7 @@
 - (void) windowDidLoad
 {
 	[self activeDocumentChanged];
-	[[NSApplication sharedApplication] addObserver:self forKeyPath:@"mainWindow.windowController.document" options:0 context:[TrackInspectorPanelController class]];
+	[[NSApplication sharedApplication] addObserver:self forKeyPath:@"mainWindow.windowController" options:0 context:[TrackInspectorPanelController class]];
 
 	[super windowDidLoad];
 }
@@ -37,9 +41,9 @@
 
 - (IBAction) toggleTrackInspectorPanel:(id)sender
 {
-    NSWindow *window = [self window];
+    NSWindow *window = self.window;
 	
-	if([window isVisible] && [window isKeyWindow])
+	if(window.isVisible && window.isKeyWindow)
 		[window orderOut:sender];
 	else
 		[window makeKeyAndOrderFront:sender];
@@ -50,7 +54,7 @@
 	if([menuItem action] == @selector(toggleTrackInspectorPanel:)) {
 		NSString *menuTitle = nil;
 
-		if(![self isWindowLoaded] || ![[self window] isVisible] || ![[self window] isKeyWindow])
+		if(!self.isWindowLoaded || !self.window.isVisible || !self. window.isKeyWindow)
 			menuTitle = NSLocalizedStringFromTable(@"Show Track Inspector", @"Menus", @"");
 		else
 			menuTitle = NSLocalizedStringFromTable(@"Hide Track Inspector", @"Menus", @"");
@@ -67,10 +71,9 @@
 
 - (void) activeDocumentChanged
 {
-	id mainDocument = [[[[NSApplication sharedApplication] mainWindow] windowController] document];
-	if(mainDocument != inspectedDocument)
-		self.inspectedDocument = (mainDocument && [mainDocument isKindOfClass:[CompactDiscDocument class]]) ? mainDocument : nil;   
+	id mainDocument = [[[NSApplication sharedApplication] mainWindow] windowController];
+	if(mainDocument != self.inspectedDocument)
+		self.inspectedDocument = (mainDocument && [mainDocument isKindOfClass:[CompactDiscWindowController class]]) ? mainDocument : nil;   
 }
-
 
 @end

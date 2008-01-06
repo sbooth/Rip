@@ -8,10 +8,10 @@
 @interface DriveInspectorPanelController : NSWindowController
 {
 	IBOutlet NSObjectController *_documentObjectController;
-	id inspectedDocument;
+	id _inspectedDocument;
 }
 
-@property id inspectedDocument;
+@property (readonly, assign) id inspectedDocument;
 
 - (IBAction) toggleDriveInspectorPanel:(id)sender;
 
