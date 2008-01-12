@@ -4,7 +4,7 @@
  */
 
 #import "ApplicationDelegate.h"
-#import "CompactDiscDocument.h"
+#import "CompactDiscWindowController.h"
 #import "AquaticPrime.h"
 
 #include <CoreFoundation/CoreFoundation.h>
@@ -31,7 +31,9 @@
 @interface ApplicationDelegate (Private)
 - (void) diskAppeared:(DADiskRef)disk;
 - (void) diskDisappeared:(DADiskRef)disk;
-- (BOOL) validateLicense:(NSString *)licensePath;
+- (NSURL *) locateLicenseURL;
+- (BOOL) validateLicenseURL:(NSURL *)licenseURL error:(NSError **)error;
+- (void) displayNagDialog;
 @end
 
 
@@ -79,6 +81,16 @@ diskDisappearedCallback(DADiskRef disk, void *context)
 {
 
 #pragma unused(aNotification)
+	
+	// Determine if this application is registered, and if not, display a nag dialog
+	NSURL *licenseURL = [self locateLicenseURL];
+	if(licenseURL) {
+		NSError *error = nil;
+		if(![self validateLicenseURL:licenseURL error:&error])
+			[[NSApplication sharedApplication] presentError:error];
+	}
+	else
+		[self displayNagDialog];
 	
 	// Use DiskArbitration to request mount/unmount information for audio CDs
 	
@@ -153,29 +165,39 @@ diskDisappearedCallback(DADiskRef disk, void *context)
 #pragma unused(theApplication)
 	
 	NSParameterAssert(nil != filename);
-	
+
 	NSString *pathExtension = [filename pathExtension];
 
-	CFStringRef myUTI = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, (CFStringRef)pathExtension, kUTTypePlainText);
-	NSLog(@"UTI = %@",myUTI);
-	Boolean result = UTTypeConformsTo(myUTI, kUTTypeImage);
+//	CFStringRef myUTI = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, (CFStringRef)pathExtension, kUTTypePlainText);
 
-	if([pathExtension isEqualToString:@"riplicense"])
-		return [self validateLicense:filename];
+	if([pathExtension isEqualToString:@"riplicense"]) {
+		NSError *error = nil;
+		if([self validateLicenseURL:[NSURL fileURLWithPath:filename] error:&error]) {
+			NSString *licenseCopyPath = [self.applicationSupportFolderURL.path stringByAppendingPathComponent:filename.lastPathComponent];
+			if(![[NSFileManager defaultManager] copyItemAtPath:filename toPath:licenseCopyPath error:&error])
+				[[NSApplication sharedApplication] presentError:error];
+		}
+		else
+			[[NSApplication sharedApplication] presentError:error];
+		
+		
+		return YES;
+	}
 	else
 		return NO;
 }
 
-- (NSString *) applicationSupportFolder
+- (NSURL *) applicationSupportFolderURL
 {
 	NSArray *applicationSupportPaths = NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, YES);
 	NSString *applicationSupportPath = (0 < applicationSupportPaths.count) ? [applicationSupportPaths objectAtIndex:0] : NSTemporaryDirectory();
 	NSString *applicationName = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleName"];
-
-	return [applicationSupportPath stringByAppendingPathComponent:applicationName];
+	NSString *applicationSupportFolder = [applicationSupportPath stringByAppendingPathComponent:applicationName];
+	
+	return [NSURL fileURLWithPath:applicationSupportFolder];
 }
 
-- (NSURL *) applicationLogURL
+- (NSURL *) applicationLogFileURL
 {
 	NSArray *userLibraryPaths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
 	NSString *userLibraryPath = (0 < userLibraryPaths.count) ? [userLibraryPaths objectAtIndex:0] : NSTemporaryDirectory();
@@ -203,14 +225,15 @@ diskDisappearedCallback(DADiskRef disk, void *context)
 		return _persistentStoreCoordinator;
 
 	NSFileManager *fileManager = [NSFileManager defaultManager];
-	NSString *applicationSupportFolder = self.applicationSupportFolder;
+	NSString *applicationSupportFolderPath = self.applicationSupportFolderURL.path;
+	
 	NSError *error = nil;
 
 	// Create the Application Support directory if it doesn't exist
-	if(![fileManager fileExistsAtPath:applicationSupportFolder isDirectory:NULL] && ![fileManager createDirectoryAtPath:applicationSupportFolder withIntermediateDirectories:YES attributes:nil error:&error])
+	if(![fileManager fileExistsAtPath:applicationSupportFolderPath isDirectory:NULL] && ![fileManager createDirectoryAtPath:applicationSupportFolderPath withIntermediateDirectories:YES attributes:nil error:&error])
 		[[NSApplication sharedApplication] presentError:error];
 
-	NSURL *url = [NSURL fileURLWithPath:[applicationSupportFolder stringByAppendingPathComponent:@"Ripped CDs.xml"]];
+	NSURL *url = [NSURL fileURLWithPath:[applicationSupportFolderPath stringByAppendingPathComponent:@"Ripped CDs.xml"]];
 
 	self.persistentStoreCoordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:self.managedObjectModel];
 
@@ -234,16 +257,9 @@ diskDisappearedCallback(DADiskRef disk, void *context)
 	return _managedObjectContext;
 }
 
-- (NSUndoManager *) windowWillReturnUndoManager:(NSWindow *)window
-{
-	
-#pragma unused(window)
-	
-	return self.managedObjectContext.undoManager;
-}
-
 - (IBAction) saveAction:(id)sender
 {
+
 #pragma unused(sender)
 
 	NSError *error = nil;
@@ -260,15 +276,19 @@ diskDisappearedCallback(DADiskRef disk, void *context)
 	NSParameterAssert(NULL != disk);
 
 	// Create a new document for this disk
-	NSError *error = nil;
+	CompactDiscWindowController *doc = [[CompactDiscWindowController alloc] init];
+	doc.disk = disk;
+	[doc showWindow:self];
+	
+/*	NSError *error = nil;
 	id document = [[NSDocumentController sharedDocumentController] openUntitledDocumentAndDisplay:YES error:&error];
 	
 	if(nil == document)
 		[[NSApplication sharedApplication] presentError:error];
 	
 	// Assign the disk to the document
-	if([document isKindOfClass:[CompactDiscDocument class]])
-		((CompactDiscDocument *)document).disk = disk;
+	if([document isKindOfClass:[CompactDiscWindowController class]])
+		((CompactDiscWindowController *)document).disk = disk;*/
 }
 
 - (void) diskDisappeared:(DADiskRef)disk
@@ -279,7 +299,7 @@ diskDisappearedCallback(DADiskRef disk, void *context)
 	
 	// Iterate through open documents and determine which one matches this disk
 	for(NSDocument *document in [[NSDocumentController sharedDocumentController] documents]) {
-		if([document isKindOfClass:[CompactDiscDocument class]] && CFEqual(((CompactDiscDocument *)document).disk, disk)) {
+		if([document isKindOfClass:[CompactDiscWindowController class]] && CFEqual(((CompactDiscWindowController *)document).disk, disk)) {
 			matchingDocument = document;
 			break;
 		}
@@ -289,54 +309,86 @@ diskDisappearedCallback(DADiskRef disk, void *context)
 		[matchingDocument close];
 }
 
-- (BOOL) validateLicense:(NSString *)licensePath
+- (NSURL *) locateLicenseURL
 {
-	// This string is specially constructed to prevent key replacement
- 	// *** Begin Public Key ***
-	NSMutableString *key = [NSMutableString string];
-	[key appendString:@"0xECBDB"];
-	[key appendString:@"E"];
-	[key appendString:@"E"];
-	[key appendString:@"C23701B8881308A2B0CCB"];
-	[key appendString:@"C4D06FD2BA857CD26161E6504"];
-	[key appendString:@"6"];
-	[key appendString:@"6"];
-	[key appendString:@"9F1"];
-	[key appendString:@"5B68F46160719425714E4DAE950193"];
-	[key appendString:@"80E03C2D"];
-	[key appendString:@"5"];
-	[key appendString:@"5"];
-	[key appendString:@"C05A0C6CC93903591E35"];
-	[key appendString:@"DA0E2534A6F39E9E18"];
-	[key appendString:@"A"];
-	[key appendString:@"A"];
-	[key appendString:@"95A8ECDFA4"];
-	[key appendString:@"ED83A6D7B3C0DF6"];
-	[key appendString:@"D"];
-	[key appendString:@"D"];
-	[key appendString:@"7731F4E0E0E4B"];
-	[key appendString:@"086"];
-	[key appendString:@"8"];
-	[key appendString:@"8"];
-	[key appendString:@"B737B712C3C8CEA6BCC90CD44"];
-	[key appendString:@"CA012E8E"];
-	[key appendString:@"A"];
-	[key appendString:@"A"];
-	[key appendString:@"81B5566E6D4F684FAD8B"];
-	[key appendString:@"8080ED6BEE1BE4BAE5"];
-	// *** End Public Key *** 
+	// Search for a license file in the Application Support folder
+	NSString *applicationSupportFolderPath = self.applicationSupportFolderURL.path;
+	NSDirectoryEnumerator *directoryEnumerator = [[NSFileManager defaultManager] enumeratorAtPath:applicationSupportFolderPath];
 	
-	// Instantiate AquaticPrime
-	AquaticPrime *licenseValidator = [AquaticPrime aquaticPrimeWithKey:key];
+	NSString *path = nil;
+	while((path = [directoryEnumerator nextObject])) {
+		// Just return the first one found
+		if([path.pathExtension isEqualToString:@"riplicense"])
+			return [NSURL fileURLWithPath:[applicationSupportFolderPath stringByAppendingPathComponent:path]];			
+	}
+	
+	return nil;
+}
 
-	// Get the dictionary from the license file
-	// If the license is invalid, we get nil back instead of a dictionary
-	NSDictionary *licenseDictionary = [licenseValidator dictionaryForLicenseFile:licensePath];
+		   
+- (BOOL) validateLicenseURL:(NSURL *)licenseURL error:(NSError **)error
+{
+	NSParameterAssert(nil != licenseURL);
+	
+	// This string is specially constructed to prevent key replacement
+	NSMutableString *publicKey = [NSMutableString string];
+	[publicKey appendString:@"0xECBDB"];
+	[publicKey appendString:@"E"];
+	[publicKey appendString:@"E"];
+	[publicKey appendString:@"C23701B8881308A2B0CCB"];
+	[publicKey appendString:@"C4D06FD2BA857CD26161E6504"];
+	[publicKey appendString:@"6"];
+	[publicKey appendString:@"6"];
+	[publicKey appendString:@"9F1"];
+	[publicKey appendString:@"5B68F46160719425714E4DAE950193"];
+	[publicKey appendString:@"80E03C2D"];
+	[publicKey appendString:@"5"];
+	[publicKey appendString:@"5"];
+	[publicKey appendString:@"C05A0C6CC93903591E35"];
+	[publicKey appendString:@"DA0E2534A6F39E9E18"];
+	[publicKey appendString:@"A"];
+	[publicKey appendString:@"A"];
+	[publicKey appendString:@"95A8ECDFA4"];
+	[publicKey appendString:@"ED83A6D7B3C0DF6"];
+	[publicKey appendString:@"D"];
+	[publicKey appendString:@"D"];
+	[publicKey appendString:@"7731F4E0E0E4B"];
+	[publicKey appendString:@"086"];
+	[publicKey appendString:@"8"];
+	[publicKey appendString:@"8"];
+	[publicKey appendString:@"B737B712C3C8CEA6BCC90CD44"];
+	[publicKey appendString:@"CA012E8E"];
+	[publicKey appendString:@"A"];
+	[publicKey appendString:@"A"];
+	[publicKey appendString:@"81B5566E6D4F684FAD8B"];
+	[publicKey appendString:@"8080ED6BEE1BE4BAE5"];
+	
+	AquaticPrime *licenseValidator = [AquaticPrime aquaticPrimeWithKey:publicKey];
+	NSDictionary *licenseDictionary = [licenseValidator dictionaryForLicenseFile:licenseURL.path];
 
-	if(nil == licenseDictionary)
-		return NO;
-	else
-		return nil != [licenseDictionary objectForKey:@"Name"];
+	// This is an invalid license
+	if(nil == licenseDictionary) {
+		if(error) {
+			NSMutableDictionary *userInfo = [NSMutableDictionary dictionary];
+			[userInfo setObject:licenseURL.path forKey:NSFilePathErrorKey];
+			[userInfo setObject:NSLocalizedStringFromTable(@"Unable to read the license file", @"Errors", @"") forKey:NSLocalizedDescriptionKey];
+			[userInfo setObject:NSLocalizedStringFromTable(@"The license could be incomplete or might contain an invalid key.", @"Errors", @"") forKey:NSLocalizedRecoverySuggestionErrorKey];
+			
+			*error = [NSError errorWithDomain:@"org.sbooth.Rip.ErrorDomain" code:20 userInfo:userInfo];
+		}
+		
+		return NO;		
+	}
+
+	// TODO: Make sure the license is sane
+	return YES;
+}
+
+- (void) displayNagDialog
+{
+	NSRunAlertPanel(NSLocalizedStringFromTable(@"This copy of Rip is unregistered.", @"", @""), 
+					NSLocalizedStringFromTable(@"You may purchase a license from http://sbooth.org/Rip/", @"", @""), 
+					NSLocalizedStringFromTable(@"OK", @"Buttons", @""), nil, nil);
 }
 
 @end

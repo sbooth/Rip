@@ -59,11 +59,11 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 
 	// If there is a dissenter, the ejection did not succeed
 	if(dissenter)
-		[document presentError:[NSError errorWithDomain:NSMachErrorDomain code:DADissenterGetStatus(dissenter) userInfo:nil] 
-				modalForWindow:compactDiscWindowController.window 
-					  delegate:nil 
-			didPresentSelector:NULL 
-				   contextInfo:NULL];
+		[compactDiscWindowController presentError:[NSError errorWithDomain:NSMachErrorDomain code:DADissenterGetStatus(dissenter) userInfo:nil] 
+								   modalForWindow:compactDiscWindowController.window 
+										 delegate:nil 
+							   didPresentSelector:NULL 
+									  contextInfo:NULL];
 	// The disk was successfully ejected
 	else
 		[compactDiscWindowController diskWasEjected];
@@ -85,7 +85,7 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 
 - (id) init
 {
-	if((self = [super initWithWindowNibName:@"CompactDiscWindowController"])) {
+	if((self = [super initWithWindowNibName:@"CompactDisc"])) {
 		_tracks = [[NSMutableArray alloc] init];
 		_metadata = [[NSMutableDictionary alloc] init];
 		_compactDiscOperationQueue = [[NSOperationQueue alloc] init];

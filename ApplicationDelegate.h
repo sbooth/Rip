@@ -14,10 +14,12 @@
 	NSManagedObjectContext *_managedObjectContext;
 }
 
-@property (readonly) NSString * applicationSupportFolder;
-@property (readonly) NSURL * applicationLogURL;
+@property (readonly) NSURL * applicationSupportFolderURL;
+@property (readonly) NSURL * applicationLogFileURL;
 @property (readonly, assign) NSPersistentStoreCoordinator * persistentStoreCoordinator;
 @property (readonly, assign) NSManagedObjectModel * managedObjectModel;
 @property (readonly, assign) NSManagedObjectContext * managedObjectContext;
+
+- (IBAction) saveAction:(id)sender;
 
 @end
