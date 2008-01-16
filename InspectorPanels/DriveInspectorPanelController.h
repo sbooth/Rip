@@ -8,6 +8,8 @@
 @interface DriveInspectorPanelController : NSWindowController
 {
 	IBOutlet NSObjectController *_documentObjectController;
+
+@private
 	id _inspectedDocument;
 }
 
