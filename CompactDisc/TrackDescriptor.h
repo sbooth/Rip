@@ -5,27 +5,36 @@
 
 #import <Cocoa/Cocoa.h>
 
+@class SessionDescriptor, SectorRange;
+
 // ========================================
-// Utility class encapsulating useful information about
-// a single track on a CDDA disk
+// This class encapsulates useful information about a single track on a CDDA disc
+// and its associated metadata
 // ========================================
-@interface TrackDescriptor : NSObject <NSCopying>
+@interface TrackDescriptor : NSManagedObject
 {
-	NSUInteger _session;
-	NSUInteger _number;
-	NSUInteger _firstSector;
-	NSUInteger _channels;
-	BOOL _preEmphasis;
-	BOOL _copyPermitted;
-	BOOL _dataTrack;
 }
 
-@property (assign) NSUInteger session;
-@property (assign) NSUInteger number;
-@property (assign) NSUInteger firstSector;
-@property (assign) NSUInteger channels;
-@property (assign) BOOL preEmphasis;
-@property (assign) BOOL copyPermitted;
-@property (assign) BOOL dataTrack;
+// ========================================
+// Core Data properties
+@property (assign) NSNumber * channelsPerFrame;
+@property (assign) NSNumber * digitalCopyPermitted;
+@property (assign) NSNumber * firstSector;
+@property (assign) NSNumber * hasPreEmphasis;
+@property (assign) NSNumber * isDataTrack;
+@property (assign) NSNumber * isSelected; // Transient
+@property (assign) NSNumber * lastSector;
+@property (assign) NSNumber * number;
+@property (assign) NSNumber * preGap;
+
+// ========================================
+// Core Data relationships
+@property (assign) NSManagedObject * metadata;
+@property (assign) SessionDescriptor * session;
+
+// ========================================
+// Computed properties
+@property (readonly) NSNumber * sectorCount;
+@property (readonly) SectorRange * sectorRange;
 
 @end

@@ -4,29 +4,62 @@
  */
 
 #import "SessionDescriptor.h"
+#import "TrackDescriptor.h"
+#import "SectorRange.h"
 
 @implementation SessionDescriptor
 
-@synthesize number = _number;
-@synthesize firstTrack = _firstTrack;
-@synthesize lastTrack = _lastTrack;
-@synthesize leadOut = _leadOut;
+// ========================================
+// Core Data properties
+@dynamic leadOut;
+@dynamic number;
 
-- (id) copyWithZone:(NSZone *)zone
+// ========================================
+// Core Data relationships
+@dynamic compactDisc;
+@dynamic tracks;
+
+// ========================================
+// Other properties
+- (NSSet *) selectedTracks
 {
-	SessionDescriptor *copy = [[[self class] allocWithZone:zone] init];
-
-	copy.number = self.number;
-	copy.firstTrack = self.firstTrack;
-	copy.lastTrack = self.lastTrack;
-	copy.leadOut = self.leadOut;
-
-	return copy;
+	NSPredicate *selectedTracksPredicate = [NSPredicate predicateWithFormat:@"isSelected == 1"];
+	return [self.tracks filteredSetUsingPredicate:selectedTracksPredicate];
 }
 
-- (NSString *) description
+- (NSArray *) orderedTracks
 {
-	return [NSString stringWithFormat:@"SessionDescriptor {\n\tSession: %u\n\tFirst Track: %u\n\tLast Track: %u\n\tLead Out: %u\n}", self.number, self.firstTrack, self.lastTrack, self.leadOut];
+	NSSortDescriptor *trackNumberSortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"number" ascending:YES];
+	return [self.tracks.allObjects sortedArrayUsingDescriptors:[NSArray arrayWithObject:trackNumberSortDescriptor]];
+}
+
+- (TrackDescriptor *) firstTrack
+{
+	NSArray *orderedTracks = self.orderedTracks;
+	return (0 == orderedTracks.count ? nil : [orderedTracks objectAtIndex:0]);
+}
+
+- (TrackDescriptor *) lastTrack
+{
+	NSArray *orderedTracks = self.orderedTracks;
+	return (0 == orderedTracks.count ? nil : orderedTracks.lastObject);
+}
+
+// ========================================
+
+- (BOOL) containsTrackNumber:(NSUInteger)number
+{
+	return (nil != [self trackNumber:number]);
+}
+
+- (TrackDescriptor *) trackNumber:(NSUInteger)number
+{
+	for(TrackDescriptor *track in self.tracks) {
+		if(track.number.unsignedIntegerValue == number)
+			return track;
+	}
+	
+	return nil;
 }
 
 @end

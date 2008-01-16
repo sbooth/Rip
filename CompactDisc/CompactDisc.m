@@ -14,8 +14,7 @@
 
 // ========================================
 // Calculates the sum of the digits in the given number
-static NSInteger
-sum_digits(NSInteger number)
+static NSInteger sum_digits(NSInteger number)
 { 
 	NSInteger sum = 0; 
 	
@@ -28,11 +27,50 @@ sum_digits(NSInteger number)
 }
 
 // ========================================
-// Public getters, private setters
-@interface CompactDisc ()
-@property (assign) NSUInteger firstSession;
-@property (assign) NSUInteger lastSession;
-@end
+// Calculate the FreeDB ID for the given CDTOC
+static NSInteger calculateFreeDBDiscIDForCDTOC(CDTOC *toc)
+{
+	NSCParameterAssert(NULL != toc);
+
+	NSInteger sumOfTrackLengthDigits = 0;
+	NSUInteger firstTrackNumber, lastTrackNumber;
+	CDMSF leadOutMSF = { 0, 0, 0 };
+
+	// Iterate through each descriptor and extract the information we need
+	// For multi-session discs only the first session is used to generate the FreeDB ID
+	NSUInteger numDescriptors = CDTOCGetDescriptorCount(toc);
+	NSUInteger i;
+	for(i = 0; i < numDescriptors; ++i) {
+		CDTOCDescriptor *desc = &toc->descriptors[i];
+		
+		// First track
+		if(0xA0 == desc->point && 1 == desc->adr) {
+			if(1 == desc->session)
+				firstTrackNumber = desc->p.minute;
+		}
+		// Last track
+		else if(0xA1 == desc->point && 1 == desc->adr) {
+			if(1 == desc->session)
+				lastTrackNumber = desc->p.minute;
+		}
+		// Lead-out
+		else if(0xA2 == desc->point && 1 == desc->adr) {
+			if(1 == desc->session)
+				leadOutMSF = desc->p;
+		}
+	}
+	
+	NSUInteger trackNumber;
+	for(trackNumber = firstTrackNumber; trackNumber <= lastTrackNumber; ++trackNumber) {
+		CDMSF msf = CDConvertTrackNumberToMSF(trackNumber, toc);
+		sumOfTrackLengthDigits += sum_digits((msf.minute * 60) + msf.second);
+	}
+		
+	CDMSF firstTrackMSF = CDConvertTrackNumberToMSF(firstTrackNumber, toc);
+	NSInteger discLengthInSeconds = ((leadOutMSF.minute * 60) + leadOutMSF.second) - ((firstTrackMSF.minute * 60) + firstTrackMSF.second);
+	
+	return ((sumOfTrackLengthDigits % 0xFF) << 24 | discLengthInSeconds << 8 | (lastTrackNumber - firstTrackNumber + 1));
+}
 
 // ========================================
 // Private methods
@@ -42,95 +80,119 @@ sum_digits(NSInteger number)
 
 @implementation CompactDisc
 
-@synthesize firstSession = _firstSession;
-@synthesize lastSession = _lastSession;
-@synthesize sessions = _sessions;
-@synthesize tracks = _tracks;
-
-- (id) initWithDADiskRef:(DADiskRef)disk
+// ========================================
+// Creation
++ (id) compactDiscWithDADiskRef:(DADiskRef)disk
 {
 	NSParameterAssert(NULL != disk);
 	
-	if((self = [super init])) {
-		// Obtain the IOMedia object (it should be IOCDMedia) from the DADiskRef
-		io_service_t ioMedia = DADiskCopyIOMedia(disk);
-		if(IO_OBJECT_NULL == ioMedia) {
-			NSLog(@"Unable to create io_service_t for DADiskRef");
-			
-			return nil;
-		}
+	// Obtain the IOMedia object (it should be IOCDMedia) from the DADiskRef
+	io_service_t ioMedia = DADiskCopyIOMedia(disk);
+	if(IO_OBJECT_NULL == ioMedia) {
+		NSLog(@"Unable to create io_service_t for DADiskRef");
 		
-		// Get the CD's property dictionary
-		CFMutableDictionaryRef mediaDictionary = NULL;
-		IOReturn err = IORegistryEntryCreateCFProperties(ioMedia, &mediaDictionary, kCFAllocatorDefault, 0);
-		if(kIOReturnSuccess != err) {
-			NSLog(@"Unable to get properties for media (IORegistryEntryCreateCFProperties returned 0x%.8x)", err);
-			
-			CFRelease(mediaDictionary);
-			IOObjectRelease(ioMedia);
-			
-			return nil;
-		}
-		
-		// Extract the disc's TOC data, and map it to a CDTOC struct
-		CFDataRef tocData = CFDictionaryGetValue(mediaDictionary, CFSTR(kIOCDMediaTOCKey));
-		if(NULL == tocData) {
-			NSLog(@"No value for kIOCDMediaTOCKey in IOCDMedia object");
-			
-			CFRelease(mediaDictionary);
-			IOObjectRelease(ioMedia);
-			
-			return nil;
-		}
-		
-		CDTOC *toc = (CDTOC *)CFDataGetBytePtr(tocData);
-		[self parseTOC:toc];
+		return nil;
+	}
+	
+	// Get the CD's property dictionary
+	CFMutableDictionaryRef mediaDictionary = NULL;
+	IOReturn err = IORegistryEntryCreateCFProperties(ioMedia, &mediaDictionary, kCFAllocatorDefault, 0);
+	if(kIOReturnSuccess != err) {
+		NSLog(@"Unable to get properties for media (IORegistryEntryCreateCFProperties returned 0x%.8x)", err);
 		
 		CFRelease(mediaDictionary);
 		IOObjectRelease(ioMedia);
+		
+		return nil;
 	}
-	return self;
+	
+	// Extract the disc's TOC data, and map it to a CDTOC struct
+	CFDataRef tocData = CFDictionaryGetValue(mediaDictionary, CFSTR(kIOCDMediaTOCKey));
+	if(NULL == tocData) {
+		NSLog(@"No value for kIOCDMediaTOCKey in IOCDMedia object");
+		
+		CFRelease(mediaDictionary);
+		IOObjectRelease(ioMedia);
+		
+		return nil;
+	}
+	
+	CDTOC *toc = (CDTOC *)CFDataGetBytePtr(tocData);
+	
+	CompactDisc *compactDisc = [CompactDisc compactDiscWithCDTOC:toc];
+	
+	CFRelease(mediaDictionary);
+	IOObjectRelease(ioMedia);
+	
+	return compactDisc;
 }
 
-- (id) initWithCDTOC:(CDTOC *)toc
++ (id) compactDiscWithCDTOC:(CDTOC *)toc
 {
 	NSParameterAssert(NULL != toc);
 	
-	if((self = [super init]))
-		[self parseTOC:toc];
-	return self;
-}
+	// If this disc has been seen before, fetch it
+	NSInteger discID = calculateFreeDBDiscIDForCDTOC(toc);
 
-- (id) copyWithZone:(NSZone *)zone
-{
-	CompactDisc *copy = [[[self class] allocWithZone:zone] init];
-	
-	copy->_sessions = [_sessions mutableCopy];
-	copy->_tracks = [_tracks mutableCopy];
-	copy.firstSession = self.firstSession;
-	copy.lastSession = self.lastSession;
-	
-	return copy;
-}
+	// Build and execute a fetch request matching on the disc's FreeDB ID
+	NSManagedObjectContext *managedObjectContext = [[[NSApplication sharedApplication] delegate] managedObjectContext];
+	NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"CompactDisc" 
+														 inManagedObjectContext:managedObjectContext];
+	NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+	[fetchRequest setEntity:entityDescription];
+	[fetchRequest setFetchLimit:1];
 
-- (NSInteger) freeDBDiscID
-{
-	NSInteger sumOfTrackLengthDigits = 0;
+	NSPredicate *fetchPredicate = [NSPredicate predicateWithFormat:@"discID == %i", discID];
+	[fetchRequest setPredicate:fetchPredicate];
 	
-	// For multi-session discs only the first session is used to generate the FreeDB ID
-	SessionDescriptor *session = [self sessionNumber:1];
-	
-	NSUInteger trackNumber;
-	for(trackNumber = session.firstTrack; trackNumber <= session.lastTrack; ++trackNumber) {
-		CDMSF msf = CDConvertLBAToMSF([self trackNumber:trackNumber].firstSector);
-		sumOfTrackLengthDigits += sum_digits((msf.minute * 60) + msf.second);
+	NSError *error = nil;
+	NSArray *matchingDiscs = [managedObjectContext executeFetchRequest:fetchRequest error:&error];
+	if(nil == matchingDiscs) {
+		// Deal with error...
+		return nil;
 	}
-
-	CDMSF firstTrack = CDConvertLBAToMSF([self trackNumber:session.firstTrack].firstSector);
-	CDMSF leadOut = CDConvertLBAToMSF(session.leadOut);
-	NSInteger discLengthInSeconds = ((leadOut.minute * 60) + leadOut.second) - ((firstTrack.minute * 60) + firstTrack.second);
 	
-	return ((sumOfTrackLengthDigits % 0xFF) << 24 | discLengthInSeconds << 8 | (session.lastTrack - session.firstTrack + 1));
+	CompactDisc *compactDisc = nil;
+	if(0 == matchingDiscs.count) {
+		compactDisc = [NSEntityDescription insertNewObjectForEntityForName:@"CompactDisc"
+													inManagedObjectContext:managedObjectContext];
+		
+		compactDisc.discID = [NSNumber numberWithInteger:discID];
+		[compactDisc parseTOC:toc];
+	}
+	else
+		compactDisc = matchingDiscs.lastObject;
+	
+	return compactDisc;
+}
+
+// ========================================
+// Core Data properties
+@dynamic discID;
+
+// ========================================
+// Core Data relationships
+@dynamic metadata;
+@dynamic sessions;
+
+// ========================================
+// Other properties
+- (NSArray *) orderedSessions
+{
+	NSSortDescriptor *sessionNumberSortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"number" ascending:YES];
+	return [self.sessions.allObjects sortedArrayUsingDescriptors:[NSArray arrayWithObject:sessionNumberSortDescriptor]];
+}
+
+- (SessionDescriptor *) firstSession
+{
+	NSArray *orderedSessions = self.orderedSessions;
+	return (0 == orderedSessions.count ? nil : [orderedSessions objectAtIndex:0]);
+}
+
+- (SessionDescriptor *) lastSession
+{
+	NSArray *orderedSessions = self.orderedSessions;
+	return (0 == orderedSessions.count ? nil : orderedSessions.lastObject);
 }
 
 - (NSString *) musicBrainzDiscID
@@ -141,15 +203,19 @@ sum_digits(NSInteger number)
 	if(NULL == discID)
 		return nil;
 	
+	// For multi-session discs only the first session is used to calculate the MusicBrainz disc ID
+	SessionDescriptor *firstSession = self.firstSession;
+	if(nil == firstSession)
+		return nil;
+	
 	// zero is lead out
 	int offsets[100];
-	offsets[0] = [self leadOutForSession:1] + 150;
+	offsets[0] = firstSession.leadOut.unsignedIntValue + 150;
 	
-	NSArray *firstSessionTracks = [self tracksForSession:1];
-	for(TrackDescriptor *trackDescriptor in firstSessionTracks)
-		offsets[trackDescriptor.number] = trackDescriptor.firstSector + 150;
+	for(TrackDescriptor *trackDescriptor in firstSession.tracks)
+		offsets[trackDescriptor.number.unsignedIntegerValue] = trackDescriptor.firstSector.unsignedIntValue + 150;
 	
-	int result = discid_put(discID, 1, firstSessionTracks.count, offsets);
+	int result = discid_put(discID, firstSession.firstTrack.number.unsignedIntValue, firstSession.lastTrack.number.unsignedIntValue, offsets);
 	if(result)
 		musicBrainzDiscID = [NSString stringWithCString:discid_get_id(discID) encoding:NSASCIIStringEncoding];
 	
@@ -159,7 +225,7 @@ sum_digits(NSInteger number)
 }
 
 // Disc track information
-- (NSUInteger) sessionContainingSector:(NSUInteger)sector
+/*- (NSUInteger) sessionContainingSector:(NSUInteger)sector
 {
 	return [self sessionContainingSectorRange:[SectorRange sectorRangeWithSector:sector]];
 }
@@ -182,103 +248,29 @@ sum_digits(NSInteger number)
 	}
 	
 	return NSNotFound;
-}
+}*/
 
-// Disc session information
-- (SessionDescriptor *)	sessionNumber:(NSUInteger)number
+// ========================================
+
+- (SessionDescriptor *) sessionNumber:(NSUInteger)number
 {
-	for(SessionDescriptor *session in _sessions) {
-		if(session.number == number)
+	for(SessionDescriptor *session in self.sessions) {
+		if(session.number.unsignedIntegerValue == number)
 			return session;
 	}
 	
-	return nil;
+	return nil;	
 }
-
-// First and last track and lead out information (session-based)
-- (NSUInteger) firstTrackForSession:(NSUInteger)session			{ return [[self sessionNumber:session] firstTrack]; }
-- (NSUInteger) lastTrackForSession:(NSUInteger)session			{ return [[self sessionNumber:session] lastTrack]; }
-- (NSUInteger) leadOutForSession:(NSUInteger)session			{ return [[self sessionNumber:session] leadOut]; }
-
-- (NSUInteger) firstSectorForSession:(NSUInteger)session		{ return [self firstSectorForTrack:[[self sessionNumber:session] firstTrack]]; }
-- (NSUInteger) lastSectorForSession:(NSUInteger)session			{ return [[self sessionNumber:session] leadOut] - 1; }
 
 - (TrackDescriptor *) trackNumber:(NSUInteger)number
 {
-	for(TrackDescriptor *track in _tracks) {
-		if(track.number == number)
+	for(SessionDescriptor *session in self.sessions) {
+		TrackDescriptor *track = [session trackNumber:number];
+		if(track)
 			return track;
 	}
 	
-	return nil;
-}
-
-- (NSArray *) tracksForSession:(NSUInteger)session
-{
-	NSMutableArray *result = [[NSMutableArray alloc] init];
-	
-	for(TrackDescriptor *track in _tracks) {
-		if(session == track.session)
-			[result addObject:track];
-	}
-
-	if(0 == result.count)
-		return nil;
-	else
-		return result;
-}
-
-// Track sector information
-- (NSUInteger)			firstSectorForTrack:(NSUInteger)number		{ return [[self trackNumber:number] firstSector]; }
-
-- (NSUInteger) lastSectorForTrack:(NSUInteger)number
-{
-	TrackDescriptor		*thisTrack		= [self trackNumber:number];
-	TrackDescriptor		*nextTrack		= [self trackNumber:number + 1];
-	
-	if(nil == thisTrack)
-		@throw [NSException exceptionWithName:@"IllegalArgumentException" reason:[NSString stringWithFormat:@"Track %u doesn't exist", number] userInfo:nil];
-	
-	return ([self lastTrackForSession:thisTrack.session] == number ? [self lastSectorForSession:thisTrack.session] : nextTrack.firstSector - 1);
-}
-
-#pragma mark KVC Accessors for sessions
-
-- (NSUInteger) countOfSessions
-{
-	return [_sessions count];
-}
-
-- (SessionDescriptor *) objectInSessionsAtIndex:(NSUInteger)index
-{
-	return [_sessions objectAtIndex:index];
-}
-
-- (void) getSessions:(id *)buffer range:(NSRange)range
-{
-	[_sessions getObjects:buffer range:range];
-}
-
-#pragma mark KVC Accessors for tracks
-
-- (NSUInteger) countOfTracks
-{
-	return [_tracks count];
-}
-
-- (TrackDescriptor *) objectInTracksAtIndex:(NSUInteger)index
-{
-	return [_tracks objectAtIndex:index];
-}
-
-- (void) getTracks:(id *)buffer range:(NSRange)range
-{
-	[_tracks getObjects:buffer range:range];
-}
-
-- (NSString *) description
-{
-	return [NSString stringWithFormat:@"{\n\tFirst Session: %u\n\tLast Session: %u\n}", self.firstSession, self.lastSession];
+	return nil;		
 }
 
 @end
@@ -288,52 +280,85 @@ sum_digits(NSInteger number)
 - (void) parseTOC:(CDTOC *)toc;
 {
 	NSParameterAssert(NULL != toc);
-	
-	_sessions = [[NSMutableArray alloc] init];
-	_tracks = [[NSMutableArray alloc] init];
 
-	NSUInteger numDescriptors = CDTOCGetDescriptorCount(toc);
-	
-	self.firstSession = toc->sessionFirst;
-	self.lastSession = toc->sessionLast;
-	
-	// Set up objects that will hold first sector, last sector and lead out information for each session	
-	NSUInteger i;
-	for(i = self.firstSession; i <= self.lastSession; ++i) {
-		SessionDescriptor *session = [[SessionDescriptor alloc] init];
-		[session setNumber:i];
-		[_sessions addObject:session];
+	// Set up SessionDescriptor objects
+	NSUInteger sessionNumber;
+	for(sessionNumber = toc->sessionFirst; sessionNumber <= toc->sessionLast; ++sessionNumber) {
+		SessionDescriptor *session = [NSEntityDescription insertNewObjectForEntityForName:@"SessionDescriptor"
+																   inManagedObjectContext:self.managedObjectContext];
+
+		session.number = [NSNumber numberWithUnsignedInteger:sessionNumber];
+		[self addSessionsObject:session];
 	}
 	
 	// Iterate through each descriptor and extract the information we need
+	NSUInteger numDescriptors = CDTOCGetDescriptorCount(toc);
+	NSUInteger i;
 	for(i = 0; i < numDescriptors; ++i) {
 		CDTOCDescriptor *desc = &toc->descriptors[i];
 		
 		// This is a normal audio or data track
 		if(0x01 <= desc->point && 0x63 >= desc->point && 1 == desc->adr) {
-			TrackDescriptor *track = [[TrackDescriptor alloc] init];
+			TrackDescriptor *track = [NSEntityDescription insertNewObjectForEntityForName:@"TrackDescriptor"
+																   inManagedObjectContext:self.managedObjectContext];
 			
-			[track setSession:desc->session];
-			[track setNumber:desc->point];
-			[track setFirstSector:CDConvertMSFToLBA(desc->p)];
+			track.session = [self sessionNumber:desc->session];
+			track.number = [NSNumber numberWithUnsignedChar:desc->point];
+			track.firstSector = [NSNumber numberWithUnsignedInt:CDConvertMSFToLBA(desc->p)];
 			
 			switch(desc->control) {
-				case 0x00:	track.channels = 2;		track.preEmphasis = NO;		track.copyPermitted = NO;	break;
-				case 0x01:	track.channels = 2;		track.preEmphasis = YES;	track.copyPermitted = NO;	break;
-				case 0x02:	track.channels = 2;		track.preEmphasis = NO;		track.copyPermitted = YES;	break;
-				case 0x03:	track.channels = 2;		track.preEmphasis = YES;	track.copyPermitted = YES;	break;
-				case 0x04:	track.dataTrack = YES;								track.copyPermitted = NO;	break;
-				case 0x06:	track.dataTrack = YES;								track.copyPermitted = YES;	break;
-				case 0x08:	track.channels = 4;		track.preEmphasis = NO;		track.copyPermitted = NO;	break;
-				case 0x09:	track.channels = 4;		track.preEmphasis = YES;	track.copyPermitted = NO;	break;
-				case 0x0A:	track.channels = 4;		track.preEmphasis = NO;		track.copyPermitted = YES;	break;
-				case 0x0B:	track.channels = 4;		track.preEmphasis = NO;		track.copyPermitted = YES;	break;
-			}
-			
-			[_tracks addObject:track];
+				case 0x00:	
+					track.channelsPerFrame = [NSNumber numberWithInt:2];
+					track.hasPreEmphasis = [NSNumber numberWithBool:NO];
+					track.digitalCopyPermitted = [NSNumber numberWithBool:NO];
+					break;
+				case 0x01:
+					track.channelsPerFrame = [NSNumber numberWithInt:2];
+					track.hasPreEmphasis = [NSNumber numberWithBool:YES];
+					track.digitalCopyPermitted = [NSNumber numberWithBool:NO];
+					break;
+				case 0x02:
+					track.channelsPerFrame = [NSNumber numberWithInt:2];
+					track.hasPreEmphasis = [NSNumber numberWithBool:NO];
+					track.digitalCopyPermitted = [NSNumber numberWithBool:YES];
+					break;
+				case 0x03:
+					track.channelsPerFrame = [NSNumber numberWithInt:2];
+					track.hasPreEmphasis = [NSNumber numberWithBool:YES];
+					track.digitalCopyPermitted = [NSNumber numberWithBool:YES];
+					break;
+				case 0x04:
+					track.isDataTrack = [NSNumber numberWithBool:YES];
+					track.digitalCopyPermitted = [NSNumber numberWithBool:NO];
+					break;
+				case 0x06:
+					track.isDataTrack = [NSNumber numberWithBool:YES];
+					track.digitalCopyPermitted = [NSNumber numberWithBool:YES];
+					break;
+				case 0x08:
+					track.channelsPerFrame = [NSNumber numberWithInt:4];
+					track.hasPreEmphasis = [NSNumber numberWithBool:NO];
+					track.digitalCopyPermitted = [NSNumber numberWithBool:NO];
+					break;
+				case 0x09:
+					track.channelsPerFrame = [NSNumber numberWithInt:4];
+					track.hasPreEmphasis = [NSNumber numberWithBool:YES];
+					track.digitalCopyPermitted = [NSNumber numberWithBool:NO];
+					break;
+				case 0x0A:
+					track.channelsPerFrame = [NSNumber numberWithInt:4];
+					track.hasPreEmphasis = [NSNumber numberWithBool:NO];
+					track.digitalCopyPermitted = [NSNumber numberWithBool:YES];
+					break;
+				case 0x0B:
+					track.channelsPerFrame = [NSNumber numberWithInt:4];
+					track.hasPreEmphasis = [NSNumber numberWithBool:NO];
+					track.digitalCopyPermitted = [NSNumber numberWithBool:YES];
+					break;
+			}			
 		}
 		else if(0xA0 == desc->point && 1 == desc->adr) {
-			[[self sessionNumber:desc->session] setFirstTrack:desc->p.minute];
+			;//[[self sessionNumber:desc->session] setFirstTrack:desc->p.minute];
 /*			NSLog(@"Disc type:                 %d (%s)\n", (int)desc->p.second,
 				  (0x00 == desc->p.second) ? "CD-DA, or CD-ROM with first track in Mode 1":
 				  (0x10 == desc->p.second) ? "CD-I disc":
@@ -341,10 +366,10 @@ sum_digits(NSInteger number)
 		}
 		// Last track
 		else if(0xA1 == desc->point && 1 == desc->adr)
-			[[self sessionNumber:desc->session] setLastTrack:desc->p.minute];
+			;//[[self sessionNumber:desc->session] setLastTrack:desc->p.minute];
 		// Lead-out
 		else if(0xA2 == desc->point && 1 == desc->adr)
-			[[self sessionNumber:desc->session] setLeadOut:CDConvertMSFToLBA(desc->p)];
+			[self sessionNumber:desc->session].leadOut = [NSNumber numberWithUnsignedInt:CDConvertMSFToLBA(desc->p)];
 /*		else if(0xB0 == desc->point && 5 == desc->adr) {
 			NSLog(@"Next possible track start: %02d:%02d.%02d\n",
 				  (int)desc->address.minute, (int)desc->address.second, (int)desc->address.frame);
@@ -373,6 +398,16 @@ sum_digits(NSInteger number)
 			NSLog(@"Start of first lead-in:    %02d:%02d.%02d\n",
 				  (int)desc->p.minute, (int)desc->p.second, (int)desc->p.frame);
 		}*/
+	}
+	
+	// Make one pass over the parsed tracks and fill in the last sector for each
+	SessionDescriptor *firstSession = self.firstSession;
+	for(TrackDescriptor *track in firstSession.tracks) {
+		TrackDescriptor *nextTrack = [firstSession trackNumber:(1 + track.number.unsignedIntegerValue)];
+		if(nil != nextTrack)
+			track.lastSector = [NSNumber numberWithUnsignedInteger:(nextTrack.firstSector.unsignedIntegerValue - 1)];
+		else
+			track.lastSector = [NSNumber numberWithUnsignedInteger:(firstSession.leadOut.unsignedIntegerValue - 1)];		
 	}
 }
 

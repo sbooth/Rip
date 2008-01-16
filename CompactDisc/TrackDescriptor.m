@@ -4,35 +4,44 @@
  */
 
 #import "TrackDescriptor.h"
+#import "SectorRange.h"
 
 @implementation TrackDescriptor
 
-@synthesize session = _session;
-@synthesize number = _number;
-@synthesize firstSector = _firstSector;
-@synthesize channels = _channels;
-@synthesize preEmphasis = _preEmphasis;
-@synthesize copyPermitted = _copyPermitted;
-@synthesize dataTrack = _dataTrack;
-
-- (id) copyWithZone:(NSZone *)zone
+// ========================================
+// KVC overrides
++ (NSSet *) keyPathsForValuesAffectingSectorCount
 {
-	TrackDescriptor *copy = [[[self class] allocWithZone:zone] init];
-	
-	copy.session = self.session;
-	copy.number = self.number;
-	copy.firstSector = self.firstSector;
-	copy.channels = self.channels;
-	copy.preEmphasis = self.preEmphasis;
-	copy.copyPermitted = self.copyPermitted;
-	copy.dataTrack = self.dataTrack;
-	
-	return copy;
+	return [NSSet setWithObjects:@"firstSector", @"lastSector", nil];
 }
 
-- (NSString *) description
+// ========================================
+// Core Data properties
+@dynamic channelsPerFrame;
+@dynamic digitalCopyPermitted;
+@dynamic firstSector;
+@dynamic hasPreEmphasis;
+@dynamic isDataTrack;
+@dynamic isSelected;
+@dynamic lastSector;
+@dynamic number;
+@dynamic preGap;
+
+// ========================================
+// Core Data relationships
+@dynamic metadata;
+@dynamic session;
+
+// ========================================
+// Computed properties
+- (NSNumber *) sectorCount
 {
-	return [NSString stringWithFormat:@"TrackDescriptor {\n\tSession: %u\n\tTrack: %u\n\tFirst Sector: %i\n}", self.session, self.number, self.firstSector];
+	return [NSNumber numberWithUnsignedInteger:(self.lastSector.unsignedIntegerValue - self.firstSector.unsignedIntegerValue + 1)];
+}
+
+- (SectorRange *) sectorRange
+{
+	return [SectorRange sectorRangeWithFirstSector:self.firstSector.unsignedIntegerValue lastSector:self.lastSector.unsignedIntegerValue];
 }
 
 @end

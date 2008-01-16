@@ -8,57 +8,47 @@
 #include <DiskArbitration/DiskArbitration.h>
 #include <IOKit/storage/IOCDTypes.h>
 
-@class SectorRange, SessionDescriptor, TrackDescriptor;
+@class SessionDescriptor, TrackDescriptor, AlbumMetadata, SectorRange;
 
 // ========================================
-// This class simplifies access to CDTOC information
+// This class simplifies access to a CDDA disc
 // ========================================
-@interface CompactDisc : NSObject <NSCopying>
+@interface CompactDisc : NSManagedObject
 {
-	NSMutableArray *_sessions;
-	NSMutableArray *_tracks;
-	
-	NSUInteger _firstSession;
-	NSUInteger _lastSession;
 }
 
-@property (readonly) NSInteger freeDBDiscID;
+// ========================================
+// Creation
++ (id) compactDiscWithDADiskRef:(DADiskRef)disk;
++ (id) compactDiscWithCDTOC:(CDTOC *)toc;
+
+// ========================================
+// Core Data properties
+@property (assign) NSNumber * discID;
+
+// ========================================
+// Core Data relationships
+@property (assign) AlbumMetadata * metadata;
+@property (assign) NSSet * sessions;
+
+// ========================================
+// Other properties
+@property (readonly) NSArray * orderedSessions;
+@property (readonly) SessionDescriptor * firstSession;
+@property (readonly) SessionDescriptor * lastSession;
+
 @property (readonly) NSString * musicBrainzDiscID;
-@property (readonly, assign) NSUInteger firstSession;
-@property (readonly, assign) NSUInteger lastSession;
-@property (readonly) NSArray * sessions;
-@property (readonly) NSArray * tracks;
 
 // ========================================
-// Create a CompactDisc with the specified CDTOC
-- (id) initWithDADiskRef:(DADiskRef)disk;
-- (id) initWithCDTOC:(CDTOC *)toc;
 
-// ========================================
-// Disc session information
 - (SessionDescriptor *) sessionNumber:(NSUInteger)number;
-
-- (NSUInteger) firstTrackForSession:(NSUInteger)session;
-- (NSUInteger) lastTrackForSession:(NSUInteger)session;
-
-// ========================================
-// Session sector information
-- (NSUInteger) firstSectorForSession:(NSUInteger)session;
-- (NSUInteger) lastSectorForSession:(NSUInteger)session;
-
-- (NSUInteger) leadOutForSession:(NSUInteger)session;
-
-- (NSUInteger) sessionContainingSector:(NSUInteger)sector;
-- (NSUInteger) sessionContainingSectorRange:(SectorRange *)sectorRange;
-
-// ========================================
-// Disc track information
 - (TrackDescriptor *) trackNumber:(NSUInteger)number;
-- (NSArray *) tracksForSession:(NSUInteger)session;
 
-// ========================================
-// Track sector information
-- (NSUInteger) firstSectorForTrack:(NSUInteger)number;
-- (NSUInteger) lastSectorForTrack:(NSUInteger)number;
+@end
 
+@interface CompactDisc (CoreDataGeneratedAccessors)
+- (void) addSessionsObject:(SessionDescriptor *)value;
+- (void) removeSessionsObject:(SessionDescriptor *)value;
+- (void) addSessions:(NSSet *)value;
+- (void) removeSessions:(NSSet *)value;
 @end
