@@ -8,6 +8,8 @@
 @interface TrackInspectorPanelController : NSWindowController
 {
 	IBOutlet NSObjectController *_documentObjectController;
+
+@private
 	id _inspectedDocument;
 }
 
