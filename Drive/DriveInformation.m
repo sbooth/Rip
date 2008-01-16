@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2005 - 2007 Stephen F. Booth <me@sbooth.org>
+ *  Copyright (C) 2005 - 2008 Stephen F. Booth <me@sbooth.org>
  *  All Rights Reserved
  */
 
@@ -13,101 +13,42 @@
 #include <IOKit/scsi/SCSITaskLib.h>
 #include <IOKit/scsi/IOSCSIMultimediaCommandsDevice.h>
 
-NSString * const	kConfiguredDrivesDefaultsKey			= @"Configured Drives";
+#include <IOKit/usb/USB.h>
 
-@interface DriveInformation ()
-@property (assign) DADiskRef disk;
-@property (copy) NSDictionary * deviceProperties;
-@end
-
-@interface DriveInformation (Private)
-- (id) valueInDeviceCharacteristicsDictionaryForKey:(NSString *)key;
-- (id) valueInProtocolCharacteristicsDictionaryForKey:(NSString *)key;
-@end
-
-@implementation DriveInformation
-
-@synthesize disk = _disk;
-@synthesize deviceProperties = _deviceProperties;
-
-- (id) initWithDADiskRef:(DADiskRef)disk
+// ========================================
+// Utility function that extracts the device identifier from a DADiskRef
+// ========================================
+static NSString * getDeviceIdentifierForDADiskRef(DADiskRef disk)
 {
-	NSParameterAssert(NULL != disk);
+	NSCParameterAssert(NULL != disk);
 	
-	if((self = [super init])) {
-		self.disk = disk;
-		
-		CFDictionaryRef description = DADiskCopyDescription(disk);
-		
-		// Extract the IOPath for the device containing this DADiskRef
-		CFStringRef ioPath = CFDictionaryGetValue(description, kDADiskDescriptionDevicePathKey);
-		if(NULL == ioPath) {
-			NSLog(@"No value for kDADiskDescriptionDevicePathKey in DADiskRef description");
-			
-			CFRelease(description);
-			
-			return nil;
-		}
-		
-		// Create a dictionary which will match the IOPath to an io_service_t object
-		CFMutableDictionaryRef matchDictionary = CFDictionaryCreateMutable(kCFAllocatorDefault, 0, &kCFCopyStringDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
-		if(NULL == matchDictionary) {
-			NSLog(@"Unable to create a CFMutableDictionaryRef for kIOPathMatchKey matching");
-			
-			CFRelease(description);
-			
-			return nil;
-		}
-		
-		CFDictionarySetValue(matchDictionary, CFSTR(kIOPathMatchKey), ioPath);
-		
-		// Obtain the matching device's io_service_t object
-		// IOServiceGetMatchingService will consume one reference to matchDictionary
-		io_service_t service = IOServiceGetMatchingService(kIOMasterPortDefault, matchDictionary);
-		if(IO_OBJECT_NULL == service) {
-			NSLog(@"No matching io_service_t found for IOPath %@", ioPath);
-			
-			CFRelease(description);
-			
-			return nil;
-		}
-		
-		// Query the device's properties
-		CFMutableDictionaryRef deviceProperties = NULL;
-		IOReturn err = IORegistryEntryCreateCFProperties(service, &deviceProperties, kCFAllocatorDefault, 0);
-		if(kIOReturnSuccess != err) {
-			NSLog(@"Unable to get properties for device (IORegistryEntryCreateCFProperties returned 0x%.8x)", err);
-			
-			CFRelease(description);
-			IOObjectRelease(service);
-			
-			return nil;
-		}
-		
-		self.deviceProperties = [NSDictionary dictionaryWithDictionary:(NSDictionary *)deviceProperties];
-		
-		// Clean up
-		CFRelease(deviceProperties);
-		IOObjectRelease(service);
-		CFRelease(description);
-	}
+	CFDictionaryRef description = DADiskCopyDescription(disk);
 	
-	return self;
+	// For USB devices, use kUSBDevicePropertyLocationID (A CFNumber) as the identifier
+	// For all other devices, such as ATAPI, use the IOPath as the identifier
+
+	NSString *deviceIdentifier = nil;
+	
+	// Extract the IOPath for the device containing this DADiskRef
+	CFStringRef ioPath = CFDictionaryGetValue(description, kDADiskDescriptionDevicePathKey);
+	if(ioPath)
+		deviceIdentifier = [NSString stringWithString:(NSString *)ioPath];	
+	else
+		NSLog(@"No value for kDADiskDescriptionDevicePathKey in DADiskRef description");
+
+	CFRelease(description);
+
+	return deviceIdentifier;
 }
 
-- (id) copyWithZone:(NSZone *)zone
+// ========================================
+// Utility function that extracts the device properties for a drive via a DADiskRef
+// ========================================
+static NSDictionary * getDevicePropertiesForDADiskRef(DADiskRef disk)
 {
-	DriveInformation *copy = [[[self class] allocWithZone:zone] init];
+	NSCParameterAssert(NULL != disk);
 	
-	copy.disk = self.disk;
-	copy.deviceProperties = self.deviceProperties;
-
-	return copy;
-}
-
-- (NSString *) deviceIdentifier
-{
-	CFDictionaryRef description = DADiskCopyDescription(self.disk);
+	CFDictionaryRef description = DADiskCopyDescription(disk);
 	
 	// Extract the IOPath for the device containing this DADiskRef
 	CFStringRef ioPath = CFDictionaryGetValue(description, kDADiskDescriptionDevicePathKey);
@@ -119,8 +60,114 @@ NSString * const	kConfiguredDrivesDefaultsKey			= @"Configured Drives";
 		return nil;
 	}
 	
-	return [NSString stringWithString:(NSString *)ioPath];
+	// Create a dictionary which will match the IOPath to an io_service_t object
+	CFMutableDictionaryRef matchDictionary = CFDictionaryCreateMutable(kCFAllocatorDefault, 0, &kCFCopyStringDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
+	if(NULL == matchDictionary) {
+		NSLog(@"Unable to create a CFMutableDictionaryRef for kIOPathMatchKey matching");
+		
+		CFRelease(description);
+		
+		return nil;
+	}
+	
+	CFDictionarySetValue(matchDictionary, CFSTR(kIOPathMatchKey), ioPath);
+	
+	// Obtain the matching device's io_service_t object
+	// IOServiceGetMatchingService will consume one reference to matchDictionary
+	io_service_t service = IOServiceGetMatchingService(kIOMasterPortDefault, matchDictionary);
+	if(IO_OBJECT_NULL == service) {
+		NSLog(@"No matching io_service_t found for IOPath %@", ioPath);
+		
+		CFRelease(description);
+		
+		return nil;
+	}
+	
+	// Query the device's properties
+	CFMutableDictionaryRef deviceProperties = NULL;
+	IOReturn err = IORegistryEntryCreateCFProperties(service, &deviceProperties, kCFAllocatorDefault, 0);
+	if(kIOReturnSuccess != err) {
+		NSLog(@"Unable to get properties for device (IORegistryEntryCreateCFProperties returned 0x%.8x)", err);
+		
+		CFRelease(description);
+		IOObjectRelease(service);
+		
+		return nil;
+	}
+	
+	NSDictionary *devicePropertiesDictionary = [NSDictionary dictionaryWithDictionary:(NSDictionary *)deviceProperties];
+	
+	// Clean up
+	CFRelease(deviceProperties);
+	IOObjectRelease(service);
+	CFRelease(description);
+	
+	return devicePropertiesDictionary;
 }
+
+@interface DriveInformation ()
+@property (assign) NSDictionary * deviceProperties;
+@end
+
+@interface DriveInformation (Private)
+- (id) valueInDeviceCharacteristicsDictionaryForKey:(NSString *)key;
+- (id) valueInProtocolCharacteristicsDictionaryForKey:(NSString *)key;
+@end
+
+@implementation DriveInformation
+
+// ========================================
+// Creation
++ (id) driveInformationWithDADiskRef:(DADiskRef)disk
+{
+	NSParameterAssert(NULL != disk);
+	
+	NSString *deviceIdentifier = getDeviceIdentifierForDADiskRef(disk);
+	if(nil == deviceIdentifier)
+		return nil;
+	
+	NSManagedObjectContext *managedObjectContext = [[[NSApplication sharedApplication] delegate] managedObjectContext];
+	NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"DriveInformation"
+														 inManagedObjectContext:managedObjectContext];
+	NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+	
+	[fetchRequest setEntity:entityDescription];
+	[fetchRequest setFetchLimit:1];
+	
+	NSPredicate *fetchPredicate = [NSPredicate predicateWithFormat:@"deviceIdentifier == %@", deviceIdentifier];
+	[fetchRequest setPredicate:fetchPredicate];
+	
+	NSError *error = nil;
+	NSArray *matchingDrives = [managedObjectContext executeFetchRequest:fetchRequest error:&error];
+	if(nil == matchingDrives) {
+		// Deal with error...
+		return nil;
+	}
+	
+	DriveInformation *driveInformation = nil;
+	if(0 == matchingDrives.count) {
+		driveInformation = [NSEntityDescription insertNewObjectForEntityForName:@"DriveInformation"
+														 inManagedObjectContext:managedObjectContext];
+		
+		driveInformation.deviceIdentifier = deviceIdentifier;
+	}
+	else
+		driveInformation = matchingDrives.lastObject;
+	
+	// Extract the device properties
+	driveInformation.deviceProperties = getDevicePropertiesForDADiskRef(disk);
+	
+	return driveInformation;
+}
+
+// ========================================
+// Core Data properties
+@dynamic deviceIdentifier;
+@dynamic readOffset;
+
+// ========================================
+// Other properties
+@synthesize deviceProperties = _deviceProperties;
 
 // Device Characteristics
 - (NSString *) vendorName
@@ -209,35 +256,6 @@ NSString * const	kConfiguredDrivesDefaultsKey			= @"Configured Drives";
 	}
 	else
 		return nil;
-}
-
-- (NSNumber *) readOffset
-{
-	NSDictionary *configuredDrives = [[NSUserDefaults standardUserDefaults] dictionaryForKey:kConfiguredDrivesDefaultsKey];
-	NSString *deviceIdentifier = self.deviceIdentifier;
-	
-	if(nil == configuredDrives || nil == deviceIdentifier)
-		return nil;
-	
-	return [configuredDrives objectForKey:deviceIdentifier];
-}
-
-- (void) setReadOffset:(NSNumber *)readOffset
-{
-	NSString *deviceIdentifier = self.deviceIdentifier;
-	
-	if(nil == deviceIdentifier)
-		return;
-
-	NSMutableDictionary *configuredDrives = [NSMutableDictionary dictionary];
-	[configuredDrives addEntriesFromDictionary:[[NSUserDefaults standardUserDefaults] dictionaryForKey:kConfiguredDrivesDefaultsKey]];
-	
-	[configuredDrives removeObjectForKey:deviceIdentifier];
-	
-	if(readOffset)
-		[configuredDrives setObject:readOffset forKey:deviceIdentifier];
-	
-	[[NSUserDefaults standardUserDefaults] setObject:configuredDrives forKey:kConfiguredDrivesDefaultsKey];
 }
 
 @end

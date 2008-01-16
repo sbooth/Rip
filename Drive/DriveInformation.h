@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2005 - 2007 Stephen F. Booth <me@sbooth.org>
+ *  Copyright (C) 2005 - 2008 Stephen F. Booth <me@sbooth.org>
  *  All Rights Reserved
  */
 
@@ -7,21 +7,27 @@
 #include <DiskArbitration/DiskArbitration.h>
 
 // ========================================
-// This class represents the information available about an IOKit
-// device that can read IOCDMedia, along with the read offset
-// stored for the device.
+// This class represents the information available about an IOKit device that can read IOCDMedia, 
+// along with the read offset stored for the device.
 // ========================================
-@interface DriveInformation : NSObject <NSCopying>
-{
-	DADiskRef _disk;
+@interface DriveInformation : NSManagedObject
+{	
+@private
 	NSDictionary *_deviceProperties;
 }
 
-@property (readonly, assign) DADiskRef disk;
-@property (readonly, copy) NSDictionary * deviceProperties;
+// ========================================
+// Creation
++ (id) driveInformationWithDADiskRef:(DADiskRef)disk;
 
-@property (readonly) NSString * deviceIdentifier;
-@property (copy) NSNumber * readOffset;
+// ========================================
+// Core Data properties
+@property (assign) NSString * deviceIdentifier;
+@property (assign) NSNumber * readOffset;
+
+// ========================================
+// Other properties
+@property (readonly, assign) NSDictionary * deviceProperties;
 
 // ========================================
 // Device Characteristics
@@ -36,7 +42,5 @@
 // Protocol Characteristics
 @property (readonly) NSString * physicalInterconnectType;
 @property (readonly) NSString * physicalInterconnectLocation;
-
-- (id) initWithDADiskRef:(DADiskRef)disk;
 
 @end
