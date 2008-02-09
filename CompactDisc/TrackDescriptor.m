@@ -44,5 +44,11 @@
 	return [SectorRange sectorRangeWithFirstSector:self.firstSector.unsignedIntegerValue lastSector:self.lastSector.unsignedIntegerValue];
 }
 
-@end
+- (void) awakeFromInsert
+{
+	// Create the metadata relationship
+	self.metadata = [NSEntityDescription insertNewObjectForEntityForName:@"TrackMetadata"
+												  inManagedObjectContext:self.managedObjectContext];	
+}
 
+@end

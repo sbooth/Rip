@@ -8,7 +8,7 @@
 #include <DiskArbitration/DiskArbitration.h>
 #include <IOKit/storage/IOCDTypes.h>
 
-@class SessionDescriptor, TrackDescriptor, AlbumMetadata, SectorRange;
+@class SessionDescriptor, TrackDescriptor, SectorRange, AccurateRipDiscRecord, AlbumMetadata;
 
 // ========================================
 // This class simplifies access to a CDDA disc
@@ -19,8 +19,8 @@
 
 // ========================================
 // Creation
-+ (id) compactDiscWithDADiskRef:(DADiskRef)disk;
-+ (id) compactDiscWithCDTOC:(CDTOC *)toc;
++ (id) compactDiscWithDADiskRef:(DADiskRef)disk inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext;
++ (id) compactDiscWithCDTOC:(CDTOC *)toc inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext;
 
 // ========================================
 // Core Data properties
@@ -28,6 +28,7 @@
 
 // ========================================
 // Core Data relationships
+@property (assign) AccurateRipDiscRecord * accurateRipDisc;
 @property (assign) AlbumMetadata * metadata;
 @property (assign) NSSet * sessions;
 
@@ -37,7 +38,11 @@
 @property (readonly) SessionDescriptor * firstSession;
 @property (readonly) SessionDescriptor * lastSession;
 
+// ========================================
+// Computed properties
 @property (readonly) NSString * musicBrainzDiscID;
+@property (readonly) NSNumber * accurateRipID1;
+@property (readonly) NSNumber * accurateRipID2;
 
 // ========================================
 

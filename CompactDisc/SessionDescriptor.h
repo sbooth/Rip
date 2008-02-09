@@ -21,7 +21,7 @@
 
 // ========================================
 // Core Data relationships
-@property (assign) CompactDisc * compactDisc;
+@property (assign) CompactDisc * disc;
 @property (assign) NSSet * tracks;
 
 // ========================================

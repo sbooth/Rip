@@ -16,7 +16,7 @@
 
 // ========================================
 // Core Data relationships
-@dynamic compactDisc;
+@dynamic disc;
 @dynamic tracks;
 
 // ========================================

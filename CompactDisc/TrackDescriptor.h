@@ -6,6 +6,7 @@
 #import <Cocoa/Cocoa.h>
 
 @class SessionDescriptor, SectorRange;
+@class TrackMetadata;
 
 // ========================================
 // This class encapsulates useful information about a single track on a CDDA disc
@@ -29,7 +30,7 @@
 
 // ========================================
 // Core Data relationships
-@property (assign) NSManagedObject * metadata;
+@property (assign) TrackMetadata * metadata;
 @property (assign) SessionDescriptor * session;
 
 // ========================================

@@ -82,9 +82,10 @@ static NSInteger calculateFreeDBDiscIDForCDTOC(CDTOC *toc)
 
 // ========================================
 // Creation
-+ (id) compactDiscWithDADiskRef:(DADiskRef)disk
++ (id) compactDiscWithDADiskRef:(DADiskRef)disk inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext
 {
 	NSParameterAssert(NULL != disk);
+	NSParameterAssert(nil != managedObjectContext);
 	
 	// Obtain the IOMedia object (it should be IOCDMedia) from the DADiskRef
 	io_service_t ioMedia = DADiskCopyIOMedia(disk);
@@ -119,7 +120,7 @@ static NSInteger calculateFreeDBDiscIDForCDTOC(CDTOC *toc)
 	
 	CDTOC *toc = (CDTOC *)CFDataGetBytePtr(tocData);
 	
-	CompactDisc *compactDisc = [CompactDisc compactDiscWithCDTOC:toc];
+	CompactDisc *compactDisc = [CompactDisc compactDiscWithCDTOC:toc inManagedObjectContext:managedObjectContext];
 	
 	CFRelease(mediaDictionary);
 	IOObjectRelease(ioMedia);
@@ -127,15 +128,15 @@ static NSInteger calculateFreeDBDiscIDForCDTOC(CDTOC *toc)
 	return compactDisc;
 }
 
-+ (id) compactDiscWithCDTOC:(CDTOC *)toc
++ (id) compactDiscWithCDTOC:(CDTOC *)toc inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext
 {
 	NSParameterAssert(NULL != toc);
+	NSParameterAssert(nil != managedObjectContext);
 	
 	// If this disc has been seen before, fetch it
 	NSInteger discID = calculateFreeDBDiscIDForCDTOC(toc);
 
 	// Build and execute a fetch request matching on the disc's FreeDB ID
-	NSManagedObjectContext *managedObjectContext = [[[NSApplication sharedApplication] delegate] managedObjectContext];
 	NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"CompactDisc" 
 														 inManagedObjectContext:managedObjectContext];
 	NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
@@ -172,8 +173,16 @@ static NSInteger calculateFreeDBDiscIDForCDTOC(CDTOC *toc)
 
 // ========================================
 // Core Data relationships
+@dynamic accurateRipDisc;
 @dynamic metadata;
 @dynamic sessions;
+
+- (void) awakeFromInsert
+{
+	// Create the metadata relationship
+	self.metadata = [NSEntityDescription insertNewObjectForEntityForName:@"AlbumMetadata"
+												  inManagedObjectContext:self.managedObjectContext];	
+}
 
 // ========================================
 // Other properties
@@ -195,6 +204,8 @@ static NSInteger calculateFreeDBDiscIDForCDTOC(CDTOC *toc)
 	return (0 == orderedSessions.count ? nil : orderedSessions.lastObject);
 }
 
+// ========================================
+// Computed properties
 - (NSString *) musicBrainzDiscID
 {
 	NSString *musicBrainzDiscID = nil;
@@ -222,6 +233,50 @@ static NSInteger calculateFreeDBDiscIDForCDTOC(CDTOC *toc)
 	discid_free(discID);
 	
 	return musicBrainzDiscID;
+}
+
+- (NSNumber *) accurateRipID1
+{
+	// ID 1 is the sum of all the disc's offsets
+	// The lead out is treated as track n + 1, where n is the number of audio tracks
+	NSUInteger accurateRipID1 = 0;
+	
+	// Use the first session
+	SessionDescriptor *firstSession = self.firstSession;
+	if(nil == firstSession)
+		return nil;
+
+	NSSet *tracks = firstSession.tracks;
+	for(TrackDescriptor *track in tracks)
+		accurateRipID1 += track.firstSector.unsignedIntegerValue;
+	
+	// Adjust for lead out
+	accurateRipID1 += firstSession.leadOut.unsignedIntegerValue;
+	
+	return [NSNumber numberWithUnsignedInteger:accurateRipID1];
+}
+
+- (NSNumber *) accurateRipID2
+{
+	// ID 2 is the sum of all the disc's offsets times their track number
+	// The lead out is treated as track n + 1, where n is the number of audio tracks
+	NSUInteger accurateRipID2 = 0;
+
+	// Use the first session
+	SessionDescriptor *firstSession = self.firstSession;
+	if(nil == firstSession)
+		return nil;
+
+	NSSet *tracks = firstSession.tracks;
+	for(TrackDescriptor *track in tracks) {
+		NSUInteger offset = track.firstSector.unsignedIntegerValue;
+		accurateRipID2 += (0 == offset ? 1 : offset) * track.number.unsignedIntValue;
+	}
+	
+	// Adjust for lead out
+	accurateRipID2 += firstSession.leadOut.unsignedIntegerValue * (1 + tracks.count);
+
+	return [NSNumber numberWithUnsignedInteger:accurateRipID2];
 }
 
 // Disc track information
