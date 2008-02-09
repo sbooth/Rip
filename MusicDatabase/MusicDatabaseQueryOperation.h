@@ -5,8 +5,6 @@
 
 #import <Cocoa/Cocoa.h>
 
-@class CompactDisc;
-
 // ========================================
 // KVC key names for the metadata dictionaries
 // ========================================
@@ -22,11 +20,10 @@ extern NSString * const		kMetadataTrackNumberKey;
 extern NSString * const		kMetadataTrackTotalKey;
 extern NSString * const		kMetadataDiscNumberKey;
 extern NSString * const		kMetadataDiscTotalKey;
+extern NSString * const		kMetadataLyricsKey;
 extern NSString * const		kMetadataCommentKey;
 extern NSString * const		kMetadataISRCKey;
 extern NSString * const		kMetadataMCNKey;
-extern NSString * const		kMetadataBPMKey;
-extern NSString * const		kMetadataMusicDNSPUIDKey;
 extern NSString * const		kMetadataMusicBrainzIDKey;
 
 // ========================================
@@ -35,18 +32,32 @@ extern NSString * const		kMetadataMusicBrainzIDKey;
 extern NSString * const		kMusicDatabaseTracksKey;		// NSArray * of NSDictionary *
 
 // ========================================
-// Class providing a generic interface to an online music database
+// NSOperation subclass providing a generic interface to an online music database
 // such as FreeDB or MusicBrainz
+// The results from the query are stored as an array; each array item represents a match
+// from the database and will contain dictionaries with entries for the keys above
+// If queryResults is nil, an error occurred and error will be set
+// If queryResults is empty, no matches were found
 // ========================================
-@interface MusicDatabase : NSObject
+@interface MusicDatabaseQueryOperation : NSOperation
 {
-	CompactDisc *_compactDisc;
-	NSMutableArray *_queryResults;
+@protected
+	NSManagedObjectID *_compactDiscID;
+	NSError *_error;
+	NSArray *_queryResults;
 }
 
-@property (copy) CompactDisc * compactDisc;
-@property (readonly) NSArray * queryResults;
+// ========================================
+// Convenience functions for creating known subclasses
++ (id) defaultMusicDatabaseQueryOperation;
++ (id) FreeDBQueryOperation;
++ (id) MusicBrainzQueryOperation;
++ (id) iTunesQueryOperation;
 
-- (BOOL) performQuery:(NSError **)error;
+// ========================================
+// Properties
+@property (assign) NSManagedObjectID * compactDiscID;
+@property (readonly, assign) NSError * error;
+@property (readonly, assign) NSArray * queryResults;
 
 @end

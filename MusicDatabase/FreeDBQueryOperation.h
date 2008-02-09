@@ -4,12 +4,12 @@
  */
 
 #import <Cocoa/Cocoa.h>
-#import "MusicDatabase.h"
+#import "MusicDatabaseQueryOperation.h"
 
 // ========================================
-// A MusicDatabase subclass providing access to the FreeDB online database
+// A MusicDatabaseQueryOperation subclass providing access to the FreeDB online database
 // ========================================
-@interface FreeDB : MusicDatabase
+@interface FreeDBQueryOperation : MusicDatabaseQueryOperation
 {
 }
 

@@ -4,12 +4,12 @@
  */
 
 #import <Cocoa/Cocoa.h>
-#import "MusicDatabase.h"
+#import "MusicDatabaseQueryOperation.h"
 
 // ========================================
-// A MusicDatabase subclass providing access to the GraceNote online database (via iTunes)
+// A MusicDatabaseQueryOperation subclass providing access to the MusicBrainz online database
 // ========================================
-@interface iTunesDatabase : MusicDatabase
+@interface MusicBrainzQueryOperation : MusicDatabaseQueryOperation
 {
 }
 

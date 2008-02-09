@@ -3,42 +3,58 @@
  *  All Rights Reserved
  */
 
-#import "iTunesDatabase.h"
+#import "iTunesQueryOperation.h"
 #import "CompactDisc.h"
 #import "SessionDescriptor.h"
 #import "TrackDescriptor.h"
 #import "iTunes.h"
 
-@implementation iTunesDatabase
+@interface MusicDatabaseQueryOperation ()
+@property (assign) NSError * error;
+@property (assign) NSArray * queryResults;
+@end
 
-- (BOOL) performQuery:(NSError **)error
+@implementation iTunesQueryOperation
+
+- (void) main
 {
-	// Remove all previous query results
-	NSIndexSet *indexesToBeRemoved = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, self.queryResults.count)];
-	[self willChange:NSKeyValueChangeRemoval valuesAtIndexes:indexesToBeRemoved forKey:@"queryResults"];
-	[_queryResults removeAllObjects];
-	[self didChange:NSKeyValueChangeRemoval valuesAtIndexes:indexesToBeRemoved forKey:@"queryResults"];
-
+	NSAssert(nil != self.compactDiscID, @"self.compactDiscID may not be nil");
+	
+	// Create our own context for accessing the store
+	NSManagedObjectContext *managedObjectContext = [[NSManagedObjectContext alloc] init];
+	[managedObjectContext setPersistentStoreCoordinator:[[[NSApplication sharedApplication] delegate] persistentStoreCoordinator]];
+	
+	// Fetch the CompactDisc object from the context and ensure it is the correct class
+	NSManagedObject *managedObject = [managedObjectContext objectWithID:self.compactDiscID];
+	if(![managedObject isKindOfClass:[CompactDisc class]]) {
+		self.error = [NSError errorWithDomain:NSCocoaErrorDomain code:2 userInfo:nil];
+		return;
+	}
+	
+	CompactDisc *compactDisc = (CompactDisc *)managedObject;
+	
 	// Create the scripting bridge application object for iTunes
 	iTunesApplication *iTunes = [SBApplication applicationWithBundleIdentifier:@"com.apple.iTunes"];
 	iTunes.delegate = self;
 
 	// iTunes isn't installed !?
 	if(nil == iTunes) {
-		*error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSNotFound userInfo:nil];
-		return NO;
+		self.error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSNotFound userInfo:nil];
+		return;
 	}
 
 	// Launch iTunes if it isn't running
 	if(!iTunes.isRunning)
 		[iTunes run];
 	
+	NSMutableArray *matchingDiscs = [[NSMutableArray alloc] init];
+	
 	// Get all the audio CDs iTunes knows about
 
 	// For some reason the following predicate isn't working
 //	NSPredicate *audioCDPredicate = [NSPredicate predicateWithFormat:@"kind == %i", iTunesESrcAudioCD];
 //	SBElementArray *iTunesAudioCDs = (SBElementArray *)[iTunes.sources filteredArrayUsingPredicate:audioCDPredicate];
-	
+
 	for(iTunesSource *source in iTunes.sources) {
 		
 		// Skip non-CD sources
@@ -53,14 +69,14 @@
 		SBElementArray *audioCDTracks = audioCDPlaylist.audioCDTracks;
 	
 		// Only discs with the same number of tracks are considered matches
-		if(audioCDTracks.count != self.compactDisc.firstSession.tracks.count)
+		if(audioCDTracks.count != compactDisc.firstSession.tracks.count)
 			continue;
 
 		NSMutableDictionary *discInformation = [[NSMutableDictionary alloc] init];
 
 		NSString *albumArtist = audioCDPlaylist.artist;
 		if(albumArtist)
-			[discInformation setObject:albumArtist forKey:kMetadataAlbumArtistKey];
+			[discInformation setObject:albumArtist forKey:kMetadataArtistKey];
 
 		NSString *albumComposer = audioCDPlaylist.composer;
 		if(albumComposer)
@@ -131,23 +147,19 @@
 		}
 		
 		[discInformation setObject:discTracks forKey:kMusicDatabaseTracksKey];
-		
-		// Add the matching disc to the set of query results in a KVC-compliant manner
-		NSIndexSet *insertionIndex = [NSIndexSet indexSetWithIndex:self.queryResults.count];
-		[self willChange:NSKeyValueChangeInsertion valuesAtIndexes:insertionIndex forKey:@"queryResults"];
-		[_queryResults addObject:discInformation];
-		[self didChange:NSKeyValueChangeInsertion valuesAtIndexes:insertionIndex forKey:@"queryResults"];		
+		[matchingDiscs addObject:discInformation];
 	}
 
-	return YES;
+	// Set the query results
+	self.queryResults = matchingDiscs;
 }
 
 - (void) eventDidFail:(const AppleEvent *)event withError:(NSError *)error
 {
 	
 #pragma unused(event)
-#pragma unused(error)
-	
+
+	self.error = error;
 }
 
 @end

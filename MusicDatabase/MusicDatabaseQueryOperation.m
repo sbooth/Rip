@@ -3,8 +3,10 @@
  *  All Rights Reserved
  */
 
-#import "MusicDatabase.h"
-#import "CompactDisc.h"
+#import "MusicDatabaseQueryOperation.h"
+#import "FreeDBQueryOperation.h"
+#import "MusicBrainzQueryOperation.h"
+#import "iTunesQueryOperation.h"
 
 // ========================================
 // KVC key names for the metadata dictionaries
@@ -21,40 +23,56 @@ NSString * const	kMetadataTrackNumberKey					= @"trackNumber";
 NSString * const	kMetadataTrackTotalKey					= @"trackTotal";
 NSString * const	kMetadataDiscNumberKey					= @"discNumber";
 NSString * const	kMetadataDiscTotalKey					= @"discTotal";
+NSString * const	kMetadataLyricsKey						= @"lyrics";
 NSString * const	kMetadataCommentKey						= @"comment";
-NSString * const	kMetadataISRCKey						= @"isrc";
-NSString * const	kMetadataMCNKey							= @"mcn";
-NSString * const	kMetadataBPMKey							= @"bpm";
-NSString * const	kMetadataMusicDNSPUIDKey				= @"musicDNSPUID";
-NSString * const	kMetadataMusicBrainzIDKey				= @"musicBrainzID";
+NSString * const	kMetadataISRCKey						= @"ISRC";
+NSString * const	kMetadataMCNKey							= @"MCN";
+NSString * const	kMetadataMusicBrainzIDKey				= @"MusicBrainzID";
 
 // ========================================
 // KVC key names for the query results
 // ========================================
 NSString * const	kMusicDatabaseTracksKey					= @"tracks";
 
-@implementation MusicDatabase
+@interface MusicDatabaseQueryOperation ()
+@property (assign) NSError * error;
+@property (assign) NSArray * queryResults;
+@end
 
-@synthesize compactDisc = _compactDisc;
+@implementation MusicDatabaseQueryOperation
+
+// ========================================
+// Convenience functions for creating known subclasses
++ (id) defaultMusicDatabaseQueryOperation
+{
+//	NSInteger foo = [[NSUserDefaults standardUserDefaults] integerForKey:@""];
+	
+	return [[FreeDBQueryOperation alloc] init];
+}
+
++ (id) FreeDBQueryOperation
+{
+	return [[FreeDBQueryOperation alloc] init];
+}
+
++ (id) MusicBrainzQueryOperation
+{
+	return [[MusicBrainzQueryOperation alloc] init];	
+}
+
++ (id) iTunesQueryOperation
+{
+	return [[iTunesQueryOperation alloc] init];
+}
+
+// ========================================
+// Properties
+@synthesize compactDiscID = _compactDiscID;
+@synthesize error = _error;
 @synthesize queryResults = _queryResults;
 
-- (id) init
-{
-	if((self = [super init]))
-		_queryResults = [[NSMutableArray alloc] init];
-	return self;
-}
-
-- (BOOL) performQuery:(NSError **)error;
-{
-
-#pragma unused(error)
-	
-	return YES;
-}
-
-#pragma mark KVC Accessors for queryResults
-
+// ========================================
+// KVC Accessors for queryResults
 - (NSUInteger) countOfQueryResults
 {
 	return [_queryResults count];
@@ -69,6 +87,5 @@ NSString * const	kMusicDatabaseTracksKey					= @"tracks";
 {
 	[_queryResults getObjects:buffer range:range];
 }
-
 
 @end

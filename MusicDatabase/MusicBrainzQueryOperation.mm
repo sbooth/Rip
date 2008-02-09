@@ -3,7 +3,7 @@
  *  All Rights Reserved
  */
 
-#import "MusicBrainzDatabase.h"
+#import "MusicBrainzQueryOperation.h"
 #import "CompactDisc.h"
 
 #include <musicbrainz3/webservice.h>
@@ -11,42 +11,55 @@
 #include <musicbrainz3/model.h>
 #include <musicbrainz3/utils.h>
 
-@implementation MusicBrainzDatabase
+@interface MusicDatabaseQueryOperation ()
+@property (assign) NSError * error;
+@property (assign) NSArray * queryResults;
+@end
 
-- (BOOL) performQuery:(NSError **)error
+@implementation MusicBrainzQueryOperation
+
+- (void) main
 {
-	// Remove all previous query results
-	NSIndexSet *indexesToBeRemoved = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, self.queryResults.count)];
-	[self willChange:NSKeyValueChangeRemoval valuesAtIndexes:indexesToBeRemoved forKey:@"queryResults"];
-	[_queryResults removeAllObjects];
-	[self didChange:NSKeyValueChangeRemoval valuesAtIndexes:indexesToBeRemoved forKey:@"queryResults"];
-
+	NSAssert(nil != self.compactDiscID, @"self.compactDiscID may not be nil");
+	
+	// Create our own context for accessing the store
+	NSManagedObjectContext *managedObjectContext = [[NSManagedObjectContext alloc] init];
+	[managedObjectContext setPersistentStoreCoordinator:[[[NSApplication sharedApplication] delegate] persistentStoreCoordinator]];
+	
+	// Fetch the CompactDisc object from the context and ensure it is the correct class
+	NSManagedObject *managedObject = [managedObjectContext objectWithID:self.compactDiscID];
+	if(![managedObject isKindOfClass:[CompactDisc class]]) {
+		self.error = [NSError errorWithDomain:NSCocoaErrorDomain code:2 userInfo:nil];
+		return;
+	}
+	
+	CompactDisc *compactDisc = (CompactDisc *)managedObject;
+	
 	// Set up the MusicBrainz web service
 	MusicBrainz::WebService *ws = new MusicBrainz::WebService();
 	if(NULL == ws) {
-		if(error)
-			*error = [NSError errorWithDomain:NSPOSIXErrorDomain code:ENOMEM userInfo:nil];
-		return NO;
+		self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:ENOMEM userInfo:nil];
+		return;
 	}
 	
 	// Set MB server and port
 	if(nil != [[NSUserDefaults standardUserDefaults] stringForKey:@"musicBrainzServer"])
-		ws->setHost([[[NSUserDefaults standardUserDefaults] stringForKey:@"musicBrainzServer"] cStringUsingEncoding:NSUTF8StringEncoding]);
+		ws->setHost([[[NSUserDefaults standardUserDefaults] stringForKey:@"musicBrainzServer"] UTF8String]);
 	
 	if(nil != [[NSUserDefaults standardUserDefaults] objectForKey:@"musicBrainzServerPort"])
 		ws->setPort([[NSUserDefaults standardUserDefaults] integerForKey:@"musicBrainzServerPort"]);
 	
 	// Use authentication, if specified
 	if(nil != [[NSUserDefaults standardUserDefaults] stringForKey:@"musicBrainzUsername"])
-		ws->setUserName([[[NSUserDefaults standardUserDefaults] stringForKey:@"musicBrainzUsername"] cStringUsingEncoding:NSUTF8StringEncoding]);
+		ws->setUserName([[[NSUserDefaults standardUserDefaults] stringForKey:@"musicBrainzUsername"] UTF8String]);
 	
 	if(nil != [[NSUserDefaults standardUserDefaults] objectForKey:@"musicBrainzPassword"])
-		ws->setPassword([[[NSUserDefaults standardUserDefaults] stringForKey:@"musicBrainzPassword"] cStringUsingEncoding:NSUTF8StringEncoding]);
+		ws->setPassword([[[NSUserDefaults standardUserDefaults] stringForKey:@"musicBrainzPassword"] UTF8String]);
 	
 	// Proxy setup
 	if([[NSUserDefaults standardUserDefaults] boolForKey:@"musicBrainzUseProxy"]) {
 		if(nil != [[NSUserDefaults standardUserDefaults] stringForKey:@"musicBrainzProxyServer"])
-			ws->setProxyHost([[[NSUserDefaults standardUserDefaults] stringForKey:@"musicBrainzProxyServer"] cStringUsingEncoding:NSUTF8StringEncoding]);
+			ws->setProxyHost([[[NSUserDefaults standardUserDefaults] stringForKey:@"musicBrainzProxyServer"] UTF8String]);
 		if(nil != [[NSUserDefaults standardUserDefaults] stringForKey:@"musicBrainzProxyServerPort"])
 			ws->setProxyPort([[NSUserDefaults standardUserDefaults] integerForKey:@"musicBrainzProxyServerPort"]);
 	}		
@@ -55,19 +68,22 @@
 	MusicBrainz::ReleaseResultList results;
 
 	try {
-		std::string discID = [self.compactDisc.musicBrainzDiscID cStringUsingEncoding:NSASCIIStringEncoding];
+		std::string discID = [compactDisc.musicBrainzDiscID cStringUsingEncoding:NSASCIIStringEncoding];
 		MusicBrainz::ReleaseFilter f = MusicBrainz::ReleaseFilter().discId(discID);
         results = q.getReleases(&f);
 	}
 	
 	catch(/* const MusicBrainz::Exception &e */const std::exception &e) {
+
 #if DEBUG
 		NSLog(@"MusicBrainz error: %s", e.what());
 #endif
-		if(error)
-			*error = [NSError errorWithDomain:NSPOSIXErrorDomain code:ENOMEM userInfo:nil];
-		return NO;
+
+		self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:ENOMEM userInfo:nil];
+		return;
 	}
+	
+	NSMutableArray *matchingReleases = [[NSMutableArray alloc] init];
 	
 	for(MusicBrainz::ReleaseResultList::iterator i = results.begin(); i != results.end(); i++) {
 		MusicBrainz::ReleaseResult *result = *i;
@@ -79,9 +95,11 @@
 		}
 		
 		catch(/* const MusicBrainz::Exception &e */const std::exception &e) {
+
 #if DEBUG
 			NSLog(@"Error: %s", e.what());
 #endif
+
 			continue;
 		}
 		
@@ -181,17 +199,13 @@
 		}
 		
 		[releaseDictionary setObject:tracksDictionary forKey:kMusicDatabaseTracksKey];
+		[matchingReleases addObject:releaseDictionary];
 
-		// Add the matching disc to the set of query results in a KVC-compliant manner
-		NSIndexSet *insertionIndex = [NSIndexSet indexSetWithIndex:self.queryResults.count];
-		[self willChange:NSKeyValueChangeInsertion valuesAtIndexes:insertionIndex forKey:@"queryResults"];
-		[_queryResults addObject:releaseDictionary];
-		[self didChange:NSKeyValueChangeInsertion valuesAtIndexes:insertionIndex forKey:@"queryResults"];
-		
 		delete result;
 	}
 	
-	return YES;
+	// Set the query results
+	self.queryResults = matchingReleases;
 }
 
 @end
