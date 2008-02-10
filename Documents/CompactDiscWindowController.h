@@ -6,49 +6,51 @@
 #import <Cocoa/Cocoa.h>
 #include <DiskArbitration/DiskArbitration.h>
 
-@class CompactDisc, AccurateRipDisc, DriveInformation;
+@class CompactDisc, DriveInformation;
 
 @interface CompactDiscWindowController : NSWindowController
 {
 	IBOutlet NSArrayController *_trackController;
 	IBOutlet NSObjectController *_driveInformationController;
 	
+@private
 	DADiskRef _disk;
 	CompactDisc *_compactDisc;
-	AccurateRipDisc *_accurateRipDisc;
 	DriveInformation *_driveInformation;
 	
-	NSMutableArray *_tracks;
-	NSMutableDictionary *_metadata;
-	
 	NSOperationQueue *_compactDiscOperationQueue;
-	NSOperationQueue *_encodingQueue;
+	NSOperationQueue *_networkOperationQueue;
 }
 
 @property (readonly) NSArrayController * trackController;
 @property (readonly) NSObjectController * driveInformationController;
 @property (readonly) NSOperationQueue * compactDiscOperationQueue;
-@property (readonly) NSOperationQueue * encodingQueue;
+@property (readonly) NSOperationQueue * networkOperationQueue;
 
 // ========================================
 // Properties
 // ========================================
 @property (assign) DADiskRef disk;
 @property (readonly, assign) CompactDisc * compactDisc;
-@property (readonly, assign) AccurateRipDisc * accurateRipDisc;
 @property (readonly, assign) DriveInformation * driveInformation;
-@property (readonly) NSMutableDictionary * metadata;
-@property (readonly) NSArray * tracks;
 
 // ========================================
 // Action Methods
 // ========================================
+- (IBAction) selectAllTracks:(id)sender;
+- (IBAction) deselectAllTracks:(id)sender;
+
 - (IBAction) copySelectedTracks:(id)sender;
 - (IBAction) copyImage:(id)sender;
 
 - (IBAction) detectPreGaps:(id)sender;
 
-- (IBAction) queryMusicDatabase:(id)sender;
+- (IBAction) queryDefaultMusicDatabase:(id)sender;
+- (IBAction) queryFreeDB:(id)sender;
+- (IBAction) queryMusicBrainz:(id)sender;
+- (IBAction) queryiTunes:(id)sender;
+
+- (IBAction) queryAccurateRip:(id)sender;
 
 - (IBAction) ejectDisc:(id)sender;
 
