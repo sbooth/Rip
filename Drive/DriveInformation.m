@@ -118,15 +118,15 @@ static NSDictionary * getDevicePropertiesForDADiskRef(DADiskRef disk)
 
 // ========================================
 // Creation
-+ (id) driveInformationWithDADiskRef:(DADiskRef)disk
++ (id) driveInformationWithDADiskRef:(DADiskRef)disk inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext
 {
 	NSParameterAssert(NULL != disk);
+	NSParameterAssert(nil != managedObjectContext);
 	
 	NSString *deviceIdentifier = getDeviceIdentifierForDADiskRef(disk);
 	if(nil == deviceIdentifier)
 		return nil;
 	
-	NSManagedObjectContext *managedObjectContext = [[[NSApplication sharedApplication] delegate] managedObjectContext];
 	NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"DriveInformation"
 														 inManagedObjectContext:managedObjectContext];
 	NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];

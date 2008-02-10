@@ -18,7 +18,7 @@
 
 // ========================================
 // Creation
-+ (id) driveInformationWithDADiskRef:(DADiskRef)disk;
++ (id) driveInformationWithDADiskRef:(DADiskRef)disk inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext;
 
 // ========================================
 // Core Data properties
