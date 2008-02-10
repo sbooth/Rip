@@ -4,6 +4,8 @@
  */
 
 #import "ApplicationDelegate.h"
+#import "ByteSizeValueTransformer.h"
+#import "DurationValueTransformer.h"
 #import "CompactDiscWindowController.h"
 #import "AquaticPrime.h"
 
@@ -63,6 +65,18 @@ diskDisappearedCallback(DADiskRef disk, void *context)
 }
 
 @implementation ApplicationDelegate
+
++ (void) initialize
+{
+	// Register custom value transformer classes
+	NSValueTransformer *transformer = nil;
+	
+	transformer = [[ByteSizeValueTransformer alloc] init];
+	[NSValueTransformer setValueTransformer:transformer forName:@"ByteSizeValueTransformer"];
+	
+	transformer = [[DurationValueTransformer alloc] init];
+	[NSValueTransformer setValueTransformer:transformer forName:@"DurationValueTransformer"];
+}
 
 @synthesize persistentStoreCoordinator = _persistentStoreCoordinator;
 @synthesize managedObjectModel = _managedObjectModel;
@@ -126,7 +140,7 @@ diskDisappearedCallback(DADiskRef disk, void *context)
 	if(nil != self.managedObjectContext) {
 		if([self.managedObjectContext commitEditing]) {
 			NSError *error = nil;
-			if([self.managedObjectContext hasChanges] && ![self.managedObjectContext save:&error]) {
+			if(self.managedObjectContext.hasChanges && ![self.managedObjectContext save:&error]) {
 				BOOL errorResult = [[NSApplication sharedApplication] presentError:error];
 
 				if(errorResult)
@@ -262,6 +276,9 @@ diskDisappearedCallback(DADiskRef disk, void *context)
 
 #pragma unused(sender)
 
+	if(!self.managedObjectContext.hasChanges)
+		return;
+	
 	NSError *error = nil;
 	if(![self.managedObjectContext save:&error])
 		[[NSApplication sharedApplication] presentError:error];
@@ -275,20 +292,21 @@ diskDisappearedCallback(DADiskRef disk, void *context)
 {
 	NSParameterAssert(NULL != disk);
 
-	// Create a new document for this disk
-	CompactDiscWindowController *doc = [[CompactDiscWindowController alloc] init];
-	doc.disk = disk;
-	[doc showWindow:self];
+	// Create a new window for this disk
+	CompactDiscWindowController *compactDiscWindow = [[CompactDiscWindowController alloc] init];
+	compactDiscWindow.disk = disk;
+
+	// Actions such as querying AccurateRip pass objectIDs across threads, so the managed object context
+	// must be saved before any queries are performed
+	[self saveAction:nil];
 	
-/*	NSError *error = nil;
-	id document = [[NSDocumentController sharedDocumentController] openUntitledDocumentAndDisplay:YES error:&error];
+	[compactDiscWindow showWindow:self];
+
+	if([[NSUserDefaults standardUserDefaults] boolForKey:@"automaticallyQueryAccurateRip"])
+		[compactDiscWindow queryAccurateRip:nil];
 	
-	if(nil == document)
-		[[NSApplication sharedApplication] presentError:error];
-	
-	// Assign the disk to the document
-	if([document isKindOfClass:[CompactDiscWindowController class]])
-		((CompactDiscWindowController *)document).disk = disk;*/
+	if([[NSUserDefaults standardUserDefaults] boolForKey:@"automaticallyQueryMusicDatabase"])
+		[compactDiscWindow queryDefaultMusicDatabase:nil];
 }
 
 - (void) diskDisappeared:(DADiskRef)disk

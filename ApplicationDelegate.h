@@ -8,6 +8,7 @@
 	
 @interface ApplicationDelegate : NSObject
 {
+@private
 	DASessionRef _diskArbitrationSession;
 	NSPersistentStoreCoordinator *_persistentStoreCoordinator;
 	NSManagedObjectModel *_managedObjectModel;
