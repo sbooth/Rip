@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2007 Stephen F. Booth <me@sbooth.org>
+ *  Copyright (C) 2007 - 2008 Stephen F. Booth <me@sbooth.org>
  *  All Rights Reserved
  */
 
@@ -7,6 +7,8 @@
 #import "SectorRange.h"
 #import "Drive.h"
 #import "CompactDisc.h"
+#import "SessionDescriptor.h"
+#import "TrackDescriptor.h"
 
 // The typical pregap is 2 seconds, or 150 sectors
 #define BUFFER_SIZE_IN_SECTORS 150u
@@ -72,15 +74,13 @@ convertQSubChannelDataFromBCDToDecimal(struct QSubChannelData *qData)
 }
 
 @interface PreGapDetectionOperation ()
-@property (copy) NSNumber * preGap;
-@property (copy) NSError * error;
+@property (assign) NSError * error;
 @end
 
 @implementation PreGapDetectionOperation
 
 @synthesize disk = _disk;
-@synthesize trackNumber = _trackNumber;
-@synthesize preGap = _preGap;
+@synthesize trackID = _trackID;
 @synthesize error = _error;
 
 - (id) initWithDADiskRef:(DADiskRef)disk
@@ -95,17 +95,35 @@ convertQSubChannelDataFromBCDToDecimal(struct QSubChannelData *qData)
 - (void) main
 {
 	NSAssert(NULL != self.disk, @"self.disk may not be NULL");
-	NSAssert(nil != self.trackNumber, @"self.trackNumber may not be nil");
-
+	NSAssert(nil != self.trackID, @"self.trackID may not be nil");
+	
+	// Create our own context for accessing the store
+	NSManagedObjectContext *managedObjectContext = [[NSManagedObjectContext alloc] init];
+	[managedObjectContext setPersistentStoreCoordinator:[[[NSApplication sharedApplication] delegate] persistentStoreCoordinator]];
+	
+	// Fetch the CompactDisc object from the context and ensure it is the correct class
+	NSManagedObject *managedObject = [managedObjectContext objectRegisteredForID:self.trackID];
+	if(![managedObject isKindOfClass:[TrackDescriptor class]]) {
+		self.error = [NSError errorWithDomain:NSCocoaErrorDomain code:2 userInfo:nil];
+		return;
+	}
+	
+	TrackDescriptor *track = (TrackDescriptor *)managedObject;
+	
 	// For the first track, the pre-gap is the area between the sector 0 and the track's first sector
-	if(1 == self.trackNumber.unsignedIntegerValue) {
-		CompactDisc *compactDisc = [[CompactDisc alloc] initWithDADiskRef:self.disk];
-
-		if(0 != [compactDisc firstSectorForTrack:1])
-		   self.preGap = [NSNumber numberWithUnsignedInteger:[compactDisc firstSectorForTrack:1]];
+	if(1 == track.number.unsignedIntegerValue) {
+		if(0 != track.session.firstTrack.firstSector.unsignedIntegerValue)
+		   track.preGap = track.session.firstTrack.firstSector;
 		else
-			self.preGap = [NSNumber numberWithUnsignedInteger:150];
+			track.preGap = [NSNumber numberWithUnsignedInteger:150];
 		   
+		// Save the changes
+		if(managedObjectContext.hasChanges) {
+			NSError *error = nil;
+			if(![managedObjectContext save:&error])
+				self.error = error;
+		}
+		
 		return;
 	}
 
@@ -130,12 +148,12 @@ convertQSubChannelDataFromBCDToDecimal(struct QSubChannelData *qData)
 		goto cleanup;
 	}
 	
-	CompactDisc *compactDisc = [[CompactDisc alloc] initWithDADiskRef:self.disk];
 	
 	// Store the sector range delineating the track holding the pregap
-	NSUInteger trackToScan = self.trackNumber.unsignedIntegerValue - 1;
-	NSUInteger firstSector = [compactDisc firstSectorForTrack:trackToScan];
-	NSUInteger lastSector = [compactDisc lastSectorForTrack:trackToScan];
+	TrackDescriptor *trackToScan = [track.session trackNumber:(track.number.unsignedIntegerValue - 1)];
+	
+	NSUInteger firstSector = trackToScan.firstSector.unsignedIntegerValue;
+	NSUInteger lastSector = trackToScan.lastSector.unsignedIntegerValue;
 		
 	// ========================================
 	// ITERATIVELY EXTRACT AND SCAN MODE-1 Q
@@ -189,7 +207,7 @@ convertQSubChannelDataFromBCDToDecimal(struct QSubChannelData *qData)
 			}
 			
 			// The pregap is encoded as index 0 with the subsequent track number
-			if(1 + trackToScan == qData->tno && 0 == qData->index) {
+			if(1 + trackToScan.number.unsignedIntegerValue == qData->tno && 0 == qData->index) {
 				preGapStart = readRange.firstSector + i;
 				break;
 			}
@@ -212,8 +230,15 @@ convertQSubChannelDataFromBCDToDecimal(struct QSubChannelData *qData)
 	}
 
 	if(0 != preGapStart)
-		self.preGap = [NSNumber numberWithUnsignedInteger:(lastSector - preGapStart + 1)];
+		track.preGap = [NSNumber numberWithUnsignedInteger:(lastSector - preGapStart + 1)];
 	
+	// Save the changes
+	if(managedObjectContext.hasChanges) {
+		NSError *error = nil;
+		if(![managedObjectContext save:&error])
+			self.error = error;
+	}
+
 	// ========================================
 	// CLEAN UP
 	

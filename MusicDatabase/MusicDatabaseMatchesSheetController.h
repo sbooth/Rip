@@ -13,7 +13,7 @@
 	NSArray *_matches;
 }
 
-@property (copy) NSArray * matches;
+@property (assign) NSArray * matches;
 
 - (IBAction) ok:(id)sender;
 - (IBAction) cancel:(id)sender;

@@ -3,6 +3,8 @@
  *  All Rights Reserved
  */
 
+// Access to AccurateRip is regulated, see http://www.accuraterip.com/3rdparty-access.htm for details
+
 #import "AccurateRipQueryOperation.h"
 #import "CompactDisc.h"
 #import "SessionDescriptor.h"
@@ -30,7 +32,7 @@
 	[managedObjectContext setPersistentStoreCoordinator:[[[NSApplication sharedApplication] delegate] persistentStoreCoordinator]];
 	
 	// Fetch the CompactDisc object from the context and ensure it is the correct class
-	NSManagedObject *managedObject = [managedObjectContext objectWithID:self.compactDiscID];
+	NSManagedObject *managedObject = [managedObjectContext objectRegisteredForID:self.compactDiscID];
 	if(![managedObject isKindOfClass:[CompactDisc class]]) {
 		self.error = [NSError errorWithDomain:NSCocoaErrorDomain code:2 userInfo:nil];
 		return;
@@ -162,8 +164,9 @@
 			[accurateRipDisc addTracksObject:accurateRipTrack];
 		}
 		
-		accurateRipTrack.confidenceLevel = [NSNumber numberWithUnsignedInteger:arTrackConfidence];
-		accurateRipTrack.CRC = [NSNumber numberWithUnsignedInteger:arTrackCRC];		
+		accurateRipTrack.confidenceLevel = [NSNumber numberWithUnsignedChar:arTrackConfidence];
+		// Since Core Data only stores signed integers, cast the unsigned CRC to signed for storage
+		accurateRipTrack.CRC = [NSNumber numberWithInt:(int32_t)arTrackCRC];
 	}	
 
 	// Save the changes
