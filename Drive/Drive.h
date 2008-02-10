@@ -6,7 +6,7 @@
 #import <Cocoa/Cocoa.h>
 #include <DiskArbitration/DiskArbitration.h>
 
-@class SectorRange, CompactDisc;
+@class SectorRange;
 
 // ========================================
 // Byte sizes of various CDDA sector areas
@@ -22,15 +22,14 @@ enum {
 // ========================================
 @interface Drive : NSObject
 {
+@private
 	DADiskRef _disk;
-	CompactDisc *_compactDisc;
 	int _fd;
 	NSUInteger _cacheSize;
 	NSError *_error;
 }
 
 @property (readonly, assign) DADiskRef disk;
-@property (readonly, assign) CompactDisc * compactDisc;
 @property (readonly, copy) NSError * error;
 @property (assign) NSUInteger cacheSize;
 @property (readonly) NSUInteger cacheSizeInSectors;

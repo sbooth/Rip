@@ -5,7 +5,6 @@
 
 #import "Drive.h"
 #import "SectorRange.h"
-#import "CompactDisc.h"
 
 #include <IOKit/storage/IOCDTypes.h>
 #include <IOKit/storage/IOCDMediaBSDClient.h>
@@ -13,7 +12,6 @@
 
 @interface Drive ()
 @property (assign) DADiskRef disk;
-@property (assign) CompactDisc * compactDisc;
 @property (copy) NSError * error;
 @property (assign) int fd;
 @end
@@ -25,7 +23,6 @@
 @implementation Drive
 
 @synthesize disk = _disk;
-@synthesize compactDisc = _compactDisc;
 @synthesize error = _error;
 @synthesize fd = _fd;
 @synthesize cacheSize = _cacheSize;
@@ -37,7 +34,6 @@
 	if((self = [super init])) {
 		self.cacheSize	= 2 * 1024 * 1024;
 		self.disk = disk;
-		self.compactDisc = [[CompactDisc alloc] initWithDADiskRef:self.disk];
 		self.fd = -1;
 	}
 
@@ -126,9 +122,9 @@
 	return YES;
 }
 
-
 - (BOOL) clearCache:(SectorRange *)range
 {
+/*	
 	NSUInteger sectorsRemaining, sectorsRead, boundary;
 
 	NSUInteger requiredReadSize			= self.cacheSizeInSectors;
@@ -220,7 +216,7 @@
 			sectorsRemaining -= sectorsRead;
 		}
 	}
-
+*/
 	return YES;
 }
 
