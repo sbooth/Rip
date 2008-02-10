@@ -25,6 +25,11 @@
 @property (assign) NSSet * tracks;
 
 // ========================================
+// Computed properties
+@property (readonly) NSNumber * sectorCount;
+@property (readonly) SectorRange * sectorRange;
+
+// ========================================
 // Other properties
 @property (readonly) NSSet * selectedTracks;
 @property (readonly) NSArray * orderedTracks;

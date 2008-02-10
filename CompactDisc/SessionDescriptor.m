@@ -20,6 +20,26 @@
 @dynamic tracks;
 
 // ========================================
+// Computed properties
+- (NSNumber *) sectorCount
+{
+	return [NSNumber numberWithUnsignedInteger:self.sectorRange.length];
+}
+
+- (SectorRange *) sectorRange
+{
+	NSArray *orderedTracks = self.orderedTracks;
+	
+	if(0 == orderedTracks.count)
+		return nil;
+	
+	TrackDescriptor *firstTrack = [orderedTracks objectAtIndex:0];
+	TrackDescriptor *lastTrack = [orderedTracks lastObject];
+	
+	return [SectorRange sectorRangeWithFirstSector:firstTrack.firstSector.unsignedIntegerValue lastSector:lastTrack.lastSector.unsignedIntegerValue];
+}
+
+// ========================================
 // Other properties
 - (NSSet *) selectedTracks
 {
