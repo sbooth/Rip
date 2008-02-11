@@ -25,7 +25,7 @@
 	[managedObjectContext setPersistentStoreCoordinator:[[[NSApplication sharedApplication] delegate] persistentStoreCoordinator]];
 	
 	// Fetch the CompactDisc object from the context and ensure it is the correct class
-	NSManagedObject *managedObject = [managedObjectContext objectRegisteredForID:self.compactDiscID];
+	NSManagedObject *managedObject = [managedObjectContext objectWithID:self.compactDiscID];
 	if(![managedObject isKindOfClass:[CompactDisc class]]) {
 		self.error = [NSError errorWithDomain:NSCocoaErrorDomain code:2 userInfo:nil];
 		return;
