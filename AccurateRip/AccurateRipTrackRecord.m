@@ -11,7 +11,7 @@
 // Core Data properties
 @dynamic number;
 @dynamic confidenceLevel;
-@dynamic CRC;
+@dynamic checksum;
 
 // ========================================
 // Core Data relationships

@@ -10,14 +10,14 @@
 #include <IOKit/storage/IOCDTypes.h>
 
 // ========================================
-// Calculate the AccurateRip CRC for the file at path
+// Calculate the AccurateRip checksum for the file at path
 // ========================================
 uint32 
-calculateAccurateRipCRCForFile(NSString *path, BOOL firstTrack, BOOL lastTrack)
+calculateAccurateRipChecksumForFile(NSString *path, BOOL firstTrack, BOOL lastTrack)
 {
 	NSCParameterAssert(nil != path);
 	
-	uint32_t crc = 0;
+	uint32_t checksum = 0;
 
 	// Open the file for reading
 	ExtAudioFileRef file = NULL;
@@ -65,7 +65,7 @@ calculateAccurateRipCRCForFile(NSString *path, BOOL firstTrack, BOOL lastTrack)
 		else if(AUDIO_FRAMES_PER_CDDA_SECTOR != frameCount)
 			break;
 		
-		crc += calculateAccurateRipCRCForBlock(buffer, blockNumber++, totalBlocks, firstTrack, lastTrack);
+		checksum += calculateAccurateRipChecksumForBlock(buffer, blockNumber++, totalBlocks, firstTrack, lastTrack);
 	}
 	
 cleanup:
@@ -73,19 +73,19 @@ cleanup:
 /*	if(noErr != status)
 		return 0;*/
 	
-	return crc;
+	return checksum;
 }
 
 // ========================================
-// Calculate the AccurateRip CRC for the specified range of CDDA sectors file at path
+// Calculate the AccurateRip checksum for the specified range of CDDA sectors file at path
 // ========================================
 uint32 
-calculateAccurateRipCRCForFileRegion(NSString *path, NSUInteger firstSector, NSUInteger lastSector, BOOL firstTrack, BOOL lastTrack)
+calculateAccurateRipChecksumForFileRegion(NSString *path, NSUInteger firstSector, NSUInteger lastSector, BOOL firstTrack, BOOL lastTrack)
 {
 	NSCParameterAssert(nil != path);
 	NSCParameterAssert(lastSector > firstSector);
 	
-	uint32_t crc = 0;
+	uint32_t checksum = 0;
 	
 	// Open the file for reading
 	ExtAudioFileRef file = NULL;
@@ -138,7 +138,7 @@ calculateAccurateRipCRCForFileRegion(NSString *path, NSUInteger firstSector, NSU
 		else if(AUDIO_FRAMES_PER_CDDA_SECTOR != frameCount)
 			break;
 		
-		crc += calculateAccurateRipCRCForBlock(buffer, blockNumber++, totalBlocks, firstTrack, lastTrack);
+		checksum += calculateAccurateRipChecksumForBlock(buffer, blockNumber++, totalBlocks, firstTrack, lastTrack);
 	}
 	
 cleanup:
@@ -146,17 +146,17 @@ cleanup:
 /*	if(noErr != status)
 		return 0;*/
 	
-	return crc;
+	return checksum;
 }
 
 // ========================================
 // Generate the AccurateRip CRC for a sector of CDDA audio
 // ========================================
 uint32_t
-calculateAccurateRipCRCForBlock(const void *block, NSUInteger blockNumber, NSUInteger totalBlocks, BOOL firstTrack, BOOL lastTrack)
+calculateAccurateRipChecksumForBlock(const void *block, NSUInteger blockNumber, NSUInteger totalBlocks, BOOL firstTrack, BOOL lastTrack)
 {
 	NSCParameterAssert(NULL != block);
-	
+
 	if(firstTrack && 4 > blockNumber)
 		return 0;
 	else if(lastTrack && 6 > (totalBlocks - blockNumber))
@@ -168,14 +168,14 @@ calculateAccurateRipCRCForBlock(const void *block, NSUInteger blockNumber, NSUIn
 	}
 	else {
 		const uint32_t *buffer = (const uint32_t *)block;
-		uint32_t crc = 0;
+		uint32_t checksum = 0;
 		NSUInteger blockOffset = AUDIO_FRAMES_PER_CDDA_SECTOR * blockNumber;
 		
 		NSUInteger i;
 		for(i = 0; i < AUDIO_FRAMES_PER_CDDA_SECTOR; ++i)
-			crc += OSSwapHostToLittleInt32(*buffer++) * ++blockOffset;
-		
-		return crc;
+			checksum += OSSwapHostToLittleInt32(*buffer++) * ++blockOffset;
+
+		return checksum;
 	}
 }
 

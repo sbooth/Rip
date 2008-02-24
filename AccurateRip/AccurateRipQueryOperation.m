@@ -128,26 +128,30 @@
 		uint8_t arTrackConfidence = 0;
 		[accurateRipResponseData getBytes:&arTrackConfidence range:NSMakeRange(offset, 1)];
 		
-		// An AccurateRip track CRC is calculated as follows:
+		// An AccurateRip track checksum is calculated as follows:
 		//
 		// Since this is CD-DA audio, a block (sector) is 2352 bytes in size and 1/75th of a second in duration
 		// A single 2352 byte block contains 588 audio frames at 16 bits per channel and 2 channels
 		//
-		// For CRC calculations, AccurateRip treats a single audio frame of as a 32-bit quantity
+		// For checksum calculations, AccurateRip treats a single audio frame of as a 32-bit quantity
+		// This is bad, because math overflow can lead to discarded samples (bits) from the right channel
 		//
 		// Multiply the audio frame's value (as an (unsigned?) 32-bit integer) [f(n)] times it's frame number [n]
-		// The first four blocks and 587 frames of the first track are skipped (zero CRC value)
-		// The last six blocks of the last track are skipped (zero CRC value)
+		// The first four blocks and 587 frames of the first track are skipped (zero checksum value)
+		// The last six blocks of the last track are skipped (zero checksum value)
 		//
-		// The CRC is additive
+		// The checksum is additive
 		
-		uint32_t arTrackCRC = 0;
-		[accurateRipResponseData getBytes:&arTrackCRC range:NSMakeRange(offset + 1, 4)];
-		arTrackCRC = OSSwapLittleToHostInt32(arTrackCRC);
+		uint32_t arTrackChecksum = 0;
+		[accurateRipResponseData getBytes:&arTrackChecksum range:NSMakeRange(offset + 1, 4)];
+		arTrackChecksum = OSSwapLittleToHostInt32(arTrackChecksum);
 		
-/*		uint32_t arTrackStartCRC = 0;
-		[self.responseData getBytes:&arTrackStartCRC range:NSMakeRange(offset + 1 + 4, 4)];
-		arTrackStartCRC = OSSwapLittleToHostInt32(arTrackStartCRC); */
+#if DEBUG
+		uint32_t arOffsetChecksum = 0;
+		[accurateRipResponseData getBytes:&arOffsetChecksum range:NSMakeRange(offset + 1 + 4, 4)];
+		arOffsetChecksum = OSSwapLittleToHostInt32(arOffsetChecksum);
+		NSLog(@"arOffsetChecksum = %x", arOffsetChecksum);
+#endif
 		
 		// What are the next 4 bytes?
 		
@@ -165,8 +169,8 @@
 		}
 		
 		accurateRipTrack.confidenceLevel = [NSNumber numberWithUnsignedChar:arTrackConfidence];
-		// Since Core Data only stores signed integers, cast the unsigned CRC to signed for storage
-		accurateRipTrack.CRC = [NSNumber numberWithInt:(int32_t)arTrackCRC];
+		// Since Core Data only stores signed integers, cast the unsigned checksum to signed for storage
+		accurateRipTrack.checksum = [NSNumber numberWithInt:(int32_t)arTrackChecksum];
 	}	
 
 	// Save the changes

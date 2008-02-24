@@ -18,7 +18,7 @@
 // Core Data properties
 @property (assign) NSNumber * number;
 @property (assign) NSNumber * confidenceLevel;
-@property (assign) NSNumber * CRC;
+@property (assign) NSNumber * checksum;
 
 // ========================================
 // Core Data relationships
