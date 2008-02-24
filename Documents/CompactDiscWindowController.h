@@ -12,6 +12,7 @@
 {
 	IBOutlet NSArrayController *_trackController;
 	IBOutlet NSObjectController *_driveInformationController;
+	IBOutlet NSMenu *_musicDatabaseMenu;
 	
 @private
 	DADiskRef _disk;
@@ -44,6 +45,9 @@
 - (IBAction) copyImage:(id)sender;
 
 - (IBAction) detectPreGaps:(id)sender;
+
+- (IBAction) readMCN:(id)sender;
+- (IBAction) readISRCs:(id)sender;
 
 - (IBAction) queryDefaultMusicDatabase:(id)sender;
 - (IBAction) queryFreeDB:(id)sender;

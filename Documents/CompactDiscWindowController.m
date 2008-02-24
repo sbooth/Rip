@@ -26,6 +26,9 @@
 
 #import "PreGapDetectionOperation.h"
 
+#import "MCNDetectionOperation.h"
+#import "ISRCDetectionOperation.h"
+
 #import "MusicDatabaseQueryOperation.h"
 #import "MusicDatabaseMatchesSheetController.h"
 
@@ -50,6 +53,10 @@ NSString * const	kNetworkOperationQueueKVOContext		= @"org.sbooth.Rip.CompactDis
 - (void) extractionOperationStopped:(ExtractionOperation *)operation;
 - (void) preGapDetectionOperationStarted:(PreGapDetectionOperation *)operation;
 - (void) preGapDetectionOperationStopped:(PreGapDetectionOperation *)operation;
+- (void) MCNDetectionOperationStarted:(MCNDetectionOperation *)operation;
+- (void) MCNDetectionOperationStopped:(MCNDetectionOperation *)operation;
+- (void) ISRCDetectionOperationStarted:(ISRCDetectionOperation *)operation;
+- (void) ISRCDetectionOperationStopped:(ISRCDetectionOperation *)operation;
 - (void) accurateRipQueryOperationStarted:(AccurateRipQueryOperation *)operation;
 - (void) accurateRipQueryOperationStopped:(AccurateRipQueryOperation *)operation;
 - (void) musicDatabaseQueryOperationStarted:(MusicDatabaseQueryOperation *)operation;
@@ -151,6 +158,10 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 		return YES;
 	else if([menuItem action] == @selector(detectPreGaps:))
 		return (0 != self.compactDisc.firstSession.selectedTracks.count);
+	else if([menuItem action] == @selector(readMCN:))
+		return YES;
+	else if([menuItem action] == @selector(readISRCs:))
+		return (0 != self.compactDisc.firstSession.selectedTracks.count);
 	else
 		return [super validateMenuItem:menuItem];
 }
@@ -173,6 +184,10 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 		return YES;
 	else if([toolbarItem action] == @selector(detectPreGaps:))
 		return (0 != self.compactDisc.firstSession.selectedTracks.count);
+	else if([toolbarItem action] == @selector(readMCN:))
+		return YES;
+	else if([toolbarItem action] == @selector(readISRCs:))
+		return (0 != self.compactDisc.firstSession.selectedTracks.count);
 	else
 		return [super validateToolbarItem:toolbarItem];
 }
@@ -189,6 +204,10 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 					[self extractionOperationStarted:(ExtractionOperation *)operation];
 				else if([operation isKindOfClass:[PreGapDetectionOperation class]])
 					[self preGapDetectionOperationStarted:(PreGapDetectionOperation *)operation];
+				else if([operation isKindOfClass:[MCNDetectionOperation class]])
+					[self MCNDetectionOperationStarted:(MCNDetectionOperation *)operation];
+				else if([operation isKindOfClass:[ISRCDetectionOperation class]])
+					[self ISRCDetectionOperationStarted:(ISRCDetectionOperation *)operation];
 			}
 		}
 		else if(NSKeyValueChangeRemoval == changeKind) {
@@ -197,6 +216,10 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 					[self extractionOperationStopped:(ExtractionOperation *)operation];
 				else if([operation isKindOfClass:[PreGapDetectionOperation class]])
 					[self preGapDetectionOperationStopped:(PreGapDetectionOperation *)operation];
+				else if([operation isKindOfClass:[MCNDetectionOperation class]])
+					[self MCNDetectionOperationStopped:(MCNDetectionOperation *)operation];
+				else if([operation isKindOfClass:[ISRCDetectionOperation class]])
+					[self ISRCDetectionOperationStopped:(ISRCDetectionOperation *)operation];
 		}
 	}
 	// Network operations
@@ -293,16 +316,11 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 		toolbarItem.target = self;
 		toolbarItem.action = @selector(queryDefaultMusicDatabase:);
 		
-		toolbarItem.label = @"fnord";
-		toolbarItem.paletteLabel = @"fnord";
-		toolbarItem.toolTip = @"fnord";
+		toolbarItem.label = @"Lookup Disc";
+		toolbarItem.paletteLabel = @"Lookup Disc";
+		toolbarItem.toolTip = @"Lookup this disc in a music database";
 		
-		NSMenu *toolbarItemMenu = [[NSMenu alloc] initWithTitle:@"fnord"];
-		[toolbarItemMenu addItemWithTitle:@"FreeDB" action:@selector(queryFreeDB:) keyEquivalent:@""];
-		[toolbarItemMenu addItemWithTitle:@"MusicBrainz" action:@selector(queryMusicBrainz:) keyEquivalent:@""];
-		[toolbarItemMenu addItemWithTitle:@"iTunes" action:@selector(queryiTunes:) keyEquivalent:@""];
-		
-		toolbarItem.menu = toolbarItemMenu;
+		toolbarItem.menu = _musicDatabaseMenu;
 		
 		return toolbarItem;
 	}
@@ -366,7 +384,7 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 
 - (IBAction) copyImage:(id)sender
 {
-
+	
 #pragma unused(sender)
 
 	ExtractionConfigurationSheetController *extractionConfigurationSheetController = [[ExtractionConfigurationSheetController alloc] init];
@@ -413,6 +431,41 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 		preGapDetectionOperation.trackID = track.objectID;
 		
 		[self.compactDiscOperationQueue addOperation:preGapDetectionOperation];
+	}
+}
+
+- (IBAction) readMCN:(id)sender
+{
+	
+#pragma unused(sender)
+	
+	MCNDetectionOperation *mcnDetectionOperation = [[MCNDetectionOperation alloc] init];
+	
+	mcnDetectionOperation.disk = self.disk;
+	mcnDetectionOperation.compactDiscID = self.compactDisc.objectID;
+	
+	[self.compactDiscOperationQueue addOperation:mcnDetectionOperation];
+}
+
+- (IBAction) readISRCs:(id)sender
+{
+
+#pragma unused(sender)
+	
+	NSSet *selectedTracks = self.compactDisc.firstSession.selectedTracks;
+	
+	if(0 == selectedTracks.count) {
+		NSBeep();
+		return;
+	}
+	
+	for(TrackDescriptor *track in selectedTracks) {
+		ISRCDetectionOperation *isrcDetectionOperation = [[ISRCDetectionOperation alloc] init];
+		
+		isrcDetectionOperation.disk = self.disk;
+		isrcDetectionOperation.trackID = track.objectID;
+		
+		[self.compactDiscOperationQueue addOperation:isrcDetectionOperation];
 	}
 }
 
@@ -534,7 +587,7 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 		NSUInteger sectorOffset = 0;
 		
 		for(NSManagedObjectID *trackID in operation.trackIDs) {
-			NSManagedObject *managedObject = [self.managedObjectContext objectRegisteredForID:trackID];
+			NSManagedObject *managedObject = [self.managedObjectContext objectWithID:trackID];
 //			if(![managedObject isKindOfClass:[TrackDescriptor class]])
 //				break;
 			
@@ -546,7 +599,7 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 			SectorRange *adjustedSectorRange = [SectorRange sectorRangeWithFirstSector:sectorOffset sectorCount:trackSectorRange.length];
 			sectorOffset += trackSectorRange.length;
 			
-			NSUInteger accurateRipCRC = calculateAccurateRipCRCForFileRegion(operation.URL.path, 
+			NSUInteger accurateRipChecksum = calculateAccurateRipChecksumForFileRegion(operation.URL.path, 
 																			 adjustedSectorRange.firstSector,
 																			 adjustedSectorRange.lastSector,
 																			 self.compactDisc.firstSession.firstTrack.number.unsignedIntegerValue == track.number.unsignedIntegerValue,
@@ -557,7 +610,7 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 			
 			extractedTrackRecord.track = track;
 			// Since Core Data only stores signed integers, cast the unsigned CRC to signed for storage
-			extractedTrackRecord.accurateRipCRC = [NSNumber numberWithInt:(int32_t)accurateRipCRC];
+			extractedTrackRecord.accurateRipChecksum = [NSNumber numberWithInt:(int32_t)accurateRipChecksum];
 			
 			[extractionRecord addTracksObject:extractedTrackRecord];
 		}
@@ -568,7 +621,7 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 		BOOL allTracksWereAccuratelyExtracted = YES;
 
 		for(NSManagedObjectID *trackID in operation.trackIDs) {
-			NSManagedObject *managedObject = [self.managedObjectContext objectRegisteredForID:trackID];
+			NSManagedObject *managedObject = [self.managedObjectContext objectWithID:trackID];
 //			if(![managedObject isKindOfClass:[TrackDescriptor class]])
 //				break;
 			
@@ -577,7 +630,7 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 			AccurateRipTrackRecord *accurateRipTrack = [self.compactDisc.accurateRipDisc trackNumber:track.number.unsignedIntegerValue];
 			ExtractedTrackRecord *extractedTrack = [extractionRecord trackNumber:track.number.unsignedIntegerValue];
 			
-			if(accurateRipTrack && accurateRipTrack.CRC.unsignedIntegerValue == extractedTrack.accurateRipCRC.unsignedIntegerValue) {
+			if(accurateRipTrack && accurateRipTrack.checksum.unsignedIntegerValue == extractedTrack.accurateRipChecksum.unsignedIntegerValue) {
 				NSLog(@"Track %@ accurately ripped, confidence %@", track.number, accurateRipTrack.confidenceLevel);
 			}
 			else
@@ -618,7 +671,51 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 	}
 	
 	// Refresh ourselves, to pull in the pre-gap set in the worker thread
-	NSManagedObject *managedObject = [self.managedObjectContext objectRegisteredForID:operation.trackID];
+	NSManagedObject *managedObject = [self.managedObjectContext objectWithID:operation.trackID];
+	[self.managedObjectContext refreshObject:managedObject mergeChanges:YES];
+}
+
+- (void) MCNDetectionOperationStarted:(MCNDetectionOperation *)operation
+{
+
+#pragma unused(operation)
+
+}
+
+- (void) MCNDetectionOperationStopped:(MCNDetectionOperation *)operation
+{
+	NSParameterAssert(nil != operation);
+	
+	if(operation.error || operation.isCancelled) {
+		if(operation.error)
+			[self presentError:operation.error modalForWindow:self.window delegate:nil didPresentSelector:NULL contextInfo:NULL];
+		return;
+	}
+	
+	// Refresh ourselves, to pull in the pre-gap set in the worker thread
+	NSManagedObject *managedObject = [self.managedObjectContext objectWithID:operation.compactDiscID];
+	[self.managedObjectContext refreshObject:managedObject mergeChanges:YES];
+}
+
+- (void) ISRCDetectionOperationStarted:(ISRCDetectionOperation *)operation
+{
+
+#pragma unused(operation)
+	
+}
+
+- (void) ISRCDetectionOperationStopped:(ISRCDetectionOperation *)operation
+{
+	NSParameterAssert(nil != operation);
+	
+	if(operation.error || operation.isCancelled) {
+		if(operation.error)
+			[self presentError:operation.error modalForWindow:self.window delegate:nil didPresentSelector:NULL contextInfo:NULL];
+		return;
+	}
+	
+	// Refresh ourselves, to pull in the pre-gap set in the worker thread
+	NSManagedObject *managedObject = [self.managedObjectContext objectWithID:operation.trackID];
 	[self.managedObjectContext refreshObject:managedObject mergeChanges:YES];
 }
 
@@ -640,7 +737,7 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 	}
 	
 	// Refresh ourselves, to pull in the AccurateRip data created by the worker thread
-	NSManagedObject *managedObject = [self.managedObjectContext objectRegisteredForID:operation.compactDiscID];
+	NSManagedObject *managedObject = [self.managedObjectContext objectWithID:operation.compactDiscID];
 	[self.managedObjectContext refreshObject:managedObject mergeChanges:YES];
 }
 
@@ -710,23 +807,17 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 - (void) updateMetadataWithMusicDatabaseEntry:(id)musicDatabaseEntry
 {
 	NSParameterAssert(nil != musicDatabaseEntry);
-	
+
 	// Set the album's metadata
 	self.compactDisc.metadata.artist = [musicDatabaseEntry valueForKey:kMetadataAlbumArtistKey];
-	//	self.compactDisc.metadata.composer = [musicDatabaseEntry valueForKey:kMetadataComposerKey];
-	self.compactDisc.metadata.date = [musicDatabaseEntry valueForKey:kMetadataDateKey];
+	self.compactDisc.metadata.date = [musicDatabaseEntry valueForKey:kMetadataReleaseDateKey];
 	self.compactDisc.metadata.discNumber = [musicDatabaseEntry valueForKey:kMetadataDiscNumberKey];
 	self.compactDisc.metadata.discTotal = [musicDatabaseEntry valueForKey:kMetadataDiscTotalKey];
-	self.compactDisc.metadata.genre = [musicDatabaseEntry valueForKey:kMetadataGenreKey];
 	self.compactDisc.metadata.isCompilation = [musicDatabaseEntry valueForKey:kMetadataCompilationKey];
 	self.compactDisc.metadata.MCN = [musicDatabaseEntry valueForKey:kMetadataMCNKey];
 	self.compactDisc.metadata.musicBrainzID = [musicDatabaseEntry valueForKey:kMetadataMusicBrainzIDKey];
 	self.compactDisc.metadata.title = [musicDatabaseEntry valueForKey:kMetadataAlbumTitleKey];
-	
-	// Fall back to album values if track values are unspecified
-	NSString *artist = [musicDatabaseEntry valueForKey:kMetadataArtistKey];
-	NSString *composer = [musicDatabaseEntry valueForKey:kMetadataComposerKey];
-	
+
 	// Set each track's metadata
 	NSArray *trackMetadataArray = [musicDatabaseEntry valueForKey:kMusicDatabaseTracksKey];
 	for(id trackMetadata in trackMetadataArray) {
@@ -736,13 +827,9 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 		if(!track)
 			continue;
 		
-		NSString *trackArtist = [trackMetadata valueForKey:kMetadataArtistKey];
-		track.metadata.artist = (trackArtist ? trackArtist : artist);
-		
-		NSString *trackComposer = [trackMetadata valueForKey:kMetadataComposerKey];
-		track.metadata.composer = (trackComposer ? trackComposer : composer);
-		
-		track.metadata.date = [trackMetadata valueForKey:kMetadataDateKey];
+		track.metadata.artist = [trackMetadata valueForKey:kMetadataArtistKey];
+		track.metadata.composer = [trackMetadata valueForKey:kMetadataComposerKey];
+		track.metadata.date = [trackMetadata valueForKey:kMetadataReleaseDateKey];
 		track.metadata.genre = [trackMetadata valueForKey:kMetadataGenreKey];
 		track.metadata.ISRC = [musicDatabaseEntry valueForKey:kMetadataISRCKey];
 		track.metadata.lyrics = [trackMetadata valueForKey:kMetadataLyricsKey];
