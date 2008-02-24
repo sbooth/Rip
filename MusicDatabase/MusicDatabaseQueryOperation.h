@@ -14,7 +14,7 @@ extern NSString * const		kMetadataArtistKey;
 extern NSString * const		kMetadataAlbumArtistKey;
 extern NSString * const		kMetadataGenreKey;
 extern NSString * const		kMetadataComposerKey;
-extern NSString * const		kMetadataDateKey;
+extern NSString * const		kMetadataReleaseDateKey;
 extern NSString * const		kMetadataCompilationKey;
 extern NSString * const		kMetadataTrackNumberKey;
 extern NSString * const		kMetadataTrackTotalKey;

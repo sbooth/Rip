@@ -76,15 +76,13 @@
 
 		NSString *albumArtist = audioCDPlaylist.artist;
 		if(albumArtist)
-			[discInformation setObject:albumArtist forKey:kMetadataArtistKey];
+			[discInformation setObject:albumArtist forKey:kMetadataAlbumArtistKey];
 
 		NSString *albumComposer = audioCDPlaylist.composer;
-		if(albumComposer)
-			[discInformation setObject:albumComposer forKey:kMetadataComposerKey];
 
 		NSInteger albumYear = audioCDPlaylist.year;
 		if(albumYear)
-			[discInformation setObject:[NSString stringWithFormat:@"%i", albumYear] forKey:kMetadataDateKey];
+			[discInformation setObject:[NSString stringWithFormat:@"%i", albumYear] forKey:kMetadataReleaseDateKey];
 		
 		NSInteger discNumber = audioCDPlaylist.discNumber;
 		if(discNumber)
@@ -95,8 +93,6 @@
 			[discInformation setObject:[NSNumber numberWithInteger:discCount] forKey:kMetadataDiscTotalKey];
 
 		NSString *albumGenre = audioCDPlaylist.genre;
-		if(albumGenre)
-			[discInformation setObject:albumGenre forKey:kMetadataGenreKey];
 		
 		if(audioCDPlaylist.compilation)
 			[discInformation setObject:[NSNumber numberWithBool:YES] forKey:kMetadataCompilationKey];
@@ -114,14 +110,18 @@
 			NSString *artist = audioCDTrack.artist;
 			if(artist)
 				[trackInformation setObject:artist forKey:kMetadataArtistKey];
+			else if(albumArtist)
+				[trackInformation setObject:albumArtist forKey:kMetadataArtistKey];
 			
 			NSString *composer = audioCDTrack.composer;
 			if(composer)
 				[trackInformation setObject:composer forKey:kMetadataComposerKey];
+			else if(albumComposer)
+				[trackInformation setObject:albumComposer forKey:kMetadataComposerKey];
 			
 			NSInteger year = audioCDTrack.year;
 			if(year)
-				[trackInformation setObject:[NSString stringWithFormat:@"%i", year] forKey:kMetadataDateKey];
+				[trackInformation setObject:[NSString stringWithFormat:@"%i", year] forKey:kMetadataReleaseDateKey];
 			
 			NSInteger trackNumber = audioCDTrack.trackNumber;
 			if(trackNumber)
@@ -134,6 +134,8 @@
 			NSString *genre = audioCDTrack.genre;
 			if(genre)
 				[trackInformation setObject:genre forKey:kMetadataGenreKey];
+			else if(albumGenre)
+				[trackInformation setObject:albumGenre forKey:kMetadataGenreKey];
 			
 			NSString *lyrics = audioCDTrack.lyrics;
 			if(lyrics)

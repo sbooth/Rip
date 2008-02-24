@@ -72,21 +72,20 @@
 		
 		NSMutableDictionary *discInformation = [[NSMutableDictionary alloc] init];
 		
+		// Genre is set in FreeDB on a per-album basis, but treated on a per-track basis here
 		const char *genre = cddb_disc_get_genre(disc);
-		if(genre)
-			[discInformation setObject:[NSString stringWithUTF8String:genre] forKey:kMetadataGenreKey];
-		
+
 		unsigned int year = cddb_disc_get_year(disc);
 		if(0 != year)
-			[discInformation setObject:[[NSNumber numberWithInt:year] stringValue] forKey:kMetadataDateKey];
+			[discInformation setObject:[[NSNumber numberWithInt:year] stringValue] forKey:kMetadataReleaseDateKey];
 
-		const char *title = cddb_disc_get_title(disc);
-		if(title)
-			[discInformation setObject:[NSString stringWithUTF8String:title] forKey:kMetadataAlbumTitleKey];
+		const char *albumTitle = cddb_disc_get_title(disc);
+		if(albumTitle)
+			[discInformation setObject:[NSString stringWithUTF8String:albumTitle] forKey:kMetadataAlbumTitleKey];
 		
-		const char *artist = cddb_disc_get_artist(disc);
-		if(artist)
-			[discInformation setObject:[NSString stringWithUTF8String:artist] forKey:kMetadataAlbumArtistKey];
+		const char *albumArtist = cddb_disc_get_artist(disc);
+		if(albumArtist)
+			[discInformation setObject:[NSString stringWithUTF8String:albumArtist] forKey:kMetadataAlbumArtistKey];
 
 		const char *extData = cddb_disc_get_ext_data(disc);
 		if(extData)
@@ -103,11 +102,17 @@
 			if(0 != number)
 				[trackInformation setObject:[NSNumber numberWithInt:number] forKey:kMetadataTrackNumberKey];
 			
-			artist = cddb_track_get_artist(track);
+			if(genre)
+				[trackInformation setObject:[NSString stringWithUTF8String:genre] forKey:kMetadataGenreKey];
+
+			// Ensure the track's artist is set if an artist was retrieved from FreeDB
+			const char *artist = cddb_track_get_artist(track);
 			if(artist)
 				[trackInformation setObject:[NSString stringWithUTF8String:artist] forKey:kMetadataArtistKey];
+			else if(albumArtist)
+				[trackInformation setObject:[NSString stringWithUTF8String:albumArtist] forKey:kMetadataArtistKey];
 			
-			title = cddb_track_get_title(track);
+			const char *title = cddb_track_get_title(track);
 			if(title)
 				[trackInformation setObject:[NSString stringWithUTF8String:title] forKey:kMetadataTitleKey];
 			

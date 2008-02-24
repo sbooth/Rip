@@ -120,7 +120,7 @@
 		// Take a best guess on the release date
 		if(1 == release->getNumReleaseEvents()) {
 			MusicBrainz::ReleaseEvent *releaseEvent = release->getReleaseEvent(0);
-			[releaseDictionary setObject:[NSString stringWithCString:releaseEvent->getDate().c_str() encoding:NSUTF8StringEncoding] forKey:kMetadataDateKey];
+			[releaseDictionary setObject:[NSString stringWithCString:releaseEvent->getDate().c_str() encoding:NSUTF8StringEncoding] forKey:kMetadataReleaseDateKey];
 		}
 		else {
 			NSString	*currentLocale		= [[NSUserDefaults standardUserDefaults] objectForKey:@"AppleLocale"];
@@ -133,13 +133,13 @@
 				MusicBrainz::ReleaseEvent *releaseEvent = release->getReleaseEvent(k);
 				NSString *releaseEventCountry = [NSString stringWithCString:releaseEvent->getCountry().c_str() encoding:NSASCIIStringEncoding];
 				if(NSOrderedSame == [releaseEventCountry caseInsensitiveCompare:currentCountry])
-					[releaseDictionary setObject:[NSString stringWithCString:releaseEvent->getDate().c_str() encoding:NSUTF8StringEncoding] forKey:kMetadataDateKey];
+					[releaseDictionary setObject:[NSString stringWithCString:releaseEvent->getDate().c_str() encoding:NSUTF8StringEncoding] forKey:kMetadataReleaseDateKey];
 			}
 			
 			// Nothing matched, just take the first one
-			if(nil == [releaseDictionary valueForKey:kMetadataDateKey] && 0 < release->getNumReleaseEvents()) {
+			if(nil == [releaseDictionary valueForKey:kMetadataReleaseDateKey] && 0 < release->getNumReleaseEvents()) {
 				MusicBrainz::ReleaseEvent *releaseEvent = release->getReleaseEvent(0);
-				[releaseDictionary setObject:[NSString stringWithCString:releaseEvent->getDate().c_str() encoding:NSUTF8StringEncoding] forKey:kMetadataDateKey];
+				[releaseDictionary setObject:[NSString stringWithCString:releaseEvent->getDate().c_str() encoding:NSUTF8StringEncoding] forKey:kMetadataReleaseDateKey];
 			}
 		}
 		
@@ -160,10 +160,12 @@
 			// Track title
 			[trackDictionary setObject:[NSString stringWithCString:track->getTitle().c_str() encoding:NSUTF8StringEncoding] forKey:kMetadataTitleKey];
 			
-			// Track artist
+			// Ensure the track's artist is set if an artist was retrieved from MusicBrainz
 			if(NULL != track->getArtist() && !track->getArtist()->getName().empty())
 				[trackDictionary setObject:[NSString stringWithCString:track->getArtist()->getName().c_str() encoding:NSUTF8StringEncoding] forKey:kMetadataArtistKey];
-			
+			else if(NULL != release->getArtist() && !release->getArtist()->getName().empty())
+				[trackDictionary setObject:[NSString stringWithCString:release->getArtist()->getName().c_str() encoding:NSUTF8StringEncoding] forKey:kMetadataArtistKey];
+
 			// Look for Composer relations
 			MusicBrainz::RelationList relations = track->getRelations(MusicBrainz::Relation::TO_TRACK);
 			
