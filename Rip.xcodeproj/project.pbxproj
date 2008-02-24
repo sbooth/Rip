@@ -48,7 +48,9 @@
 		8C7D314A0D05235200CEEE44 /* DriveInspectorPanel.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8C7D31480D05235200CEEE44 /* DriveInspectorPanel.xib */; };
 		8C807ABF0D3F069300B48E7A /* Rip.xcdatamodel in Sources */ = {isa = PBXBuildFile; fileRef = 8C807ABE0D3F069300B48E7A /* Rip.xcdatamodel */; };
 		8C8502D80D2C282A0081DB75 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 13E42FBA07B3F13500E4EEF1 /* CoreData.framework */; };
-		8C8AC5A70D0A572E00A90C21 /* md5.c in Sources */ = {isa = PBXBuildFile; fileRef = 8C8AC5A50D0A572E00A90C21 /* md5.c */; };
+		8C8EFBA50D6E7AC1009E9299 /* ISRCDetectionOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C8EFBA40D6E7AC1009E9299 /* ISRCDetectionOperation.m */; };
+		8C8EFBCA0D6E7C21009E9299 /* MCNDetectionOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C8EFBC90D6E7C21009E9299 /* MCNDetectionOperation.m */; };
+		8C8EFC400D706471009E9299 /* AlbumArtwork.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C8EFC3F0D706471009E9299 /* AlbumArtwork.m */; };
 		8C92D1FE0D5821F4004521F4 /* ScriptingBridge.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8C92D1FD0D5821F4004521F4 /* ScriptingBridge.framework */; };
 		8C9817100CF7C6AB00F45B7F /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8C98170C0CF7C6AB00F45B7F /* MainMenu.xib */; };
 		8CA35D670D2E7AEA00F89E3B /* cddb.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8CA35D660D2E7AEA00F89E3B /* cddb.framework */; };
@@ -176,8 +178,12 @@
 		8C4C8E0B0D5E2BB900DC0279 /* ExtractedTrackRecord.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ExtractedTrackRecord.m; sourceTree = "<group>"; };
 		8C7D31490D05235200CEEE44 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/DriveInspectorPanel.xib; sourceTree = "<group>"; };
 		8C807ABE0D3F069300B48E7A /* Rip.xcdatamodel */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = wrapper.xcdatamodel; name = Rip.xcdatamodel; path = Models/Rip.xcdatamodel; sourceTree = "<group>"; };
-		8C8AC5A50D0A572E00A90C21 /* md5.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = md5.c; path = ThirdParty/md5/md5.c; sourceTree = "<group>"; };
-		8C8AC5A60D0A572E00A90C21 /* md5.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = md5.h; path = ThirdParty/md5/md5.h; sourceTree = "<group>"; };
+		8C8EFBA30D6E7AC1009E9299 /* ISRCDetectionOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ISRCDetectionOperation.h; sourceTree = "<group>"; };
+		8C8EFBA40D6E7AC1009E9299 /* ISRCDetectionOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ISRCDetectionOperation.m; sourceTree = "<group>"; };
+		8C8EFBC80D6E7C21009E9299 /* MCNDetectionOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MCNDetectionOperation.h; sourceTree = "<group>"; };
+		8C8EFBC90D6E7C21009E9299 /* MCNDetectionOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MCNDetectionOperation.m; sourceTree = "<group>"; };
+		8C8EFC3E0D706471009E9299 /* AlbumArtwork.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AlbumArtwork.h; sourceTree = "<group>"; };
+		8C8EFC3F0D706471009E9299 /* AlbumArtwork.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AlbumArtwork.m; sourceTree = "<group>"; };
 		8C92D1FD0D5821F4004521F4 /* ScriptingBridge.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ScriptingBridge.framework; path = /System/Library/Frameworks/ScriptingBridge.framework; sourceTree = "<absolute>"; };
 		8C92D2020D582225004521F4 /* iTunes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = iTunes.h; path = AppleScript/iTunes.h; sourceTree = "<group>"; };
 		8C98170D0CF7C6AB00F45B7F /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/MainMenu.xib; sourceTree = "<group>"; };
@@ -429,6 +435,10 @@
 				8C4C8B9B0D5C1E0800DC0279 /* ExternalCodecEncodeOperation.m */,
 				8C4C8B9E0D5C1E0800DC0279 /* PreGapDetectionOperation.h */,
 				8C4C8B9F0D5C1E0800DC0279 /* PreGapDetectionOperation.m */,
+				8C8EFBA30D6E7AC1009E9299 /* ISRCDetectionOperation.h */,
+				8C8EFBA40D6E7AC1009E9299 /* ISRCDetectionOperation.m */,
+				8C8EFBC80D6E7C21009E9299 /* MCNDetectionOperation.h */,
+				8C8EFBC90D6E7C21009E9299 /* MCNDetectionOperation.m */,
 			);
 			path = Operations;
 			sourceTree = "<group>";
@@ -448,6 +458,8 @@
 				8C4C8B7F0D5C1DE600DC0279 /* TrackDescriptor.m */,
 				8C4C8B800D5C1DE600DC0279 /* TrackMetadata.h */,
 				8C4C8B810D5C1DE600DC0279 /* TrackMetadata.m */,
+				8C8EFC3E0D706471009E9299 /* AlbumArtwork.h */,
+				8C8EFC3F0D706471009E9299 /* AlbumArtwork.m */,
 			);
 			path = CompactDisc;
 			sourceTree = "<group>";
@@ -471,15 +483,6 @@
 			path = InspectorPanels;
 			sourceTree = "<group>";
 		};
-		8C8AC5A40D0A571F00A90C21 /* md5 */ = {
-			isa = PBXGroup;
-			children = (
-				8C8AC5A50D0A572E00A90C21 /* md5.c */,
-				8C8AC5A60D0A572E00A90C21 /* md5.h */,
-			);
-			name = md5;
-			sourceTree = "<group>";
-		};
 		8C92D2010D58220A004521F4 /* AppleScript */ = {
 			isa = PBXGroup;
 			children = (
@@ -493,7 +496,6 @@
 			children = (
 				8C4C8A610D5A85C800DC0279 /* KBPopUpToolbarItem */,
 				8CB2A67B0D2B04490028332F /* AquaticPrime */,
-				8C8AC5A40D0A571F00A90C21 /* md5 */,
 			);
 			name = "Third Party";
 			sourceTree = "<group>";
@@ -613,7 +615,6 @@
 				8CDBEE680CFA09B7000EC553 /* ApplicationDelegate.m in Sources */,
 				8CB2094E0D0507F5003A90A6 /* Drive.m in Sources */,
 				8CB209750D050EE9003A90A6 /* DriveInformation.m in Sources */,
-				8C8AC5A70D0A572E00A90C21 /* md5.c in Sources */,
 				8CF322070D1883E1005657A6 /* ExtractionConfigurationSheetController.m in Sources */,
 				8CB2A6B70D2C15530028332F /* AquaticPrime.m in Sources */,
 				8CA8BAAF0D304F9B006B4779 /* CompactDiscWindowController.m in Sources */,
@@ -651,6 +652,9 @@
 				8C4C8E030D5E2A0600DC0279 /* ExtractionOperation.m in Sources */,
 				8C4C8E080D5E2ADB00DC0279 /* ExtractionRecord.m in Sources */,
 				8C4C8E0C0D5E2BB900DC0279 /* ExtractedTrackRecord.m in Sources */,
+				8C8EFBA50D6E7AC1009E9299 /* ISRCDetectionOperation.m in Sources */,
+				8C8EFBCA0D6E7C21009E9299 /* MCNDetectionOperation.m in Sources */,
+				8C8EFC400D706471009E9299 /* AlbumArtwork.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
