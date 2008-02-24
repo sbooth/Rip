@@ -3,24 +3,17 @@
  *  All Rights Reserved
  */
 
-#import "TrackMetadata.h"
+#import "AlbumArtwork.h"
 
-@implementation TrackMetadata
+@implementation AlbumArtwork
 
 // ========================================
 // Core Data properties
-@dynamic artist;
-@dynamic composer;
-@dynamic date;
-@dynamic genre;
-@dynamic ISRC;
-@dynamic lyrics;
-@dynamic musicBrainzID;
-@dynamic title;
+@dynamic frontCover;
 
 // ========================================
 // Core Data relationships
-@dynamic track;
+@dynamic metadata;
 
 @end
 

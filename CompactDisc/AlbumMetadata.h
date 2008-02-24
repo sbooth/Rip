@@ -5,7 +5,7 @@
 
 #import <Cocoa/Cocoa.h>
 
-@class CompactDisc;
+@class CompactDisc, AlbumArtwork;
 
 // ========================================
 // This class encapsulates metadata pertaining to an entire album
@@ -18,11 +18,9 @@
 // Core Data properties
 @property (assign) NSString * accurateRipURL;
 @property (assign) NSString * artist;
-@property (assign) NSString * composer;
 @property (assign) NSString * date;
 @property (assign) NSNumber * discNumber;
 @property (assign) NSNumber * discTotal;
-@property (assign) NSString * genre;
 @property (assign) NSNumber * isCompilation;
 @property (assign) NSString * MCN;
 @property (assign) NSString * musicBrainzID;
@@ -30,6 +28,7 @@
 
 // ========================================
 // Core Data relationships
+@property (assign) NSSet * artwork;
 @property (assign) CompactDisc * disc;
 
 @end

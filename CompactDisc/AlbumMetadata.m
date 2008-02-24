@@ -11,11 +11,9 @@
 // Core Data properties
 @dynamic accurateRipURL;
 @dynamic artist;
-@dynamic composer;
 @dynamic date;
 @dynamic discNumber;
 @dynamic discTotal;
-@dynamic genre;
 @dynamic isCompilation;
 @dynamic MCN;
 @dynamic musicBrainzID;
@@ -23,7 +21,15 @@
 
 // ========================================
 // Core Data relationships
+@dynamic artwork;
 @dynamic disc;
+
+- (void) awakeFromInsert
+{
+	// Create the metadata relationship
+	self.artwork = [NSEntityDescription insertNewObjectForEntityForName:@"AlbumArtwork"
+												 inManagedObjectContext:self.managedObjectContext];	
+}
 
 @end
 
