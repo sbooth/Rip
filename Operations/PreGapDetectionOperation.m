@@ -101,7 +101,7 @@ convertQSubChannelDataFromBCDToDecimal(struct QSubChannelData *qData)
 	NSManagedObjectContext *managedObjectContext = [[NSManagedObjectContext alloc] init];
 	[managedObjectContext setPersistentStoreCoordinator:[[[NSApplication sharedApplication] delegate] persistentStoreCoordinator]];
 	
-	// Fetch the CompactDisc object from the context and ensure it is the correct class
+	// Fetch the TrackDescriptor object from the context and ensure it is the correct class
 	NSManagedObject *managedObject = [managedObjectContext objectWithID:self.trackID];
 	if(![managedObject isKindOfClass:[TrackDescriptor class]]) {
 		self.error = [NSError errorWithDomain:NSCocoaErrorDomain code:2 userInfo:nil];
