@@ -16,7 +16,7 @@
 
 // ========================================
 // Core Data properties
-@property (assign) NSNumber * accurateRipCRC;
+@property (assign) NSNumber * accurateRipChecksum;
 
 // ========================================
 // Core Data relationships

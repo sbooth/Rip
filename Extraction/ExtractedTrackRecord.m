@@ -9,7 +9,7 @@
 
 // ========================================
 // Core Data properties
-@dynamic accurateRipCRC;
+@dynamic accurateRipChecksum;
 
 // ========================================
 // Core Data relationships

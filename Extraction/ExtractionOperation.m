@@ -10,10 +10,9 @@
 #import "Drive.h"
 #import "CDDAUtilities.h"
 
-#include "md5.h"
-
 #include <IOKit/storage/IOCDTypes.h>
 #include <AudioToolbox/ExtendedAudioFile.h>
+#include <CommonCrypto/CommonDigest.h>
 
 // Keep reads to approximately 2 MB in size (2352 + 294 + 16 bytes are necessary for each sector)
 #define BUFFER_SIZE_IN_SECTORS 775u
@@ -91,8 +90,8 @@
 	}
 	
 	// Initialize the MD5
-	md5_state_t md5;
-	md5_init(&md5);
+	CC_MD5_CTX md5;
+	CC_MD5_Init(&md5);
 
 	// ========================================
 	// SETUP FOR READ OFFSET HANDLING
@@ -190,7 +189,7 @@
 		}
 
 		// Update the MD5 digest
-		md5_append(&md5, audioData.bytes, audioData.length);
+		CC_MD5_Update(&md5, audioData.bytes, audioData.length);
 	}
 	
 	// ========================================
@@ -262,7 +261,7 @@
 		}
 		
 		// Update the MD5 digest
-		md5_append(&md5, audioData.bytes, audioData.length);
+		CC_MD5_Update(&md5, audioData.bytes, audioData.length);
 		
 		// Housekeeping
 		sectorsRemaining -= sectorsRead;
@@ -298,15 +297,15 @@
 		}
 
 		// Update the MD5 digest
-		md5_append(&md5, audioData.bytes, audioData.length);
+		CC_MD5_Update(&md5, audioData.bytes, audioData.length);
 	}
 
 	// ========================================
 	// COMPLETE EXTRACTION
 	
 	// Complete the MD5 calculation and store the result
-	md5_byte_t digest [16];
-	md5_finish(&md5, digest);
+	unsigned char digest [CC_MD5_DIGEST_LENGTH];
+	CC_MD5_Final(digest, &md5);
 	
 	self.MD5 = [NSString stringWithFormat:@"%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x", digest[0], digest[1], digest[2], digest[3], digest[4], digest[5], digest[6], digest[7], digest[8], digest[9], digest[10], digest[11], digest[12], digest[13], digest[14], digest[15]];
 
