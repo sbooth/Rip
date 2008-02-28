@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2007 Stephen F. Booth <me@sbooth.org>
+ *  Copyright (C) 2007 - 2008 Stephen F. Booth <me@sbooth.org>
  *  All Rights Reserved
  */
 
@@ -9,18 +9,27 @@
 
 #define BUFFER_SIZE 2048u
 
-@interface CoreAudioEncodeOperation ()
-@property (copy) NSError * error;
-@end
+// ========================================
+// KVC key names for the metadata dictionaries
+// ========================================
+NSString * const	kAudioConverterConfigKey				= @"AudioConverter Configuration";
+NSString * const	kAudioFileTypeKey						= @"AudioFileTypeID";
+NSString * const	kStreamDescriptionKey					= @"AudioStreamBasicDescription";
 
 @implementation CoreAudioEncodeOperation
 
-@synthesize inputURL = _inputURL;
-@synthesize outputURL = _outputURL;
-@synthesize fileType = _fileType;
-@synthesize streamDescription = _streamDescription;
-@synthesize propertySettings = _propertySettings;
-@synthesize error = _error;
+// Properties
+- (AudioFileTypeID) fileType
+{
+	NSNumber *fileType = [self.settings valueForKey:kAudioFileTypeKey];
+	return fileType.integerValue;
+}
+
+- (AudioStreamBasicDescription) streamDescription
+{
+	NSData *streamDescriptionData = [self.settings valueForKey:kStreamDescriptionKey];
+	return (*((AudioStreamBasicDescription *)streamDescriptionData.bytes));
+}
 
 - (void) main
 {
@@ -93,9 +102,9 @@
 	}
 	
 	// Set the converter properties
-	if(self.propertySettings) {
-		NSArray *propertySettings = self.propertySettings;
-		status = ExtAudioFileSetProperty(outputFile, kExtAudioFileProperty_ConverterConfig, sizeof(propertySettings), &propertySettings);
+	if(self.settings) {
+		id converterConfig = [self.settings objectForKey:kAudioConverterConfigKey];
+		status = ExtAudioFileSetProperty(outputFile, kExtAudioFileProperty_ConverterConfig, sizeof(converterConfig), &converterConfig);
 		if(noErr != status) {
 			self.error = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
 			goto cleanup;
@@ -138,6 +147,10 @@
 			self.error = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
 			goto cleanup;
 		}
+
+		// Stop if requested
+		if(self.isCancelled)
+			goto cleanup;
 	}
 	
 	// Cleanup
