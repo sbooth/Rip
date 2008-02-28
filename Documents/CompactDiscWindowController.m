@@ -64,6 +64,7 @@ NSString * const	kNetworkOperationQueueKVOContext		= @"org.sbooth.Rip.CompactDis
 - (void) diskWasEjected;
 - (void) showMusicDatabaseMatchesSheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode contextInfo:(void *)contextInfo;
 - (void) updateMetadataWithMusicDatabaseEntry:(id)musicDatabaseEntry;
+- (void) toggleTableColumnVisible:(id)sender;
 @end
 
 // ========================================
@@ -135,6 +136,20 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 	[self.window setAutorecalculatesContentBorderThickness:YES forEdge:NSMinYEdge];
 	[self.window setContentBorderThickness:WINDOW_BORDER_THICKNESS forEdge:NSMinYEdge];
 	
+	// Create the menu for the table's header, to allow showing and hiding of columns
+	NSMenu *menu = [[NSMenu alloc] initWithTitle:NSLocalizedStringFromTable(@"Track Table Columns", @"", @"")];
+	NSSortDescriptor *tableColumnsNameSortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"headerCell.title" ascending:YES];
+	NSArray *sortedTableColumns = [_trackTable.tableColumns sortedArrayUsingDescriptors:[NSArray arrayWithObject:tableColumnsNameSortDescriptor]];
+	for(NSTableColumn *column in sortedTableColumns) {
+		NSMenuItem *menuItem = [menu addItemWithTitle:[column.headerCell title]
+											   action:@selector(toggleTableColumnVisible:) 
+										keyEquivalent:@""];
+		[menuItem setTarget:self];
+		[menuItem setRepresentedObject:column];
+		[menuItem setState:!column.isHidden];
+	}
+	[_trackTable.headerView setMenu:menu];
+	
 	// Set the default sort descriptors for the track table
 	NSSortDescriptor *trackNumberSortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"number" ascending:YES];
 	[self.trackController setSortDescriptors:[NSArray arrayWithObject:trackNumberSortDescriptor]];
@@ -162,6 +177,8 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 		return YES;
 	else if([menuItem action] == @selector(readISRCs:))
 		return (0 != self.compactDisc.firstSession.selectedTracks.count);
+	else if([menuItem action] == @selector(toggleTableColumnVisible:))
+		return YES;
 	else
 		return [super validateMenuItem:menuItem];
 }
@@ -188,6 +205,8 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 		return YES;
 	else if([toolbarItem action] == @selector(readISRCs:))
 		return (0 != self.compactDisc.firstSession.selectedTracks.count);
+	else if([toolbarItem action] == @selector(toggleTableColumnVisible:))
+		return YES;
 	else
 		return [super validateToolbarItem:toolbarItem];
 }
@@ -263,10 +282,23 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 
 - (NSUndoManager *) windowWillReturnUndoManager:(NSWindow *)window
 {
-	
+
 #pragma unused(window)
 	
 	return self.managedObjectContext.undoManager;
+}
+
+- (BOOL) windowShouldClose:(NSWindow *)window
+{
+
+#pragma unused(window)
+	
+	if(self.compactDiscOperationQueue.operations.count) {
+		NSBeep();
+		return NO;
+	}
+	
+	return YES;
 }
 
 - (void) setDisk:(DADiskRef)disk
@@ -278,6 +310,9 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 		self.compactDisc = nil;
 		self.driveInformation = nil;
 		
+		[self.networkOperationQueue cancelAllOperations];
+		[self.compactDiscOperationQueue cancelAllOperations];
+		
 		if(disk) {
 			_disk = DADiskCopyWholeDisk(disk);
 			self.compactDisc = [CompactDisc compactDiscWithDADiskRef:self.disk inManagedObjectContext:self.managedObjectContext];
@@ -287,6 +322,9 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 				NSLog(@"Read offset is not configured for drive %@", self.driveInformation.deviceIdentifier);
 			
 			self.driveInformation.readOffset = [NSNumber numberWithInt:102];
+			
+			// Use the MusicBrainz disc ID as the window frame's autosave name
+			[self.window setFrameAutosaveName:self.compactDisc.musicBrainzDiscID];
 		}
 	}
 }
@@ -306,7 +344,6 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 
 - (NSToolbarItem *) toolbar:(NSToolbar *)toolbar itemForItemIdentifier:(NSString *)itemIdentifier willBeInsertedIntoToolbar:(BOOL)flag
 {
-	NSLog(@"%@",itemIdentifier);
 
 	if([itemIdentifier isEqualToString:@"fnord"]) {
 		KBPopUpToolbarItem *toolbarItem = [[KBPopUpToolbarItem alloc] initWithItemIdentifier:itemIdentifier];
@@ -354,7 +391,7 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 }
 
 // ========================================
-// Copy the selected tracks to intermediate WAV files, then to the encoder
+// Copy the selected tracks to intermediate WAV files, then send to the encoder
 - (IBAction) copySelectedTracks:(id)sender
 {
 	
@@ -384,7 +421,7 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 
 - (IBAction) copyImage:(id)sender
 {
-	
+
 #pragma unused(sender)
 
 	ExtractionConfigurationSheetController *extractionConfigurationSheetController = [[ExtractionConfigurationSheetController alloc] init];
@@ -577,7 +614,7 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 	extractionRecord.disc = self.compactDisc;
 	extractionRecord.date = [NSDate date];
 	extractionRecord.drive = self.driveInformation;
-	extractionRecord.URL = operation.URL.absoluteString;
+//	extractionRecord.URL = operation.URL.absoluteString;
 //	extractionRecord setValue:operation.errorFlags forKey:@"errorFlags"];
 	extractionRecord.MD5 = operation.MD5;
 		
@@ -588,8 +625,8 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 		
 		for(NSManagedObjectID *trackID in operation.trackIDs) {
 			NSManagedObject *managedObject = [self.managedObjectContext objectWithID:trackID];
-//			if(![managedObject isKindOfClass:[TrackDescriptor class]])
-//				break;
+			if(![managedObject isKindOfClass:[TrackDescriptor class]])
+				continue;
 			
 			TrackDescriptor *track = (TrackDescriptor *)managedObject;			
 			SectorRange *trackSectorRange = track.sectorRange;
@@ -609,7 +646,7 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 																					   inManagedObjectContext:self.managedObjectContext];
 			
 			extractedTrackRecord.track = track;
-			// Since Core Data only stores signed integers, cast the unsigned CRC to signed for storage
+			// Since Core Data only stores signed integers, cast the unsigned checksum to signed for storage
 			extractedTrackRecord.accurateRipChecksum = [NSNumber numberWithInt:(int32_t)accurateRipChecksum];
 			
 			[extractionRecord addTracksObject:extractedTrackRecord];
@@ -622,24 +659,23 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 
 		for(NSManagedObjectID *trackID in operation.trackIDs) {
 			NSManagedObject *managedObject = [self.managedObjectContext objectWithID:trackID];
-//			if(![managedObject isKindOfClass:[TrackDescriptor class]])
-//				break;
+			if(![managedObject isKindOfClass:[TrackDescriptor class]])
+				continue;
 			
 			TrackDescriptor *track = (TrackDescriptor *)managedObject;			
 
 			AccurateRipTrackRecord *accurateRipTrack = [self.compactDisc.accurateRipDisc trackNumber:track.number.unsignedIntegerValue];
 			ExtractedTrackRecord *extractedTrack = [extractionRecord trackNumber:track.number.unsignedIntegerValue];
 			
-			if(accurateRipTrack && accurateRipTrack.checksum.unsignedIntegerValue == extractedTrack.accurateRipChecksum.unsignedIntegerValue) {
-				NSLog(@"Track %@ accurately ripped, confidence %@", track.number, accurateRipTrack.confidenceLevel);
-			}
-			else
+			if(accurateRipTrack && accurateRipTrack.checksum.unsignedIntegerValue != extractedTrack.accurateRipChecksum.unsignedIntegerValue)
 				allTracksWereAccuratelyExtracted = NO;
+			else
+				NSLog(@"Track %@ accurately ripped, confidence %@", track.number, accurateRipTrack.confidenceLevel);
 		}
 
-		// If all tracks were accurately ripped, ship the image off to the encoder(s)
+		// If all tracks were accurately ripped, ship the tracks/image off to the encoder(s)
 		if(allTracksWereAccuratelyExtracted) {
-			
+//			[self.encoderManager encodeURL:operation.URL toBaseURL:outputBaseURL trackIDs:operation.trackIDs];
 		}
 	}
 	// Re-rip the tracks if any C2 error flags were returned
@@ -843,6 +879,18 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 	NSLog(@"showStreamInformationSheetDidEnd");
 	
 	[sheet orderOut:self];
+}
+
+- (void) toggleTableColumnVisible:(id)sender
+{
+	NSParameterAssert(nil != sender);
+	NSParameterAssert([sender isKindOfClass:[NSMenuItem class]]);
+	
+	NSMenuItem *menuItem = (NSMenuItem *)sender;
+	NSTableColumn *column = menuItem.representedObject;
+	
+	[column setHidden:!column.isHidden];
+	[menuItem setState:!column.isHidden];
 }
 
 @end

@@ -13,6 +13,7 @@
 	IBOutlet NSArrayController *_trackController;
 	IBOutlet NSObjectController *_driveInformationController;
 	IBOutlet NSMenu *_musicDatabaseMenu;
+	IBOutlet NSTableView *_trackTable;
 	
 @private
 	DADiskRef _disk;
