@@ -175,14 +175,14 @@
 										   freeWhenDone:NO];
 
 		// Stuff the silence in an AudioBufferList
-		AudioBufferList audioBuffer;
-		audioBuffer.mNumberBuffers = 1;
-		audioBuffer.mBuffers[0].mNumberChannels = cddaASBD.mChannelsPerFrame;
-		audioBuffer.mBuffers[0].mData = (void *)audioData.bytes;
-		audioBuffer.mBuffers[0].mDataByteSize = audioData.length;
+		AudioBufferList bufferList;
+		bufferList.mNumberBuffers = 1;
+		bufferList.mBuffers[0].mNumberChannels = cddaASBD.mChannelsPerFrame;
+		bufferList.mBuffers[0].mData = (void *)audioData.bytes;
+		bufferList.mBuffers[0].mDataByteSize = audioData.length;
 		
 		// Write the silence to the output file
-		status = ExtAudioFileWrite(file, (audioData.length / cddaASBD.mBytesPerFrame), &audioBuffer);
+		status = ExtAudioFileWrite(file, (audioData.length / cddaASBD.mBytesPerFrame), &bufferList);
 		if(noErr != status) {
 			self.error = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
 			goto cleanup;
@@ -247,14 +247,14 @@
 									   freeWhenDone:NO];
 
 		// Stuff the data in an AudioBufferList
-		AudioBufferList audioBuffer;
-		audioBuffer.mNumberBuffers = 1;
-		audioBuffer.mBuffers[0].mNumberChannels = cddaASBD.mChannelsPerFrame;
-		audioBuffer.mBuffers[0].mData = (void *)audioData.bytes;
-		audioBuffer.mBuffers[0].mDataByteSize = audioData.length;
+		AudioBufferList bufferList;
+		bufferList.mNumberBuffers = 1;
+		bufferList.mBuffers[0].mNumberChannels = cddaASBD.mChannelsPerFrame;
+		bufferList.mBuffers[0].mData = (void *)audioData.bytes;
+		bufferList.mBuffers[0].mDataByteSize = audioData.length;
 		
 		// Write the data to the output file
-		status = ExtAudioFileWrite(file, (audioData.length / cddaASBD.mBytesPerFrame), &audioBuffer);
+		status = ExtAudioFileWrite(file, (audioData.length / cddaASBD.mBytesPerFrame), &bufferList);
 		if(noErr != status) {
 			self.error = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
 			goto cleanup;
@@ -283,14 +283,14 @@
 										   freeWhenDone:NO];
 		
 		// Stuff the silence in an AudioBufferList
-		AudioBufferList audioBuffer;
-		audioBuffer.mNumberBuffers = 1;
-		audioBuffer.mBuffers[0].mNumberChannels = cddaASBD.mChannelsPerFrame;
-		audioBuffer.mBuffers[0].mData = (void *)audioData.bytes;
-		audioBuffer.mBuffers[0].mDataByteSize = audioData.length;
+		AudioBufferList bufferList;
+		bufferList.mNumberBuffers = 1;
+		bufferList.mBuffers[0].mNumberChannels = cddaASBD.mChannelsPerFrame;
+		bufferList.mBuffers[0].mData = (void *)audioData.bytes;
+		bufferList.mBuffers[0].mDataByteSize = audioData.length;
 		
 		// Write the silence to the output file
-		status = ExtAudioFileWrite(file, (audioData.length / cddaASBD.mBytesPerFrame), &audioBuffer);
+		status = ExtAudioFileWrite(file, (audioData.length / cddaASBD.mBytesPerFrame), &bufferList);
 		if(noErr != status) {
 			self.error = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
 			goto cleanup;
