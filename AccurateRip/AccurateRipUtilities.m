@@ -83,7 +83,7 @@ uint32
 calculateAccurateRipChecksumForFileRegion(NSString *path, NSUInteger firstSector, NSUInteger lastSector, BOOL firstTrack, BOOL lastTrack)
 {
 	NSCParameterAssert(nil != path);
-	NSCParameterAssert(lastSector > firstSector);
+	NSCParameterAssert(lastSector >= firstSector);
 	
 	uint32_t checksum = 0;
 	
