@@ -16,8 +16,8 @@
 - (NSPoint)menuPositionForFrame:(NSRect)cellFrame inView:(NSView *)controlView
 {
 	NSPoint result = [controlView convertPoint:cellFrame.origin toView:nil];
-	result.x += 1.0;
-	result.y -= cellFrame.size.height + 5.5;
+	result.x += (CGFloat)1.0;
+	result.y -= cellFrame.size.height + (CGFloat)5.5;
 	return result;
 }
 
