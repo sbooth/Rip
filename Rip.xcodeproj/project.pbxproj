@@ -8,6 +8,12 @@
 
 /* Begin PBXBuildFile section */
 		8C1BBC650D43DF0D00DAC484 /* GenreUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C1BBC640D43DF0D00DAC484 /* GenreUtilities.m */; };
+		8C34BB0B0D761A99003F2953 /* ApplicationDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C34BB0A0D761A99003F2953 /* ApplicationDelegate.m */; };
+		8C34BB0E0D761AB7003F2953 /* PlugInManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C34BB0D0D761AB7003F2953 /* PlugInManager.m */; };
+		8C3C19470D73EA12001BAC88 /* EncoderInterface.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8C3C19460D73EA0B001BAC88 /* EncoderInterface.framework */; };
+		8C3C194A0D73EA35001BAC88 /* EncoderInterface.framework in Copy Embedded Frameworks */ = {isa = PBXBuildFile; fileRef = 8C3C19460D73EA0B001BAC88 /* EncoderInterface.framework */; };
+		8C3C19880D73EBFB001BAC88 /* CoreAudio.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 8C3C19870D73EBF4001BAC88 /* CoreAudio.bundle */; };
+		8C3C198B0D73EC1E001BAC88 /* CoreAudio.bundle in Copy PlugIns */ = {isa = PBXBuildFile; fileRef = 8C3C19870D73EBF4001BAC88 /* CoreAudio.bundle */; };
 		8C3EF7690CFE663A0086181E /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8C3EF7680CFE663A0086181E /* IOKit.framework */; };
 		8C3EFC640D0357D10086181E /* TrackInspectorPanel.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8C3EFC620D0357D10086181E /* TrackInspectorPanel.xib */; };
 		8C4C8AE70D5BCADA00DC0279 /* KBPopUpToolbarItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C4C8A630D5A85E500DC0279 /* KBPopUpToolbarItem.m */; };
@@ -23,7 +29,6 @@
 		8C4C8B920D5C1DF300DC0279 /* DurationFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C4C8B8D0D5C1DF300DC0279 /* DurationFormatter.m */; };
 		8C4C8B930D5C1DF300DC0279 /* YesNoFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C4C8B8F0D5C1DF300DC0279 /* YesNoFormatter.m */; };
 		8C4C8BA10D5C1E0800DC0279 /* CDDAUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C4C8B970D5C1E0800DC0279 /* CDDAUtilities.m */; };
-		8C4C8BA20D5C1E0800DC0279 /* CoreAudioEncodeOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C4C8B990D5C1E0800DC0279 /* CoreAudioEncodeOperation.m */; };
 		8C4C8BA30D5C1E0800DC0279 /* ExternalCodecEncodeOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C4C8B9B0D5C1E0800DC0279 /* ExternalCodecEncodeOperation.m */; };
 		8C4C8BA50D5C1E0800DC0279 /* PreGapDetectionOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C4C8B9F0D5C1E0800DC0279 /* PreGapDetectionOperation.m */; };
 		8C4C8BAA0D5C1E1D00DC0279 /* DriveInspectorPanelController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C4C8BA70D5C1E1D00DC0279 /* DriveInspectorPanelController.m */; };
@@ -68,7 +73,6 @@
 		8CB209750D050EE9003A90A6 /* DriveInformation.m in Sources */ = {isa = PBXBuildFile; fileRef = 8CB209740D050EE9003A90A6 /* DriveInformation.m */; };
 		8CB2A6B70D2C15530028332F /* AquaticPrime.m in Sources */ = {isa = PBXBuildFile; fileRef = 8CB2A67D0D2B045E0028332F /* AquaticPrime.m */; };
 		8CD9C1FE0D0F6C4E00C974C9 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8CD9C1FD0D0F6C4E00C974C9 /* AudioToolbox.framework */; };
-		8CDBEE680CFA09B7000EC553 /* ApplicationDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 8CDBEE670CFA09B7000EC553 /* ApplicationDelegate.m */; };
 		8CDBEE6D0CFA0A4A000EC553 /* DiskArbitration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8CDBEE6C0CFA0A4A000EC553 /* DiskArbitration.framework */; };
 		8CF322070D1883E1005657A6 /* ExtractionConfigurationSheetController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8CF322060D1883E1005657A6 /* ExtractionConfigurationSheetController.m */; };
 		8CF322110D18842B005657A6 /* ExtractionConfigurationSheet.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8CF3220F0D18842B005657A6 /* ExtractionConfigurationSheet.xib */; };
@@ -78,13 +82,56 @@
 		8D15AC340486D014006FF6A4 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A7FEA54F5311CA2CBB /* Cocoa.framework */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		8C3C19450D73EA0B001BAC88 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 8C3C193E0D73EA0B001BAC88 /* EncoderInterface.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 8DC2EF5B0486A6940098B216;
+			remoteInfo = EncoderInterface;
+		};
+		8C3C19480D73EA21001BAC88 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 8C3C193E0D73EA0B001BAC88 /* EncoderInterface.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 8DC2EF4F0486A6940098B216;
+			remoteInfo = EncoderInterface;
+		};
+		8C3C19860D73EBF4001BAC88 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 8C3C19820D73EBF4001BAC88 /* CoreAudio.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 8D5B49B6048680CD000E48DA;
+			remoteInfo = CoreAudio;
+		};
+		8C3C19890D73EC08001BAC88 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 8C3C19820D73EBF4001BAC88 /* CoreAudio.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 8D5B49AC048680CD000E48DA;
+			remoteInfo = CoreAudio;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXCopyFilesBuildPhase section */
+		8C3C17F80D73981A001BAC88 /* Copy PlugIns */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				8C3C198B0D73EC1E001BAC88 /* CoreAudio.bundle in Copy PlugIns */,
+			);
+			name = "Copy PlugIns";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		8CA35D6B0D2E7B1900F89E3B /* Copy Embedded Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				8C3C194A0D73EA35001BAC88 /* EncoderInterface.framework in Copy Embedded Frameworks */,
 				8CA361DB0D2F6DDF00F89E3B /* musicbrainz3.framework in Copy Embedded Frameworks */,
 				8CA361940D2F68AE00F89E3B /* neon.framework in Copy Embedded Frameworks */,
 				8CA35F950D2F42B300F89E3B /* discid.framework in Copy Embedded Frameworks */,
@@ -106,6 +153,12 @@
 		32DBCF750370BD2300C91783 /* Rip_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Rip_Prefix.pch; sourceTree = "<group>"; };
 		8C1BBC630D43DF0D00DAC484 /* GenreUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GenreUtilities.h; path = Utilities/GenreUtilities.h; sourceTree = "<group>"; };
 		8C1BBC640D43DF0D00DAC484 /* GenreUtilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = GenreUtilities.m; path = Utilities/GenreUtilities.m; sourceTree = "<group>"; };
+		8C34BB090D761A99003F2953 /* ApplicationDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ApplicationDelegate.h; sourceTree = "<group>"; };
+		8C34BB0A0D761A99003F2953 /* ApplicationDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ApplicationDelegate.m; sourceTree = "<group>"; };
+		8C34BB0C0D761AB7003F2953 /* PlugInManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PlugInManager.h; sourceTree = "<group>"; };
+		8C34BB0D0D761AB7003F2953 /* PlugInManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PlugInManager.m; sourceTree = "<group>"; };
+		8C3C193E0D73EA0B001BAC88 /* EncoderInterface.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = EncoderInterface.xcodeproj; path = EncoderInterface/EncoderInterface.xcodeproj; sourceTree = "<group>"; };
+		8C3C19820D73EBF4001BAC88 /* CoreAudio.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = CoreAudio.xcodeproj; path = CoreAudio/CoreAudio.xcodeproj; sourceTree = "<group>"; };
 		8C3EF7680CFE663A0086181E /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = /System/Library/Frameworks/IOKit.framework; sourceTree = "<absolute>"; };
 		8C3EFC630D0357D10086181E /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/TrackInspectorPanel.xib; sourceTree = "<group>"; };
 		8C4C8A620D5A85E500DC0279 /* KBPopUpToolbarItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = KBPopUpToolbarItem.h; path = ThirdParty/KBPopUpToolbarItem/KBPopUpToolbarItem.h; sourceTree = "<group>"; };
@@ -134,8 +187,6 @@
 		8C4C8B8F0D5C1DF300DC0279 /* YesNoFormatter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YesNoFormatter.m; sourceTree = "<group>"; };
 		8C4C8B960D5C1E0800DC0279 /* CDDAUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDDAUtilities.h; sourceTree = "<group>"; };
 		8C4C8B970D5C1E0800DC0279 /* CDDAUtilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDDAUtilities.m; sourceTree = "<group>"; };
-		8C4C8B980D5C1E0800DC0279 /* CoreAudioEncodeOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CoreAudioEncodeOperation.h; sourceTree = "<group>"; };
-		8C4C8B990D5C1E0800DC0279 /* CoreAudioEncodeOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CoreAudioEncodeOperation.m; sourceTree = "<group>"; };
 		8C4C8B9A0D5C1E0800DC0279 /* ExternalCodecEncodeOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExternalCodecEncodeOperation.h; sourceTree = "<group>"; };
 		8C4C8B9B0D5C1E0800DC0279 /* ExternalCodecEncodeOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ExternalCodecEncodeOperation.m; sourceTree = "<group>"; };
 		8C4C8B9E0D5C1E0800DC0279 /* PreGapDetectionOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PreGapDetectionOperation.h; sourceTree = "<group>"; };
@@ -202,8 +253,6 @@
 		8CB2A67C0D2B045E0028332F /* AquaticPrime.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AquaticPrime.h; path = ThirdParty/AquaticPrime/AquaticPrime.h; sourceTree = "<group>"; };
 		8CB2A67D0D2B045E0028332F /* AquaticPrime.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AquaticPrime.m; path = ThirdParty/AquaticPrime/AquaticPrime.m; sourceTree = "<group>"; };
 		8CD9C1FD0D0F6C4E00C974C9 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = /System/Library/Frameworks/AudioToolbox.framework; sourceTree = "<absolute>"; };
-		8CDBEE660CFA09B7000EC553 /* ApplicationDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ApplicationDelegate.h; sourceTree = "<group>"; };
-		8CDBEE670CFA09B7000EC553 /* ApplicationDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ApplicationDelegate.m; sourceTree = "<group>"; };
 		8CDBEE6C0CFA0A4A000EC553 /* DiskArbitration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = DiskArbitration.framework; path = /System/Library/Frameworks/DiskArbitration.framework; sourceTree = "<absolute>"; };
 		8CF322050D1883E1005657A6 /* ExtractionConfigurationSheetController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ExtractionConfigurationSheetController.h; path = Documents/ExtractionConfigurationSheetController.h; sourceTree = "<group>"; };
 		8CF322060D1883E1005657A6 /* ExtractionConfigurationSheetController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ExtractionConfigurationSheetController.m; path = Documents/ExtractionConfigurationSheetController.m; sourceTree = "<group>"; };
@@ -227,6 +276,7 @@
 				8CA361930D2F68A700F89E3B /* neon.framework in Frameworks */,
 				8CA361D80D2F6DD500F89E3B /* musicbrainz3.framework in Frameworks */,
 				8C92D1FE0D5821F4004521F4 /* ScriptingBridge.framework in Frameworks */,
+				8C3C19470D73EA12001BAC88 /* EncoderInterface.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -273,6 +323,7 @@
 				2A37F4ABFDCFA73011CA2CEA /* Documents */,
 				8C618C8A0D066FC800A43E04 /* Operations */,
 				8C4C8DFC0D5E29A300DC0279 /* Extraction */,
+				8C19B2EA0D729637002BE7BF /* Encoding */,
 				8C8AC5680D099D4B00A90C21 /* InspectorPanels */,
 				8C3EF83D0CFFC5880086181E /* AccurateRip */,
 				8CA35CC80D2E707800F89E3B /* MusicDatabase */,
@@ -340,6 +391,15 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		8C19B2EA0D729637002BE7BF /* Encoding */ = {
+			isa = PBXGroup;
+			children = (
+				8C3C19820D73EBF4001BAC88 /* CoreAudio.xcodeproj */,
+				8C3C193E0D73EA0B001BAC88 /* EncoderInterface.xcodeproj */,
+			);
+			path = Encoding;
+			sourceTree = "<group>";
+		};
 		8C1BBC620D43DEF800DAC484 /* Utilities */ = {
 			isa = PBXGroup;
 			children = (
@@ -347,6 +407,22 @@
 				8C1BBC640D43DF0D00DAC484 /* GenreUtilities.m */,
 			);
 			name = Utilities;
+			sourceTree = "<group>";
+		};
+		8C3C193F0D73EA0B001BAC88 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				8C3C19460D73EA0B001BAC88 /* EncoderInterface.framework */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		8C3C19830D73EBF4001BAC88 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				8C3C19870D73EBF4001BAC88 /* CoreAudio.bundle */,
+			);
+			name = Products;
 			sourceTree = "<group>";
 		};
 		8C3EF83D0CFFC5880086181E /* AccurateRip */ = {
@@ -429,8 +505,6 @@
 			children = (
 				8C4C8B960D5C1E0800DC0279 /* CDDAUtilities.h */,
 				8C4C8B970D5C1E0800DC0279 /* CDDAUtilities.m */,
-				8C4C8B980D5C1E0800DC0279 /* CoreAudioEncodeOperation.h */,
-				8C4C8B990D5C1E0800DC0279 /* CoreAudioEncodeOperation.m */,
 				8C4C8B9A0D5C1E0800DC0279 /* ExternalCodecEncodeOperation.h */,
 				8C4C8B9B0D5C1E0800DC0279 /* ExternalCodecEncodeOperation.m */,
 				8C4C8B9E0D5C1E0800DC0279 /* PreGapDetectionOperation.h */,
@@ -540,10 +614,12 @@
 		8CDBEE630CFA092E000EC553 /* Application */ = {
 			isa = PBXGroup;
 			children = (
-				8CDBEE660CFA09B7000EC553 /* ApplicationDelegate.h */,
-				8CDBEE670CFA09B7000EC553 /* ApplicationDelegate.m */,
+				8C34BB090D761A99003F2953 /* ApplicationDelegate.h */,
+				8C34BB0A0D761A99003F2953 /* ApplicationDelegate.m */,
+				8C34BB0C0D761AB7003F2953 /* PlugInManager.h */,
+				8C34BB0D0D761AB7003F2953 /* PlugInManager.m */,
 			);
-			name = Application;
+			path = Application;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -557,10 +633,13 @@
 				8D15AC300486D014006FF6A4 /* Sources */,
 				8D15AC330486D014006FF6A4 /* Frameworks */,
 				8CA35D6B0D2E7B1900F89E3B /* Copy Embedded Frameworks */,
+				8C3C17F80D73981A001BAC88 /* Copy PlugIns */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				8C3C19490D73EA21001BAC88 /* PBXTargetDependency */,
+				8C3C198A0D73EC08001BAC88 /* PBXTargetDependency */,
 			);
 			name = Rip;
 			productInstallPath = "$(HOME)/Applications";
@@ -578,12 +657,39 @@
 			hasScannedForEncodings = 1;
 			mainGroup = 2A37F4AAFDCFA73011CA2CEA /* Rip */;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = 8C3C19830D73EBF4001BAC88 /* Products */;
+					ProjectRef = 8C3C19820D73EBF4001BAC88 /* CoreAudio.xcodeproj */;
+				},
+				{
+					ProductGroup = 8C3C193F0D73EA0B001BAC88 /* Products */;
+					ProjectRef = 8C3C193E0D73EA0B001BAC88 /* EncoderInterface.xcodeproj */;
+				},
+			);
 			projectRoot = "";
 			targets = (
 				8D15AC270486D014006FF6A4 /* Rip */,
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		8C3C19460D73EA0B001BAC88 /* EncoderInterface.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = EncoderInterface.framework;
+			remoteRef = 8C3C19450D73EA0B001BAC88 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		8C3C19870D73EBF4001BAC88 /* CoreAudio.bundle */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = CoreAudio.bundle;
+			remoteRef = 8C3C19860D73EBF4001BAC88 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
 		8D15AC2B0486D014006FF6A4 /* Resources */ = {
@@ -601,6 +707,7 @@
 				8C4C8BBE0D5C1E6600DC0279 /* Green Light.tiff in Resources */,
 				8C4C8BBF0D5C1E6600DC0279 /* Red Light.tiff in Resources */,
 				8C4C8BC00D5C1E6600DC0279 /* Yellow Light.tiff in Resources */,
+				8C3C19880D73EBFB001BAC88 /* CoreAudio.bundle in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -612,7 +719,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				8D15AC320486D014006FF6A4 /* main.m in Sources */,
-				8CDBEE680CFA09B7000EC553 /* ApplicationDelegate.m in Sources */,
 				8CB2094E0D0507F5003A90A6 /* Drive.m in Sources */,
 				8CB209750D050EE9003A90A6 /* DriveInformation.m in Sources */,
 				8CF322070D1883E1005657A6 /* ExtractionConfigurationSheetController.m in Sources */,
@@ -633,7 +739,6 @@
 				8C4C8B920D5C1DF300DC0279 /* DurationFormatter.m in Sources */,
 				8C4C8B930D5C1DF300DC0279 /* YesNoFormatter.m in Sources */,
 				8C4C8BA10D5C1E0800DC0279 /* CDDAUtilities.m in Sources */,
-				8C4C8BA20D5C1E0800DC0279 /* CoreAudioEncodeOperation.m in Sources */,
 				8C4C8BA30D5C1E0800DC0279 /* ExternalCodecEncodeOperation.m in Sources */,
 				8C4C8BA50D5C1E0800DC0279 /* PreGapDetectionOperation.m in Sources */,
 				8C4C8BAA0D5C1E1D00DC0279 /* DriveInspectorPanelController.m in Sources */,
@@ -655,10 +760,25 @@
 				8C8EFBA50D6E7AC1009E9299 /* ISRCDetectionOperation.m in Sources */,
 				8C8EFBCA0D6E7C21009E9299 /* MCNDetectionOperation.m in Sources */,
 				8C8EFC400D706471009E9299 /* AlbumArtwork.m in Sources */,
+				8C34BB0B0D761A99003F2953 /* ApplicationDelegate.m in Sources */,
+				8C34BB0E0D761AB7003F2953 /* PlugInManager.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		8C3C19490D73EA21001BAC88 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = EncoderInterface;
+			targetProxy = 8C3C19480D73EA21001BAC88 /* PBXContainerItemProxy */;
+		};
+		8C3C198A0D73EC08001BAC88 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = CoreAudio;
+			targetProxy = 8C3C19890D73EC08001BAC88 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		089C165FFE840EACC02AAC07 /* InfoPlist.strings */ = {
@@ -742,10 +862,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = Rip_Prefix.pch;
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				GCC_WARN_PEDANTIC = NO;
-				GCC_WARN_PROTOTYPE_CONVERSION = NO;
-				GCC_WARN_SHADOW = NO;
+				GCC_PREPROCESSOR_DEFINITIONS = "DEBUG=1";
 				GCC_WARN_UNINITIALIZED_AUTOS = NO;
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
@@ -767,11 +884,6 @@
 				GCC_MODEL_TUNING = G5;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = Rip_Prefix.pch;
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				GCC_WARN_PEDANTIC = NO;
-				GCC_WARN_PROTOTYPE_CONVERSION = NO;
-				GCC_WARN_SHADOW = NO;
-				GCC_WARN_UNINITIALIZED_AUTOS = NO;
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
 				OTHER_LDFLAGS = "-lcrypto";
@@ -785,24 +897,21 @@
 			buildSettings = {
 				GCC_ENABLE_OBJC_GC = required;
 				GCC_TREAT_IMPLICIT_FUNCTION_DECLARATIONS_AS_ERRORS = YES;
-				GCC_TREAT_NONCONFORMANT_CODE_ERRORS_AS_WARNINGS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_CHECK_SWITCH_STATEMENTS = YES;
-				GCC_WARN_EFFECTIVE_CPLUSPLUS_VIOLATIONS = YES;
 				GCC_WARN_FOUR_CHARACTER_CONSTANTS = YES;
 				GCC_WARN_HIDDEN_VIRTUAL_FUNCTIONS = YES;
 				GCC_WARN_INITIALIZER_NOT_FULLY_BRACKETED = YES;
 				GCC_WARN_MISSING_PARENTHESES = YES;
 				GCC_WARN_NON_VIRTUAL_DESTRUCTOR = YES;
-				GCC_WARN_PEDANTIC = YES;
-				GCC_WARN_PROTOTYPE_CONVERSION = YES;
 				GCC_WARN_SHADOW = YES;
 				GCC_WARN_SIGN_COMPARE = YES;
 				GCC_WARN_TYPECHECK_CALLS_TO_PRINTF = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNKNOWN_PRAGMAS = YES;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_LABEL = YES;
 				GCC_WARN_UNUSED_PARAMETER = YES;
@@ -822,24 +931,21 @@
 				);
 				GCC_ENABLE_OBJC_GC = required;
 				GCC_TREAT_IMPLICIT_FUNCTION_DECLARATIONS_AS_ERRORS = YES;
-				GCC_TREAT_NONCONFORMANT_CODE_ERRORS_AS_WARNINGS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_CHECK_SWITCH_STATEMENTS = YES;
-				GCC_WARN_EFFECTIVE_CPLUSPLUS_VIOLATIONS = YES;
 				GCC_WARN_FOUR_CHARACTER_CONSTANTS = YES;
 				GCC_WARN_HIDDEN_VIRTUAL_FUNCTIONS = YES;
 				GCC_WARN_INITIALIZER_NOT_FULLY_BRACKETED = YES;
 				GCC_WARN_MISSING_PARENTHESES = YES;
 				GCC_WARN_NON_VIRTUAL_DESTRUCTOR = YES;
-				GCC_WARN_PEDANTIC = YES;
-				GCC_WARN_PROTOTYPE_CONVERSION = YES;
 				GCC_WARN_SHADOW = YES;
 				GCC_WARN_SIGN_COMPARE = YES;
 				GCC_WARN_TYPECHECK_CALLS_TO_PRINTF = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNKNOWN_PRAGMAS = YES;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_LABEL = YES;
 				GCC_WARN_UNUSED_PARAMETER = YES;
