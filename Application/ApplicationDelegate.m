@@ -7,6 +7,7 @@
 #import "ByteSizeValueTransformer.h"
 #import "DurationValueTransformer.h"
 #import "CompactDiscWindowController.h"
+#import "PlugInManager.h"
 #import "AquaticPrime.h"
 
 #include <CoreFoundation/CoreFoundation.h>
@@ -23,6 +24,7 @@
 @property (assign) NSPersistentStoreCoordinator * persistentStoreCoordinator;
 @property (assign) NSManagedObjectModel * managedObjectModel;
 @property (assign) NSManagedObjectContext * managedObjectContext;
+@property (assign) PlugInManager * plugInManager;
 @end
 
 
@@ -82,6 +84,8 @@ diskDisappearedCallback(DADiskRef disk, void *context)
 @synthesize managedObjectModel = _managedObjectModel;
 @synthesize managedObjectContext = _managedObjectContext;
 
+@synthesize plugInManager = _plugInManager;
+
 // Don't automatically open an untitled document
 - (BOOL) applicationShouldOpenUntitledFile:(NSApplication *)sender
 {
@@ -105,7 +109,7 @@ diskDisappearedCallback(DADiskRef disk, void *context)
 	}
 	else
 		[self displayNagDialog];
-	
+		
 	// Use DiskArbitration to request mount/unmount information for audio CDs
 	
 	// Create a dictionary which will match IOMedia objects of type kIOCDMediaClass
@@ -146,7 +150,7 @@ diskDisappearedCallback(DADiskRef disk, void *context)
 				if(errorResult)
 					reply = NSTerminateCancel;
 				else {
-					NSInteger alertReturn = NSRunAlertPanel(nil, @"Could not save changes while quitting. Quit anyway?" , @"Quit anyway", @"Cancel", nil);
+					NSInteger alertReturn = NSRunAlertPanel(nil, @"Could not save changes while quitting. Quit anyway?" , @"Quit", @"Cancel", nil);
 					if(NSAlertAlternateReturn == alertReturn)
 						reply = NSTerminateCancel;	
 				}
@@ -193,7 +197,6 @@ diskDisappearedCallback(DADiskRef disk, void *context)
 		}
 		else
 			[[NSApplication sharedApplication] presentError:error];
-		
 		
 		return YES;
 	}
@@ -271,6 +274,18 @@ diskDisappearedCallback(DADiskRef disk, void *context)
 	return _managedObjectContext;
 }
 
+#pragma mark Plug-ins
+
+- (PlugInManager *) plugInManager
+{
+	if(nil == _plugInManager)
+		self.plugInManager = [[PlugInManager alloc] init];
+	
+	return _plugInManager;
+}
+
+#pragma mark Action methods
+
 - (IBAction) saveAction:(id)sender
 {
 
@@ -313,18 +328,22 @@ diskDisappearedCallback(DADiskRef disk, void *context)
 {
 	NSParameterAssert(NULL != disk);
 
-	NSDocument *matchingDocument = nil;
+	CompactDiscWindowController *matchingWindowController = nil;
 	
-	// Iterate through open documents and determine which one matches this disk
-	for(NSDocument *document in [[NSDocumentController sharedDocumentController] documents]) {
-		if([document isKindOfClass:[CompactDiscWindowController class]] && CFEqual(((CompactDiscWindowController *)document).disk, disk)) {
-			matchingDocument = document;
+	// Iterate through open windows and determine which one matches this disk
+	for(NSWindow *window in [[NSApplication sharedApplication] windows]) {
+		NSWindowController *windowController = window.windowController;
+		if(windowController && [windowController isKindOfClass:[CompactDiscWindowController class]] && CFEqual(((CompactDiscWindowController *)windowController).disk, disk)) {
+			matchingWindowController = (CompactDiscWindowController *)windowController;
 			break;
 		}
 	}
 	
-	if(matchingDocument)
-		[matchingDocument close];
+	// Set the disk to NULL, to allow the window's resources to be garbage collected
+	if(matchingWindowController) {
+		matchingWindowController.disk = NULL;
+		[matchingWindowController close];
+	}
 }
 
 - (NSURL *) locateLicenseURL
