@@ -8,14 +8,33 @@
 
 @implementation CoreAudioEncoderInterface
 
-- (NSString *) encoderName
+- (NSDictionary *) defaultSettings
 {
-	return NSLocalizedString(@"Core Audio", @"The name of the encoder");
+	NSMutableDictionary *defaultSettings = [[NSMutableDictionary alloc] init];
+	
+	// M4A container
+	[defaultSettings setObject:[NSNumber numberWithInteger:kAudioFileM4AType] forKey:kAudioFileTypeKey];
+
+	// Apple Lossless sourced from 16-bit, 2 channel audio (CDDA)
+	AudioStreamBasicDescription alacASBD;
+	memset(&alacASBD, 0, sizeof(alacASBD));
+	
+	alacASBD.mFormatID = kAudioFormatAppleLossless;
+	alacASBD.mFormatFlags = kAppleLosslessFormatFlag_16BitSourceData;
+	alacASBD.mSampleRate = 44100;
+	alacASBD.mChannelsPerFrame = 2;
+	alacASBD.mFramesPerPacket = 4096;
+	
+	NSData *alacASBDData = [NSData dataWithBytes:&alacASBD length:sizeof(alacASBD)];
+	
+	[defaultSettings setObject:alacASBDData forKey:kStreamDescriptionKey];
+	
+	return defaultSettings;
 }
 
-- (NSImage *) encoderIcon
+- (NSViewController *) configurationViewController
 {
-	return [NSImage imageNamed:@"NSSound"];
+	return nil;
 }
 
 - (EncodingOperation *) encodingOperation

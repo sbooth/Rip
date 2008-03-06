@@ -6,7 +6,7 @@
 #import <Cocoa/Cocoa.h>
 #import "EncoderInterface/EncoderInterface.h"
 
-@interface CoreAudioEncoderInterface : EncoderInterface
+@interface CoreAudioEncoderInterface : NSObject <EncoderInterface>
 {
 }
 
