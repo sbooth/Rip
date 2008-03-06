@@ -16,7 +16,13 @@
 		8C3C198B0D73EC1E001BAC88 /* CoreAudio.bundle in Copy PlugIns */ = {isa = PBXBuildFile; fileRef = 8C3C19870D73EBF4001BAC88 /* CoreAudio.bundle */; };
 		8C3EF7690CFE663A0086181E /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8C3EF7680CFE663A0086181E /* IOKit.framework */; };
 		8C3EFC640D0357D10086181E /* TrackInspectorPanel.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8C3EFC620D0357D10086181E /* TrackInspectorPanel.xib */; };
-		8C4C8AE70D5BCADA00DC0279 /* KBPopUpToolbarItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C4C8A630D5A85E500DC0279 /* KBPopUpToolbarItem.m */; };
+		8C46E3880D77550E00AE4470 /* EncoderManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C46E3870D77550E00AE4470 /* EncoderManager.m */; };
+		8C46E3CF0D775E0400AE4470 /* CompactDiscWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8C46E3CD0D775E0400AE4470 /* CompactDiscWindow.xib */; };
+		8C46E3F10D775E7600AE4470 /* PreferencesWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8C46E3EF0D775E7600AE4470 /* PreferencesWindow.xib */; };
+		8C46E3F40D775E8D00AE4470 /* PreferencesWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C46E3F30D775E8D00AE4470 /* PreferencesWindowController.m */; };
+		8C46E4010D778DC400AE4470 /* ImageAndTextCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C46E4000D778DC400AE4470 /* ImageAndTextCell.m */; };
+		8C46E4040D778DD000AE4470 /* KBPopUpToolbarItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C46E4030D778DD000AE4470 /* KBPopUpToolbarItem.m */; };
+		8C46E4070D778DDB00AE4470 /* AquaticPrime.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C46E4060D778DDB00AE4470 /* AquaticPrime.m */; };
 		8C4C8B750D5C1DA700DC0279 /* ByteSizeValueTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C4C8B740D5C1DA700DC0279 /* ByteSizeValueTransformer.m */; };
 		8C4C8B820D5C1DE600DC0279 /* AlbumMetadata.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C4C8B770D5C1DE600DC0279 /* AlbumMetadata.m */; };
 		8C4C8B830D5C1DE600DC0279 /* CompactDisc.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C4C8B790D5C1DE600DC0279 /* CompactDisc.m */; };
@@ -68,10 +74,8 @@
 		8CA361D80D2F6DD500F89E3B /* musicbrainz3.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8CA361D70D2F6DD500F89E3B /* musicbrainz3.framework */; };
 		8CA361DB0D2F6DDF00F89E3B /* musicbrainz3.framework in Copy Embedded Frameworks */ = {isa = PBXBuildFile; fileRef = 8CA361D70D2F6DD500F89E3B /* musicbrainz3.framework */; };
 		8CA8BAAF0D304F9B006B4779 /* CompactDiscWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8CA8BAAE0D304F9B006B4779 /* CompactDiscWindowController.m */; };
-		8CA8BAB80D30503C006B4779 /* CompactDisc.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8CA8BAB60D30503C006B4779 /* CompactDisc.xib */; };
 		8CB2094E0D0507F5003A90A6 /* Drive.m in Sources */ = {isa = PBXBuildFile; fileRef = 8CB2094D0D0507F5003A90A6 /* Drive.m */; };
 		8CB209750D050EE9003A90A6 /* DriveInformation.m in Sources */ = {isa = PBXBuildFile; fileRef = 8CB209740D050EE9003A90A6 /* DriveInformation.m */; };
-		8CB2A6B70D2C15530028332F /* AquaticPrime.m in Sources */ = {isa = PBXBuildFile; fileRef = 8CB2A67D0D2B045E0028332F /* AquaticPrime.m */; };
 		8CD9C1FE0D0F6C4E00C974C9 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8CD9C1FD0D0F6C4E00C974C9 /* AudioToolbox.framework */; };
 		8CDBEE6D0CFA0A4A000EC553 /* DiskArbitration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8CDBEE6C0CFA0A4A000EC553 /* DiskArbitration.framework */; };
 		8CF322070D1883E1005657A6 /* ExtractionConfigurationSheetController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8CF322060D1883E1005657A6 /* ExtractionConfigurationSheetController.m */; };
@@ -161,8 +165,18 @@
 		8C3C19820D73EBF4001BAC88 /* CoreAudio.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = CoreAudio.xcodeproj; path = CoreAudio/CoreAudio.xcodeproj; sourceTree = "<group>"; };
 		8C3EF7680CFE663A0086181E /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = /System/Library/Frameworks/IOKit.framework; sourceTree = "<absolute>"; };
 		8C3EFC630D0357D10086181E /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/TrackInspectorPanel.xib; sourceTree = "<group>"; };
-		8C4C8A620D5A85E500DC0279 /* KBPopUpToolbarItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = KBPopUpToolbarItem.h; path = ThirdParty/KBPopUpToolbarItem/KBPopUpToolbarItem.h; sourceTree = "<group>"; };
-		8C4C8A630D5A85E500DC0279 /* KBPopUpToolbarItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = KBPopUpToolbarItem.m; path = ThirdParty/KBPopUpToolbarItem/KBPopUpToolbarItem.m; sourceTree = "<group>"; };
+		8C46E3860D77550E00AE4470 /* EncoderManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EncoderManager.h; sourceTree = "<group>"; };
+		8C46E3870D77550E00AE4470 /* EncoderManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EncoderManager.m; sourceTree = "<group>"; };
+		8C46E3CE0D775E0400AE4470 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/CompactDiscWindow.xib; sourceTree = "<group>"; };
+		8C46E3F00D775E7600AE4470 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/PreferencesWindow.xib; sourceTree = "<group>"; };
+		8C46E3F20D775E8D00AE4470 /* PreferencesWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PreferencesWindowController.h; sourceTree = "<group>"; };
+		8C46E3F30D775E8D00AE4470 /* PreferencesWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PreferencesWindowController.m; sourceTree = "<group>"; };
+		8C46E3FF0D778DC400AE4470 /* ImageAndTextCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ImageAndTextCell.h; path = ImageAndTextCell/ImageAndTextCell.h; sourceTree = "<group>"; };
+		8C46E4000D778DC400AE4470 /* ImageAndTextCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ImageAndTextCell.m; path = ImageAndTextCell/ImageAndTextCell.m; sourceTree = "<group>"; };
+		8C46E4020D778DD000AE4470 /* KBPopUpToolbarItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = KBPopUpToolbarItem.h; path = KBPopUpToolbarItem/KBPopUpToolbarItem.h; sourceTree = "<group>"; };
+		8C46E4030D778DD000AE4470 /* KBPopUpToolbarItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = KBPopUpToolbarItem.m; path = KBPopUpToolbarItem/KBPopUpToolbarItem.m; sourceTree = "<group>"; };
+		8C46E4050D778DDB00AE4470 /* AquaticPrime.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AquaticPrime.h; path = AquaticPrime/AquaticPrime.h; sourceTree = "<group>"; };
+		8C46E4060D778DDB00AE4470 /* AquaticPrime.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AquaticPrime.m; path = AquaticPrime/AquaticPrime.m; sourceTree = "<group>"; };
 		8C4C8B730D5C1DA700DC0279 /* ByteSizeValueTransformer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ByteSizeValueTransformer.h; sourceTree = "<group>"; };
 		8C4C8B740D5C1DA700DC0279 /* ByteSizeValueTransformer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ByteSizeValueTransformer.m; sourceTree = "<group>"; };
 		8C4C8B760D5C1DE600DC0279 /* AlbumMetadata.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AlbumMetadata.h; sourceTree = "<group>"; };
@@ -245,13 +259,10 @@
 		8CA361D70D2F6DD500F89E3B /* musicbrainz3.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = musicbrainz3.framework; path = Frameworks/musicbrainz3.framework; sourceTree = "<group>"; };
 		8CA8BAAD0D304F9B006B4779 /* CompactDiscWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CompactDiscWindowController.h; path = Documents/CompactDiscWindowController.h; sourceTree = "<group>"; };
 		8CA8BAAE0D304F9B006B4779 /* CompactDiscWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CompactDiscWindowController.m; path = Documents/CompactDiscWindowController.m; sourceTree = "<group>"; };
-		8CA8BAB70D30503C006B4779 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/CompactDisc.xib; sourceTree = "<group>"; };
 		8CB2094C0D0507F5003A90A6 /* Drive.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Drive.h; path = Drive/Drive.h; sourceTree = "<group>"; };
 		8CB2094D0D0507F5003A90A6 /* Drive.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Drive.m; path = Drive/Drive.m; sourceTree = "<group>"; };
 		8CB209730D050EE9003A90A6 /* DriveInformation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DriveInformation.h; path = Drive/DriveInformation.h; sourceTree = "<group>"; };
 		8CB209740D050EE9003A90A6 /* DriveInformation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DriveInformation.m; path = Drive/DriveInformation.m; sourceTree = "<group>"; };
-		8CB2A67C0D2B045E0028332F /* AquaticPrime.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AquaticPrime.h; path = ThirdParty/AquaticPrime/AquaticPrime.h; sourceTree = "<group>"; };
-		8CB2A67D0D2B045E0028332F /* AquaticPrime.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AquaticPrime.m; path = ThirdParty/AquaticPrime/AquaticPrime.m; sourceTree = "<group>"; };
 		8CD9C1FD0D0F6C4E00C974C9 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = /System/Library/Frameworks/AudioToolbox.framework; sourceTree = "<absolute>"; };
 		8CDBEE6C0CFA0A4A000EC553 /* DiskArbitration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = DiskArbitration.framework; path = /System/Library/Frameworks/DiskArbitration.framework; sourceTree = "<absolute>"; };
 		8CF322050D1883E1005657A6 /* ExtractionConfigurationSheetController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ExtractionConfigurationSheetController.h; path = Documents/ExtractionConfigurationSheetController.h; sourceTree = "<group>"; };
@@ -327,13 +338,14 @@
 				8C8AC5680D099D4B00A90C21 /* InspectorPanels */,
 				8C3EF83D0CFFC5880086181E /* AccurateRip */,
 				8CA35CC80D2E707800F89E3B /* MusicDatabase */,
+				8C46E3EC0D775E4700AE4470 /* Preferences */,
 				8CDBEE630CFA092E000EC553 /* Application */,
 				8C3EFB370D02841B0086181E /* Formatters */,
 				8C4C8B600D5C1AC600DC0279 /* ValueTransformers */,
 				8C1BBC620D43DEF800DAC484 /* Utilities */,
 				8C92D2010D58220A004521F4 /* AppleScript */,
 				2A37F4AFFDCFA73011CA2CEA /* Other Sources */,
-				8CA1EA160D091F0A00980383 /* Third Party */,
+				8CA1EA160D091F0A00980383 /* ThirdParty */,
 				8C4C8AA70D5A902F00DC0279 /* Images */,
 				2A37F4B8FDCFA73011CA2CEA /* Resources */,
 				2A37F4C3FDCFA73011CA2CEA /* Frameworks */,
@@ -365,7 +377,8 @@
 		2A37F4B8FDCFA73011CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				8CA8BAB60D30503C006B4779 /* CompactDisc.xib */,
+				8C46E3EF0D775E7600AE4470 /* PreferencesWindow.xib */,
+				8C46E3CD0D775E0400AE4470 /* CompactDiscWindow.xib */,
 				8CA35EDD0D2F0AA100F89E3B /* MusicDatabaseMatchesSheet.xib */,
 				8CF3220F0D18842B005657A6 /* ExtractionConfigurationSheet.xib */,
 				8C7D31480D05235200CEEE44 /* DriveInspectorPanel.xib */,
@@ -396,6 +409,8 @@
 			children = (
 				8C3C19820D73EBF4001BAC88 /* CoreAudio.xcodeproj */,
 				8C3C193E0D73EA0B001BAC88 /* EncoderInterface.xcodeproj */,
+				8C46E3860D77550E00AE4470 /* EncoderManager.h */,
+				8C46E3870D77550E00AE4470 /* EncoderManager.m */,
 			);
 			path = Encoding;
 			sourceTree = "<group>";
@@ -455,11 +470,29 @@
 			path = Formatters;
 			sourceTree = "<group>";
 		};
+		8C46E3EC0D775E4700AE4470 /* Preferences */ = {
+			isa = PBXGroup;
+			children = (
+				8C46E3F20D775E8D00AE4470 /* PreferencesWindowController.h */,
+				8C46E3F30D775E8D00AE4470 /* PreferencesWindowController.m */,
+			);
+			path = Preferences;
+			sourceTree = "<group>";
+		};
+		8C46E3FE0D778DA400AE4470 /* ImageAndTextCell */ = {
+			isa = PBXGroup;
+			children = (
+				8C46E3FF0D778DC400AE4470 /* ImageAndTextCell.h */,
+				8C46E4000D778DC400AE4470 /* ImageAndTextCell.m */,
+			);
+			name = ImageAndTextCell;
+			sourceTree = "<group>";
+		};
 		8C4C8A610D5A85C800DC0279 /* KBPopUpToolbarItem */ = {
 			isa = PBXGroup;
 			children = (
-				8C4C8A620D5A85E500DC0279 /* KBPopUpToolbarItem.h */,
-				8C4C8A630D5A85E500DC0279 /* KBPopUpToolbarItem.m */,
+				8C46E4020D778DD000AE4470 /* KBPopUpToolbarItem.h */,
+				8C46E4030D778DD000AE4470 /* KBPopUpToolbarItem.m */,
 			);
 			name = KBPopUpToolbarItem;
 			sourceTree = "<group>";
@@ -565,13 +598,14 @@
 			name = AppleScript;
 			sourceTree = "<group>";
 		};
-		8CA1EA160D091F0A00980383 /* Third Party */ = {
+		8CA1EA160D091F0A00980383 /* ThirdParty */ = {
 			isa = PBXGroup;
 			children = (
-				8C4C8A610D5A85C800DC0279 /* KBPopUpToolbarItem */,
 				8CB2A67B0D2B04490028332F /* AquaticPrime */,
+				8C46E3FE0D778DA400AE4470 /* ImageAndTextCell */,
+				8C4C8A610D5A85C800DC0279 /* KBPopUpToolbarItem */,
 			);
-			name = "Third Party";
+			path = ThirdParty;
 			sourceTree = "<group>";
 		};
 		8CA35CC80D2E707800F89E3B /* MusicDatabase */ = {
@@ -605,8 +639,8 @@
 		8CB2A67B0D2B04490028332F /* AquaticPrime */ = {
 			isa = PBXGroup;
 			children = (
-				8CB2A67C0D2B045E0028332F /* AquaticPrime.h */,
-				8CB2A67D0D2B045E0028332F /* AquaticPrime.m */,
+				8C46E4050D778DDB00AE4470 /* AquaticPrime.h */,
+				8C46E4060D778DDB00AE4470 /* AquaticPrime.m */,
 			);
 			name = AquaticPrime;
 			sourceTree = "<group>";
@@ -703,11 +737,12 @@
 				8C7D314A0D05235200CEEE44 /* DriveInspectorPanel.xib in Resources */,
 				8CF322110D18842B005657A6 /* ExtractionConfigurationSheet.xib in Resources */,
 				8CA35EDF0D2F0AA100F89E3B /* MusicDatabaseMatchesSheet.xib in Resources */,
-				8CA8BAB80D30503C006B4779 /* CompactDisc.xib in Resources */,
 				8C4C8BBE0D5C1E6600DC0279 /* Green Light.tiff in Resources */,
 				8C4C8BBF0D5C1E6600DC0279 /* Red Light.tiff in Resources */,
 				8C4C8BC00D5C1E6600DC0279 /* Yellow Light.tiff in Resources */,
 				8C3C19880D73EBFB001BAC88 /* CoreAudio.bundle in Resources */,
+				8C46E3CF0D775E0400AE4470 /* CompactDiscWindow.xib in Resources */,
+				8C46E3F10D775E7600AE4470 /* PreferencesWindow.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -722,11 +757,9 @@
 				8CB2094E0D0507F5003A90A6 /* Drive.m in Sources */,
 				8CB209750D050EE9003A90A6 /* DriveInformation.m in Sources */,
 				8CF322070D1883E1005657A6 /* ExtractionConfigurationSheetController.m in Sources */,
-				8CB2A6B70D2C15530028332F /* AquaticPrime.m in Sources */,
 				8CA8BAAF0D304F9B006B4779 /* CompactDiscWindowController.m in Sources */,
 				8C807ABF0D3F069300B48E7A /* Rip.xcdatamodel in Sources */,
 				8C1BBC650D43DF0D00DAC484 /* GenreUtilities.m in Sources */,
-				8C4C8AE70D5BCADA00DC0279 /* KBPopUpToolbarItem.m in Sources */,
 				8C4C8B750D5C1DA700DC0279 /* ByteSizeValueTransformer.m in Sources */,
 				8C4C8B820D5C1DE600DC0279 /* AlbumMetadata.m in Sources */,
 				8C4C8B830D5C1DE600DC0279 /* CompactDisc.m in Sources */,
@@ -762,6 +795,11 @@
 				8C8EFC400D706471009E9299 /* AlbumArtwork.m in Sources */,
 				8C34BB0B0D761A99003F2953 /* ApplicationDelegate.m in Sources */,
 				8C34BB0E0D761AB7003F2953 /* PlugInManager.m in Sources */,
+				8C46E3880D77550E00AE4470 /* EncoderManager.m in Sources */,
+				8C46E3F40D775E8D00AE4470 /* PreferencesWindowController.m in Sources */,
+				8C46E4010D778DC400AE4470 /* ImageAndTextCell.m in Sources */,
+				8C46E4040D778DD000AE4470 /* KBPopUpToolbarItem.m in Sources */,
+				8C46E4070D778DDB00AE4470 /* AquaticPrime.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -805,6 +843,22 @@
 			name = TrackInspectorPanel.xib;
 			sourceTree = "<group>";
 		};
+		8C46E3CD0D775E0400AE4470 /* CompactDiscWindow.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				8C46E3CE0D775E0400AE4470 /* English */,
+			);
+			name = CompactDiscWindow.xib;
+			sourceTree = "<group>";
+		};
+		8C46E3EF0D775E7600AE4470 /* PreferencesWindow.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				8C46E3F00D775E7600AE4470 /* English */,
+			);
+			name = PreferencesWindow.xib;
+			sourceTree = "<group>";
+		};
 		8C7D31480D05235200CEEE44 /* DriveInspectorPanel.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -827,14 +881,6 @@
 				8CA35EDE0D2F0AA100F89E3B /* English */,
 			);
 			name = MusicDatabaseMatchesSheet.xib;
-			sourceTree = "<group>";
-		};
-		8CA8BAB60D30503C006B4779 /* CompactDisc.xib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				8CA8BAB70D30503C006B4779 /* English */,
-			);
-			name = CompactDisc.xib;
 			sourceTree = "<group>";
 		};
 		8CF3220F0D18842B005657A6 /* ExtractionConfigurationSheet.xib */ = {
