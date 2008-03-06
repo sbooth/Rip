@@ -32,6 +32,8 @@
 #import "MusicDatabaseQueryOperation.h"
 #import "MusicDatabaseMatchesSheetController.h"
 
+#import "EncoderManager.h"
+
 #import "ExtractionConfigurationSheetController.h"
 #import "KBPopUpToolbarItem.h"
 
@@ -105,7 +107,7 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 
 - (id) init
 {
-	if((self = [super initWithWindowNibName:@"CompactDisc"])) {
+	if((self = [super initWithWindowNibName:@"CompactDiscWindow"])) {
 		_compactDiscOperationQueue = [[NSOperationQueue alloc] init];
 		_networkOperationQueue = [[NSOperationQueue alloc] init];
 
