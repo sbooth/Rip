@@ -20,9 +20,12 @@
 - (NSArray *) allPlugIns;
 - (NSArray *) allIdentifiers;
 
-- (NSArray *) plugInsConformingToProtocol:(Protocol *)protocol;
-- (NSArray *) plugInsMatchingClass:(Class)class;
+- (NSArray *) plugInsConformingToProtocol:(Protocol *)protocol error:(NSError **)error;
+- (NSArray *) plugInsMatchingClass:(Class)class error:(NSError **)error;
 
 - (NSBundle *) plugInForIdentifier:(NSString *)identifier;
+
+// Scan all PlugIn folders for available PlugIns
+- (BOOL) scanForPlugIns:(NSError **)error;
 
 @end

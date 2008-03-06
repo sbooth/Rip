@@ -8,11 +8,16 @@
 // Constants
 static NSString * const	kPlugInsFolderName						= @"PlugIns";
 
-@interface PlugInManager (Private)
-- (void) scanForPlugins;
-@end
-
 @implementation PlugInManager
+
+- (id) init
+{
+	if((self = [super init]))
+		_plugIns = [[NSMutableDictionary alloc] init];
+	return self;
+}
+
+#pragma mark Properties
 
 - (NSURL *) builtInPlugInsFolderURL
 {
@@ -41,15 +46,6 @@ static NSString * const	kPlugInsFolderName						= @"PlugIns";
 	return [NSURL fileURLWithPath:localPlugInsFolder];
 }
 
-- (id) init
-{
-	if((self = [super init])) {
-		_plugIns = [[NSMutableDictionary alloc] init];
-		[self scanForPlugins];
-	}
-	return self;
-}
-
 #pragma mark Accessing PlugIns
 
 - (NSArray *) allPlugIns
@@ -62,33 +58,49 @@ static NSString * const	kPlugInsFolderName						= @"PlugIns";
 	return [_plugIns allKeys];
 }
 
-- (NSArray *) plugInsConformingToProtocol:(Protocol *)protocol
+- (NSArray *) plugInsConformingToProtocol:(Protocol *)protocol error:(NSError **)error
 {
 	NSParameterAssert(nil != protocol);
 	
 	NSMutableArray *conformingPlugIns = [[NSMutableArray alloc] init];
 	
-	for(NSBundle *plugIn in _plugIns) {
+	for(NSBundle *plugIn in [_plugIns allValues]) {
+		// Attempt to load the plug-in's executable code
+		// Don't return nil; just store the error so that one bad plug-in won't prevent others from being detected
+		if(![plugIn loadAndReturnError:error])
+			continue;
+
 		id plugInObject = [[[plugIn principalClass] alloc] init];
 		if([plugInObject conformsToProtocol:protocol])
 			[conformingPlugIns addObject:plugIn];
+
+		// Clean up
 		plugInObject = nil;
+//		[plugIn unload];
 	}
 	
 	return conformingPlugIns;
 }
 
-- (NSArray *) plugInsMatchingClass:(Class)class
+- (NSArray *) plugInsMatchingClass:(Class)class error:(NSError **)error
 {
 	NSParameterAssert(nil != class);
 
 	NSMutableArray *matchingPlugIns = [[NSMutableArray alloc] init];
 	
-	for(NSBundle *plugIn in _plugIns) {
+	for(NSBundle *plugIn in [_plugIns allValues]) {
+		// Attempt to load the plug-in's executable code
+		// Don't return nil; just store the error so that one bad plug-in won't prevent others from being detected
+		if(![plugIn loadAndReturnError:error])
+			continue;
+		
 		id plugInObject = [[[plugIn principalClass] alloc] init];
 		if([plugInObject isKindOfClass:class])
 			[matchingPlugIns addObject:plugIn];
+
+		// Clean up
 		plugInObject = nil;
+//		[plugIn unload];
 	}
 	
 	return matchingPlugIns;
@@ -102,44 +114,45 @@ static NSString * const	kPlugInsFolderName						= @"PlugIns";
 	return [_plugIns objectForKey:identifier];
 }
 
-@end
-
-@implementation PlugInManager (Private)
-
-- (void) scanForPlugins
+- (BOOL) scanForPlugIns:(NSError **)error;
 {
-	// Scan for installed plug-ins
+	BOOL result = YES;
+	
+	// Dump all previously found plug-ins
+	[_plugIns removeAllObjects];
+	
+	// Scan these folders installed plug-ins
 	NSArray *plugInsFolderURLS = [NSArray arrayWithObjects:
 								  self.builtInPlugInsFolderURL,
 								  self.userPlugInsFolderURL,
 								  self.localPlugInsFolderURL, nil];
-	NSError *error = nil;
 	
 	// Iterate through each PlugIns folder
 	for(NSURL *plugInsFolderURL in plugInsFolderURLS) {
 		
+		// Skip folders that don't exist
 		NSString *plugInsFolderPath = [plugInsFolderURL path];
 		if(![[NSFileManager defaultManager] fileExistsAtPath:plugInsFolderPath])
 			continue;
 		
-		NSArray *plugInDirectoryContents = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:plugInsFolderPath error:&error];
+		// Iterate through the directory contents and determine which files represent
+		// plug-ins (as determined by NSBundle)
+		NSArray *plugInDirectoryContents = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:plugInsFolderPath error:error];
 		if(plugInDirectoryContents) {
 			for(NSString *plugInName in plugInDirectoryContents) {
 				NSString *plugInPath = [plugInsFolderPath stringByAppendingPathComponent:plugInName];
 				NSBundle *plugInBundle = [NSBundle bundleWithPath:plugInPath];
 
 				// Register the plug-in
-				if(plugInBundle)
+				if(plugInBundle && ![plugInBundle isEqual:[NSBundle mainBundle]])
 					[_plugIns setObject:plugInBundle forKey:[plugInBundle bundleIdentifier]];
-					
-//				[plugInBundle unload];
 			}
 		}
 		else
-			[[NSApplication sharedApplication] presentError:error];
+			result = NO;
 	}
 	
-	NSLog(@"PlugIn scan complete: %@",_plugIns);
+	return result;
 }
 
 @end
