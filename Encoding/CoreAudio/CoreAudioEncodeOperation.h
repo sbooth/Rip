@@ -14,6 +14,7 @@
 extern NSString * const		kAudioConverterConfigKey;	// id (CFPropertyListRef)
 extern NSString * const		kAudioFileTypeKey;			// NSNumber * (int)
 extern NSString * const		kStreamDescriptionKey;		// NSData * (AudioStreamBasicDescription)
+extern NSString * const		kMagicCookieKey;			// NSData * (void *)
 
 // ========================================
 // An EncodingOperation subclass that transcodes CDDA audio using Apple's Core Audio

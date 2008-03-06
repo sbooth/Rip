@@ -15,6 +15,7 @@
 NSString * const	kAudioConverterConfigKey				= @"AudioConverter Configuration";
 NSString * const	kAudioFileTypeKey						= @"AudioFileTypeID";
 NSString * const	kStreamDescriptionKey					= @"AudioStreamBasicDescription";
+NSString * const	kMagicCookieKey							= @"Magic Cookie";
 
 @implementation CoreAudioEncodeOperation
 
@@ -27,8 +28,14 @@ NSString * const	kStreamDescriptionKey					= @"AudioStreamBasicDescription";
 
 - (AudioStreamBasicDescription) streamDescription
 {
+	AudioStreamBasicDescription streamDescription;
+	memset(&streamDescription, 0, sizeof(streamDescription));
+	
 	NSData *streamDescriptionData = [self.settings valueForKey:kStreamDescriptionKey];
-	return (*((AudioStreamBasicDescription *)streamDescriptionData.bytes));
+	if(streamDescriptionData)
+		[streamDescriptionData getBytes:&streamDescription length:sizeof(streamDescription)];
+	
+	return streamDescription;
 }
 
 - (void) main
@@ -102,8 +109,8 @@ NSString * const	kStreamDescriptionKey					= @"AudioStreamBasicDescription";
 	}
 	
 	// Set the converter properties
-	if(self.settings) {
-		id converterConfig = [self.settings objectForKey:kAudioConverterConfigKey];
+	id converterConfig = [self.settings objectForKey:kAudioConverterConfigKey];
+	if(converterConfig) {
 		status = ExtAudioFileSetProperty(outputFile, kExtAudioFileProperty_ConverterConfig, sizeof(converterConfig), &converterConfig);
 		if(noErr != status) {
 			self.error = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
