@@ -10,13 +10,10 @@
 // ========================================
 // The interface encoders must implement to integrate with Rip
 // ========================================
-@interface EncoderInterface : NSObject
-{
-}
+@protocol EncoderInterface
 
-// Encoder information, for presentation in a list of available encoders
-@property (readonly) NSString * encoderName;
-@property (readonly) NSImage * encoderIcon;
+// The default encoder settings, if any
+- (NSDictionary *) defaultSettings;
 
 // Create an instance of NSViewController allowing users to edit the encoder's configuration
 // The controller's representedObject will be set to the applicable encoder settings (NSDictionary *)

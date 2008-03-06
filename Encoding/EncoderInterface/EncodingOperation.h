@@ -6,7 +6,7 @@
 #import <Cocoa/Cocoa.h>
 
 // ========================================
-// An NSOperation subclass that defines the interface to be implemented by encoder plug-ins
+// An NSOperation subclass that defines the interface to be implemented by encoders
 // ========================================
 @interface EncodingOperation : NSOperation
 {

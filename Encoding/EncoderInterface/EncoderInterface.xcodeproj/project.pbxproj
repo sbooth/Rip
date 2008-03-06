@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		8C3C19280D73E943001BAC88 /* EncoderInterface.h in Headers */ = {isa = PBXBuildFile; fileRef = 8C3C19240D73E943001BAC88 /* EncoderInterface.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		8C3C19290D73E943001BAC88 /* EncoderInterface.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C3C19250D73E943001BAC88 /* EncoderInterface.m */; };
 		8C3C192A0D73E943001BAC88 /* EncodingOperation.h in Headers */ = {isa = PBXBuildFile; fileRef = 8C3C19260D73E943001BAC88 /* EncodingOperation.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8C3C192B0D73E943001BAC88 /* EncodingOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C3C19270D73E943001BAC88 /* EncodingOperation.m */; };
 		8DC2EF530486A6940098B216 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C1666FE841158C02AAC07 /* InfoPlist.strings */; };
@@ -22,7 +21,6 @@
 		1058C7B1FEA5585E11CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
 		32DBCF5E0370ADEE00C91783 /* EncoderInterface_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EncoderInterface_Prefix.pch; sourceTree = "<group>"; };
 		8C3C19240D73E943001BAC88 /* EncoderInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EncoderInterface.h; sourceTree = "<group>"; };
-		8C3C19250D73E943001BAC88 /* EncoderInterface.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EncoderInterface.m; sourceTree = "<group>"; };
 		8C3C19260D73E943001BAC88 /* EncodingOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EncodingOperation.h; sourceTree = "<group>"; };
 		8C3C19270D73E943001BAC88 /* EncodingOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EncodingOperation.m; sourceTree = "<group>"; };
 		8DC2EF5A0486A6940098B216 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -84,7 +82,6 @@
 			isa = PBXGroup;
 			children = (
 				8C3C19240D73E943001BAC88 /* EncoderInterface.h */,
-				8C3C19250D73E943001BAC88 /* EncoderInterface.m */,
 				8C3C19260D73E943001BAC88 /* EncodingOperation.h */,
 				8C3C19270D73E943001BAC88 /* EncodingOperation.m */,
 			);
@@ -185,7 +182,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8C3C19290D73E943001BAC88 /* EncoderInterface.m in Sources */,
 				8C3C192B0D73E943001BAC88 /* EncodingOperation.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
