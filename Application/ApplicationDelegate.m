@@ -8,6 +8,7 @@
 #import "DurationValueTransformer.h"
 #import "CompactDiscWindowController.h"
 #import "PlugInManager.h"
+#import "EncoderManager.h"
 #import "AquaticPrime.h"
 
 #include <CoreFoundation/CoreFoundation.h>
@@ -25,6 +26,7 @@
 @property (assign) NSManagedObjectModel * managedObjectModel;
 @property (assign) NSManagedObjectContext * managedObjectContext;
 @property (assign) PlugInManager * plugInManager;
+@property (assign) EncoderManager * encoderManager;
 @end
 
 
@@ -85,6 +87,7 @@ diskDisappearedCallback(DADiskRef disk, void *context)
 @synthesize managedObjectContext = _managedObjectContext;
 
 @synthesize plugInManager = _plugInManager;
+@synthesize encoderManager = _encoderManager;
 
 // Don't automatically open an untitled document
 - (BOOL) applicationShouldOpenUntitledFile:(NSApplication *)sender
@@ -278,10 +281,23 @@ diskDisappearedCallback(DADiskRef disk, void *context)
 
 - (PlugInManager *) plugInManager
 {
-	if(nil == _plugInManager)
+	if(nil == _plugInManager) {
 		self.plugInManager = [[PlugInManager alloc] init];
+
+		NSError *error = nil;
+		if(![self.plugInManager scanForPlugIns:&error])
+			[[NSApplication sharedApplication] presentError:error];
+	}
 	
 	return _plugInManager;
+}
+
+- (EncoderManager *) encoderManager
+{
+	if(nil == _encoderManager)
+		self.encoderManager = [[EncoderManager alloc] init];
+	
+	return _encoderManager;
 }
 
 #pragma mark Action methods

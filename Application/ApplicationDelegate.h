@@ -6,7 +6,7 @@
 #import <Cocoa/Cocoa.h>
 #import <DiskArbitration/DASession.h>
 
-@class PlugInManager;
+@class PlugInManager, EncoderManager;
 
 @interface ApplicationDelegate : NSObject
 {
@@ -16,6 +16,7 @@
 	NSManagedObjectModel *_managedObjectModel;
 	NSManagedObjectContext *_managedObjectContext;
 	PlugInManager *_plugInManager;
+	EncoderManager *_encoderManager;
 }
 
 // File and folder locations
@@ -27,8 +28,9 @@
 @property (readonly, assign) NSManagedObjectModel * managedObjectModel;
 @property (readonly, assign) NSManagedObjectContext * managedObjectContext;
 
-// Plug-in manager
+// Managers
 @property (readonly, assign) PlugInManager * plugInManager;
+@property (readonly, assign) EncoderManager * encoderManager;
 
 // Save changes to the main NSManagedObjectContext
 - (IBAction) saveAction:(id)sender;
