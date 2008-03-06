@@ -22,5 +22,9 @@
 	<string>1.0</string>
 	<key>NSPrincipalClass</key>
 	<string>CoreAudioEncoderInterface</string>
+	<key>EncoderName</key>
+	<string>Core Audio</string>
+	<key>EncoderIcon</key>
+	<string>NSComputer</string>
 </dict>
 </plist>
