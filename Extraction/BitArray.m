@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2005 - 2007 Stephen F. Booth <me@sbooth.org>
+ *  Copyright (C) 2005 - 2008 Stephen F. Booth <me@sbooth.org>
  *  All Rights Reserved
  */
 
@@ -19,6 +19,36 @@
 		self.bitCount = bitCount;
 	return self;
 }
+
+#pragma mark NSCoding
+
+- (id) initWithCoder:(NSCoder *)decoder
+{
+	NSParameterAssert(nil != decoder);
+
+	if((self = [super initWithCoder:decoder])) {
+		self.bitCount = (NSUInteger)[decoder decodeIntegerForKey:@"BABitCount"];
+
+		NSUInteger length = 0;
+		const uint8_t *bits = [decoder decodeBytesForKey:@"BABits" returnedLength:&length];
+
+		memcpy(_bits, bits, length);
+	}
+	
+	return self;
+}
+
+- (void) encodeWithCoder:(NSCoder *)encoder
+{
+	NSParameterAssert(nil != encoder);
+
+	[super encodeWithCoder:encoder];
+	
+	[encoder encodeInteger:(NSInteger)self.bitCount forKey:@"BABitCount"];
+	[encoder encodeBytes:(const uint8_t *)_bits length:(self.arrayLength * sizeof(NSUInteger)) forKey:@"BABits"];
+}
+
+#pragma mark NSCopying
 
 - (id) copyWithZone:(NSZone *)zone
 {
@@ -43,7 +73,11 @@
 		
 		_bits = NSAllocateCollectable(self.arrayLength * sizeof(NSUInteger), 0);
 		if(NULL == _bits) {
+
+#if DEBUG
 			NSLog(@"Unable to allocate memory");
+#endif
+
 			_bitCount = 0;
 			return;
 		}

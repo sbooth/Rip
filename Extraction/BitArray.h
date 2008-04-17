@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2005 - 2007 Stephen F. Booth <me@sbooth.org>
+ *  Copyright (C) 2005 - 2008 Stephen F. Booth <me@sbooth.org>
  *  All Rights Reserved
  */
 
@@ -8,7 +8,7 @@
 // ========================================
 // A compact way of storing and accessing a array of YES/NO values
 // ========================================
-@interface BitArray : NSObject <NSCopying>
+@interface BitArray : NSObject <NSCopying, NSCoding>
 {
 @private
 	NSUInteger _bitCount;
