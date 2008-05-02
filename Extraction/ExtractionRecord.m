@@ -12,6 +12,7 @@
 // ========================================
 // Core Data properties
 @dynamic date;
+@dynamic errorFlags;
 @dynamic MD5;
 @dynamic URL;
 
@@ -57,4 +58,5 @@
 	
 	return nil;
 }
+
 @end

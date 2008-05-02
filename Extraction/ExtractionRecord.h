@@ -5,7 +5,7 @@
 
 #import <Cocoa/Cocoa.h>
 
-@class CompactDisc, DriveInformation, ExtractedTrackRecord;
+@class BitArray, CompactDisc, DriveInformation, ExtractedTrackRecord;
 
 // ========================================
 // This class represents one or more tracks extracted from a CDDA disc
@@ -17,6 +17,7 @@
 // ========================================
 // Core Data properties
 @property (assign) NSDate * date;
+@property (assign) BitArray * errorFlags;
 @property (assign) NSString * MD5;
 @property (assign) NSString * URL;
 
