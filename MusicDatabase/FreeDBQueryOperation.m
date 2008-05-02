@@ -168,7 +168,7 @@ cleanup:
 	}
 	
 	// Convert the TOC from the CompactDisc object's format to that used by libcddb
-	CDMSF lastSectorMSF = CDConvertLBAToMSF(compactDisc.firstSession.leadOut.unsignedIntegerValue - 1);
+	CDMSF lastSectorMSF = CDConvertLBAToMSF((UInt32)compactDisc.firstSession.leadOut.unsignedIntegerValue - 1);
 	NSUInteger lengthInSeconds = (60 * lastSectorMSF.minute) + lastSectorMSF.second;
 	
 	cddb_disc_set_length(disc, lengthInSeconds);
