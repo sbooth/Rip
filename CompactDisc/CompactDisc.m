@@ -33,7 +33,7 @@ static NSInteger calculateFreeDBDiscIDForCDTOC(CDTOC *toc)
 	NSCParameterAssert(NULL != toc);
 
 	NSInteger sumOfTrackLengthDigits = 0;
-	NSUInteger firstTrackNumber, lastTrackNumber;
+	NSUInteger firstTrackNumber = 0, lastTrackNumber = 0;
 	CDMSF leadOutMSF = { 0, 0, 0 };
 
 	// Iterate through each descriptor and extract the information we need
