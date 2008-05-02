@@ -41,6 +41,9 @@
 		case 4:		[_numberFormatter setPositiveSuffix:NSLocalizedStringFromTable(@" GB", @"General", @"")];		break;
 		case 5:		[_numberFormatter setPositiveSuffix:NSLocalizedStringFromTable(@" TB", @"General", @"")];		break;
 		case 6:		[_numberFormatter setPositiveSuffix:NSLocalizedStringFromTable(@" PB", @"General", @"")];		break;
+		case 7:		[_numberFormatter setPositiveSuffix:NSLocalizedStringFromTable(@" EB", @"General", @"")];		break;
+		case 8:		[_numberFormatter setPositiveSuffix:NSLocalizedStringFromTable(@" ZB", @"General", @"")];		break;
+		case 9:		[_numberFormatter setPositiveSuffix:NSLocalizedStringFromTable(@" YB", @"General", @"")];		break;
 	}
 	
 	return [_numberFormatter stringForObjectValue:[NSNumber numberWithFloat:size]];
