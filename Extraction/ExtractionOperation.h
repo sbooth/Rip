@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2007 Stephen F. Booth <me@sbooth.org>
+ *  Copyright (C) 2007 - 2008 Stephen F. Booth <me@sbooth.org>
  *  All Rights Reserved
  */
 
@@ -23,6 +23,8 @@
 	NSNumber *_readOffset;			// The read offset (in audio frames) to use for extraction
 	NSArray *_trackIDs;				// The CD track(s) being extracted (if applicable)
 	
+	NSNumber *_fractionComplete;	// A float [0, 1] indicating the extraction progress
+	
 	SectorRange *_sectorsRead;		// The sectors that were actually read (sectors adjusted for read offset)
 	NSError *_error;				// Holds the first error (if any) occurring during extraction
 	BitArray *_errorFlags;			// C2 error flags corresponding to readSectors
@@ -37,6 +39,10 @@
 @property (assign) NSURL * URL;
 @property (assign) NSNumber * readOffset;
 @property (assign) NSArray * trackIDs;
+
+// ========================================
+// Properties set during extraction
+@property (readonly, assign) NSNumber * fractionComplete;
 
 // ========================================
 // Properties set after extraction is complete (or cancelled)

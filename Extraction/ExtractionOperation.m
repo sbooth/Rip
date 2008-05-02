@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2007 Stephen F. Booth <me@sbooth.org>
+ *  Copyright (C) 2007 - 2008 Stephen F. Booth <me@sbooth.org>
  *  All Rights Reserved
  */
 
@@ -22,6 +22,7 @@
 @property (assign) NSError * error;
 @property (assign) BitArray * errorFlags;
 @property (assign) NSString * MD5;
+@property (assign) NSNumber * fractionComplete;
 @end
 
 @interface ExtractionOperation (Private)
@@ -40,6 +41,7 @@
 @synthesize URL = _URL;
 @synthesize readOffset = _readOffset;
 @synthesize MD5 = _MD5;
+@synthesize fractionComplete = _fractionComplete;
 
 - (id) initWithDADiskRef:(DADiskRef)disk
 {
@@ -163,6 +165,8 @@
 	// Setup C2 error flag tracking
 	self.errorFlags = [[BitArray alloc] initWithBitCount:self.sectorsRead.length];
 	
+	self.fractionComplete = [NSNumber numberWithInt:0];
+	
 	// ========================================
 	// EXTRACTION PHASE 1: PREPEND SILENCE AS NECESSARY
 	
@@ -265,6 +269,7 @@
 		
 		// Housekeeping
 		sectorsRemaining -= sectorsRead;
+		self.fractionComplete = [NSNumber numberWithFloat:(1.f - (sectorsRemaining / (float)self.sectorsRead.length))];
 		
 		// Stop if requested
 		if(self.isCancelled)
@@ -303,6 +308,8 @@
 	// ========================================
 	// COMPLETE EXTRACTION
 	
+	self.fractionComplete = [NSNumber numberWithInt:1];
+
 	// Complete the MD5 calculation and store the result
 	unsigned char digest [CC_MD5_DIGEST_LENGTH];
 	CC_MD5_Final(digest, &md5);
