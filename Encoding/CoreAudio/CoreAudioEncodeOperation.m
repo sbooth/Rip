@@ -23,7 +23,7 @@ NSString * const	kMagicCookieKey							= @"Magic Cookie";
 - (AudioFileTypeID) fileType
 {
 	NSNumber *fileType = [self.settings valueForKey:kAudioFileTypeKey];
-	return fileType.integerValue;
+	return (AudioFileTypeID)fileType.integerValue;
 }
 
 - (AudioStreamBasicDescription) streamDescription
@@ -55,7 +55,7 @@ NSString * const	kMagicCookieKey							= @"Magic Cookie";
 	
 	// Determine the input file's type (should be CDDA)
 	AudioStreamBasicDescription inputStreamDescription;
-	UInt32 dataSize = sizeof(inputStreamDescription);
+	UInt32 dataSize = (UInt32)sizeof(inputStreamDescription);
 	status = ExtAudioFileGetProperty(inputFile, kExtAudioFileProperty_FileDataFormat, &dataSize, &inputStreamDescription);
 	if(noErr != status) {
 		self.error = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
@@ -93,7 +93,7 @@ NSString * const	kMagicCookieKey							= @"Magic Cookie";
 	}
 	
 	// Set the client data format
-	status = ExtAudioFileSetProperty(outputFile, kExtAudioFileProperty_ClientDataFormat, sizeof(inputStreamDescription), &inputStreamDescription);
+	status = ExtAudioFileSetProperty(outputFile, kExtAudioFileProperty_ClientDataFormat, (UInt32)sizeof(inputStreamDescription), &inputStreamDescription);
 	if(noErr != status) {
 		self.error = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
 		goto cleanup;
@@ -101,7 +101,7 @@ NSString * const	kMagicCookieKey							= @"Magic Cookie";
 	
 	// Set the client channel layout (if any)
 	if(inputChannelLayout) {
-		status = ExtAudioFileSetProperty(outputFile, kExtAudioFileProperty_ClientChannelLayout, sizeof(*inputChannelLayout), inputChannelLayout);
+		status = ExtAudioFileSetProperty(outputFile, kExtAudioFileProperty_ClientChannelLayout, (UInt32)sizeof(*inputChannelLayout), inputChannelLayout);
 		if(noErr != status) {
 			self.error = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
 			goto cleanup;
@@ -111,7 +111,7 @@ NSString * const	kMagicCookieKey							= @"Magic Cookie";
 	// Set the converter properties
 	id converterConfig = [self.settings objectForKey:kAudioConverterConfigKey];
 	if(converterConfig) {
-		status = ExtAudioFileSetProperty(outputFile, kExtAudioFileProperty_ConverterConfig, sizeof(converterConfig), &converterConfig);
+		status = ExtAudioFileSetProperty(outputFile, kExtAudioFileProperty_ConverterConfig, (UInt32)sizeof(converterConfig), &converterConfig);
 		if(noErr != status) {
 			self.error = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
 			goto cleanup;
