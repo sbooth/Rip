@@ -97,7 +97,7 @@
 		catch(/* const MusicBrainz::Exception &e */const std::exception &e) {
 
 #if DEBUG
-			NSLog(@"Error: %s", e.what());
+			NSLog(@"MusicBrainz error: %s", e.what());
 #endif
 
 			continue;
