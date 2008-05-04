@@ -3,10 +3,13 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 44;
+	objectVersion = 45;
 	objects = {
 
 /* Begin PBXBuildFile section */
+		324EC6740DA2D411002A3CA7 /* Rip.icns in Resources */ = {isa = PBXBuildFile; fileRef = 324EC6730DA2D411002A3CA7 /* Rip.icns */; };
+		329560E10DCC0050005DA87B /* TagEditingSheetController.m in Sources */ = {isa = PBXBuildFile; fileRef = 329560E00DCC0050005DA87B /* TagEditingSheetController.m */; };
+		329560E70DCC008E005DA87B /* TagEditingSheet.xib in Resources */ = {isa = PBXBuildFile; fileRef = 329560E50DCC008E005DA87B /* TagEditingSheet.xib */; };
 		8C1BBC650D43DF0D00DAC484 /* GenreUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C1BBC640D43DF0D00DAC484 /* GenreUtilities.m */; };
 		8C34BB0B0D761A99003F2953 /* ApplicationDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C34BB0A0D761A99003F2953 /* ApplicationDelegate.m */; };
 		8C34BB0E0D761AB7003F2953 /* PlugInManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C34BB0D0D761AB7003F2953 /* PlugInManager.m */; };
@@ -35,7 +38,6 @@
 		8C4C8B920D5C1DF300DC0279 /* DurationFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C4C8B8D0D5C1DF300DC0279 /* DurationFormatter.m */; };
 		8C4C8B930D5C1DF300DC0279 /* YesNoFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C4C8B8F0D5C1DF300DC0279 /* YesNoFormatter.m */; };
 		8C4C8BA10D5C1E0800DC0279 /* CDDAUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C4C8B970D5C1E0800DC0279 /* CDDAUtilities.m */; };
-		8C4C8BA30D5C1E0800DC0279 /* ExternalCodecEncodeOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C4C8B9B0D5C1E0800DC0279 /* ExternalCodecEncodeOperation.m */; };
 		8C4C8BA50D5C1E0800DC0279 /* PreGapDetectionOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C4C8B9F0D5C1E0800DC0279 /* PreGapDetectionOperation.m */; };
 		8C4C8BAA0D5C1E1D00DC0279 /* DriveInspectorPanelController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C4C8BA70D5C1E1D00DC0279 /* DriveInspectorPanelController.m */; };
 		8C4C8BAB0D5C1E1D00DC0279 /* TrackInspectorPanelController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C4C8BA90D5C1E1D00DC0279 /* TrackInspectorPanelController.m */; };
@@ -50,7 +52,6 @@
 		8C4C8CCF0D5D66A800DC0279 /* MusicDatabaseQueryOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C4C8CCE0D5D66A800DC0279 /* MusicDatabaseQueryOperation.m */; };
 		8C4C8CD80D5D673800DC0279 /* FreeDBQueryOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C4C8CD30D5D673800DC0279 /* FreeDBQueryOperation.m */; };
 		8C4C8CD90D5D673800DC0279 /* iTunesQueryOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C4C8CD50D5D673800DC0279 /* iTunesQueryOperation.m */; };
-		8C4C8CDA0D5D673800DC0279 /* MusicBrainzQueryOperation.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8C4C8CD70D5D673800DC0279 /* MusicBrainzQueryOperation.mm */; };
 		8C4C8CEF0D5D699C00DC0279 /* MusicDatabaseMatchesSheetController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C4C8CEE0D5D699C00DC0279 /* MusicDatabaseMatchesSheetController.m */; };
 		8C4C8E020D5E2A0600DC0279 /* BitArray.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C4C8DFF0D5E2A0600DC0279 /* BitArray.m */; };
 		8C4C8E030D5E2A0600DC0279 /* ExtractionOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C4C8E010D5E2A0600DC0279 /* ExtractionOperation.m */; };
@@ -69,17 +70,11 @@
 		8CA35EDF0D2F0AA100F89E3B /* MusicDatabaseMatchesSheet.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8CA35EDD0D2F0AA100F89E3B /* MusicDatabaseMatchesSheet.xib */; };
 		8CA35F920D2F42A800F89E3B /* discid.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8CA35F910D2F42A800F89E3B /* discid.framework */; };
 		8CA35F950D2F42B300F89E3B /* discid.framework in Copy Embedded Frameworks */ = {isa = PBXBuildFile; fileRef = 8CA35F910D2F42A800F89E3B /* discid.framework */; };
-		8CA361930D2F68A700F89E3B /* neon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8CA361920D2F68A700F89E3B /* neon.framework */; };
-		8CA361940D2F68AE00F89E3B /* neon.framework in Copy Embedded Frameworks */ = {isa = PBXBuildFile; fileRef = 8CA361920D2F68A700F89E3B /* neon.framework */; };
-		8CA361D80D2F6DD500F89E3B /* musicbrainz3.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8CA361D70D2F6DD500F89E3B /* musicbrainz3.framework */; };
-		8CA361DB0D2F6DDF00F89E3B /* musicbrainz3.framework in Copy Embedded Frameworks */ = {isa = PBXBuildFile; fileRef = 8CA361D70D2F6DD500F89E3B /* musicbrainz3.framework */; };
 		8CA8BAAF0D304F9B006B4779 /* CompactDiscWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8CA8BAAE0D304F9B006B4779 /* CompactDiscWindowController.m */; };
 		8CB2094E0D0507F5003A90A6 /* Drive.m in Sources */ = {isa = PBXBuildFile; fileRef = 8CB2094D0D0507F5003A90A6 /* Drive.m */; };
 		8CB209750D050EE9003A90A6 /* DriveInformation.m in Sources */ = {isa = PBXBuildFile; fileRef = 8CB209740D050EE9003A90A6 /* DriveInformation.m */; };
 		8CD9C1FE0D0F6C4E00C974C9 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8CD9C1FD0D0F6C4E00C974C9 /* AudioToolbox.framework */; };
 		8CDBEE6D0CFA0A4A000EC553 /* DiskArbitration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8CDBEE6C0CFA0A4A000EC553 /* DiskArbitration.framework */; };
-		8CF322070D1883E1005657A6 /* ExtractionConfigurationSheetController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8CF322060D1883E1005657A6 /* ExtractionConfigurationSheetController.m */; };
-		8CF322110D18842B005657A6 /* ExtractionConfigurationSheet.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8CF3220F0D18842B005657A6 /* ExtractionConfigurationSheet.xib */; };
 		8D15AC2C0486D014006FF6A4 /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 2A37F4B9FDCFA73011CA2CEA /* Credits.rtf */; };
 		8D15AC2F0486D014006FF6A4 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165FFE840EACC02AAC07 /* InfoPlist.strings */; };
 		8D15AC320486D014006FF6A4 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 2A37F4B0FDCFA73011CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
@@ -136,8 +131,6 @@
 			dstSubfolderSpec = 10;
 			files = (
 				8C3C194A0D73EA35001BAC88 /* EncoderInterface.framework in Copy Embedded Frameworks */,
-				8CA361DB0D2F6DDF00F89E3B /* musicbrainz3.framework in Copy Embedded Frameworks */,
-				8CA361940D2F68AE00F89E3B /* neon.framework in Copy Embedded Frameworks */,
 				8CA35F950D2F42B300F89E3B /* discid.framework in Copy Embedded Frameworks */,
 				8CA35D6C0D2E7B1A00F89E3B /* cddb.framework in Copy Embedded Frameworks */,
 			);
@@ -154,6 +147,10 @@
 		2A37F4BAFDCFA73011CA2CEA /* English */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = English; path = English.lproj/Credits.rtf; sourceTree = "<group>"; };
 		2A37F4C4FDCFA73011CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		2A37F4C5FDCFA73011CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
+		324EC6730DA2D411002A3CA7 /* Rip.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = Rip.icns; sourceTree = "<group>"; };
+		329560DF0DCC0050005DA87B /* TagEditingSheetController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TagEditingSheetController.h; path = Documents/TagEditingSheetController.h; sourceTree = "<group>"; };
+		329560E00DCC0050005DA87B /* TagEditingSheetController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TagEditingSheetController.m; path = Documents/TagEditingSheetController.m; sourceTree = "<group>"; };
+		329560E60DCC008E005DA87B /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/TagEditingSheet.xib; sourceTree = "<group>"; };
 		32DBCF750370BD2300C91783 /* Rip_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Rip_Prefix.pch; sourceTree = "<group>"; };
 		8C1BBC630D43DF0D00DAC484 /* GenreUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GenreUtilities.h; path = Utilities/GenreUtilities.h; sourceTree = "<group>"; };
 		8C1BBC640D43DF0D00DAC484 /* GenreUtilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = GenreUtilities.m; path = Utilities/GenreUtilities.m; sourceTree = "<group>"; };
@@ -201,8 +198,6 @@
 		8C4C8B8F0D5C1DF300DC0279 /* YesNoFormatter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YesNoFormatter.m; sourceTree = "<group>"; };
 		8C4C8B960D5C1E0800DC0279 /* CDDAUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDDAUtilities.h; sourceTree = "<group>"; };
 		8C4C8B970D5C1E0800DC0279 /* CDDAUtilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDDAUtilities.m; sourceTree = "<group>"; };
-		8C4C8B9A0D5C1E0800DC0279 /* ExternalCodecEncodeOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExternalCodecEncodeOperation.h; sourceTree = "<group>"; };
-		8C4C8B9B0D5C1E0800DC0279 /* ExternalCodecEncodeOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ExternalCodecEncodeOperation.m; sourceTree = "<group>"; };
 		8C4C8B9E0D5C1E0800DC0279 /* PreGapDetectionOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PreGapDetectionOperation.h; sourceTree = "<group>"; };
 		8C4C8B9F0D5C1E0800DC0279 /* PreGapDetectionOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PreGapDetectionOperation.m; sourceTree = "<group>"; };
 		8C4C8BA60D5C1E1D00DC0279 /* DriveInspectorPanelController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DriveInspectorPanelController.h; sourceTree = "<group>"; };
@@ -255,8 +250,6 @@
 		8CA35D660D2E7AEA00F89E3B /* cddb.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = cddb.framework; path = Frameworks/cddb.framework; sourceTree = "<group>"; };
 		8CA35EDE0D2F0AA100F89E3B /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/MusicDatabaseMatchesSheet.xib; sourceTree = "<group>"; };
 		8CA35F910D2F42A800F89E3B /* discid.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = discid.framework; path = Frameworks/discid.framework; sourceTree = "<group>"; };
-		8CA361920D2F68A700F89E3B /* neon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = neon.framework; path = Frameworks/neon.framework; sourceTree = "<group>"; };
-		8CA361D70D2F6DD500F89E3B /* musicbrainz3.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = musicbrainz3.framework; path = Frameworks/musicbrainz3.framework; sourceTree = "<group>"; };
 		8CA8BAAD0D304F9B006B4779 /* CompactDiscWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CompactDiscWindowController.h; path = Documents/CompactDiscWindowController.h; sourceTree = "<group>"; };
 		8CA8BAAE0D304F9B006B4779 /* CompactDiscWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CompactDiscWindowController.m; path = Documents/CompactDiscWindowController.m; sourceTree = "<group>"; };
 		8CB2094C0D0507F5003A90A6 /* Drive.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Drive.h; path = Drive/Drive.h; sourceTree = "<group>"; };
@@ -265,9 +258,6 @@
 		8CB209740D050EE9003A90A6 /* DriveInformation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DriveInformation.m; path = Drive/DriveInformation.m; sourceTree = "<group>"; };
 		8CD9C1FD0D0F6C4E00C974C9 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = /System/Library/Frameworks/AudioToolbox.framework; sourceTree = "<absolute>"; };
 		8CDBEE6C0CFA0A4A000EC553 /* DiskArbitration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = DiskArbitration.framework; path = /System/Library/Frameworks/DiskArbitration.framework; sourceTree = "<absolute>"; };
-		8CF322050D1883E1005657A6 /* ExtractionConfigurationSheetController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ExtractionConfigurationSheetController.h; path = Documents/ExtractionConfigurationSheetController.h; sourceTree = "<group>"; };
-		8CF322060D1883E1005657A6 /* ExtractionConfigurationSheetController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ExtractionConfigurationSheetController.m; path = Documents/ExtractionConfigurationSheetController.m; sourceTree = "<group>"; };
-		8CF322100D18842B005657A6 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/ExtractionConfigurationSheet.xib; sourceTree = "<group>"; };
 		8D15AC360486D014006FF6A4 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8D15AC370486D014006FF6A4 /* Rip.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Rip.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -284,8 +274,6 @@
 				8C8502D80D2C282A0081DB75 /* CoreData.framework in Frameworks */,
 				8CA35D670D2E7AEA00F89E3B /* cddb.framework in Frameworks */,
 				8CA35F920D2F42A800F89E3B /* discid.framework in Frameworks */,
-				8CA361930D2F68A700F89E3B /* neon.framework in Frameworks */,
-				8CA361D80D2F6DD500F89E3B /* musicbrainz3.framework in Frameworks */,
 				8C92D1FE0D5821F4004521F4 /* ScriptingBridge.framework in Frameworks */,
 				8C3C19470D73EA12001BAC88 /* EncoderInterface.framework in Frameworks */,
 			);
@@ -347,6 +335,7 @@
 				2A37F4AFFDCFA73011CA2CEA /* Other Sources */,
 				8CA1EA160D091F0A00980383 /* ThirdParty */,
 				8C4C8AA70D5A902F00DC0279 /* Images */,
+				3227175C0D9F140600A421F0 /* Icons */,
 				2A37F4B8FDCFA73011CA2CEA /* Resources */,
 				2A37F4C3FDCFA73011CA2CEA /* Frameworks */,
 				19C28FB0FE9D524F11CA2CBB /* Products */,
@@ -359,8 +348,8 @@
 			children = (
 				8CA8BAAD0D304F9B006B4779 /* CompactDiscWindowController.h */,
 				8CA8BAAE0D304F9B006B4779 /* CompactDiscWindowController.m */,
-				8CF322050D1883E1005657A6 /* ExtractionConfigurationSheetController.h */,
-				8CF322060D1883E1005657A6 /* ExtractionConfigurationSheetController.m */,
+				329560DF0DCC0050005DA87B /* TagEditingSheetController.h */,
+				329560E00DCC0050005DA87B /* TagEditingSheetController.m */,
 			);
 			name = Documents;
 			sourceTree = "<group>";
@@ -380,13 +369,13 @@
 				8C46E3EF0D775E7600AE4470 /* PreferencesWindow.xib */,
 				8C46E3CD0D775E0400AE4470 /* CompactDiscWindow.xib */,
 				8CA35EDD0D2F0AA100F89E3B /* MusicDatabaseMatchesSheet.xib */,
-				8CF3220F0D18842B005657A6 /* ExtractionConfigurationSheet.xib */,
 				8C7D31480D05235200CEEE44 /* DriveInspectorPanel.xib */,
 				8C3EFC620D0357D10086181E /* TrackInspectorPanel.xib */,
 				8C98170C0CF7C6AB00F45B7F /* MainMenu.xib */,
 				2A37F4B9FDCFA73011CA2CEA /* Credits.rtf */,
 				8D15AC360486D014006FF6A4 /* Info.plist */,
 				089C165FFE840EACC02AAC07 /* InfoPlist.strings */,
+				329560E50DCC008E005DA87B /* TagEditingSheet.xib */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -394,14 +383,20 @@
 		2A37F4C3FDCFA73011CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				8CA361D70D2F6DD500F89E3B /* musicbrainz3.framework */,
-				8CA361920D2F68A700F89E3B /* neon.framework */,
 				8CA35F910D2F42A800F89E3B /* discid.framework */,
 				8CA35D660D2E7AEA00F89E3B /* cddb.framework */,
 				1058C7A6FEA54F5311CA2CBB /* Linked Frameworks */,
 				1058C7A8FEA54F5311CA2CBB /* Other Frameworks */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		3227175C0D9F140600A421F0 /* Icons */ = {
+			isa = PBXGroup;
+			children = (
+				324EC6730DA2D411002A3CA7 /* Rip.icns */,
+			);
+			path = Icons;
 			sourceTree = "<group>";
 		};
 		8C19B2EA0D729637002BE7BF /* Encoding */ = {
@@ -538,8 +533,6 @@
 			children = (
 				8C4C8B960D5C1E0800DC0279 /* CDDAUtilities.h */,
 				8C4C8B970D5C1E0800DC0279 /* CDDAUtilities.m */,
-				8C4C8B9A0D5C1E0800DC0279 /* ExternalCodecEncodeOperation.h */,
-				8C4C8B9B0D5C1E0800DC0279 /* ExternalCodecEncodeOperation.m */,
 				8C4C8B9E0D5C1E0800DC0279 /* PreGapDetectionOperation.h */,
 				8C4C8B9F0D5C1E0800DC0279 /* PreGapDetectionOperation.m */,
 				8C8EFBA30D6E7AC1009E9299 /* ISRCDetectionOperation.h */,
@@ -687,7 +680,7 @@
 		2A37F4A9FDCFA73011CA2CEA /* Project object */ = {
 			isa = PBXProject;
 			buildConfigurationList = C05733CB08A9546B00998B17 /* Build configuration list for PBXProject "Rip" */;
-			compatibilityVersion = "Xcode 3.0";
+			compatibilityVersion = "Xcode 3.1";
 			hasScannedForEncodings = 1;
 			mainGroup = 2A37F4AAFDCFA73011CA2CEA /* Rip */;
 			projectDirPath = "";
@@ -735,7 +728,6 @@
 				8C9817100CF7C6AB00F45B7F /* MainMenu.xib in Resources */,
 				8C3EFC640D0357D10086181E /* TrackInspectorPanel.xib in Resources */,
 				8C7D314A0D05235200CEEE44 /* DriveInspectorPanel.xib in Resources */,
-				8CF322110D18842B005657A6 /* ExtractionConfigurationSheet.xib in Resources */,
 				8CA35EDF0D2F0AA100F89E3B /* MusicDatabaseMatchesSheet.xib in Resources */,
 				8C4C8BBE0D5C1E6600DC0279 /* Green Light.tiff in Resources */,
 				8C4C8BBF0D5C1E6600DC0279 /* Red Light.tiff in Resources */,
@@ -743,6 +735,8 @@
 				8C3C19880D73EBFB001BAC88 /* CoreAudio.bundle in Resources */,
 				8C46E3CF0D775E0400AE4470 /* CompactDiscWindow.xib in Resources */,
 				8C46E3F10D775E7600AE4470 /* PreferencesWindow.xib in Resources */,
+				324EC6740DA2D411002A3CA7 /* Rip.icns in Resources */,
+				329560E70DCC008E005DA87B /* TagEditingSheet.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -756,7 +750,6 @@
 				8D15AC320486D014006FF6A4 /* main.m in Sources */,
 				8CB2094E0D0507F5003A90A6 /* Drive.m in Sources */,
 				8CB209750D050EE9003A90A6 /* DriveInformation.m in Sources */,
-				8CF322070D1883E1005657A6 /* ExtractionConfigurationSheetController.m in Sources */,
 				8CA8BAAF0D304F9B006B4779 /* CompactDiscWindowController.m in Sources */,
 				8C807ABF0D3F069300B48E7A /* Rip.xcdatamodel in Sources */,
 				8C1BBC650D43DF0D00DAC484 /* GenreUtilities.m in Sources */,
@@ -772,7 +765,6 @@
 				8C4C8B920D5C1DF300DC0279 /* DurationFormatter.m in Sources */,
 				8C4C8B930D5C1DF300DC0279 /* YesNoFormatter.m in Sources */,
 				8C4C8BA10D5C1E0800DC0279 /* CDDAUtilities.m in Sources */,
-				8C4C8BA30D5C1E0800DC0279 /* ExternalCodecEncodeOperation.m in Sources */,
 				8C4C8BA50D5C1E0800DC0279 /* PreGapDetectionOperation.m in Sources */,
 				8C4C8BAA0D5C1E1D00DC0279 /* DriveInspectorPanelController.m in Sources */,
 				8C4C8BAB0D5C1E1D00DC0279 /* TrackInspectorPanelController.m in Sources */,
@@ -784,7 +776,6 @@
 				8C4C8CCF0D5D66A800DC0279 /* MusicDatabaseQueryOperation.m in Sources */,
 				8C4C8CD80D5D673800DC0279 /* FreeDBQueryOperation.m in Sources */,
 				8C4C8CD90D5D673800DC0279 /* iTunesQueryOperation.m in Sources */,
-				8C4C8CDA0D5D673800DC0279 /* MusicBrainzQueryOperation.mm in Sources */,
 				8C4C8CEF0D5D699C00DC0279 /* MusicDatabaseMatchesSheetController.m in Sources */,
 				8C4C8E020D5E2A0600DC0279 /* BitArray.m in Sources */,
 				8C4C8E030D5E2A0600DC0279 /* ExtractionOperation.m in Sources */,
@@ -800,6 +791,7 @@
 				8C46E4010D778DC400AE4470 /* ImageAndTextCell.m in Sources */,
 				8C46E4040D778DD000AE4470 /* KBPopUpToolbarItem.m in Sources */,
 				8C46E4070D778DDB00AE4470 /* AquaticPrime.m in Sources */,
+				329560E10DCC0050005DA87B /* TagEditingSheetController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -833,6 +825,14 @@
 				2A37F4BAFDCFA73011CA2CEA /* English */,
 			);
 			name = Credits.rtf;
+			sourceTree = "<group>";
+		};
+		329560E50DCC008E005DA87B /* TagEditingSheet.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				329560E60DCC008E005DA87B /* English */,
+			);
+			name = TagEditingSheet.xib;
 			sourceTree = "<group>";
 		};
 		8C3EFC620D0357D10086181E /* TrackInspectorPanel.xib */ = {
@@ -883,14 +883,6 @@
 			name = MusicDatabaseMatchesSheet.xib;
 			sourceTree = "<group>";
 		};
-		8CF3220F0D18842B005657A6 /* ExtractionConfigurationSheet.xib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				8CF322100D18842B005657A6 /* English */,
-			);
-			name = ExtractionConfigurationSheet.xib;
-			sourceTree = "<group>";
-		};
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
@@ -922,6 +914,7 @@
 		C05733C908A9546B00998B17 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -964,17 +957,14 @@
 				GCC_WARN_UNUSED_VALUE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				PREBINDING = NO;
-				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.5.sdk";
+				SDKROOT = macosx10.5;
 			};
 			name = Debug;
 		};
 		C05733CD08A9546B00998B17 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = (
-					ppc,
-					i386,
-				);
+				ARCHS = "$(NATIVE_ARCH)";
 				GCC_ENABLE_OBJC_GC = required;
 				GCC_TREAT_IMPLICIT_FUNCTION_DECLARATIONS_AS_ERRORS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -998,7 +988,7 @@
 				GCC_WARN_UNUSED_VALUE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				PREBINDING = NO;
-				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.5.sdk";
+				SDKROOT = macosx10.5;
 			};
 			name = Release;
 		};
