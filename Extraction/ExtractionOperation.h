@@ -29,6 +29,7 @@
 	NSError *_error;				// Holds the first error (if any) occurring during extraction
 	BitArray *_errorFlags;			// C2 error flags corresponding to readSectors
 	NSString *_MD5;					// The MD5 sum of the extracted audio
+	NSString *_SHA1;				// The SHA1 sum of the extracted audio
 }
 
 // ========================================
@@ -50,6 +51,7 @@
 @property (readonly, assign) NSError * error;
 @property (readonly, assign) BitArray * errorFlags;
 @property (readonly, assign) NSString * MD5;
+@property (readonly, assign) NSString * SHA1;
 
 // ========================================
 // Initialization

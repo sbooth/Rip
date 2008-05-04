@@ -22,6 +22,7 @@
 @property (assign) NSError * error;
 @property (assign) BitArray * errorFlags;
 @property (assign) NSString * MD5;
+@property (assign) NSString * SHA1;
 @property (assign) NSNumber * fractionComplete;
 @end
 
@@ -41,6 +42,7 @@
 @synthesize URL = _URL;
 @synthesize readOffset = _readOffset;
 @synthesize MD5 = _MD5;
+@synthesize SHA1 = _SHA1;
 @synthesize fractionComplete = _fractionComplete;
 
 - (id) initWithDADiskRef:(DADiskRef)disk
@@ -91,9 +93,12 @@
 		goto cleanup;
 	}
 	
-	// Initialize the MD5
+	// Initialize the MD5 and SHA1 checksums
 	CC_MD5_CTX md5;
 	CC_MD5_Init(&md5);
+	
+	CC_SHA1_CTX sha1;
+	CC_SHA1_Init(&sha1);
 
 	// ========================================
 	// SETUP FOR READ OFFSET HANDLING
@@ -192,8 +197,9 @@
 			goto cleanup;
 		}
 
-		// Update the MD5 digest
+		// Update the MD5 and SHA1 digests
 		CC_MD5_Update(&md5, audioData.bytes, audioData.length);
+		CC_SHA1_Update(&sha1, audioData.bytes, audioData.length);
 	}
 	
 	// ========================================
@@ -264,8 +270,9 @@
 			goto cleanup;
 		}
 		
-		// Update the MD5 digest
+		// Update the MD5 and SHA1 digests
 		CC_MD5_Update(&md5, audioData.bytes, audioData.length);
+		CC_SHA1_Update(&sha1, audioData.bytes, audioData.length);
 		
 		// Housekeeping
 		sectorsRemaining -= sectorsRead;
@@ -301,8 +308,9 @@
 			goto cleanup;
 		}
 
-		// Update the MD5 digest
+		// Update the MD5 and SHA1 digests
 		CC_MD5_Update(&md5, audioData.bytes, audioData.length);
+		CC_SHA1_Update(&sha1, audioData.bytes, audioData.length);
 	}
 
 	// ========================================
@@ -310,12 +318,25 @@
 	
 	self.fractionComplete = [NSNumber numberWithInt:1];
 
-	// Complete the MD5 calculation and store the result
-	unsigned char digest [CC_MD5_DIGEST_LENGTH];
-	CC_MD5_Final(digest, &md5);
-	
-	self.MD5 = [NSString stringWithFormat:@"%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x", digest[0], digest[1], digest[2], digest[3], digest[4], digest[5], digest[6], digest[7], digest[8], digest[9], digest[10], digest[11], digest[12], digest[13], digest[14], digest[15]];
+	// Complete the MD5 and SHA1 calculations and store the result
+	unsigned char md5Digest [CC_MD5_DIGEST_LENGTH];
+	CC_MD5_Final(md5Digest, &md5);
 
+	unsigned char sha1Digest [CC_SHA1_DIGEST_LENGTH];
+	CC_SHA1_Final(sha1Digest, &sha1);
+	
+	NSMutableString *tempString = [NSMutableString string];
+	
+	NSUInteger i;
+	for(i = 0; i < CC_MD5_DIGEST_LENGTH; ++i)
+		[tempString appendFormat:@"%02x", md5Digest[i]];
+	self.MD5 = tempString;
+
+	tempString = [NSMutableString string];
+	for(i = 0; i < CC_SHA1_DIGEST_LENGTH; ++i)
+		[tempString appendFormat:@"%02x", sha1Digest[i]];
+	self.SHA1 = tempString;
+	
 	// ========================================
 	// CLEAN UP
 
