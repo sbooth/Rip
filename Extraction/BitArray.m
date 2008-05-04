@@ -42,7 +42,7 @@
 {
 	NSParameterAssert(nil != encoder);
 
-	[super encodeWithCoder:encoder];
+//	[super encodeWithCoder:encoder];
 	
 	[encoder encodeInteger:(NSInteger)self.bitCount forKey:@"BABitCount"];
 	[encoder encodeBytes:(const uint8_t *)_bits length:(self.arrayLength * sizeof(NSUInteger)) forKey:@"BABits"];
