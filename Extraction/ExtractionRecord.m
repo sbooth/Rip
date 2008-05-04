@@ -14,6 +14,7 @@
 @dynamic date;
 @dynamic errorFlags;
 @dynamic MD5;
+@dynamic SHA1;
 @dynamic URL;
 
 // ========================================

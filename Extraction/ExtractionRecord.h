@@ -19,7 +19,8 @@
 @property (assign) NSDate * date;
 @property (assign) BitArray * errorFlags;
 @property (assign) NSString * MD5;
-@property (assign) NSString * URL;
+@property (assign) NSString * SHA1;
+@property (assign) NSURL * URL;
 
 // ========================================
 // Core Data relationships
