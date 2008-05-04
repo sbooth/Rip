@@ -12,16 +12,16 @@
 // ========================================
 // Calculate the AccurateRip checksum for the file at path
 // ========================================
-uint32 
-calculateAccurateRipChecksumForFile(NSString *path, BOOL firstTrack, BOOL lastTrack)
+uint32_t 
+calculateAccurateRipChecksumForFile(NSURL *fileURL, BOOL firstTrack, BOOL lastTrack)
 {
-	NSCParameterAssert(nil != path);
+	NSCParameterAssert(nil != fileURL);
 	
 	uint32_t checksum = 0;
 
 	// Open the file for reading
 	ExtAudioFileRef file = NULL;
-	OSStatus status = ExtAudioFileOpenURL((CFURLRef)[NSURL fileURLWithPath:path], &file);
+	OSStatus status = ExtAudioFileOpenURL((CFURLRef)fileURL, &file);
 	if(noErr != status)
 		return 0;
 	
@@ -79,17 +79,17 @@ cleanup:
 // ========================================
 // Calculate the AccurateRip checksum for the specified range of CDDA sectors file at path
 // ========================================
-uint32 
-calculateAccurateRipChecksumForFileRegion(NSString *path, NSUInteger firstSector, NSUInteger lastSector, BOOL firstTrack, BOOL lastTrack)
+uint32_t 
+calculateAccurateRipChecksumForFileRegion(NSURL *fileURL, NSUInteger firstSector, NSUInteger lastSector, BOOL firstTrack, BOOL lastTrack)
 {
-	NSCParameterAssert(nil != path);
+	NSCParameterAssert(nil != fileURL);
 	NSCParameterAssert(lastSector >= firstSector);
 	
 	uint32_t checksum = 0;
 	
 	// Open the file for reading
 	ExtAudioFileRef file = NULL;
-	OSStatus status = ExtAudioFileOpenURL((CFURLRef)[NSURL fileURLWithPath:path], &file);
+	OSStatus status = ExtAudioFileOpenURL((CFURLRef)fileURL, &file);
 	if(noErr != status)
 		return 0;
 	
