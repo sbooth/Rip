@@ -22,7 +22,7 @@
 				<string key="NSClassName">FirstResponder</string>
 			</object>
 			<object class="NSWindowTemplate" id="275939982">
-				<int key="NSWindowStyleMask">15</int>
+				<int key="NSWindowStyleMask">13</int>
 				<int key="NSWindowBacking">2</int>
 				<string key="NSWindowRect">{{382, 402}, {600, 350}}</string>
 				<int key="NSWTFlags">1886912512</int>
@@ -329,7 +329,7 @@ ELIAAAAAAAgACAAIAAgAAQABAAEAAQ</bytes>
 							</object>
 						</object>
 					</object>
-					<object class="NSMutableArray" key="NSToolbarIBAllowedItems">
+					<object class="NSArray" key="NSToolbarIBAllowedItems">
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<reference ref="462869114"/>
 						<reference ref="625918845"/>
@@ -1154,13 +1154,9 @@ ELIAAAAAAAgACAAIAAgAAQABAAEAAQ</bytes>
 							<object class="NSImageCell" key="NSCell" id="957374275">
 								<int key="NSCellFlags">270663168</int>
 								<int key="NSCellFlags2">0</int>
-								<object class="NSCustomResource" key="NSContents">
-									<string key="NSClassName">NSImage</string>
-									<string key="NSResourceName">Rip</string>
-								</object>
 								<int key="NSAlign">0</int>
-								<int key="NSScale">0</int>
-								<int key="NSStyle">0</int>
+								<int key="NSScale">3</int>
+								<int key="NSStyle">2</int>
 								<bool key="NSAnimates">NO</bool>
 							</object>
 							<bool key="NSEditable">YES</bool>
@@ -1269,6 +1265,15 @@ ELIAAAAAAAgACAAIAAgAAQABAAEAAQ</bytes>
 					<object class="NSMenuItem" id="763658495">
 						<reference key="NSMenu" ref="38501164"/>
 						<string key="NSTitle">FreeDB</string>
+						<string key="NSKeyEquiv"/>
+						<int key="NSKeyEquivModMask">1048576</int>
+						<int key="NSMnemonicLoc">2147483647</int>
+						<reference key="NSOnImage" ref="683523931"/>
+						<reference key="NSMixedImage" ref="641723729"/>
+					</object>
+					<object class="NSMenuItem" id="901960727">
+						<reference key="NSMenu" ref="38501164"/>
+						<string key="NSTitle">MusicBrainz</string>
 						<string key="NSKeyEquiv"/>
 						<int key="NSKeyEquivModMask">1048576</int>
 						<int key="NSMnemonicLoc">2147483647</int>
@@ -1958,6 +1963,14 @@ ELIAAAAAAAgACAAIAAgAAQABAAEAAQ</bytes>
 					</object>
 					<int key="connectionID">100772</int>
 				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">queryMusicBrainz:</string>
+						<reference key="source" ref="512844837"/>
+						<reference key="destination" ref="901960727"/>
+					</object>
+					<int key="connectionID">100782</int>
+				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
 				<object class="NSArray" key="orderedObjects">
@@ -2380,6 +2393,7 @@ ELIAAAAAAAgACAAIAAgAAQABAAEAAQ</bytes>
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<reference ref="763658495"/>
 							<reference ref="272515083"/>
+							<reference ref="901960727"/>
 						</object>
 						<reference key="parent" ref="906013984"/>
 					</object>
@@ -2499,6 +2513,11 @@ ELIAAAAAAAgACAAIAAgAAQABAAEAAQ</bytes>
 						<reference key="object" ref="66250441"/>
 						<reference key="parent" ref="1073046195"/>
 					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">100781</int>
+						<reference key="object" ref="901960727"/>
+						<reference key="parent" ref="38501164"/>
+					</object>
 				</object>
 			</object>
 			<object class="NSMutableDictionary" key="flattenedProperties">
@@ -2539,6 +2558,7 @@ ELIAAAAAAAgACAAIAAgAAQABAAEAAQ</bytes>
 					<string>100126.IBPluginDependency</string>
 					<string>100127.IBPluginDependency</string>
 					<string>100176.IBPluginDependency</string>
+					<string>100186.IBEditorWindowLastContentRect</string>
 					<string>100186.IBPluginDependency</string>
 					<string>100186.editorWindowContentRectSynchronizationRect</string>
 					<string>100189.IBPluginDependency</string>
@@ -2555,6 +2575,7 @@ ELIAAAAAAAgACAAIAAgAAQABAAEAAQ</bytes>
 					<string>100365.IBPluginDependency</string>
 					<string>100367.IBPluginDependency</string>
 					<string>100396.IBPluginDependency</string>
+					<string>100427.IBEditorWindowLastContentRect</string>
 					<string>100427.IBPluginDependency</string>
 					<string>100427.editorWindowContentRectSynchronizationRect</string>
 					<string>100428.IBPluginDependency</string>
@@ -2568,6 +2589,8 @@ ELIAAAAAAAgACAAIAAgAAQABAAEAAQ</bytes>
 					<string>100615.IBPluginDependency</string>
 					<string>100619.IBPluginDependency</string>
 					<string>100676.IBPluginDependency</string>
+					<string>100781.IBPluginDependency</string>
+					<string>5.IBEditorWindowLastContentRect</string>
 					<string>5.IBPluginDependency</string>
 					<string>5.IBWindowTemplateEditedContentRect</string>
 					<string>5.ImportedFromIB2</string>
@@ -2613,6 +2636,7 @@ ELIAAAAAAAgACAAIAAgAAQABAAEAAQ</bytes>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>{{38, 708}, {616, 0}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>{{92, 734}, {616, 0}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -2629,6 +2653,7 @@ ELIAAAAAAAgACAAIAAgAAQABAAEAAQ</bytes>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>{{21, 748}, {151, 63}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>{{186, 766}, {117, 43}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -2643,7 +2668,9 @@ ELIAAAAAAAgACAAIAAgAAQABAAEAAQ</bytes>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{100, 384}, {600, 350}}</string>
+					<string>{{46, 358}, {600, 350}}</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>{{46, 358}, {600, 350}}</string>
 					<reference ref="9"/>
 					<string>{{100, 384}, {600, 350}}</string>
 					<reference ref="9"/>
@@ -2672,7 +2699,7 @@ ELIAAAAAAAgACAAIAAgAAQABAAEAAQ</bytes>
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">100778</int>
+			<int key="maxID">100782</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -2704,10 +2731,12 @@ ELIAAAAAAAgACAAIAAgAAQABAAEAAQ</bytes>
 							<string>copySelectedTracks:</string>
 							<string>deselectAllTracks:</string>
 							<string>detectPreGaps:</string>
+							<string>editTags:</string>
 							<string>ejectDisc:</string>
 							<string>queryAccurateRip:</string>
 							<string>queryDefaultMusicDatabase:</string>
 							<string>queryFreeDB:</string>
+							<string>queryMusicBrainz:</string>
 							<string>queryiTunes:</string>
 							<string>readISRCs:</string>
 							<string>readMCN:</string>
@@ -2715,6 +2744,8 @@ ELIAAAAAAAgACAAIAAgAAQABAAEAAQ</bytes>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>id</string>
+							<string>id</string>
 							<string>id</string>
 							<string>id</string>
 							<string>id</string>
@@ -2762,7 +2793,7 @@ ELIAAAAAAAgACAAIAAgAAQABAAEAAQ</bytes>
 			</object>
 		</object>
 		<int key="IBDocument.localizationMode">0</int>
-		<string key="IBDocument.LastKnownRelativeProjectPath">../../Rip.xcodeproj</string>
+		<string key="IBDocument.LastKnownRelativeProjectPath">../Rip.xcodeproj</string>
 		<int key="IBDocument.defaultPropertyAccessControl">3</int>
 	</data>
 </archive>
