@@ -13,6 +13,8 @@ extern NSString * const		kEncoderSettingsKey; // NSDictionary *
 extern NSString * const		kEncoderNicknameKey; // NSString *
 extern NSString * const		kEncoderSelectedKey; // NSNumber *
 
+@class ExtractionRecord;
+
 @interface EncoderManager : NSObject
 {
 	@private
@@ -31,6 +33,6 @@ extern NSString * const		kEncoderSelectedKey; // NSNumber *
 @property (readonly) NSOperationQueue * queue; 
 
 // Queue an encoding request
-- (BOOL) encodeURL:(NSURL *)inputURL toURL:(NSURL *)outputURL metadata:(NSDictionary *)metadata;
+- (BOOL) encodeURL:(NSURL *)inputURL extractionRecord:(ExtractionRecord *)extractionRecord error:(NSError **)error;
 
 @end
