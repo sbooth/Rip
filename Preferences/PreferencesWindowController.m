@@ -4,6 +4,7 @@
  */
 
 #import "PreferencesWindowController.h"
+#import "EncoderSettingsSheetController.h"
 #import "EncoderManager.h"
 #import "EncoderInterface/EncoderInterface.h"
 
@@ -11,16 +12,7 @@
 
 - (id) init
 {
-	if((self = [super initWithWindowNibName:@"PreferencesWindow"])) {
-		
-	}
-	return self;
-}
-
-- (void) awakeFromNib
-{
-	// Force an empty selection so the collection view will update properly
-	[_arrayController setSelectionIndexes:[NSIndexSet indexSet]];
+	return [super initWithWindowNibName:@"PreferencesWindow"];
 }
 
 - (NSArray *) availableEncoders
@@ -54,41 +46,69 @@
 	return encoders;
 }
 
-- (IBAction) addEncoder:(id)sender
+- (IBAction) editEncoderSettings:(id)sender
 {
-
+	
 #pragma unused(sender)
-	
-	NSDictionary *encoderDictionary = [_arrayController.selectedObjects lastObject];
-	NSLog(@"%@",encoderDictionary);
-	
+
+	// Determine which encoder bundle we are working with
+	NSDictionary *encoderDictionary = [_arrayController.selectedObjects lastObject];	
 	NSBundle *encoderBundle = [encoderDictionary objectForKey:@"encoderBundle"];
+
+	// Instantiate the encoder interface
+	id <EncoderInterface> encoderInterface = [[[encoderBundle principalClass] alloc] init];
+
+	// Grab the encoder's settings dictionary
+	NSDictionary *allEncoderSettings = [[NSUserDefaults standardUserDefaults] dictionaryForKey:@"encoderSettings"];
+	NSString *bundleIdentifier = [encoderBundle bundleIdentifier];
+	NSDictionary *encoderSettings = [allEncoderSettings objectForKey:bundleIdentifier];
+	if(!encoderSettings)
+		encoderSettings = [encoderInterface defaultSettings];
+
+	// The encoder's view controller uses the representedObject property to hold the encoder settings
+	NSViewController *encoderSettingsViewController = [encoderInterface configurationViewController];
+	[encoderSettingsViewController setRepresentedObject:encoderSettings];
+
+	// Create the sheet which will display the encoder settings and assign the encoder-specific view
+	EncoderSettingsSheetController *encoderSettingsSheetController = [[EncoderSettingsSheetController alloc] init];
+	encoderSettingsSheetController.settingsViewController = encoderSettingsViewController;
 	
-	id <EncoderInterface> foo = [[[encoderBundle principalClass] alloc] init];
-	NSDictionary *encoderDefaults = [foo defaultSettings];
-	
-	NSMutableArray *configuredEncoders = [[NSMutableArray alloc] initWithArray:[[NSUserDefaults standardUserDefaults] arrayForKey:@"configuredEncoders"]];
-	
-	NSMutableDictionary *encoder = [[NSMutableDictionary alloc] init];
-	
-	[encoder setObject:[encoderBundle bundleIdentifier] forKey:@"identifier"];
-	if(encoderDefaults)
-		[encoder setObject:encoderDefaults forKey:@"settings"];
-	
-	[configuredEncoders addObject:encoder];
-	
-	[[NSUserDefaults standardUserDefaults] setObject:configuredEncoders forKey:@"configuredEncoders"];
+	// Show the sheet
+	[[NSApplication sharedApplication] beginSheet:encoderSettingsSheetController.window
+								   modalForWindow:self.window
+									modalDelegate:self
+								   didEndSelector:@selector(encoderSettingsSheetDidEnd:returnCode:contextInfo:)
+									  contextInfo:encoderSettingsSheetController];
 }
 
-#pragma mark NSTableView Delegate Methods
+@end
 
-/*- (void) tableView:(NSTableView *)aTableView willDisplayCell:(id)aCell forTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex
+@implementation PreferencesWindowController (Private)
+
+- (void) encoderSettingsSheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode contextInfo:(void *)contextInfo
 {
+	NSParameterAssert(nil != sheet);
+	NSParameterAssert(NULL != contextInfo);
 	
-#pragma unused(aTableView)
+	[sheet orderOut:self];
 	
-	if([aTableColumn.identifier isEqualToString:@"encoder"])
-		[aCell setImage:[[_arrayController.arrangedObjects objectAtIndex:rowIndex] valueForKey:@"encoderIcon"]];
-}*/
+	EncoderSettingsSheetController *encoderSettingsSheetController = (EncoderSettingsSheetController *)contextInfo;
+	
+	// Don't save settings if the cancel button was pressed
+	if(NSCancelButton == returnCode)
+		return;
+	
+	// Determine which encoder plug-in bundle the settings belong to
+	NSDictionary *encoderSettings = encoderSettingsSheetController.settingsViewController.representedObject;
+	NSBundle *encoderBundle = [NSBundle bundleForClass:[encoderSettingsSheetController.settingsViewController class]];
+	
+	// Replace only the relevant encoder's settings in the defaults
+	NSMutableDictionary *allEncoderSettings = [[[NSUserDefaults standardUserDefaults] dictionaryForKey:@"encoderSettings"] mutableCopy];
+	if(!allEncoderSettings)
+		allEncoderSettings = [NSMutableDictionary dictionary];
+	
+	[allEncoderSettings setObject:encoderSettings forKey:[encoderBundle bundleIdentifier]];
+	[[NSUserDefaults standardUserDefaults] setObject:allEncoderSettings forKey:@"encoderSettings"];
+}
 
 @end

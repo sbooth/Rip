@@ -10,10 +10,11 @@
 @interface PreferencesWindowController : NSWindowController
 {
 	IBOutlet NSArrayController *_arrayController;
+	
 	@private
 	EncoderManager *_em;
 }
 
-- (IBAction) addEncoder:(id)sender;
+- (IBAction) editEncoderSettings:(id)sender;
 
 @end
