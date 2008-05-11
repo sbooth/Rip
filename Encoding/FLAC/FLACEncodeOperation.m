@@ -8,7 +8,7 @@
 // ========================================
 // KVC key names for the metadata dictionaries
 // ========================================
-NSString * const	kFLACCompressionLevelKey				= @"FLAC Compression Level";
+NSString * const	kFLACCompressionLevelKey				= @"compressionLevel";
 
 static void
 setArgumentForTag(NSMutableArray *arguments, NSDictionary *metadata, NSString *keyName, NSString *tagName)
@@ -81,6 +81,10 @@ setArgumentForTag(NSMutableArray *arguments, NSDictionary *metadata, NSString *k
 	[task setLaunchPath:flacPath];
 	[task setArguments:arguments];
 
+	// Redirect input and output to /dev/null
+	[task setStandardOutput:[NSFileHandle fileHandleWithNullDevice]];
+//	[task setStandardError:[NSFileHandle fileHandleWithNullDevice]];
+	
 	// Run the task
 	[task launch];
 
@@ -93,6 +97,11 @@ setArgumentForTag(NSMutableArray *arguments, NSDictionary *metadata, NSString *k
 		// Sleep to avoid spinning
 		[NSThread sleepUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.25]];
 	}
+	
+	// Get the result
+	int terminationStatus = [task terminationStatus];
+	if(EXIT_SUCCESS != terminationStatus)
+		self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:terminationStatus userInfo:nil];
 }
 
 @end

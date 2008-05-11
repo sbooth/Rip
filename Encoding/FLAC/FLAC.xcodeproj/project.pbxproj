@@ -12,6 +12,8 @@
 		3252C1160DD2318200856BFE /* EncoderInterface.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3252C0F70DD2302100856BFE /* EncoderInterface.framework */; };
 		3252C14F0DD2349100856BFE /* flac in Resources */ = {isa = PBXBuildFile; fileRef = 3252C14D0DD2349100856BFE /* flac */; };
 		3252C1500DD2349100856BFE /* metaflac in Resources */ = {isa = PBXBuildFile; fileRef = 3252C14E0DD2349100856BFE /* metaflac */; };
+		32E9F7860DD6950700E8ACCA /* FLACSettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 32E9F7850DD6950700E8ACCA /* FLACSettingsViewController.m */; };
+		32E9F78E0DD6957600E8ACCA /* FLACSettings.xib in Resources */ = {isa = PBXBuildFile; fileRef = 32E9F78C0DD6957600E8ACCA /* FLACSettings.xib */; };
 		8D5B49B0048680CD000E48DA /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C167DFE841241C02AAC07 /* InfoPlist.strings */; };
 		8D5B49B4048680CD000E48DA /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7ADFEA557BF11CA2CBB /* Cocoa.framework */; };
 /* End PBXBuildFile section */
@@ -46,6 +48,9 @@
 		3252C14D0DD2349100856BFE /* flac */ = {isa = PBXFileReference; lastKnownFileType = file; path = flac; sourceTree = "<group>"; };
 		3252C14E0DD2349100856BFE /* metaflac */ = {isa = PBXFileReference; lastKnownFileType = file; path = metaflac; sourceTree = "<group>"; };
 		32DBCF630370AF2F00C91783 /* FLAC_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FLAC_Prefix.pch; sourceTree = "<group>"; };
+		32E9F7840DD6950700E8ACCA /* FLACSettingsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FLACSettingsViewController.h; sourceTree = "<group>"; };
+		32E9F7850DD6950700E8ACCA /* FLACSettingsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FLACSettingsViewController.m; sourceTree = "<group>"; };
+		32E9F78D0DD6957600E8ACCA /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/FLACSettings.xib; sourceTree = "<group>"; };
 		8D5B49B6048680CD000E48DA /* FLAC.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FLAC.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
 		8D5B49B7048680CD000E48DA /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D2F7E65807B2D6F200F64583 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = /System/Library/Frameworks/CoreData.framework; sourceTree = "<absolute>"; };
@@ -88,6 +93,7 @@
 		089C167CFE841241C02AAC07 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				32E9F78C0DD6957600E8ACCA /* FLACSettings.xib */,
 				3252C14D0DD2349100856BFE /* flac */,
 				3252C14E0DD2349100856BFE /* metaflac */,
 				8D5B49B7048680CD000E48DA /* Info.plist */,
@@ -103,6 +109,8 @@
 				3252C1050DD2309D00856BFE /* FLACEncodeOperation.m */,
 				3252C1060DD2309D00856BFE /* FLACEncoderInterface.h */,
 				3252C1070DD2309D00856BFE /* FLACEncoderInterface.m */,
+				32E9F7840DD6950700E8ACCA /* FLACSettingsViewController.h */,
+				32E9F7850DD6950700E8ACCA /* FLACSettingsViewController.m */,
 			);
 			name = Classes;
 			sourceTree = "<group>";
@@ -213,6 +221,7 @@
 				8D5B49B0048680CD000E48DA /* InfoPlist.strings in Resources */,
 				3252C14F0DD2349100856BFE /* flac in Resources */,
 				3252C1500DD2349100856BFE /* metaflac in Resources */,
+				32E9F78E0DD6957600E8ACCA /* FLACSettings.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -225,6 +234,7 @@
 			files = (
 				3252C1080DD2309D00856BFE /* FLACEncodeOperation.m in Sources */,
 				3252C1090DD2309D00856BFE /* FLACEncoderInterface.m in Sources */,
+				32E9F7860DD6950700E8ACCA /* FLACSettingsViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -245,6 +255,14 @@
 				089C167EFE841241C02AAC07 /* English */,
 			);
 			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		32E9F78C0DD6957600E8ACCA /* FLACSettings.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				32E9F78D0DD6957600E8ACCA /* English */,
+			);
+			name = FLACSettings.xib;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */

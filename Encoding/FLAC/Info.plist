@@ -22,5 +22,9 @@
 	<string>1.0</string>
 	<key>NSPrincipalClass</key>
 	<string>FLACEncoderInterface</string>
+	<key>EncoderName</key>
+	<string>FLAC</string>
+	<key>EncoderVersion</key>
+	<string>1.2.1</string>
 </dict>
 </plist>

@@ -5,6 +5,7 @@
 
 #import "FLACEncoderInterface.h"
 #import "FLACEncodeOperation.h"
+#import "FLACSettingsViewController.h"
 
 @implementation FLACEncoderInterface
 
@@ -20,7 +21,7 @@
 
 - (NSViewController *) configurationViewController
 {
-	return nil;
+	return [[FLACSettingsViewController alloc] init];
 }
 
 - (EncodingOperation *) encodingOperation
