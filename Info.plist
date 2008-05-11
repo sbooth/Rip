@@ -82,7 +82,7 @@
 	<key>CFBundleExecutable</key>
 	<string>${EXECUTABLE_NAME}</string>
 	<key>CFBundleIconFile</key>
-	<string></string>
+	<string>Rip</string>
 	<key>CFBundleIdentifier</key>
 	<string>org.sbooth.Rip</string>
 	<key>CFBundleInfoDictionaryVersion</key>
