@@ -72,6 +72,14 @@ diskDisappearedCallback(DADiskRef disk, void *context)
 
 + (void) initialize
 {
+	// Register application defaults
+	NSDictionary *ripDefaults = [NSDictionary dictionaryWithObjectsAndKeys:
+								 [NSArchiver archivedDataWithRootObject:[NSURL fileURLWithPath:[@"~/Music" stringByExpandingTildeInPath]]], @"outputDirectory",
+								 [NSNumber numberWithBool:YES], @"automaticallyQueryAccurateRip",
+								 [NSNumber numberWithBool:YES], @"automaticallyQueryMusicDatabase",
+								 nil];
+	[[NSUserDefaults standardUserDefaults] registerDefaults:ripDefaults];
+	
 	// Register custom value transformer classes
 	NSValueTransformer *transformer = nil;
 	
@@ -102,6 +110,9 @@ diskDisappearedCallback(DADiskRef disk, void *context)
 {
 
 #pragma unused(aNotification)
+	
+	// Seed the random number generator
+	srandom(time(NULL));
 	
 	// Determine if this application is registered, and if not, display a nag dialog
 	NSURL *licenseURL = [self locateLicenseURL];
@@ -327,17 +338,23 @@ diskDisappearedCallback(DADiskRef disk, void *context)
 	CompactDiscWindowController *compactDiscWindow = [[CompactDiscWindowController alloc] init];
 	compactDiscWindow.disk = disk;
 
-	// Actions such as querying AccurateRip pass objectIDs across threads, so the managed object context
-	// must be saved before any queries are performed
-	[self saveAction:nil];
-	
-	[compactDiscWindow showWindow:self];
+	// If this is the first time this disc has been seen, query AccurateRip and/or a music database
+	if([compactDiscWindow.compactDisc isInserted]) {
 
-	if([[NSUserDefaults standardUserDefaults] boolForKey:@"automaticallyQueryAccurateRip"])
-		[compactDiscWindow queryAccurateRip:nil];
-	
-	if([[NSUserDefaults standardUserDefaults] boolForKey:@"automaticallyQueryMusicDatabase"])
-		[compactDiscWindow queryDefaultMusicDatabase:nil];
+		// Actions such as querying AccurateRip pass objectIDs across threads, so the managed object context
+		// must be saved before any queries are performed
+		[self saveAction:self];
+		
+		[compactDiscWindow showWindow:self];
+		
+		if([[NSUserDefaults standardUserDefaults] boolForKey:@"automaticallyQueryAccurateRip"])
+			[compactDiscWindow queryAccurateRip:self];
+		
+		if([[NSUserDefaults standardUserDefaults] boolForKey:@"automaticallyQueryMusicDatabase"])
+			[compactDiscWindow queryDefaultMusicDatabase:self];
+	}
+	else
+		[compactDiscWindow showWindow:self];
 }
 
 - (void) diskDisappeared:(DADiskRef)disk
