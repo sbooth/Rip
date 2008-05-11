@@ -5,6 +5,27 @@
 
 #import "EncodingOperation.h"
 
+// ========================================
+// KVC key names for the metadata dictionary
+// ========================================
+NSString * const	kMetadataTitleKey						= @"title";
+NSString * const	kMetadataAlbumTitleKey					= @"albumTitle";
+NSString * const	kMetadataArtistKey						= @"artist";
+NSString * const	kMetadataAlbumArtistKey					= @"albumArtist";
+NSString * const	kMetadataGenreKey						= @"genre";
+NSString * const	kMetadataComposerKey					= @"composer";
+NSString * const	kMetadataReleaseDateKey					= @"date";
+NSString * const	kMetadataCompilationKey					= @"compilation";
+NSString * const	kMetadataTrackNumberKey					= @"trackNumber";
+NSString * const	kMetadataTrackTotalKey					= @"trackTotal";
+NSString * const	kMetadataDiscNumberKey					= @"discNumber";
+NSString * const	kMetadataDiscTotalKey					= @"discTotal";
+NSString * const	kMetadataLyricsKey						= @"lyrics";
+NSString * const	kMetadataCommentKey						= @"comment";
+NSString * const	kMetadataISRCKey						= @"ISRC";
+NSString * const	kMetadataMCNKey							= @"MCN";
+NSString * const	kMetadataMusicBrainzIDKey				= @"MusicBrainzID";
+
 @implementation EncodingOperation
 
 @synthesize inputURL = _inputURL;
