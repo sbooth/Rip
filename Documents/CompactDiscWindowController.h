@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2007 Stephen F. Booth <me@sbooth.org>
+ *  Copyright (C) 2007 - 2008 Stephen F. Booth <me@sbooth.org>
  *  All Rights Reserved
  */
 
@@ -49,6 +49,8 @@
 
 - (IBAction) readMCN:(id)sender;
 - (IBAction) readISRCs:(id)sender;
+
+- (IBAction) editTags:(id)sender;
 
 - (IBAction) queryDefaultMusicDatabase:(id)sender;
 - (IBAction) queryFreeDB:(id)sender;

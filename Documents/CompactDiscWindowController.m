@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2007 Stephen F. Booth <me@sbooth.org>
+ *  Copyright (C) 2007 - 2008 Stephen F. Booth <me@sbooth.org>
  *  All Rights Reserved
  */
 
@@ -32,10 +32,16 @@
 #import "MusicDatabaseQueryOperation.h"
 #import "MusicDatabaseMatchesSheetController.h"
 
+#import "TagEditingSheetController.h"
+
 #import "EncoderManager.h"
 
-#import "ExtractionConfigurationSheetController.h"
+//#import "ExtractionConfigurationSheetController.h"
 #import "KBPopUpToolbarItem.h"
+
+// For getuid
+#include <unistd.h>
+#include <sys/types.h>
 
 #define WINDOW_BORDER_THICKNESS ((CGFloat)20)
 
@@ -67,6 +73,7 @@ NSString * const	kNetworkOperationQueueKVOContext		= @"org.sbooth.Rip.CompactDis
 - (void) showMusicDatabaseMatchesSheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode contextInfo:(void *)contextInfo;
 - (void) updateMetadataWithMusicDatabaseEntry:(id)musicDatabaseEntry;
 - (void) toggleTableColumnVisible:(id)sender;
+- (ExtractionRecord *) createExtractionRecordForOperation:(ExtractionOperation *)operation checksums:(NSDictionary *)checksums;
 @end
 
 // ========================================
@@ -157,60 +164,34 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 	[self.trackController setSortDescriptors:[NSArray arrayWithObject:trackNumberSortDescriptor]];
 }
 
-- (BOOL) validateMenuItem:(NSMenuItem *)menuItem
+- (BOOL) validateUserInterfaceItem:(id <NSValidatedUserInterfaceItem>)anItem
 {
-	if([menuItem action] == @selector(copySelectedTracks:))
+	if([anItem action] == @selector(copySelectedTracks:))
 		return (0 != self.compactDisc.firstSession.selectedTracks.count);
-	else if([menuItem action] == @selector(copyImage:))
+	else if([anItem action] == @selector(copyImage:))
 		return YES;
-	else if([menuItem action] == @selector(queryDefaultMusicDatabase:))
+	else if([anItem action] == @selector(queryDefaultMusicDatabase:))
 		return YES;
-	else if([menuItem action] == @selector(queryFreeDB:))
+	else if([anItem action] == @selector(queryFreeDB:))
 		return YES;
-	else if([menuItem action] == @selector(queryMusicBrainz:))
+	else if([anItem action] == @selector(queryMusicBrainz:))
 		return YES;
-	else if([menuItem action] == @selector(queryiTunes:))
+	else if([anItem action] == @selector(queryiTunes:))
 		return YES;
-	else if([menuItem action] == @selector(queryAccurateRip:))
+	else if([anItem action] == @selector(queryAccurateRip:))
 		return YES;
-	else if([menuItem action] == @selector(detectPreGaps:))
+	else if([anItem action] == @selector(detectPreGaps:))
 		return (0 != self.compactDisc.firstSession.selectedTracks.count);
-	else if([menuItem action] == @selector(readMCN:))
+	else if([anItem action] == @selector(readMCN:))
 		return YES;
-	else if([menuItem action] == @selector(readISRCs:))
+	else if([anItem action] == @selector(readISRCs:))
 		return (0 != self.compactDisc.firstSession.selectedTracks.count);
-	else if([menuItem action] == @selector(toggleTableColumnVisible:))
+	else if([anItem action] == @selector(toggleTableColumnVisible:))
+		return YES;
+	else if([anItem action] == @selector(editTags:))
 		return YES;
 	else
-		return [super validateMenuItem:menuItem];
-}
-
-- (BOOL) validateToolbarItem:(NSToolbarItem *)toolbarItem
-{
-	if([toolbarItem action] == @selector(copySelectedTracks:))
-		return (0 != self.compactDisc.firstSession.selectedTracks.count);
-	else if([toolbarItem action] == @selector(copyImage:))
-		return YES;
-	else if([toolbarItem action] == @selector(queryDefaultMusicDatabase:))
-		return YES;
-	else if([toolbarItem action] == @selector(queryFreeDB:))
-		return YES;
-	else if([toolbarItem action] == @selector(queryMusicBrainz:))
-		return YES;
-	else if([toolbarItem action] == @selector(queryiTunes:))
-		return YES;
-	else if([toolbarItem action] == @selector(queryAccurateRip:))
-		return YES;
-	else if([toolbarItem action] == @selector(detectPreGaps:))
-		return (0 != self.compactDisc.firstSession.selectedTracks.count);
-	else if([toolbarItem action] == @selector(readMCN:))
-		return YES;
-	else if([toolbarItem action] == @selector(readISRCs:))
-		return (0 != self.compactDisc.firstSession.selectedTracks.count);
-	else if([toolbarItem action] == @selector(toggleTableColumnVisible:))
-		return YES;
-	else
-		return [super validateToolbarItem:toolbarItem];
+		return NO;
 }
 
 - (void) observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
@@ -295,12 +276,10 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 
 #pragma unused(window)
 	
-	if(self.compactDiscOperationQueue.operations.count) {
-		NSBeep();
+	if(self.compactDiscOperationQueue.operations.count)
 		return NO;
-	}
-	
-	return YES;
+	else	
+		return YES;
 }
 
 - (void) setDisk:(DADiskRef)disk
@@ -323,6 +302,7 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 			if(!self.driveInformation.readOffset)
 				NSLog(@"Read offset is not configured for drive %@", self.driveInformation.deviceIdentifier);
 			
+			// FIXME: Replace with calculated offset
 			self.driveInformation.readOffset = [NSNumber numberWithInt:102];
 			
 			// Use the MusicBrainz disc ID as the window frame's autosave name
@@ -406,16 +386,58 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 		NSBeep();
 		return;
 	}
+
+	// Ensure the disc's MCN has been read
+	if(nil == self.compactDisc.metadata.MCN)
+		[self readMCN:sender];
+	
+	// Ensure ISRCs and pre-gaps have been read for the selected tracks
+	for(TrackDescriptor *track in selectedTracks) {
+
+		// Don't waste time re-reading a pre-existing ISRC
+		if(nil == track.metadata.ISRC) {
+			ISRCDetectionOperation *isrcDetectionOperation = [[ISRCDetectionOperation alloc] init];
+			
+			isrcDetectionOperation.disk = self.disk;
+			isrcDetectionOperation.trackID = track.objectID;
+			
+			[self.compactDiscOperationQueue addOperation:isrcDetectionOperation];
+		}
+
+		// Grab pre-gaps
+		if(nil == track.preGap) {
+			PreGapDetectionOperation *preGapDetectionOperation = [[PreGapDetectionOperation alloc] init];
+			
+			preGapDetectionOperation.disk = self.disk;
+			preGapDetectionOperation.trackID = track.objectID;
+			
+			[self.compactDiscOperationQueue addOperation:preGapDetectionOperation];
+		}
+	}
+
+	// Use the specified temporary directory if it exists, otherwise try the default and fall back to /tmp
+	NSString *temporaryDirectory = [[NSUserDefaults standardUserDefaults] stringForKey:@"Temporary Directory"];
+	if(nil == temporaryDirectory)
+		temporaryDirectory = NSTemporaryDirectory();
+	if(nil == temporaryDirectory)
+		temporaryDirectory = @"/tmp";
 	
 	for(TrackDescriptor *track in selectedTracks) {
 		ExtractionOperation *trackExtractionOperation = [[ExtractionOperation alloc] init];
+
+		// Generate a random filename
+		NSString *temporaryFilename = nil;
+		do {
+			NSString *randomFilename = [NSString stringWithFormat:@"Rip %x.wav", random()];
+			temporaryFilename = [temporaryDirectory stringByAppendingPathComponent:randomFilename];
+		} while([[NSFileManager defaultManager] fileExistsAtPath:temporaryFilename]);
 		
 		trackExtractionOperation.disk = self.disk;
 		trackExtractionOperation.sectors = track.sectorRange;
 		trackExtractionOperation.allowedSectors = self.compactDisc.firstSession.sectorRange;
 		trackExtractionOperation.trackIDs = [NSArray arrayWithObject:track.objectID];
 		trackExtractionOperation.readOffset = self.driveInformation.readOffset;
-		trackExtractionOperation.URL = [NSURL fileURLWithPath:[NSString stringWithFormat:@"/tmp/Track %@.wav", track.number]];
+		trackExtractionOperation.URL = [NSURL fileURLWithPath:temporaryFilename];
 		
 		[self.compactDiscOperationQueue addOperation:trackExtractionOperation];
 	}
@@ -426,29 +448,38 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 
 #pragma unused(sender)
 
-	ExtractionConfigurationSheetController *extractionConfigurationSheetController = [[ExtractionConfigurationSheetController alloc] init];
+/*	ExtractionConfigurationSheetController *extractionConfigurationSheetController = [[ExtractionConfigurationSheetController alloc] init];
 	
 	[[NSApplication sharedApplication] beginSheet:[extractionConfigurationSheetController window] 
 								   modalForWindow:self.window 
 									modalDelegate:self 
 								   didEndSelector:@selector(showStreamInformationSheetDidEnd:returnCode:contextInfo:) 
-									  contextInfo:extractionConfigurationSheetController];
+									  contextInfo:extractionConfigurationSheetController];*/
 
-	/*
-	SectorRange *imageSectorRange = [SectorRange sectorRangeWithFirstSector:[self.compactDisc firstSectorForSession:1]
-																 lastSector:[self.compactDisc lastSectorForSession:1]];
-	
+	// Use the specified temporary directory if it exists, otherwise try the default and fall back to /tmp
+	NSString *temporaryDirectory = [[NSUserDefaults standardUserDefaults] stringForKey:@"Temporary Directory"];
+	if(nil == temporaryDirectory)
+		temporaryDirectory = NSTemporaryDirectory();
+	if(nil == temporaryDirectory)
+		temporaryDirectory = @"/tmp";
+
 	ExtractionOperation *imageExtractionOperation = [[ExtractionOperation alloc] init];
 	
+	// Generate a random filename
+	NSString *temporaryFilename = nil;
+	do {
+		NSString *randomFilename = [NSString stringWithFormat:@"Rip %x.wav", random()];
+		temporaryFilename = [temporaryDirectory stringByAppendingPathComponent:randomFilename];
+	} while([[NSFileManager defaultManager] fileExistsAtPath:temporaryFilename]);
+	
 	imageExtractionOperation.disk = self.disk;
-	imageExtractionOperation.sectors = imageSectorRange;
+	imageExtractionOperation.sectors = self.compactDisc.firstSession.sectorRange;
 	imageExtractionOperation.allowedSectors = self.compactDisc.firstSession.sectorRange;
 	imageExtractionOperation.trackIDs = [self.compactDisc.firstSession.tracks valueForKey:@"objectID"];
 	imageExtractionOperation.readOffset = self.driveInformation.readOffset;
-	imageExtractionOperation.url = [NSURL fileURLWithPath:@"/tmp/Disc Image.wav"];
+	imageExtractionOperation.URL = [NSURL fileURLWithPath:temporaryFilename];
 	
 	[self.compactDiscOperationQueue addOperation:imageExtractionOperation];
-	 */
 }
 
 - (IBAction) detectPreGaps:(id)sender
@@ -506,6 +537,23 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 		
 		[self.compactDiscOperationQueue addOperation:isrcDetectionOperation];
 	}
+}
+
+- (IBAction) editTags:(id)sender
+{
+	
+#pragma unused(sender)
+	
+	TagEditingSheetController *tagEditingSheetController = [[TagEditingSheetController alloc] init];		
+	[tagEditingSheetController setTrackDescriptorObjectIDs:[self.compactDisc.firstSession.orderedTracks valueForKey:@"objectID"]];
+	[tagEditingSheetController setSortDescriptors:[_trackController sortDescriptors]];
+	
+	[[NSApplication sharedApplication] beginSheet:tagEditingSheetController.window 
+								   modalForWindow:self.window
+									modalDelegate:self 
+								   didEndSelector:@selector(showTagEditingSheetDidEnd:returnCode:contextInfo:) 
+									  contextInfo:tagEditingSheetController];
+	
 }
 
 - (IBAction) queryDefaultMusicDatabase:(id)sender
@@ -584,11 +632,9 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 
 - (void) extractionOperationStarted:(ExtractionOperation *)operation
 {
-	NSParameterAssert(nil != operation);
 
-#if DEBUG
-	NSLog(@"Extraction to %@ started", operation.URL.path);
-#endif
+#pragma unused(operation)
+
 }
 
 - (void) extractionOperationStopped:(ExtractionOperation *)operation
@@ -610,20 +656,14 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 	NSLog(@"Extraction to %@ finished, %u C2 errors.  MD5 = %@", operation.URL.path, operation.errorFlags.countOfOnes, operation.MD5);
 #endif
 	
-	ExtractionRecord *extractionRecord = [NSEntityDescription insertNewObjectForEntityForName:@"ExtractionRecord" 
-																	   inManagedObjectContext:self.managedObjectContext];
+	// Create a dictionary to hold the actual checksums of the extracted audio
+	NSMutableDictionary *actualAccurateRipChecksums = nil;
 	
-	extractionRecord.disc = self.compactDisc;
-	extractionRecord.date = [NSDate date];
-	extractionRecord.drive = self.driveInformation;
-//	extractionRecord.URL = operation.URL.absoluteString;
-//	extractionRecord setValue:operation.errorFlags forKey:@"errorFlags"];
-	extractionRecord.MD5 = operation.MD5;
-		
 	// If trackIDs is set, the ExtractionOperation represents one or more whole tracks (and not an arbitrary range of sectors)
 	// If this is the case, calculate the AccurateRip checksum(s) for the extracted tracks
 	if(operation.trackIDs) {
 		NSUInteger sectorOffset = 0;
+		actualAccurateRipChecksums = [NSMutableDictionary dictionary];
 		
 		for(NSManagedObjectID *trackID in operation.trackIDs) {
 			NSManagedObject *managedObject = [self.managedObjectContext objectWithID:trackID];
@@ -638,20 +678,15 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 			SectorRange *adjustedSectorRange = [SectorRange sectorRangeWithFirstSector:sectorOffset sectorCount:trackSectorRange.length];
 			sectorOffset += trackSectorRange.length;
 			
-			NSUInteger accurateRipChecksum = calculateAccurateRipChecksumForFileRegion(operation.URL.path, 
-																			 adjustedSectorRange.firstSector,
-																			 adjustedSectorRange.lastSector,
-																			 self.compactDisc.firstSession.firstTrack.number.unsignedIntegerValue == track.number.unsignedIntegerValue,
-																			 self.compactDisc.firstSession.lastTrack.number.unsignedIntegerValue == track.number.unsignedIntegerValue);
+			NSUInteger accurateRipChecksum = calculateAccurateRipChecksumForFileRegion(operation.URL, 
+																					   adjustedSectorRange.firstSector,
+																					   adjustedSectorRange.lastSector,
+																					   self.compactDisc.firstSession.firstTrack.number.unsignedIntegerValue == track.number.unsignedIntegerValue,
+																					   self.compactDisc.firstSession.lastTrack.number.unsignedIntegerValue == track.number.unsignedIntegerValue);
 			
-			ExtractedTrackRecord *extractedTrackRecord = [NSEntityDescription insertNewObjectForEntityForName:@"ExtractedTrackRecord" 
-																					   inManagedObjectContext:self.managedObjectContext];
-			
-			extractedTrackRecord.track = track;
 			// Since Core Data only stores signed integers, cast the unsigned checksum to signed for storage
-			extractedTrackRecord.accurateRipChecksum = [NSNumber numberWithInt:(int32_t)accurateRipChecksum];
-			
-			[extractionRecord addTracksObject:extractedTrackRecord];
+			[actualAccurateRipChecksums setObject:[NSNumber numberWithInt:(int32_t)accurateRipChecksum]
+										   forKey:track.objectID];			
 		}
 	}
 	
@@ -667,28 +702,35 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 			TrackDescriptor *track = (TrackDescriptor *)managedObject;			
 
 			AccurateRipTrackRecord *accurateRipTrack = [self.compactDisc.accurateRipDisc trackNumber:track.number.unsignedIntegerValue];
-			ExtractedTrackRecord *extractedTrack = [extractionRecord trackNumber:track.number.unsignedIntegerValue];
+			NSNumber *trackActualAccurateRipChecksum = [actualAccurateRipChecksums objectForKey:track.objectID];
 			
-			if(accurateRipTrack && accurateRipTrack.checksum.unsignedIntegerValue != extractedTrack.accurateRipChecksum.unsignedIntegerValue)
-				allTracksWereAccuratelyExtracted = NO;
+			if(accurateRipTrack && accurateRipTrack.checksum.unsignedIntegerValue != trackActualAccurateRipChecksum.unsignedIntegerValue) {
+				allTracksWereAccuratelyExtracted = NO;				
+#if DEBUG
+				NSLog(@"AccurateRip checksums don't match.  Expected %x, got %x", accurateRipTrack.checksum.unsignedIntegerValue, trackActualAccurateRipChecksum.unsignedIntegerValue);
+#endif
+			}
+#if DEBUG
 			else
 				NSLog(@"Track %@ accurately ripped, confidence %@", track.number, accurateRipTrack.confidenceLevel);
+#endif
 		}
 
-		// If all tracks were accurately ripped, ship the tracks/image off to the encoder(s)
+		// If all tracks were accurately ripped, ship the tracks/image off to the encoder
 		if(allTracksWereAccuratelyExtracted) {
-//			[self.encoderManager encodeURL:operation.URL toBaseURL:outputBaseURL trackIDs:operation.trackIDs];
+			ExtractionRecord *extractionRecord = [self createExtractionRecordForOperation:operation checksums:actualAccurateRipChecksums];
+			[[[[NSApplication sharedApplication] delegate] encoderManager] encodeURL:operation.URL extractionRecord:extractionRecord error:NULL];
 		}
 	}
 	// Re-rip the tracks if any C2 error flags were returned
 	else if(operation.errorFlags.countOfOnes) {
 		
 	}
-	// No C2 errors
+	// No C2 errors, pass the track to the encoder
 	else {
-		
-	}
-	
+		ExtractionRecord *extractionRecord = [self createExtractionRecordForOperation:operation checksums:actualAccurateRipChecksums];
+		[[[[NSApplication sharedApplication] delegate] encoderManager] encodeURL:operation.URL extractionRecord:extractionRecord error:NULL];
+	}	
 }
 
 - (void) preGapDetectionOperationStarted:(PreGapDetectionOperation *)operation
@@ -730,31 +772,39 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 		return;
 	}
 	
-	// Refresh ourselves, to pull in the pre-gap set in the worker thread
+	// Refresh the disc's metadata, to pull in the MCN set in the worker thread
 	NSManagedObject *managedObject = [self.managedObjectContext objectWithID:operation.compactDiscID];
-	[self.managedObjectContext refreshObject:managedObject mergeChanges:YES];
+	if(![managedObject isKindOfClass:[CompactDisc class]])
+		return;
+	
+	CompactDisc *disc = (CompactDisc *)managedObject;
+	[self.managedObjectContext refreshObject:disc.metadata mergeChanges:YES];
 }
 
 - (void) ISRCDetectionOperationStarted:(ISRCDetectionOperation *)operation
 {
 
 #pragma unused(operation)
-	
+
 }
 
 - (void) ISRCDetectionOperationStopped:(ISRCDetectionOperation *)operation
 {
 	NSParameterAssert(nil != operation);
-	
+
 	if(operation.error || operation.isCancelled) {
 		if(operation.error)
 			[self presentError:operation.error modalForWindow:self.window delegate:nil didPresentSelector:NULL contextInfo:NULL];
 		return;
 	}
 	
-	// Refresh ourselves, to pull in the pre-gap set in the worker thread
+	// Refresh the track's metadata, to pull in the ISRC set in the worker thread
 	NSManagedObject *managedObject = [self.managedObjectContext objectWithID:operation.trackID];
-	[self.managedObjectContext refreshObject:managedObject mergeChanges:YES];
+	if(![managedObject isKindOfClass:[TrackDescriptor class]])
+		return;
+
+	TrackDescriptor *track = (TrackDescriptor *)managedObject;
+	[self.managedObjectContext refreshObject:track.metadata mergeChanges:YES];
 }
 
 - (void) accurateRipQueryOperationStarted:(AccurateRipQueryOperation *)operation
@@ -876,6 +926,20 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 	}
 }
 
+- (void) showTagEditingSheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode contextInfo:(void *)contextInfo
+{
+	NSParameterAssert(nil != sheet);
+	NSParameterAssert(NULL != contextInfo);
+	
+	[sheet orderOut:self];
+	
+	TagEditingSheetController *tagEditingSheetController = (TagEditingSheetController *)contextInfo;
+	
+	if(NSCancelButton == returnCode)
+		return;
+}
+
+
 - (void) showStreamInformationSheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode contextInfo:(void *)contextInfo
 {
 	NSLog(@"showStreamInformationSheetDidEnd");
@@ -893,6 +957,41 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 	
 	[column setHidden:!column.isHidden];
 	[menuItem setState:!column.isHidden];
+}
+
+- (ExtractionRecord *) createExtractionRecordForOperation:(ExtractionOperation *)operation checksums:(NSDictionary *)checksums
+{
+	NSParameterAssert(nil != operation);
+	
+	ExtractionRecord *extractionRecord = [NSEntityDescription insertNewObjectForEntityForName:@"ExtractionRecord" 
+																	   inManagedObjectContext:self.managedObjectContext];
+	 
+	extractionRecord.disc = self.compactDisc;
+	extractionRecord.date = [NSDate date];
+	extractionRecord.drive = self.driveInformation;
+	extractionRecord.errorFlags = operation.errorFlags;
+	extractionRecord.MD5 = operation.MD5;
+	extractionRecord.SHA1 = operation.SHA1;
+
+	if(operation.trackIDs) {		
+		for(NSManagedObjectID *trackID in operation.trackIDs) {
+			NSManagedObject *managedObject = [self.managedObjectContext objectWithID:trackID];
+			if(![managedObject isKindOfClass:[TrackDescriptor class]])
+				continue;
+			
+			TrackDescriptor *track = (TrackDescriptor *)managedObject;			
+
+			ExtractedTrackRecord *extractedTrackRecord = [NSEntityDescription insertNewObjectForEntityForName:@"ExtractedTrackRecord" 
+																					   inManagedObjectContext:self.managedObjectContext];
+		
+			extractedTrackRecord.track = track;		
+			extractedTrackRecord.accurateRipChecksum = [checksums objectForKey:track.objectID];
+		
+			[extractionRecord addTracksObject:extractedTrackRecord];
+		}
+	}
+	
+	return extractionRecord;
 }
 
 @end
