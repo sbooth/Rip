@@ -82,8 +82,10 @@ setArgumentForTag(NSMutableArray *arguments, NSDictionary *metadata, NSString *k
 	[task setArguments:arguments];
 
 	// Redirect input and output to /dev/null
+#if (!DEBUG)
 	[task setStandardOutput:[NSFileHandle fileHandleWithNullDevice]];
-//	[task setStandardError:[NSFileHandle fileHandleWithNullDevice]];
+	[task setStandardError:[NSFileHandle fileHandleWithNullDevice]];
+#endif
 	
 	// Run the task
 	[task launch];

@@ -26,5 +26,7 @@
 	<string>FLAC</string>
 	<key>EncoderVersion</key>
 	<string>1.2.1</string>
+	<key>EncoderIcon</key>
+	<string>FLACLogo.png</string>
 </dict>
 </plist>
