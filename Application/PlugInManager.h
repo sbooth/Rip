@@ -16,6 +16,9 @@
 @property (readonly) NSURL * userPlugInsFolderURL;
 @property (readonly) NSURL * localPlugInsFolderURL;
 
+// The shared instance
++ (id) sharedPlugInManager;
+
 // Accessing PlugIns
 - (NSArray *) allPlugIns;
 - (NSArray *) allIdentifiers;

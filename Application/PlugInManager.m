@@ -5,10 +5,30 @@
 
 #import "PlugInManager.h"
 
+// ========================================
 // Constants
+// ========================================
 static NSString * const	kPlugInsFolderName						= @"PlugIns";
 
+// ========================================
+// Static variables
+// ========================================
+static PlugInManager *sSharedPlugInManager						= nil;
+
 @implementation PlugInManager
+
++ (id) sharedPlugInManager
+{
+	if(!sSharedPlugInManager) {
+		sSharedPlugInManager = [[PlugInManager alloc] init];
+		
+		NSError *error = nil;
+		if(![sSharedPlugInManager scanForPlugIns:&error])
+			[[NSApplication sharedApplication] presentError:error];
+	}
+	
+	return sSharedPlugInManager;
+}
 
 - (id) init
 {
