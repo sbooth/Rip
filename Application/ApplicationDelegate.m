@@ -7,8 +7,6 @@
 #import "ByteSizeValueTransformer.h"
 #import "DurationValueTransformer.h"
 #import "CompactDiscWindowController.h"
-#import "PlugInManager.h"
-#import "EncoderManager.h"
 #import "AquaticPrime.h"
 
 #include <CoreFoundation/CoreFoundation.h>
@@ -23,10 +21,10 @@
 
 @interface ApplicationDelegate ()
 @property (assign) NSPersistentStoreCoordinator * persistentStoreCoordinator;
+@property (assign) NSPersistentStore * primaryStore;
+@property (assign) NSPersistentStore * inMemoryStore;
 @property (assign) NSManagedObjectModel * managedObjectModel;
 @property (assign) NSManagedObjectContext * managedObjectContext;
-@property (assign) PlugInManager * plugInManager;
-@property (assign) EncoderManager * encoderManager;
 @end
 
 
@@ -40,6 +38,7 @@
 - (NSURL *) locateLicenseURL;
 - (BOOL) validateLicenseURL:(NSURL *)licenseURL error:(NSError **)error;
 - (void) displayNagDialog;
+- (void) handleGetURLAppleEvent:(NSAppleEventDescriptor *)event withReplyEvent:(NSAppleEventDescriptor *)replyEvent;
 @end
 
 
@@ -74,9 +73,11 @@ diskDisappearedCallback(DADiskRef disk, void *context)
 {
 	// Register application defaults
 	NSDictionary *ripDefaults = [NSDictionary dictionaryWithObjectsAndKeys:
+								 [NSNumber numberWithInteger:1], @"preferencesVersion",
 								 [NSArchiver archivedDataWithRootObject:[NSURL fileURLWithPath:[@"~/Music" stringByExpandingTildeInPath]]], @"outputDirectory",
 								 [NSNumber numberWithBool:YES], @"automaticallyQueryAccurateRip",
 								 [NSNumber numberWithBool:YES], @"automaticallyQueryMusicDatabase",
+								 [NSNumber numberWithInteger:0], @"defaultMusicDatabase",
 								 nil];
 	[[NSUserDefaults standardUserDefaults] registerDefaults:ripDefaults];
 	
@@ -91,11 +92,10 @@ diskDisappearedCallback(DADiskRef disk, void *context)
 }
 
 @synthesize persistentStoreCoordinator = _persistentStoreCoordinator;
+@synthesize primaryStore = _primaryStore;
+@synthesize inMemoryStore = _inMemoryStore;
 @synthesize managedObjectModel = _managedObjectModel;
 @synthesize managedObjectContext = _managedObjectContext;
-
-@synthesize plugInManager = _plugInManager;
-@synthesize encoderManager = _encoderManager;
 
 // Don't automatically open an untitled document
 - (BOOL) applicationShouldOpenUntitledFile:(NSApplication *)sender
@@ -114,6 +114,12 @@ diskDisappearedCallback(DADiskRef disk, void *context)
 	// Seed the random number generator
 	srandom(time(NULL));
 	
+	// Register our URL handlers
+	[[NSAppleEventManager sharedAppleEventManager] setEventHandler:self 
+													   andSelector:@selector(handleGetURLAppleEvent:withReplyEvent:) 
+													 forEventClass:kInternetEventClass 
+														andEventID:kAEGetURL];
+
 	// Determine if this application is registered, and if not, display a nag dialog
 	NSURL *licenseURL = [self locateLicenseURL];
 	if(licenseURL) {
@@ -264,11 +270,18 @@ diskDisappearedCallback(DADiskRef disk, void *context)
 	if(![fileManager fileExistsAtPath:applicationSupportFolderPath isDirectory:NULL] && ![fileManager createDirectoryAtPath:applicationSupportFolderPath withIntermediateDirectories:YES attributes:nil error:&error])
 		[[NSApplication sharedApplication] presentError:error];
 
-	NSURL *url = [NSURL fileURLWithPath:[applicationSupportFolderPath stringByAppendingPathComponent:@"Ripped CDs.xml"]];
+	NSURL *url = [NSURL fileURLWithPath:[applicationSupportFolderPath stringByAppendingPathComponent:@"Ripped CDs.sqlite"]];
 
 	self.persistentStoreCoordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:self.managedObjectModel];
 
-	if(![_persistentStoreCoordinator addPersistentStoreWithType:NSXMLStoreType configuration:nil URL:url options:nil error:&error])
+	// Add the main store
+	self.primaryStore = [_persistentStoreCoordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:url options:nil error:&error];
+	if(!self.primaryStore)
+		[[NSApplication sharedApplication] presentError:error];
+
+	// Add an in-memory store as a temporary home
+	self.inMemoryStore = [_persistentStoreCoordinator addPersistentStoreWithType:NSInMemoryStoreType configuration:nil URL:nil options:nil error:&error];
+	if(!self.inMemoryStore)
 		[[NSApplication sharedApplication] presentError:error];
 
 	return _persistentStoreCoordinator;
@@ -286,29 +299,6 @@ diskDisappearedCallback(DADiskRef disk, void *context)
 	}
 
 	return _managedObjectContext;
-}
-
-#pragma mark Plug-ins
-
-- (PlugInManager *) plugInManager
-{
-	if(nil == _plugInManager) {
-		self.plugInManager = [[PlugInManager alloc] init];
-
-		NSError *error = nil;
-		if(![self.plugInManager scanForPlugIns:&error])
-			[[NSApplication sharedApplication] presentError:error];
-	}
-	
-	return _plugInManager;
-}
-
-- (EncoderManager *) encoderManager
-{
-	if(nil == _encoderManager)
-		self.encoderManager = [[EncoderManager alloc] init];
-	
-	return _encoderManager;
 }
 
 #pragma mark Action methods
@@ -395,43 +385,42 @@ diskDisappearedCallback(DADiskRef disk, void *context)
 	return nil;
 }
 
-		   
 - (BOOL) validateLicenseURL:(NSURL *)licenseURL error:(NSError **)error
 {
 	NSParameterAssert(nil != licenseURL);
 	
 	// This string is specially constructed to prevent key replacement
 	NSMutableString *publicKey = [NSMutableString string];
-	[publicKey appendString:@"0xECBDB"];
+	[publicKey appendString:@"0xB41079DB7"];
+	[publicKey appendString:@"B"];
+	[publicKey appendString:@"B"];
+	[publicKey appendString:@"B3FA82DEFD95ABC7E"];
+	[publicKey appendString:@"D923F96C0C"];
+	[publicKey appendString:@"2"];
+	[publicKey appendString:@"2"];
+	[publicKey appendString:@"174947E10FAC0BAD48"];
+	[publicKey appendString:@"4"];
 	[publicKey appendString:@"E"];
 	[publicKey appendString:@"E"];
-	[publicKey appendString:@"C23701B8881308A2B0CCB"];
-	[publicKey appendString:@"C4D06FD2BA857CD26161E6504"];
-	[publicKey appendString:@"6"];
-	[publicKey appendString:@"6"];
-	[publicKey appendString:@"9F1"];
-	[publicKey appendString:@"5B68F46160719425714E4DAE950193"];
-	[publicKey appendString:@"80E03C2D"];
+	[publicKey appendString:@"37F5672F71C0D5DE95B9D8BECE2"];
+	[publicKey appendString:@"6D4A2076E149E4C35"];
+	[publicKey appendString:@"0"];
+	[publicKey appendString:@"0"];
+	[publicKey appendString:@"16662D0E41D"];
+	[publicKey appendString:@"6231FB7ED6E9"];
 	[publicKey appendString:@"5"];
 	[publicKey appendString:@"5"];
-	[publicKey appendString:@"C05A0C6CC93903591E35"];
-	[publicKey appendString:@"DA0E2534A6F39E9E18"];
-	[publicKey appendString:@"A"];
-	[publicKey appendString:@"A"];
-	[publicKey appendString:@"95A8ECDFA4"];
-	[publicKey appendString:@"ED83A6D7B3C0DF6"];
-	[publicKey appendString:@"D"];
-	[publicKey appendString:@"D"];
-	[publicKey appendString:@"7731F4E0E0E4B"];
-	[publicKey appendString:@"086"];
-	[publicKey appendString:@"8"];
-	[publicKey appendString:@"8"];
-	[publicKey appendString:@"B737B712C3C8CEA6BCC90CD44"];
-	[publicKey appendString:@"CA012E8E"];
-	[publicKey appendString:@"A"];
-	[publicKey appendString:@"A"];
-	[publicKey appendString:@"81B5566E6D4F684FAD8B"];
-	[publicKey appendString:@"8080ED6BEE1BE4BAE5"];
+	[publicKey appendString:@"A56E975ECCB6566E"];
+	[publicKey appendString:@"4C701DEA7A62B620878E1B534C19B4"];
+	[publicKey appendString:@"9C9A95D9E52"];
+	[publicKey appendString:@"3"];
+	[publicKey appendString:@"3"];
+	[publicKey appendString:@"1D8708BA81E325AB6"];
+	[publicKey appendString:@"54F"];
+	[publicKey appendString:@"C"];
+	[publicKey appendString:@"C"];
+	[publicKey appendString:@"89B2FF1CC1026247D6B2BB1C3"];
+	[publicKey appendString:@"DCC8564BED5E2E46F1"];
 	
 	AquaticPrime *licenseValidator = [AquaticPrime aquaticPrimeWithKey:publicKey];
 	NSDictionary *licenseDictionary = [licenseValidator dictionaryForLicenseFile:licenseURL.path];
@@ -459,6 +448,14 @@ diskDisappearedCallback(DADiskRef disk, void *context)
 	NSRunAlertPanel(NSLocalizedStringFromTable(@"This copy of Rip is unregistered.", @"", @""), 
 					NSLocalizedStringFromTable(@"You may purchase a license from http://sbooth.org/Rip/", @"", @""), 
 					NSLocalizedStringFromTable(@"OK", @"Buttons", @""), nil, nil);
+}
+
+- (void) handleGetURLAppleEvent:(NSAppleEventDescriptor *)event withReplyEvent:(NSAppleEventDescriptor *)replyEvent
+{
+	
+#pragma unused(replyEvent)
+	
+	NSURL *url = [NSURL URLWithString:[[event paramDescriptorForKeyword:keyDirectObject] stringValue]];
 }
 
 @end

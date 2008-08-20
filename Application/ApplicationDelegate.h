@@ -6,8 +6,6 @@
 #import <Cocoa/Cocoa.h>
 #import <DiskArbitration/DASession.h>
 
-@class PlugInManager, EncoderManager;
-
 @interface ApplicationDelegate : NSObject
 {
 @private
@@ -15,8 +13,8 @@
 	NSPersistentStoreCoordinator *_persistentStoreCoordinator;
 	NSManagedObjectModel *_managedObjectModel;
 	NSManagedObjectContext *_managedObjectContext;
-	PlugInManager *_plugInManager;
-	EncoderManager *_encoderManager;
+	NSPersistentStore *_primaryStore;
+	NSPersistentStore *_inMemoryStore;
 }
 
 // File and folder locations
@@ -25,12 +23,10 @@
 
 // Core Data
 @property (readonly, assign) NSPersistentStoreCoordinator * persistentStoreCoordinator;
+@property (readonly, assign) NSPersistentStore * primaryStore;
+@property (readonly, assign) NSPersistentStore * inMemoryStore;
 @property (readonly, assign) NSManagedObjectModel * managedObjectModel;
 @property (readonly, assign) NSManagedObjectContext * managedObjectContext;
-
-// Managers
-@property (readonly, assign) PlugInManager * plugInManager;
-@property (readonly, assign) EncoderManager * encoderManager;
 
 // Save changes to the main NSManagedObjectContext
 - (IBAction) saveAction:(id)sender;
