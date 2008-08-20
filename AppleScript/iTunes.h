@@ -200,9 +200,11 @@ typedef enum {
 @interface iTunesArtwork : iTunesItem
 
 @property (copy) NSImage *data;  // data for this artwork, in the form of a picture
+@property (copy) NSString *objectDescription;  // description of artwork as a string
 @property (readonly) BOOL downloaded;  // was this artwork downloaded by iTunes?
 @property (copy, readonly) NSNumber *format;  // the data format for this piece of artwork
 @property NSInteger kind;  // kind or purpose of this piece of artwork
+@property (copy) id rawData;  // data for this artwork, in original format
 
 
 @end
