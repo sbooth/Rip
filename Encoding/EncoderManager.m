@@ -104,9 +104,21 @@ NSString * const	kEncoderSettingsKey						= @"settings";
 NSString * const	kEncoderNicknameKey						= @"nickname";
 NSString * const	kEncoderSelectedKey						= @"selected";
 
+// ========================================
+// Static variables
+// ========================================
+static EncoderManager *sSharedEncoderManager				= nil;
+
 @implementation EncoderManager
 
 @synthesize queue = _queue;
+
++ (id) sharedEncoderManager
+{
+	if(!sSharedEncoderManager)
+		sSharedEncoderManager = [[EncoderManager alloc] init];
+	return sSharedEncoderManager;
+}
 
 - (id) init
 {
@@ -117,7 +129,7 @@ NSString * const	kEncoderSelectedKey						= @"selected";
 
 - (NSArray *) availableEncoders
 {
-	PlugInManager *plugInManager = [[[NSApplication sharedApplication] delegate] plugInManager];
+	PlugInManager *plugInManager = [PlugInManager sharedPlugInManager];
 	
 	NSError *error = nil;
 	NSArray *availableEncoders = [plugInManager plugInsConformingToProtocol:@protocol(EncoderInterface) error:&error];
@@ -141,12 +153,15 @@ NSString * const	kEncoderSelectedKey						= @"selected";
 	NSParameterAssert(nil != inputURL);
 	NSParameterAssert(nil != extractionRecord);
 	
-	PlugInManager *plugInManager = [[[NSApplication sharedApplication] delegate] plugInManager];
-//	NSBundle *encoderBundle = [plugInManager plugInForIdentifier:@"org.sbooth.Rip.Encoder.CoreAudio"];
-	NSBundle *encoderBundle = [plugInManager plugInForIdentifier:@"org.sbooth.Rip.Encoder.FLAC"];
+	NSString *defaultEncoder = [[NSUserDefaults standardUserDefaults] stringForKey:@"defaultEncoder"];
+	
+	PlugInManager *plugInManager = [PlugInManager sharedPlugInManager];
+	NSBundle *encoderBundle = [plugInManager plugInForIdentifier:defaultEncoder];
 	
 	if(![encoderBundle loadAndReturnError:error])
 		return NO;
+	
+	NSDictionary *encoderSettings = [[NSUserDefaults standardUserDefaults] dictionaryForKey:defaultEncoder];
 	
 	Class encoderClass = [encoderBundle principalClass];
 	NSObject <EncoderInterface> *encoderInterface = [[encoderClass alloc] init];
@@ -154,9 +169,9 @@ NSString * const	kEncoderSelectedKey						= @"selected";
 	EncodingOperation *encodingOperation = [encoderInterface encodingOperation];
 	
 	encodingOperation.inputURL = inputURL;
-	NSURL *outputFolderURL = [NSURL fileURLWithPath:[[NSUserDefaults standardUserDefaults] stringForKey:@"outputDirectory"]];
-	encodingOperation.outputURL = [NSURL fileURLWithPath:[@"~/Music/fnord.flac" stringByExpandingTildeInPath]];
-	encodingOperation.settings = [encoderInterface defaultSettings];
+	NSURL *outputFolderURL = [NSUnarchiver unarchiveObjectWithData:[[NSUserDefaults standardUserDefaults] dataForKey:@"outputDirectory"]];
+	encodingOperation.outputURL = [NSURL fileURLWithPath:[@"~/Music/fnord" stringByExpandingTildeInPath]];
+	encodingOperation.settings = encoderSettings;
 	encodingOperation.metadata = metadataForExtractionRecord(extractionRecord);
 	
 	[_queue addOperation:encodingOperation];

@@ -32,6 +32,9 @@ extern NSString * const		kEncoderSelectedKey; // NSNumber *
 
 @property (readonly) NSOperationQueue * queue; 
 
+// The shared instance
++ (id) sharedEncoderManager;
+
 // Queue an encoding request
 - (BOOL) encodeURL:(NSURL *)inputURL extractionRecord:(ExtractionRecord *)extractionRecord error:(NSError **)error;
 
