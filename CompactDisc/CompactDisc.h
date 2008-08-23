@@ -20,11 +20,12 @@
 // ========================================
 // Creation
 + (id) compactDiscWithDADiskRef:(DADiskRef)disk inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext;
-+ (id) compactDiscWithCDTOC:(CDTOC *)toc inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext;
++ (id) compactDiscWithCDTOC:(NSData *)tocData inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext;
 
 // ========================================
 // Core Data properties
-@property (assign) NSNumber * discID;
+@property (assign) NSData * discTOC;
+@property (assign) NSNumber * freeDBDiscID;
 
 // ========================================
 // Core Data relationships

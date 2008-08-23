@@ -118,9 +118,7 @@ static NSInteger calculateFreeDBDiscIDForCDTOC(CDTOC *toc)
 		return nil;
 	}
 	
-	CDTOC *toc = (CDTOC *)CFDataGetBytePtr(tocData);
-	
-	CompactDisc *compactDisc = [CompactDisc compactDiscWithCDTOC:toc inManagedObjectContext:managedObjectContext];
+	CompactDisc *compactDisc = [CompactDisc compactDiscWithCDTOC:(NSData *)tocData inManagedObjectContext:managedObjectContext];
 	
 	CFRelease(mediaDictionary);
 	IOObjectRelease(ioMedia);
@@ -128,10 +126,12 @@ static NSInteger calculateFreeDBDiscIDForCDTOC(CDTOC *toc)
 	return compactDisc;
 }
 
-+ (id) compactDiscWithCDTOC:(CDTOC *)toc inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext
++ (id) compactDiscWithCDTOC:(NSData *)tocData inManagedObjectContext:(NSManagedObjectContext *)managedObjectContext
 {
-	NSParameterAssert(NULL != toc);
+	NSParameterAssert(nil != tocData);
 	NSParameterAssert(nil != managedObjectContext);
+	
+	CDTOC *toc = (CDTOC *)[tocData bytes];
 	
 	// If this disc has been seen before, fetch it
 	NSInteger discID = calculateFreeDBDiscIDForCDTOC(toc);
@@ -143,13 +143,15 @@ static NSInteger calculateFreeDBDiscIDForCDTOC(CDTOC *toc)
 	[fetchRequest setEntity:entityDescription];
 	[fetchRequest setFetchLimit:1];
 
-	NSPredicate *fetchPredicate = [NSPredicate predicateWithFormat:@"discID == %i", discID];
+	NSPredicate *fetchPredicate = [NSPredicate predicateWithFormat:@"freeDBDiscID == %i", discID];
 	[fetchRequest setPredicate:fetchPredicate];
 	
 	NSError *error = nil;
 	NSArray *matchingDiscs = [managedObjectContext executeFetchRequest:fetchRequest error:&error];
 	if(nil == matchingDiscs) {
-		// Deal with error...
+		// TODO: Deal with error...
+		[[NSApplication sharedApplication] presentError:error];
+		
 		return nil;
 	}
 	
@@ -158,7 +160,8 @@ static NSInteger calculateFreeDBDiscIDForCDTOC(CDTOC *toc)
 		compactDisc = [NSEntityDescription insertNewObjectForEntityForName:@"CompactDisc"
 													inManagedObjectContext:managedObjectContext];
 		
-		compactDisc.discID = [NSNumber numberWithInteger:discID];
+		compactDisc.discTOC = tocData;
+		compactDisc.freeDBDiscID = [NSNumber numberWithInteger:discID];
 		[compactDisc parseTOC:toc];
 	}
 	else
@@ -169,7 +172,8 @@ static NSInteger calculateFreeDBDiscIDForCDTOC(CDTOC *toc)
 
 // ========================================
 // Core Data properties
-@dynamic discID;
+@dynamic discTOC;
+@dynamic freeDBDiscID;
 
 // ========================================
 // Core Data relationships
@@ -332,7 +336,7 @@ static NSInteger calculateFreeDBDiscIDForCDTOC(CDTOC *toc)
 
 @implementation CompactDisc (Private)
 
-- (void) parseTOC:(CDTOC *)toc;
+- (void) parseTOC:(CDTOC *)toc
 {
 	NSParameterAssert(NULL != toc);
 
