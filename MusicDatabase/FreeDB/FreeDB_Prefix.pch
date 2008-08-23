@@ -1,0 +1,7 @@
+//
+// Prefix header for all source files of the 'MusicBrainz' target in the 'MusicBrainz' project.
+//
+
+#ifdef __OBJC__
+    #import <Cocoa/Cocoa.h>
+#endif
