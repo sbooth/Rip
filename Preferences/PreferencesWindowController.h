@@ -5,16 +5,29 @@
 
 #import <Cocoa/Cocoa.h>
 
-@class EncoderManager;
+// ========================================
+// Identifiers for toolbar items
+// ========================================
+extern NSString	* const		GeneralPreferencesToolbarItemIdentifier;
+extern NSString	* const		EncoderPreferencesToolbarItemIdentifier;
+extern NSString	* const		MusicDatabasePreferencesToolbarItemIdentifier;
+extern NSString * const		AdvancedPreferencesToolbarItemIdentifier;
 
+// ========================================
+// This class manages the preference window
+// ========================================
 @interface PreferencesWindowController : NSWindowController
 {
-	IBOutlet NSArrayController *_arrayController;
-	
-	@private
-	EncoderManager *_em;
+	IBOutlet NSView *_preferencesView;
+
+@private
+	NSViewController *_preferencesViewController;
 }
 
-- (IBAction) editEncoderSettings:(id)sender;
+// ========================================
+// The shared instance
++ (PreferencesWindowController *) sharedPreferencesWindowController;
+
+- (void) selectPreferencePaneWithIdentifier:(NSString *)itemIdentifier;
 
 @end
