@@ -124,7 +124,7 @@ static NSDictionary * getDevicePropertiesForDADiskRef(DADiskRef disk)
 	NSParameterAssert(nil != managedObjectContext);
 	
 	NSString *deviceIdentifier = getDeviceIdentifierForDADiskRef(disk);
-	if(nil == deviceIdentifier)
+	if(!deviceIdentifier)
 		return nil;
 	
 	NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"DriveInformation"
@@ -139,7 +139,7 @@ static NSDictionary * getDevicePropertiesForDADiskRef(DADiskRef disk)
 	
 	NSError *error = nil;
 	NSArray *matchingDrives = [managedObjectContext executeFetchRequest:fetchRequest error:&error];
-	if(nil == matchingDrives) {
+	if(!matchingDrives) {
 		// Deal with error...
 		return nil;
 	}
