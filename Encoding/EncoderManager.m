@@ -101,8 +101,6 @@ metadataForExtractionRecord(ExtractionRecord *extractionRecord)
 // ========================================
 NSString * const	kEncoderBundleKey						= @"bundle";
 NSString * const	kEncoderSettingsKey						= @"settings";
-NSString * const	kEncoderNicknameKey						= @"nickname";
-NSString * const	kEncoderSelectedKey						= @"selected";
 
 // ========================================
 // Static variables
@@ -111,12 +109,12 @@ static EncoderManager *sSharedEncoderManager				= nil;
 
 @implementation EncoderManager
 
-@synthesize queue = _queue;
+//@synthesize queue = _queue;
 
 + (id) sharedEncoderManager
 {
 	if(!sSharedEncoderManager)
-		sSharedEncoderManager = [[EncoderManager alloc] init];
+		sSharedEncoderManager = [[self alloc] init];
 	return sSharedEncoderManager;
 }
 
@@ -137,6 +135,81 @@ static EncoderManager *sSharedEncoderManager				= nil;
 	return availableEncoders;	
 }
 
+- (NSBundle *) defaultEncoder
+{
+	NSString *bundleIdentifier = [[NSUserDefaults standardUserDefaults] stringForKey:@"defaultEncoder"];
+	NSBundle *bundle = [[PlugInManager sharedPlugInManager] plugInForIdentifier:bundleIdentifier];
+	
+	// If the default wasn't found, return any available encoder
+	if(!bundle)
+		bundle = [self.availableEncoders lastObject];
+	
+	return bundle;
+}
+
+- (void) setDefaultEncoder:(NSBundle *)encoder
+{
+	NSParameterAssert(nil != encoder);
+	
+	// Verify this is a valid encoder
+	if(![self.availableEncoders containsObject:encoder])
+		return;
+	
+	// Set this as the default encoder
+	NSString *bundleIdentifier = [encoder bundleIdentifier];
+	[[NSUserDefaults standardUserDefaults] setObject:bundleIdentifier forKey:@"defaultEncoder"];
+	
+	// If no settings are present for this encoder, store the defaults
+	if(![[NSUserDefaults standardUserDefaults] dictionaryForKey:bundleIdentifier]) {
+		// Instantiate the encoder interface
+		id <EncoderInterface> encoderInterface = [[[encoder principalClass] alloc] init];
+		
+		// Grab the encoder's settings dictionary
+		[[NSUserDefaults standardUserDefaults] setObject:[encoderInterface defaultSettings] forKey:bundleIdentifier];
+	}
+}
+
+- (NSDictionary *) settingsForEncoder:(NSBundle *)encoder
+{
+	NSParameterAssert(nil != encoder);
+	
+	// Verify this is a valid encoder
+	if(![self.availableEncoders containsObject:encoder])
+		return nil;
+	
+	NSString *bundleIdentifier = [encoder bundleIdentifier];
+	NSDictionary *encoderSettings = [[NSUserDefaults standardUserDefaults] dictionaryForKey:bundleIdentifier];
+	
+	// If no settings are present for this encoder, use the defaults
+	if(!encoderSettings) {
+		// Instantiate the encoder interface
+		id <EncoderInterface> encoderInterface = [[[encoder principalClass] alloc] init];
+		
+		// Grab the encoder's settings dictionary
+		encoderSettings = [encoderInterface defaultSettings];
+		
+		// Store the defaults
+		if(encoderSettings)
+			[[NSUserDefaults standardUserDefaults] setObject:encoderSettings forKey:bundleIdentifier];
+	}
+	
+	return [encoderSettings copy];
+}
+
+- (void) storeSettings:(NSDictionary *)encoderSettings forEncoder:(NSBundle *)encoder
+{
+	NSParameterAssert(nil != encoderSettings);
+	NSParameterAssert(nil != encoder);
+	
+	// Verify this is a valid encoder
+	if(![self.availableEncoders containsObject:encoder])
+		return;
+	
+	NSString *bundleIdentifier = [encoder bundleIdentifier];
+	[[NSUserDefaults standardUserDefaults] setObject:encoderSettings forKey:bundleIdentifier];
+}
+
+#if 0
 - (NSArray *) configuredEncoders
 {
 	return [[NSUserDefaults standardUserDefaults] arrayForKey:@"configuredEncoders"];
@@ -147,6 +220,7 @@ static EncoderManager *sSharedEncoderManager				= nil;
 	NSPredicate *selectedEncodersPredicate = [NSPredicate predicateWithFormat:@"%K == 1", kEncoderSelectedKey];
 	return [self.configuredEncoders filteredArrayUsingPredicate:selectedEncodersPredicate];
 }
+#endif
 
 - (BOOL) encodeURL:(NSURL *)inputURL extractionRecord:(ExtractionRecord *)extractionRecord error:(NSError **)error
 {

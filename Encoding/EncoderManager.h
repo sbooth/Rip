@@ -10,8 +10,6 @@
 // ========================================
 extern NSString * const		kEncoderBundleKey; // NSBundle *
 extern NSString * const		kEncoderSettingsKey; // NSDictionary *
-extern NSString * const		kEncoderNicknameKey; // NSString *
-extern NSString * const		kEncoderSelectedKey; // NSNumber *
 
 @class ExtractionRecord;
 
@@ -21,19 +19,30 @@ extern NSString * const		kEncoderSelectedKey; // NSNumber *
 	NSOperationQueue *_queue;
 }
 
-// Returns an array of NSBundle * objects whose principalClasse implement the EncoderInterface protocol
-@property (readonly) NSArray * availableEncoders;
-
 // Returns an array of NSDictionary * for all encoders the user has configured
-@property (readonly) NSArray * configuredEncoders;
+//@property (readonly) NSArray * configuredEncoders;
 
 // Returns an array of NSDictionary * for all encoders the user has configured and selected
-@property (readonly) NSArray * selectedEncoders;
+//@property (readonly) NSArray * selectedEncoders;
 
-@property (readonly) NSOperationQueue * queue; 
+//@property (readonly) NSOperationQueue * queue; 
 
+// ========================================
+// Returns an array of NSBundle * objects whose principalClasses implement the EncoderInterface protocol
+@property (readonly) NSArray * availableEncoders;
+
+// ========================================
+// Returns an NSBundle * object corresponding to the user's default encoder
+@property (assign) NSBundle * defaultEncoder;
+
+// ========================================
 // The shared instance
 + (id) sharedEncoderManager;
+
+// ========================================
+// Access to stored encoder settings
+- (NSDictionary *) settingsForEncoder:(NSBundle *)encoder;
+- (void) storeSettings:(NSDictionary *)encoderSettings forEncoder:(NSBundle *)encoder;
 
 // Queue an encoding request
 - (BOOL) encodeURL:(NSURL *)inputURL extractionRecord:(ExtractionRecord *)extractionRecord error:(NSError **)error;
