@@ -9,7 +9,7 @@
 
 - (NSString *) stringForObjectValue:(id)anObject
 {
-	if(nil == anObject || ! [anObject respondsToSelector:@selector(integerValue)])
+	if(!anObject || ![anObject respondsToSelector:@selector(integerValue)])
 		return nil;
 	
 	if([anObject integerValue])
