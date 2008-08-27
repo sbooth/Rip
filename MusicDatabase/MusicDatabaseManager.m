@@ -24,7 +24,7 @@ static MusicDatabaseManager *sSharedMusicDatabaseManager	= nil;
 + (id) sharedMusicDatabaseManager
 {
 	if(!sSharedMusicDatabaseManager)
-		sSharedMusicDatabaseManager = [[MusicDatabaseManager alloc] init];
+		sSharedMusicDatabaseManager = [[self alloc] init];
 	return sSharedMusicDatabaseManager;
 }
 
@@ -48,6 +48,68 @@ static MusicDatabaseManager *sSharedMusicDatabaseManager	= nil;
 		bundle = [self.availableMusicDatabases lastObject];
 	
 	return bundle;
+}
+
+- (void) setDefaultMusicDatabase:(NSBundle *)musicDatabase
+{
+	NSParameterAssert(nil != musicDatabase);
+	
+	// Verify this is a valid music database
+	if(![self.availableMusicDatabases containsObject:musicDatabase])
+		return;
+	
+	// Set this as the default music database
+	NSString *bundleIdentifier = [musicDatabase bundleIdentifier];
+	[[NSUserDefaults standardUserDefaults] setObject:bundleIdentifier forKey:@"defaultMusicDatabase"];
+
+	// If no settings are present for this music database, store the defaults
+	if(![[NSUserDefaults standardUserDefaults] dictionaryForKey:bundleIdentifier]) {
+		// Instantiate the music database interface
+		id <MusicDatabaseInterface> musicDatabaseInterface = [[[musicDatabase principalClass] alloc] init];
+		
+		// Grab the music database's settings dictionary
+		[[NSUserDefaults standardUserDefaults] setObject:[musicDatabaseInterface defaultSettings] forKey:bundleIdentifier];
+	}
+}
+
+- (NSDictionary *) settingsForMusicDatabase:(NSBundle *)musicDatabase
+{
+	NSParameterAssert(nil != musicDatabase);
+	
+	// Verify this is a valid music database
+	if(![self.availableMusicDatabases containsObject:musicDatabase])
+		return nil;
+
+	NSString *bundleIdentifier = [musicDatabase bundleIdentifier];
+	NSDictionary *musicDatabaseSettings = [[NSUserDefaults standardUserDefaults] dictionaryForKey:bundleIdentifier];
+	
+	// If no settings are present for this music database, use the defaults
+	if(!musicDatabaseSettings) {
+		// Instantiate the music database interface
+		id <MusicDatabaseInterface> musicDatabaseInterface = [[[musicDatabase principalClass] alloc] init];
+		
+		// Grab the music database's settings dictionary
+		musicDatabaseSettings = [musicDatabaseInterface defaultSettings];
+		
+		// Store the defaults
+		if(musicDatabaseSettings)
+			[[NSUserDefaults standardUserDefaults] setObject:musicDatabaseSettings forKey:bundleIdentifier];
+	}
+
+	return musicDatabaseSettings;
+}
+
+- (void) storeSettings:(NSDictionary *)musicDatabaseSettings forMusicDatabase:(NSBundle *)musicDatabase
+{
+	NSParameterAssert(nil != musicDatabaseSettings);
+	NSParameterAssert(nil != musicDatabase);
+	
+	// Verify this is a valid music database
+	if(![self.availableMusicDatabases containsObject:musicDatabase])
+		return;
+
+	NSString *bundleIdentifier = [musicDatabase bundleIdentifier];
+	[[NSUserDefaults standardUserDefaults] setObject:musicDatabaseSettings forKey:bundleIdentifier];
 }
 
 @end

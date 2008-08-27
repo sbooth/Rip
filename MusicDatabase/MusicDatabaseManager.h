@@ -15,13 +15,19 @@ extern NSString * const		kMusicDatabaseSettingsKey; // NSDictionary *
 {
 }
 
+// ========================================
 // Returns an array of NSBundle * objects whose principalClasses implement the MusicDatabaseInterface protocol
 @property (readonly) NSArray * availableMusicDatabases;
 
+// ========================================
 // Returns an NSBundle * object corresponding to the user's default music database
-@property (readonly) NSBundle * defaultMusicDatabase;
+@property (assign) NSBundle * defaultMusicDatabase;
 
+// ========================================
 // The shared instance
 + (id) sharedMusicDatabaseManager;
+
+- (NSDictionary *) settingsForMusicDatabase:(NSBundle *)musicDatabase;
+- (void) storeSettings:(NSDictionary *)musicDatabaseSettings forMusicDatabase:(NSBundle *)musicDatabase;
 
 @end

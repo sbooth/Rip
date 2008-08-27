@@ -10,8 +10,8 @@
 		328DE3F00E5F917300F5BD13 /* MusicDatabaseInterface.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 328DE36D0E5F8C3100F5BD13 /* MusicDatabaseInterface.framework */; };
 		328DE6630E5FDB8000F5BD13 /* FreeDBDatabaseInterface.m in Sources */ = {isa = PBXBuildFile; fileRef = 328DE6600E5FDB8000F5BD13 /* FreeDBDatabaseInterface.m */; };
 		328DE6640E5FDB8000F5BD13 /* FreeDBQueryOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 328DE6620E5FDB8000F5BD13 /* FreeDBQueryOperation.m */; };
-		328DE69E0E5FDE0E00F5BD13 /* cddb.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 328DE69D0E5FDE0E00F5BD13 /* cddb.framework */; };
-		328DE69F0E5FDE1500F5BD13 /* cddb.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 328DE69D0E5FDE0E00F5BD13 /* cddb.framework */; };
+		328DEA320E607BA800F5BD13 /* cddb.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 328DEA310E607BA800F5BD13 /* cddb.framework */; };
+		328DEA330E607BAE00F5BD13 /* cddb.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 328DEA310E607BA800F5BD13 /* cddb.framework */; };
 		8D5B49B0048680CD000E48DA /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C167DFE841241C02AAC07 /* InfoPlist.strings */; };
 		8D5B49B4048680CD000E48DA /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7ADFEA557BF11CA2CBB /* Cocoa.framework */; };
 /* End PBXBuildFile section */
@@ -40,7 +40,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				328DE69F0E5FDE1500F5BD13 /* cddb.framework in Copy Frameworks */,
+				328DEA330E607BAE00F5BD13 /* cddb.framework in Copy Frameworks */,
 			);
 			name = "Copy Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -58,7 +58,7 @@
 		328DE6610E5FDB8000F5BD13 /* FreeDBQueryOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FreeDBQueryOperation.h; sourceTree = "<group>"; };
 		328DE6620E5FDB8000F5BD13 /* FreeDBQueryOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FreeDBQueryOperation.m; sourceTree = "<group>"; };
 		328DE66D0E5FDC0500F5BD13 /* FreeDB_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FreeDB_Prefix.pch; sourceTree = "<group>"; };
-		328DE69D0E5FDE0E00F5BD13 /* cddb.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = cddb.framework; path = ../../Frameworks/cddb.framework; sourceTree = SOURCE_ROOT; };
+		328DEA310E607BA800F5BD13 /* cddb.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = cddb.framework; path = ../../Frameworks/cddb.framework; sourceTree = SOURCE_ROOT; };
 		8D5B49B6048680CD000E48DA /* FreeDB.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FreeDB.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
 		8D5B49B7048680CD000E48DA /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D2F7E65807B2D6F200F64583 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = /System/Library/Frameworks/CoreData.framework; sourceTree = "<absolute>"; };
@@ -71,7 +71,7 @@
 			files = (
 				328DE3F00E5F917300F5BD13 /* MusicDatabaseInterface.framework in Frameworks */,
 				8D5B49B4048680CD000E48DA /* Cocoa.framework in Frameworks */,
-				328DE69E0E5FDE0E00F5BD13 /* cddb.framework in Frameworks */,
+				328DEA320E607BA800F5BD13 /* cddb.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -93,7 +93,7 @@
 		089C1671FE841209C02AAC07 /* Frameworks and Libraries */ = {
 			isa = PBXGroup;
 			children = (
-				328DE69D0E5FDE0E00F5BD13 /* cddb.framework */,
+				328DEA310E607BA800F5BD13 /* cddb.framework */,
 				1058C7ACFEA557BF11CA2CBB /* Linked Frameworks */,
 				1058C7AEFEA557BF11CA2CBB /* Other Frameworks */,
 			);
@@ -278,7 +278,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = FreeDB_Prefix.pch;
 				INFOPLIST_FILE = Info.plist;
-				INSTALL_PATH = "$(HOME)/Library/Bundles";
+				INSTALL_PATH = "@executable_path/../PlugIns";
 				PRODUCT_NAME = FreeDB;
 				WRAPPER_EXTENSION = bundle;
 			};
@@ -298,7 +298,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = FreeDB_Prefix.pch;
 				INFOPLIST_FILE = Info.plist;
-				INSTALL_PATH = "$(HOME)/Library/Bundles";
+				INSTALL_PATH = "@executable_path/../PlugIns";
 				PRODUCT_NAME = FreeDB;
 				WRAPPER_EXTENSION = bundle;
 			};

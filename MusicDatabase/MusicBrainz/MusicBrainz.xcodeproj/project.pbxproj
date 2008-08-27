@@ -8,10 +8,10 @@
 
 /* Begin PBXBuildFile section */
 		328DE35F0E5F8C0300F5BD13 /* MusicBrainzQueryOperation.mm in Sources */ = {isa = PBXBuildFile; fileRef = 328DE35E0E5F8C0300F5BD13 /* MusicBrainzQueryOperation.mm */; };
-		328DE3810E5F8EE500F5BD13 /* musicbrainz3.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 328DE3800E5F8EE500F5BD13 /* musicbrainz3.framework */; };
-		328DE3830E5F8F0A00F5BD13 /* musicbrainz3.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 328DE3800E5F8EE500F5BD13 /* musicbrainz3.framework */; };
 		328DE3F00E5F917300F5BD13 /* MusicDatabaseInterface.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 328DE36D0E5F8C3100F5BD13 /* MusicDatabaseInterface.framework */; };
 		328DE4A50E5FBED700F5BD13 /* MusicBrainzDatabaseInterface.m in Sources */ = {isa = PBXBuildFile; fileRef = 328DE4A40E5FBED700F5BD13 /* MusicBrainzDatabaseInterface.m */; };
+		328DEA620E607C7D00F5BD13 /* musicbrainz3.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 328DEA600E607C7D00F5BD13 /* musicbrainz3.framework */; };
+		328DEA640E607C8400F5BD13 /* musicbrainz3.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 328DEA600E607C7D00F5BD13 /* musicbrainz3.framework */; };
 		8D5B49B0048680CD000E48DA /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C167DFE841241C02AAC07 /* InfoPlist.strings */; };
 		8D5B49B4048680CD000E48DA /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7ADFEA557BF11CA2CBB /* Cocoa.framework */; };
 /* End PBXBuildFile section */
@@ -40,7 +40,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				328DE3830E5F8F0A00F5BD13 /* musicbrainz3.framework in Copy Frameworks */,
+				328DEA640E607C8400F5BD13 /* musicbrainz3.framework in Copy Frameworks */,
 			);
 			name = "Copy Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -55,9 +55,9 @@
 		328DE35D0E5F8C0300F5BD13 /* MusicBrainzQueryOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MusicBrainzQueryOperation.h; sourceTree = "<group>"; };
 		328DE35E0E5F8C0300F5BD13 /* MusicBrainzQueryOperation.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MusicBrainzQueryOperation.mm; sourceTree = "<group>"; };
 		328DE3680E5F8C3100F5BD13 /* MusicDatabaseInterface.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = MusicDatabaseInterface.xcodeproj; path = ../MusicDatabaseInterface/MusicDatabaseInterface.xcodeproj; sourceTree = SOURCE_ROOT; };
-		328DE3800E5F8EE500F5BD13 /* musicbrainz3.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = musicbrainz3.framework; path = ../../Frameworks/musicbrainz3.framework; sourceTree = SOURCE_ROOT; };
 		328DE4A30E5FBED700F5BD13 /* MusicBrainzDatabaseInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MusicBrainzDatabaseInterface.h; sourceTree = "<group>"; };
 		328DE4A40E5FBED700F5BD13 /* MusicBrainzDatabaseInterface.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MusicBrainzDatabaseInterface.m; sourceTree = "<group>"; };
+		328DEA600E607C7D00F5BD13 /* musicbrainz3.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = musicbrainz3.framework; path = ../../Frameworks/musicbrainz3.framework; sourceTree = SOURCE_ROOT; };
 		32DBCF630370AF2F00C91783 /* MusicBrainz_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MusicBrainz_Prefix.pch; sourceTree = "<group>"; };
 		8D5B49B6048680CD000E48DA /* MusicBrainz.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MusicBrainz.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
 		8D5B49B7048680CD000E48DA /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -71,7 +71,7 @@
 			files = (
 				328DE3F00E5F917300F5BD13 /* MusicDatabaseInterface.framework in Frameworks */,
 				8D5B49B4048680CD000E48DA /* Cocoa.framework in Frameworks */,
-				328DE3810E5F8EE500F5BD13 /* musicbrainz3.framework in Frameworks */,
+				328DEA620E607C7D00F5BD13 /* musicbrainz3.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -93,7 +93,7 @@
 		089C1671FE841209C02AAC07 /* Frameworks and Libraries */ = {
 			isa = PBXGroup;
 			children = (
-				328DE3800E5F8EE500F5BD13 /* musicbrainz3.framework */,
+				328DEA600E607C7D00F5BD13 /* musicbrainz3.framework */,
 				1058C7ACFEA557BF11CA2CBB /* Linked Frameworks */,
 				1058C7AEFEA557BF11CA2CBB /* Other Frameworks */,
 			);
