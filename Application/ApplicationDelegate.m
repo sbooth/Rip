@@ -106,6 +106,23 @@ diskDisappearedCallback(DADiskRef disk, void *context)
 	return NO;
 }
 
+- (void) applicationWillFinishLaunching:(NSNotification *)aNotification
+{
+	
+#pragma unused(aNotification)
+	
+	// Register reasonable defaults for most preferences
+	NSMutableDictionary *defaultsDictionary = [NSMutableDictionary dictionary];
+
+	NSURL *musicFolderURL = [NSURL URLWithString:[@"~/Music" stringByExpandingTildeInPath]];
+	[defaultsDictionary setObject:[NSArchiver archivedDataWithRootObject:musicFolderURL] forKey:@"outputDirectory"];
+
+	[defaultsDictionary setObject:@"org.sbooth.Rip.MusicDatabase.MusicBrainz" forKey:@"defaultMusicDatabase"];
+	[defaultsDictionary setObject:@"org.sbooth.Rip.Encoder.FLAC" forKey:@"defaultEncoder"];
+	
+	[[NSUserDefaults standardUserDefaults] registerDefaults:defaultsDictionary];
+}
+
 - (void) applicationDidFinishLaunching:(NSNotification *)aNotification
 {
 
@@ -250,7 +267,7 @@ diskDisappearedCallback(DADiskRef disk, void *context)
 
 - (NSManagedObjectModel *) managedObjectModel
 {
-	if(nil == _managedObjectModel)
+	if(!_managedObjectModel)
 		self.managedObjectModel = [NSManagedObjectModel mergedModelFromBundles:nil];
 
 	return _managedObjectModel;
@@ -426,7 +443,7 @@ diskDisappearedCallback(DADiskRef disk, void *context)
 	NSDictionary *licenseDictionary = [licenseValidator dictionaryForLicenseFile:licenseURL.path];
 
 	// This is an invalid license
-	if(nil == licenseDictionary) {
+	if(!licenseDictionary) {
 		if(error) {
 			NSMutableDictionary *userInfo = [NSMutableDictionary dictionary];
 			[userInfo setObject:licenseURL.path forKey:NSFilePathErrorKey];
