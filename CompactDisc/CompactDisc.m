@@ -148,7 +148,7 @@ static NSInteger calculateFreeDBDiscIDForCDTOC(CDTOC *toc)
 	
 	NSError *error = nil;
 	NSArray *matchingDiscs = [managedObjectContext executeFetchRequest:fetchRequest error:&error];
-	if(nil == matchingDiscs) {
+	if(!matchingDiscs) {
 		// TODO: Deal with error...
 		[[NSApplication sharedApplication] presentError:error];
 		
@@ -220,7 +220,7 @@ static NSInteger calculateFreeDBDiscIDForCDTOC(CDTOC *toc)
 	
 	// For multi-session discs only the first session is used to calculate the MusicBrainz disc ID
 	SessionDescriptor *firstSession = self.firstSession;
-	if(nil == firstSession)
+	if(!firstSession)
 		return nil;
 	
 	// zero is lead out
@@ -247,7 +247,7 @@ static NSInteger calculateFreeDBDiscIDForCDTOC(CDTOC *toc)
 	
 	// Use the first session
 	SessionDescriptor *firstSession = self.firstSession;
-	if(nil == firstSession)
+	if(!firstSession)
 		return nil;
 
 	NSSet *tracks = firstSession.tracks;
@@ -268,7 +268,7 @@ static NSInteger calculateFreeDBDiscIDForCDTOC(CDTOC *toc)
 
 	// Use the first session
 	SessionDescriptor *firstSession = self.firstSession;
-	if(nil == firstSession)
+	if(!firstSession)
 		return nil;
 
 	NSSet *tracks = firstSession.tracks;
