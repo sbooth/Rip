@@ -96,7 +96,7 @@ static MusicDatabaseManager *sSharedMusicDatabaseManager	= nil;
 			[[NSUserDefaults standardUserDefaults] setObject:musicDatabaseSettings forKey:bundleIdentifier];
 	}
 
-	return musicDatabaseSettings;
+	return [musicDatabaseSettings copy];
 }
 
 - (void) storeSettings:(NSDictionary *)musicDatabaseSettings forMusicDatabase:(NSBundle *)musicDatabase

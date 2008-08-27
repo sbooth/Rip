@@ -27,6 +27,8 @@ extern NSString * const		kMusicDatabaseSettingsKey; // NSDictionary *
 // The shared instance
 + (id) sharedMusicDatabaseManager;
 
+// ========================================
+// Access to stored music database settings
 - (NSDictionary *) settingsForMusicDatabase:(NSBundle *)musicDatabase;
 - (void) storeSettings:(NSDictionary *)musicDatabaseSettings forMusicDatabase:(NSBundle *)musicDatabase;
 
