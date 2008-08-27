@@ -54,7 +54,7 @@
 												  sessionTracks.count,
 												  accurateRipID1,
 												  accurateRipID2,
-												  compactDisc.discID.integerValue]];
+												  compactDisc.freeDBDiscID.integerValue]];
 	
 	// Create a request for the URL with a 2 minute timeout
 	NSURLRequest *request = [NSURLRequest requestWithURL:accurateRipURL
@@ -66,7 +66,7 @@
 	NSData *accurateRipResponseData = [NSURLConnection sendSynchronousRequest:request 
 															returningResponse:&accurateRipResponse 
 																		error:&error];
-	if(nil == accurateRipResponseData) {
+	if(!accurateRipResponseData) {
 		self.error = error;
 		return;
 	}
@@ -102,7 +102,7 @@
 	[accurateRipResponseData getBytes:&arFreeDBID range:NSMakeRange(9, 4)];
 	arFreeDBID = OSSwapLittleToHostInt32(arFreeDBID);
 
-	if(arTrackCount != orderedTracks.count || arDiscID1 != accurateRipID1 || arDiscID2 != accurateRipID2 || arFreeDBID != compactDisc.discID.intValue) {
+	if(arTrackCount != orderedTracks.count || arDiscID1 != accurateRipID1 || arDiscID2 != accurateRipID2 || arFreeDBID != compactDisc.freeDBDiscID.intValue) {
 
 #if DEBUG
 		NSLog(@"AccurateRip track count or disc IDs don't match.");
