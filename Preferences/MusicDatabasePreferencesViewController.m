@@ -12,7 +12,10 @@
 
 - (id) init
 {
-	return [super initWithNibName:@"MusicDatabasePreferencesView" bundle:nil];
+	if((self = [super initWithNibName:@"MusicDatabasePreferencesView" bundle:nil]))
+		self.title = NSLocalizedString(@"Metadata", @"The name of the music databases preference pane");
+	
+	return self;
 }
 
 - (void) awakeFromNib

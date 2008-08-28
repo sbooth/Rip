@@ -12,21 +12,73 @@
 
 - (id) init
 {
-	return [super initWithNibName:@"EncoderPreferencesView" bundle:nil];
+	if((self = [super initWithNibName:@"EncoderPreferencesView" bundle:nil]))
+		self.title = NSLocalizedString(@"Encoders", @"The name of the encoders preference pane");
+	
+	return self;
 }
 
 - (void) awakeFromNib
 {
 	// Determine the default encoder
-	NSString *bundleIdentifier = [[NSUserDefaults standardUserDefaults] stringForKey:@"defaultEncoder"];
-	NSBundle *bundle = [NSBundle bundleWithIdentifier:bundleIdentifier];
-	
-	// Ensure it is the selected object
+	NSBundle *bundle = [[EncoderManager sharedEncoderManager] defaultEncoder];	
 	NSPredicate *predicate = [NSPredicate predicateWithFormat:@"encoderBundle == %@", bundle];
 	NSArray *matchingBundles = [_encoderArrayController.arrangedObjects filteredArrayUsingPredicate:predicate];
 	
 	if(matchingBundles)
-		[_encoderArrayController setSelectedObjects:matchingBundles];	
+		[_encoderArrayController setSelectedObjects:matchingBundles];
+	
+	// Determine which encoder bundle we are working with
+	NSDictionary *encoderDictionary = [_encoderArrayController.selectedObjects lastObject];	
+	NSBundle *encoderBundle = [encoderDictionary objectForKey:@"encoderBundle"];
+	
+	// If the bundle wasn't found, display an appropriate error
+	if(!encoderBundle) {
+		NSError *missingBundleError = [NSError errorWithDomain:NSCocoaErrorDomain code:ENOENT userInfo:nil];
+		[[NSApplication sharedApplication] presentError:missingBundleError];
+		return;
+	}
+	
+	EncoderManager *encoderManager = [EncoderManager sharedEncoderManager];
+	
+	Class encoderClass = [encoderBundle principalClass];
+	NSObject <EncoderInterface> *encoderInterface = [[encoderClass alloc] init];
+	
+	// The encoder's view controller uses the representedObject property to hold the encoder settings
+	_encoderSettingsViewController = [encoderInterface configurationViewController];
+	
+	NSDictionary *encoderSettings = [encoderManager settingsForEncoder:encoderBundle];
+	[_encoderSettingsViewController setRepresentedObject:[encoderSettings mutableCopy]];
+	
+	// Adjust two view sizes to accomodate the encoder's settings view:
+	//  1. The frame belonging to self.view
+	//  2. The frame belonging to _encoderSettingsView
+	
+	// Calculate the difference between the current and target encoder settings view sizes
+	NSRect currentEncoderSettingsViewFrame = [_encoderSettingsView frame];
+	NSRect targetEncoderSettingsViewFrame = [_encoderSettingsViewController.view frame];
+	
+	// The frames of both views will be adjusted by the following dimensions
+	CGFloat viewDeltaX = targetEncoderSettingsViewFrame.size.width - currentEncoderSettingsViewFrame.size.width;
+	CGFloat viewDeltaY = targetEncoderSettingsViewFrame.size.height - currentEncoderSettingsViewFrame.size.height;
+	
+	NSRect newEncoderSettingsViewFrame = currentEncoderSettingsViewFrame;
+	
+	newEncoderSettingsViewFrame.size.width += viewDeltaX;
+	newEncoderSettingsViewFrame.size.height += viewDeltaY;
+	
+	NSRect currentViewFrame = [self.view frame];
+	NSRect newViewFrame = currentViewFrame;
+	
+	newViewFrame.size.width += viewDeltaX;
+	newViewFrame.size.height += viewDeltaY;
+
+	// Set the new sizes
+	[self.view setFrame:newViewFrame];
+	[_encoderSettingsView setFrame:newEncoderSettingsViewFrame];
+	
+	// Now that the sizes are correct, add the view controller's view to the view hierarchy
+	[_encoderSettingsView addSubview:_encoderSettingsViewController.view];
 }
 
 - (NSArray *) availableEncoders
@@ -41,8 +93,8 @@
 		
 		NSString *encoderName = [encoderBundle objectForInfoDictionaryKey:@"EncoderName"];
 		NSString *encoderVersion = [encoderBundle objectForInfoDictionaryKey:@"EncoderVersion"];
-		//		NSString *encoderIconName = [encoderBundle objectForInfoDictionaryKey:@"EncoderIcon"];
-		//		NSImage *encoderIcon = [NSImage imageNamed:encoderIconName];
+		NSString *encoderIconName = [encoderBundle objectForInfoDictionaryKey:@"EncoderIcon"];
+		NSImage *encoderIcon = [NSImage imageNamed:encoderIconName];
 		
 		[encoderDictionary setObject:encoderBundle forKey:@"encoderBundle"];
 		
@@ -50,8 +102,8 @@
 			[encoderDictionary setObject:encoderName forKey:@"encoderName"];
 		if(encoderVersion)
 			[encoderDictionary setObject:encoderVersion forKey:@"encoderVersion"];
-		//		if(encoderIcon)
-		//			[encoderDictionary setObject:encoderIcon forKey:@"encoderIcon"];			
+		if(encoderIcon)
+			[encoderDictionary setObject:encoderIcon forKey:@"encoderIcon"];			
 		
 		[encoders addObject:encoderDictionary];
 	}
@@ -63,89 +115,78 @@
 {
 	
 #pragma unused(sender)
-	
-	// Determine which encoder bundle we are working with
-	NSDictionary *encoderDictionary = [_encoderArrayController.selectedObjects lastObject];	
-	NSBundle *encoderBundle = [encoderDictionary objectForKey:@"encoderBundle"];
-	NSString *bundleIdentifier = [encoderBundle bundleIdentifier];
-	
-	// Set this as the default encoder
-	[[NSUserDefaults standardUserDefaults] setObject:bundleIdentifier forKey:@"defaultEncoder"];
-	
-	// If no settings are present for this encoder, store the defaults
-	if(![[NSUserDefaults standardUserDefaults] dictionaryForKey:bundleIdentifier]) {
-		// Instantiate the encoder interface
-		id <EncoderInterface> encoderInterface = [[[encoderBundle principalClass] alloc] init];
 		
-		// Grab the encoder's settings dictionary
-		[[NSUserDefaults standardUserDefaults] setObject:[encoderInterface defaultSettings] forKey:bundleIdentifier];
-	}
-}
-
-- (IBAction) editEncoderSettings:(id)sender
-{
-	
-#pragma unused(sender)
-	
 	// Determine which encoder bundle we are working with
 	NSDictionary *encoderDictionary = [_encoderArrayController.selectedObjects lastObject];	
 	NSBundle *encoderBundle = [encoderDictionary objectForKey:@"encoderBundle"];
 	
-	// Instantiate the encoder interface
-	id <EncoderInterface> encoderInterface = [[[encoderBundle principalClass] alloc] init];
-	
-	// Grab the encoder's settings dictionary
-	NSString *bundleIdentifier = [encoderBundle bundleIdentifier];
-	NSDictionary *encoderSettings = [[NSUserDefaults standardUserDefaults] dictionaryForKey:bundleIdentifier];
-	if(!encoderSettings)
-		encoderSettings = [encoderInterface defaultSettings];
-	
-	// The encoder's view controller uses the representedObject property to hold the encoder settings
-	NSViewController *encoderSettingsViewController = [encoderInterface configurationViewController];
-	[encoderSettingsViewController setRepresentedObject:[encoderSettings mutableCopy]];
-	
-	// If there is nothing to configure, avoid showing an empty window
-	if(!encoderSettingsViewController) {
-		NSBeep();
+	// If the bundle wasn't found, display an appropriate error
+	if(!encoderBundle) {
+		NSError *missingBundleError = [NSError errorWithDomain:NSCocoaErrorDomain code:ENOENT userInfo:nil];
+		[[NSApplication sharedApplication] presentError:missingBundleError];
 		return;
 	}
-	
-	// Create the sheet which will display the encoder settings and assign the encoder-specific view
-	EncoderSettingsSheetController *encoderSettingsSheetController = [[EncoderSettingsSheetController alloc] init];
-	encoderSettingsSheetController.settingsViewController = encoderSettingsViewController;
-	
-	// Show the sheet
-	[[NSApplication sharedApplication] beginSheet:encoderSettingsSheetController.window
-								   modalForWindow:[[self view] window]
-									modalDelegate:self
-								   didEndSelector:@selector(encoderSettingsSheetDidEnd:returnCode:contextInfo:)
-									  contextInfo:encoderSettingsSheetController];
-}
 
-@end
+	EncoderManager *encoderManager = [EncoderManager sharedEncoderManager];
+	
+	// Remove any encoder settings subviews that are currently being displayed and save the settings
+	if(_encoderSettingsViewController) {
+		[_encoderSettingsViewController.view removeFromSuperview];
+		encoderManager.defaultEncoderSettings = _encoderSettingsViewController.representedObject;
+	}
 
-@implementation EncoderPreferencesViewController (Callbacks)
+	// The newly selected encoder is now the default
+	encoderManager.defaultEncoder = encoderBundle;
+	
+	Class encoderClass = [encoderBundle principalClass];
+	NSObject <EncoderInterface> *encoderInterface = [[encoderClass alloc] init];
 
-- (void) encoderSettingsSheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode contextInfo:(void *)contextInfo
-{
-	NSParameterAssert(nil != sheet);
-	NSParameterAssert(NULL != contextInfo);
+	// The encoder's view controller uses the representedObject property to hold the encoder settings
+	_encoderSettingsViewController = [encoderInterface configurationViewController];
+
+	NSDictionary *encoderSettings = [encoderManager settingsForEncoder:encoderBundle];
+	[_encoderSettingsViewController setRepresentedObject:[encoderSettings mutableCopy]];
+
+	// Adjust three view sizes to accomodate the encoder's settings view:
+	//  1. The frame belonging to self.view
+	//  2. The frame belonging to _encoderSettingsView
+	//  3. The enclosing window's frame
 	
-	[sheet orderOut:self];
+	// Calculate the difference between the current and target encoder settings view sizes
+	NSRect currentEncoderSettingsViewFrame = [_encoderSettingsView frame];
+	NSRect targetEncoderSettingsViewFrame = [_encoderSettingsViewController.view frame];
+
+	// The frames of all views will be adjusted by the following dimensions
+	CGFloat viewDeltaX = targetEncoderSettingsViewFrame.size.width - currentEncoderSettingsViewFrame.size.width;
+	CGFloat viewDeltaY = targetEncoderSettingsViewFrame.size.height - currentEncoderSettingsViewFrame.size.height;
 	
-	EncoderSettingsSheetController *encoderSettingsSheetController = (EncoderSettingsSheetController *)contextInfo;
+	// Calculate the new window and view sizes
+	NSRect currentWindowFrame = [[[self view] window] frame];
+	NSRect newWindowFrame = currentWindowFrame;
 	
-	// Don't save settings if the cancel button was pressed
-	if(NSCancelButton == returnCode)
-		return;
+	newWindowFrame.origin.x -= viewDeltaX / 2;
+	newWindowFrame.origin.y -= viewDeltaY;
+	newWindowFrame.size.width += viewDeltaX;
+	newWindowFrame.size.height += viewDeltaY;
+
+	NSRect newEncoderSettingsViewFrame = currentEncoderSettingsViewFrame;
+
+	newEncoderSettingsViewFrame.size.width += viewDeltaX;
+	newEncoderSettingsViewFrame.size.height += viewDeltaY;
+
+	NSRect currentViewFrame = [self.view frame];
+	NSRect newViewFrame = currentViewFrame;
 	
-	// Determine which encoder plug-in bundle the settings belong to
-	NSDictionary *encoderSettings = encoderSettingsSheetController.settingsViewController.representedObject;
-	NSBundle *encoderBundle = [NSBundle bundleForClass:[encoderSettingsSheetController.settingsViewController class]];
-	NSString *bundleIdentifier = [encoderBundle bundleIdentifier];
+	newViewFrame.size.width += viewDeltaX;
+	newViewFrame.size.height += viewDeltaY;
 	
-	// Replace only the relevant encoder's settings in the defaults
-	[[NSUserDefaults standardUserDefaults] setObject:encoderSettings forKey:bundleIdentifier];
+	// Set the new sizes
+	[self.view setFrame:newViewFrame];
+	[_encoderSettingsView setFrame:newEncoderSettingsViewFrame];
+	[[[self view] window] setFrame:newWindowFrame display:YES animate:YES];
+	
+	// Now that the sizes are correct, add the view controller's view to the view hierarchy
+	[_encoderSettingsView addSubview:_encoderSettingsViewController.view];
 }
 
 @end

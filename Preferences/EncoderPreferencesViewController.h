@@ -8,11 +8,16 @@
 @interface EncoderPreferencesViewController : NSViewController
 {
 	IBOutlet NSArrayController *_encoderArrayController;
+	IBOutlet NSView *_encoderSettingsView;
+
+@private
+	NSViewController *_encoderSettingsViewController;
 }
+
+@property (readonly, assign) NSArray * availableEncoders;
 
 // ========================================
 // Action methods
 - (IBAction) selectDefaultEncoder:(id)sender;
-- (IBAction) editEncoderSettings:(id)sender;
 
 @end

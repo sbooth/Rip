@@ -9,7 +9,10 @@
 
 - (id) init
 {
-	return [super initWithNibName:@"GeneralPreferencesView" bundle:nil];
+	if((self = [super initWithNibName:@"GeneralPreferencesView" bundle:nil]))
+		self.title = NSLocalizedString(@"General", @"The name of the general preference pane");
+	
+	return self;
 }
 
 @end

@@ -36,11 +36,11 @@ static PreferencesWindowController *sSharedPreferencesWindowController = nil;
 	return [super initWithWindowNibName:@"PreferencesWindow"];
 }
 
-- (void) awakeFromNib
+- (void) windowDidLoad
 {
 	// Set up the toolbar
     NSToolbar *toolbar = [[NSToolbar alloc] initWithIdentifier:@"org.sbooth.Rip.Preferences.Toolbar"];
-
+	
     [toolbar setAllowsUserCustomization:NO];
     [toolbar setDelegate:self];
 	
@@ -48,7 +48,7 @@ static PreferencesWindowController *sSharedPreferencesWindowController = nil;
 	
 	// Determine which preference view to select
 	NSString *itemIdentifier = [[NSUserDefaults standardUserDefaults] stringForKey:@"selectedPreferencePane"];
-
+	
 	// If the item identifier is nil, fall back to a visible item
 	if(!itemIdentifier) {
 		if(nil != [toolbar visibleItems] && 0 != [[toolbar visibleItems] count])
@@ -62,7 +62,7 @@ static PreferencesWindowController *sSharedPreferencesWindowController = nil;
 	[self selectPreferencePaneWithIdentifier:itemIdentifier];
 	
 	// Center our window
-	[[self window] center];
+//	[[self window] center];
 }
 
 - (void) selectPreferencePaneWithIdentifier:(NSString *)itemIdentifier
@@ -73,7 +73,7 @@ static PreferencesWindowController *sSharedPreferencesWindowController = nil;
 	if(![[[[self window] toolbar] selectedItemIdentifier] isEqualToString:itemIdentifier])
 		[[[self window] toolbar] setSelectedItemIdentifier:itemIdentifier];
 	
-	// Remove any encoder settings subviews that are currently being displayed
+	// Remove any preference subviews that are currently being displayed
 	if(_preferencesViewController)
 		[_preferencesViewController.view removeFromSuperview];
 	
@@ -107,12 +107,18 @@ static PreferencesWindowController *sSharedPreferencesWindowController = nil;
 	[_preferencesView setFrame:newViewFrame];
 	
 	// Now that the sizes are correct, add the view controller's view to the view hierarchy
+#if 0
+	if([_preferencesViewController respondsToSelector:@selector(willAddViewToWindow:)])
+		[_preferencesViewController willAddViewToWindow:[self window]];
+#endif
 	[_preferencesView addSubview:_preferencesViewController.view];
+#if 0
+	if([_preferencesViewController respondsToSelector:@selector(didAddViewToWindow:)])
+		[_preferencesViewController didAddViewToWindow:[self window]];
+#endif
 	
 	// Set the window's title to the name of the preference view
-	[[self window] setTitle:[[self toolbar:[[self window] toolbar] 
-					 itemForItemIdentifier:itemIdentifier 
-				 willBeInsertedIntoToolbar:NO] label]];
+	[[self window] setTitle:[_preferencesViewController title]];
 	
 	// Save the selected pane
 	[[NSUserDefaults standardUserDefaults] setObject:itemIdentifier forKey:@"selectedPreferencePane"];	
