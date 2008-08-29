@@ -169,6 +169,18 @@ static EncoderManager *sSharedEncoderManager				= nil;
 	}
 }
 
+- (NSDictionary *) defaultEncoderSettings
+{
+	return [self settingsForEncoder:self.defaultEncoder];
+}
+
+- (void) setDefaultEncoderSettings:(NSDictionary *)encoderSettings
+{
+	NSParameterAssert(nil != encoderSettings);
+
+	[self storeSettings:encoderSettings forEncoder:self.defaultEncoder];
+}
+
 - (NSDictionary *) settingsForEncoder:(NSBundle *)encoder
 {
 	NSParameterAssert(nil != encoder);
@@ -207,6 +219,29 @@ static EncoderManager *sSharedEncoderManager				= nil;
 	
 	NSString *bundleIdentifier = [encoder bundleIdentifier];
 	[[NSUserDefaults standardUserDefaults] setObject:encoderSettings forKey:bundleIdentifier];
+}
+
+- (void) restoreDefaultSettingsForEncoder:(NSBundle *)encoder
+{
+	NSParameterAssert(nil != encoder);
+	
+	// Verify this is a valid encoder
+	if(![self.availableEncoders containsObject:encoder])
+		return;
+	
+	NSString *bundleIdentifier = [encoder bundleIdentifier];
+
+	// Instantiate the encoder interface
+	id <EncoderInterface> encoderInterface = [[[encoder principalClass] alloc] init];
+	
+	// Grab the encoder's settings dictionary
+	NSDictionary *encoderSettings = [encoderInterface defaultSettings];
+	
+	// Store the defaults
+	if(encoderSettings)
+		[[NSUserDefaults standardUserDefaults] setObject:encoderSettings forKey:bundleIdentifier];
+	else
+		[[NSUserDefaults standardUserDefaults] removeObjectForKey:bundleIdentifier];
 }
 
 #if 0

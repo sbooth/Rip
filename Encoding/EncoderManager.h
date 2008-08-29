@@ -34,6 +34,7 @@ extern NSString * const		kEncoderSettingsKey; // NSDictionary *
 // ========================================
 // Returns an NSBundle * object corresponding to the user's default encoder
 @property (assign) NSBundle * defaultEncoder;
+@property (assign) NSDictionary * defaultEncoderSettings;
 
 // ========================================
 // The shared instance
@@ -43,6 +44,7 @@ extern NSString * const		kEncoderSettingsKey; // NSDictionary *
 // Access to stored encoder settings
 - (NSDictionary *) settingsForEncoder:(NSBundle *)encoder;
 - (void) storeSettings:(NSDictionary *)encoderSettings forEncoder:(NSBundle *)encoder;
+- (void) restoreDefaultSettingsForEncoder:(NSBundle *)encoder;
 
 // Queue an encoding request
 - (BOOL) encodeURL:(NSURL *)inputURL extractionRecord:(ExtractionRecord *)extractionRecord error:(NSError **)error;
