@@ -12,17 +12,17 @@
 // ========================================
 // KVC key names for the metadata dictionaries
 // ========================================
-NSString * const	kAudioConverterConfigKey				= @"AudioConverter Configuration";
+NSString * const	kAudioConverterConfigKey				= @"AudioConverterConfiguration";
 NSString * const	kAudioFileTypeKey						= @"AudioFileTypeID";
 NSString * const	kStreamDescriptionKey					= @"AudioStreamBasicDescription";
-NSString * const	kMagicCookieKey							= @"Magic Cookie";
+NSString * const	kMagicCookieKey							= @"MagicCookie";
 
 @implementation CoreAudioEncodeOperation
 
 // Properties
 - (AudioFileTypeID) fileType
 {
-	NSNumber *fileType = [self.settings valueForKey:kAudioFileTypeKey];
+	NSNumber *fileType = [self.settings objectForKey:kAudioFileTypeKey];
 	return (AudioFileTypeID)fileType.integerValue;
 }
 
@@ -31,7 +31,7 @@ NSString * const	kMagicCookieKey							= @"Magic Cookie";
 	AudioStreamBasicDescription streamDescription;
 	memset(&streamDescription, 0, sizeof(streamDescription));
 	
-	NSData *streamDescriptionData = [self.settings valueForKey:kStreamDescriptionKey];
+	NSData *streamDescriptionData = [self.settings objectForKey:kStreamDescriptionKey];
 	if(streamDescriptionData)
 		[streamDescriptionData getBytes:&streamDescription length:sizeof(streamDescription)];
 	
