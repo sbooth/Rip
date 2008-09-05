@@ -11,6 +11,8 @@
 		328DE61D0E5FD89A00F5BD13 /* iTunesDatabaseInterface.m in Sources */ = {isa = PBXBuildFile; fileRef = 328DE61A0E5FD89A00F5BD13 /* iTunesDatabaseInterface.m */; };
 		328DE61E0E5FD89A00F5BD13 /* iTunesQueryOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 328DE61C0E5FD89A00F5BD13 /* iTunesQueryOperation.m */; };
 		328DE6F00E5FE04D00F5BD13 /* ScriptingBridge.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 328DE6EF0E5FE04D00F5BD13 /* ScriptingBridge.framework */; };
+		32AC71020E719070009A5E1B /* iTunesSettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 32AC71010E719070009A5E1B /* iTunesSettingsViewController.m */; };
+		32AC710C0E719109009A5E1B /* iTunesSettings.xib in Resources */ = {isa = PBXBuildFile; fileRef = 32AC710A0E719109009A5E1B /* iTunesSettings.xib */; };
 		8D5B49B0048680CD000E48DA /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C167DFE841241C02AAC07 /* InfoPlist.strings */; };
 		8D5B49B4048680CD000E48DA /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7ADFEA557BF11CA2CBB /* Cocoa.framework */; };
 /* End PBXBuildFile section */
@@ -44,6 +46,9 @@
 		328DE61B0E5FD89A00F5BD13 /* iTunesQueryOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iTunesQueryOperation.h; sourceTree = "<group>"; };
 		328DE61C0E5FD89A00F5BD13 /* iTunesQueryOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iTunesQueryOperation.m; sourceTree = "<group>"; };
 		328DE6EF0E5FE04D00F5BD13 /* ScriptingBridge.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ScriptingBridge.framework; path = System/Library/Frameworks/ScriptingBridge.framework; sourceTree = SDKROOT; };
+		32AC71000E719070009A5E1B /* iTunesSettingsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iTunesSettingsViewController.h; sourceTree = "<group>"; };
+		32AC71010E719070009A5E1B /* iTunesSettingsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iTunesSettingsViewController.m; sourceTree = "<group>"; };
+		32AC710B0E719109009A5E1B /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/iTunesSettings.xib; sourceTree = "<group>"; };
 		32DBCF630370AF2F00C91783 /* MusicBrainz_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MusicBrainz_Prefix.pch; sourceTree = "<group>"; };
 		8D5B49B6048680CD000E48DA /* iTunes.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = iTunes.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
 		8D5B49B7048680CD000E48DA /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -72,7 +77,6 @@
 				089C167CFE841241C02AAC07 /* Resources */,
 				089C1671FE841209C02AAC07 /* Frameworks and Libraries */,
 				19C28FB8FE9D52D311CA2CBB /* Products */,
-				328DE6EF0E5FE04D00F5BD13 /* ScriptingBridge.framework */,
 			);
 			name = MusicBrainz;
 			sourceTree = "<group>";
@@ -89,6 +93,7 @@
 		089C167CFE841241C02AAC07 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				32AC710A0E719109009A5E1B /* iTunesSettings.xib */,
 				8D5B49B7048680CD000E48DA /* Info.plist */,
 				089C167DFE841241C02AAC07 /* InfoPlist.strings */,
 			);
@@ -103,6 +108,8 @@
 				328DE61A0E5FD89A00F5BD13 /* iTunesDatabaseInterface.m */,
 				328DE61B0E5FD89A00F5BD13 /* iTunesQueryOperation.h */,
 				328DE61C0E5FD89A00F5BD13 /* iTunesQueryOperation.m */,
+				32AC71000E719070009A5E1B /* iTunesSettingsViewController.h */,
+				32AC71010E719070009A5E1B /* iTunesSettingsViewController.m */,
 			);
 			name = Classes;
 			sourceTree = "<group>";
@@ -110,6 +117,7 @@
 		1058C7ACFEA557BF11CA2CBB /* Linked Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				328DE6EF0E5FE04D00F5BD13 /* ScriptingBridge.framework */,
 				1058C7ADFEA557BF11CA2CBB /* Cocoa.framework */,
 			);
 			name = "Linked Frameworks";
@@ -211,6 +219,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				8D5B49B0048680CD000E48DA /* InfoPlist.strings in Resources */,
+				32AC710C0E719109009A5E1B /* iTunesSettings.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -223,6 +232,7 @@
 			files = (
 				328DE61D0E5FD89A00F5BD13 /* iTunesDatabaseInterface.m in Sources */,
 				328DE61E0E5FD89A00F5BD13 /* iTunesQueryOperation.m in Sources */,
+				32AC71020E719070009A5E1B /* iTunesSettingsViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -243,6 +253,14 @@
 				089C167EFE841241C02AAC07 /* English */,
 			);
 			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		32AC710A0E719109009A5E1B /* iTunesSettings.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				32AC710B0E719109009A5E1B /* English */,
+			);
+			name = iTunesSettings.xib;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */

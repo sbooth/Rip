@@ -196,7 +196,7 @@ cleanup:
 	CDMSF firstTrackMSF = CDConvertTrackNumberToMSF(firstTrackNumber, toc);
 	NSInteger discLengthInSeconds = ((leadOutMSF.minute * 60) + leadOutMSF.second) - ((firstTrackMSF.minute * 60) + firstTrackMSF.second);
 
-	cddb_disc_set_length(disc, discLengthInSeconds);
+	cddb_disc_set_length(disc, (unsigned int)discLengthInSeconds);
 	
 	return disc;
 }

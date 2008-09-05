@@ -5,7 +5,7 @@
 
 #import "iTunesDatabaseInterface.h"
 #import "iTunesQueryOperation.h"
-//#import "iTunesViewController.h"
+#import "iTunesSettingsViewController.h"
 
 @implementation iTunesDatabaseInterface
 
@@ -16,8 +16,7 @@
 
 - (NSViewController *) configurationViewController
 {
-//	return [[iTunesViewController alloc] init];
-	return nil;
+	return [[iTunesSettingsViewController alloc] init];
 }
 
 - (MusicDatabaseQueryOperation *) musicDatabaseQueryOperation

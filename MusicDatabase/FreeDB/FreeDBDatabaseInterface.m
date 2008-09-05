@@ -5,7 +5,7 @@
 
 #import "FreeDBDatabaseInterface.h"
 #import "FreeDBQueryOperation.h"
-//#import "FreeDBViewController.h"
+#import "FreeDBSettingsViewController.h"
 
 @implementation FreeDBDatabaseInterface
 
@@ -20,8 +20,7 @@
 
 - (NSViewController *) configurationViewController
 {
-//	return [[FreeDBViewController alloc] init];
-	return nil;
+	return [[FreeDBSettingsViewController alloc] init];
 }
 
 - (MusicDatabaseQueryOperation *) musicDatabaseQueryOperation

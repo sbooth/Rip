@@ -12,6 +12,8 @@
 		328DE6640E5FDB8000F5BD13 /* FreeDBQueryOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 328DE6620E5FDB8000F5BD13 /* FreeDBQueryOperation.m */; };
 		328DEA320E607BA800F5BD13 /* cddb.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 328DEA310E607BA800F5BD13 /* cddb.framework */; };
 		328DEA330E607BAE00F5BD13 /* cddb.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 328DEA310E607BA800F5BD13 /* cddb.framework */; };
+		32AC71260E7191DF009A5E1B /* FreeDBSettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 32AC71250E7191DF009A5E1B /* FreeDBSettingsViewController.m */; };
+		32AC71350E719246009A5E1B /* FreeDBSettings.xib in Resources */ = {isa = PBXBuildFile; fileRef = 32AC71330E719246009A5E1B /* FreeDBSettings.xib */; };
 		8D5B49B0048680CD000E48DA /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C167DFE841241C02AAC07 /* InfoPlist.strings */; };
 		8D5B49B4048680CD000E48DA /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7ADFEA557BF11CA2CBB /* Cocoa.framework */; };
 /* End PBXBuildFile section */
@@ -59,6 +61,9 @@
 		328DE6620E5FDB8000F5BD13 /* FreeDBQueryOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FreeDBQueryOperation.m; sourceTree = "<group>"; };
 		328DE66D0E5FDC0500F5BD13 /* FreeDB_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FreeDB_Prefix.pch; sourceTree = "<group>"; };
 		328DEA310E607BA800F5BD13 /* cddb.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = cddb.framework; path = ../../Frameworks/cddb.framework; sourceTree = SOURCE_ROOT; };
+		32AC71240E7191DF009A5E1B /* FreeDBSettingsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FreeDBSettingsViewController.h; sourceTree = "<group>"; };
+		32AC71250E7191DF009A5E1B /* FreeDBSettingsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FreeDBSettingsViewController.m; sourceTree = "<group>"; };
+		32AC71340E719246009A5E1B /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/FreeDBSettings.xib; sourceTree = "<group>"; };
 		8D5B49B6048680CD000E48DA /* FreeDB.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FreeDB.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
 		8D5B49B7048680CD000E48DA /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D2F7E65807B2D6F200F64583 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = /System/Library/Frameworks/CoreData.framework; sourceTree = "<absolute>"; };
@@ -103,6 +108,7 @@
 		089C167CFE841241C02AAC07 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				32AC71330E719246009A5E1B /* FreeDBSettings.xib */,
 				8D5B49B7048680CD000E48DA /* Info.plist */,
 				089C167DFE841241C02AAC07 /* InfoPlist.strings */,
 			);
@@ -116,6 +122,8 @@
 				328DE6600E5FDB8000F5BD13 /* FreeDBDatabaseInterface.m */,
 				328DE6610E5FDB8000F5BD13 /* FreeDBQueryOperation.h */,
 				328DE6620E5FDB8000F5BD13 /* FreeDBQueryOperation.m */,
+				32AC71240E7191DF009A5E1B /* FreeDBSettingsViewController.h */,
+				32AC71250E7191DF009A5E1B /* FreeDBSettingsViewController.m */,
 			);
 			name = Classes;
 			sourceTree = "<group>";
@@ -225,6 +233,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				8D5B49B0048680CD000E48DA /* InfoPlist.strings in Resources */,
+				32AC71350E719246009A5E1B /* FreeDBSettings.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -237,6 +246,7 @@
 			files = (
 				328DE6630E5FDB8000F5BD13 /* FreeDBDatabaseInterface.m in Sources */,
 				328DE6640E5FDB8000F5BD13 /* FreeDBQueryOperation.m in Sources */,
+				32AC71260E7191DF009A5E1B /* FreeDBSettingsViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -257,6 +267,14 @@
 				089C167EFE841241C02AAC07 /* English */,
 			);
 			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		32AC71330E719246009A5E1B /* FreeDBSettings.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				32AC71340E719246009A5E1B /* English */,
+			);
+			name = FreeDBSettings.xib;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */

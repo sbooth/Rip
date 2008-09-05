@@ -12,6 +12,8 @@
 		328DE4A50E5FBED700F5BD13 /* MusicBrainzDatabaseInterface.m in Sources */ = {isa = PBXBuildFile; fileRef = 328DE4A40E5FBED700F5BD13 /* MusicBrainzDatabaseInterface.m */; };
 		328DEA620E607C7D00F5BD13 /* musicbrainz3.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 328DEA600E607C7D00F5BD13 /* musicbrainz3.framework */; };
 		328DEA640E607C8400F5BD13 /* musicbrainz3.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 328DEA600E607C7D00F5BD13 /* musicbrainz3.framework */; };
+		32AC71650E7192F0009A5E1B /* MusicBrainzSettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 32AC71640E7192F0009A5E1B /* MusicBrainzSettingsViewController.m */; };
+		32AC71740E71934C009A5E1B /* MusicBrainzSettings.xib in Resources */ = {isa = PBXBuildFile; fileRef = 32AC71720E71934C009A5E1B /* MusicBrainzSettings.xib */; };
 		8D5B49B0048680CD000E48DA /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C167DFE841241C02AAC07 /* InfoPlist.strings */; };
 		8D5B49B4048680CD000E48DA /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7ADFEA557BF11CA2CBB /* Cocoa.framework */; };
 /* End PBXBuildFile section */
@@ -58,6 +60,9 @@
 		328DE4A30E5FBED700F5BD13 /* MusicBrainzDatabaseInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MusicBrainzDatabaseInterface.h; sourceTree = "<group>"; };
 		328DE4A40E5FBED700F5BD13 /* MusicBrainzDatabaseInterface.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MusicBrainzDatabaseInterface.m; sourceTree = "<group>"; };
 		328DEA600E607C7D00F5BD13 /* musicbrainz3.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = musicbrainz3.framework; path = ../../Frameworks/musicbrainz3.framework; sourceTree = SOURCE_ROOT; };
+		32AC71630E7192F0009A5E1B /* MusicBrainzSettingsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MusicBrainzSettingsViewController.h; sourceTree = "<group>"; };
+		32AC71640E7192F0009A5E1B /* MusicBrainzSettingsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MusicBrainzSettingsViewController.m; sourceTree = "<group>"; };
+		32AC71730E71934C009A5E1B /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/MusicBrainzSettings.xib; sourceTree = "<group>"; };
 		32DBCF630370AF2F00C91783 /* MusicBrainz_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MusicBrainz_Prefix.pch; sourceTree = "<group>"; };
 		8D5B49B6048680CD000E48DA /* MusicBrainz.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MusicBrainz.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
 		8D5B49B7048680CD000E48DA /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -103,6 +108,7 @@
 		089C167CFE841241C02AAC07 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				32AC71720E71934C009A5E1B /* MusicBrainzSettings.xib */,
 				8D5B49B7048680CD000E48DA /* Info.plist */,
 				089C167DFE841241C02AAC07 /* InfoPlist.strings */,
 			);
@@ -116,6 +122,8 @@
 				328DE35E0E5F8C0300F5BD13 /* MusicBrainzQueryOperation.mm */,
 				328DE4A30E5FBED700F5BD13 /* MusicBrainzDatabaseInterface.h */,
 				328DE4A40E5FBED700F5BD13 /* MusicBrainzDatabaseInterface.m */,
+				32AC71630E7192F0009A5E1B /* MusicBrainzSettingsViewController.h */,
+				32AC71640E7192F0009A5E1B /* MusicBrainzSettingsViewController.m */,
 			);
 			name = Classes;
 			sourceTree = "<group>";
@@ -225,6 +233,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				8D5B49B0048680CD000E48DA /* InfoPlist.strings in Resources */,
+				32AC71740E71934C009A5E1B /* MusicBrainzSettings.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -237,6 +246,7 @@
 			files = (
 				328DE35F0E5F8C0300F5BD13 /* MusicBrainzQueryOperation.mm in Sources */,
 				328DE4A50E5FBED700F5BD13 /* MusicBrainzDatabaseInterface.m in Sources */,
+				32AC71650E7192F0009A5E1B /* MusicBrainzSettingsViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -257,6 +267,14 @@
 				089C167EFE841241C02AAC07 /* English */,
 			);
 			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		32AC71720E71934C009A5E1B /* MusicBrainzSettings.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				32AC71730E71934C009A5E1B /* English */,
+			);
+			name = MusicBrainzSettings.xib;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */

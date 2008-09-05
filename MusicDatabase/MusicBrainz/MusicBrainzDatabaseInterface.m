@@ -5,7 +5,7 @@
 
 #import "MusicBrainzDatabaseInterface.h"
 #import "MusicBrainzQueryOperation.h"
-//#import "MusicBrainzViewController.h"
+#import "MusicBrainzSettingsViewController.h"
 
 @implementation MusicBrainzDatabaseInterface
 
@@ -20,8 +20,7 @@
 
 - (NSViewController *) configurationViewController
 {
-//	return [[MusicBrainzViewController alloc] init];
-	return nil;
+	return [[MusicBrainzSettingsViewController alloc] init];
 }
 
 - (MusicDatabaseQueryOperation *) musicDatabaseQueryOperation
