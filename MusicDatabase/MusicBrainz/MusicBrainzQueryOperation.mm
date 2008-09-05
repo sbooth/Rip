@@ -4,6 +4,9 @@
  */
 
 #import "MusicBrainzQueryOperation.h"
+#import "MusicBrainzSettingsViewController.h"
+
+#include <Security/Security.h>
 
 #include <musicbrainz3/webservice.h>
 #include <musicbrainz3/query.h>
@@ -29,25 +32,67 @@
 	}
 	
 	// Set MB server and port
-	if(nil != [self.settings objectForKey:@"musicBrainzServer"])
+	if([self.settings objectForKey:@"musicBrainzServer"])
 		ws->setHost([[self.settings objectForKey:@"musicBrainzServer"] UTF8String]);
 	
-	if(nil != [self.settings objectForKey:@"musicBrainzServerPort"])
-		ws->setPort([[self.settings objectForKey:@"musicBrainzServerPort"] integerValue]);
+	if([self.settings objectForKey:@"musicBrainzServerPort"])
+		ws->setPort((const int)[[self.settings objectForKey:@"musicBrainzServerPort"] integerValue]);
 	
 	// Use authentication, if specified
-	if(nil != [self.settings objectForKey:@"musicBrainzUsername"])
-		ws->setUserName([[self.settings objectForKey:@"musicBrainzUsername"] UTF8String]);
+	if([self.settings objectForKey:@"musicBrainzUsername"]) {
+		NSString *username = [self.settings objectForKey:@"musicBrainzUsername"];
+		
+		ws->setUserName([username UTF8String]);
+
+		// Use KeyChain for password storage
+		SecKeychainItemRef keychainItemRef = NULL;
+		void *passwordData = NULL;
+		UInt32 passwordLength = 0;
+
+		const char *serviceNameUTF8 = [kMusicBrainzServiceName UTF8String];
+		const char *usernameUTF8 = [username UTF8String];
+		
+		// Search for the item in the keychain
+		OSStatus status = SecKeychainFindGenericPassword(NULL,
+														 strlen(serviceNameUTF8),
+														 serviceNameUTF8,
+														 strlen(usernameUTF8),
+														 usernameUTF8,
+														 &passwordLength,
+														 &passwordData,
+														 &keychainItemRef);
+		if(noErr == status) {
+			NSString *password = [[NSString alloc] initWithBytes:passwordData length:passwordLength encoding:NSUTF8StringEncoding];
+			ws->setPassword([password UTF8String]);
+		}
+		else if(errSecItemNotFound == status)
+			;
+		else
+			;
+		
+		// Clean up
+		status = SecKeychainItemFreeContent(NULL, passwordData);
+		if(noErr != status)
+			;
+		
+		if(keychainItemRef)
+			CFRelease(keychainItemRef);			
+	}
 	
-	if(nil != [self.settings objectForKey:@"musicBrainzPassword"])
-		ws->setPassword([[self.settings objectForKey:@"musicBrainzPassword"] UTF8String]);
 	
 	// Proxy setup
 	if([[self.settings objectForKey:@"musicBrainzUseProxy"] boolValue]) {
-		if(nil != [self.settings objectForKey:@"musicBrainzProxyServer"])
+		if([self.settings objectForKey:@"musicBrainzProxyServer"])
 			ws->setProxyHost([[self.settings objectForKey:@"musicBrainzProxyServer"] UTF8String]);
-		if(nil != [self.settings objectForKey:@"musicBrainzProxyServerPort"])
-			ws->setProxyPort([[self.settings objectForKey:@"musicBrainzProxyServerPort"] integerValue]);
+		if([self.settings objectForKey:@"musicBrainzProxyServerPort"])
+			ws->setProxyPort((const int)[[self.settings objectForKey:@"musicBrainzProxyServerPort"] integerValue]);
+
+		if([self.settings objectForKey:@"musicBrainzProxyUsername"]) {
+			ws->setProxyUserName([[self.settings objectForKey:@"musicBrainzProxyUsername"] UTF8String]);
+			
+			if([self.settings objectForKey:@"musicBrainzProxyPassword"])
+				ws->setProxyPassword([[self.settings objectForKey:@"musicBrainzProxyPassword"] UTF8String]);
+		}
 	}		
 
 	MusicBrainz::Query q(ws);

@@ -5,8 +5,14 @@
 
 #import <Cocoa/Cocoa.h>
 
+// ========================================
+// Constants
+// ========================================
+extern NSString * const		kMusicBrainzServiceName;
+
 @interface MusicBrainzSettingsViewController : NSViewController
 {
+	IBOutlet NSTextField *_musicBrainzPasswordTextField;
 }
 
 @end

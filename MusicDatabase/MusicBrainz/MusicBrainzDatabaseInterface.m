@@ -13,7 +13,7 @@
 {
 	NSMutableDictionary *defaultSettings = [[NSMutableDictionary alloc] init];
 	
-//	[defaultSettings setObject:[NSNumber numberWithInteger:5] forKey:kFLACCompressionLevelKey];
+	[defaultSettings setObject:[NSNumber numberWithBool:NO] forKey:@"musicBrainzUseProxy"];
 	
 	return defaultSettings;
 }
