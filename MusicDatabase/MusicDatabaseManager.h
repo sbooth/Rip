@@ -22,6 +22,7 @@ extern NSString * const		kMusicDatabaseSettingsKey; // NSDictionary *
 // ========================================
 // Returns an NSBundle * object corresponding to the user's default music database
 @property (assign) NSBundle * defaultMusicDatabase;
+@property (assign) NSDictionary * defaultMusicDatabaseSettings;
 
 // ========================================
 // The shared instance
@@ -31,5 +32,6 @@ extern NSString * const		kMusicDatabaseSettingsKey; // NSDictionary *
 // Access to stored music database settings
 - (NSDictionary *) settingsForMusicDatabase:(NSBundle *)musicDatabase;
 - (void) storeSettings:(NSDictionary *)musicDatabaseSettings forMusicDatabase:(NSBundle *)musicDatabase;
+- (void) restoreDefaultSettingsForMusicDatabase:(NSBundle *)musicDatabase;
 
 @end
