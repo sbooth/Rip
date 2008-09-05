@@ -97,6 +97,26 @@ metadataForExtractionRecord(ExtractionRecord *extractionRecord)
 }
 
 // ========================================
+// Sorting function for sorting bundles by encoder names
+// ========================================
+static NSComparisonResult
+encoderBundleSortFunction(id bundleA, id bundleB, void *context)
+{
+	
+#pragma unused(context)
+	
+	NSCParameterAssert(nil != bundleA);
+	NSCParameterAssert(nil != bundleB);
+	NSCParameterAssert([bundleA isKindOfClass:[NSBundle class]]);
+	NSCParameterAssert([bundleB isKindOfClass:[NSBundle class]]);
+	
+	NSString *bundleAName = [bundleA objectForInfoDictionaryKey:@"EncoderName"];
+	NSString *bundleBName = [bundleB objectForInfoDictionaryKey:@"EncoderName"];
+
+	return [bundleAName compare:bundleBName];;
+}
+
+// ========================================
 // KVC key names for the encoder dictionaries
 // ========================================
 NSString * const	kEncoderBundleKey						= @"bundle";
@@ -118,6 +138,11 @@ static EncoderManager *sSharedEncoderManager				= nil;
 	return sSharedEncoderManager;
 }
 
++ (NSSet *) keyPathsForValuesAffectingDefaultEncoderSettings
+{
+	return [NSSet setWithObject:@"defaultEncoder"];
+}
+
 - (id) init
 {
 	if((self = [super init]))
@@ -132,7 +157,7 @@ static EncoderManager *sSharedEncoderManager				= nil;
 	NSError *error = nil;
 	NSArray *availableEncoders = [plugInManager plugInsConformingToProtocol:@protocol(EncoderInterface) error:&error];
 	
-	return availableEncoders;	
+	return [availableEncoders sortedArrayUsingFunction:encoderBundleSortFunction context:NULL];
 }
 
 - (NSBundle *) defaultEncoder
@@ -155,6 +180,8 @@ static EncoderManager *sSharedEncoderManager				= nil;
 	if(![self.availableEncoders containsObject:encoder])
 		return;
 	
+	[self willChangeValueForKey:@"settingsForDefaultMusicDatabase"];
+
 	// Set this as the default encoder
 	NSString *bundleIdentifier = [encoder bundleIdentifier];
 	[[NSUserDefaults standardUserDefaults] setObject:bundleIdentifier forKey:@"defaultEncoder"];
@@ -176,8 +203,6 @@ static EncoderManager *sSharedEncoderManager				= nil;
 
 - (void) setDefaultEncoderSettings:(NSDictionary *)encoderSettings
 {
-	NSParameterAssert(nil != encoderSettings);
-
 	[self storeSettings:encoderSettings forEncoder:self.defaultEncoder];
 }
 
@@ -210,7 +235,7 @@ static EncoderManager *sSharedEncoderManager				= nil;
 
 - (void) storeSettings:(NSDictionary *)encoderSettings forEncoder:(NSBundle *)encoder
 {
-	NSParameterAssert(nil != encoderSettings);
+
 	NSParameterAssert(nil != encoder);
 	
 	// Verify this is a valid encoder
@@ -218,7 +243,10 @@ static EncoderManager *sSharedEncoderManager				= nil;
 		return;
 	
 	NSString *bundleIdentifier = [encoder bundleIdentifier];
-	[[NSUserDefaults standardUserDefaults] setObject:encoderSettings forKey:bundleIdentifier];
+	if(encoderSettings)
+		[[NSUserDefaults standardUserDefaults] setObject:encoderSettings forKey:bundleIdentifier];
+	else
+		[[NSUserDefaults standardUserDefaults] removeObjectForKey:bundleIdentifier];
 }
 
 - (void) restoreDefaultSettingsForEncoder:(NSBundle *)encoder
@@ -243,19 +271,6 @@ static EncoderManager *sSharedEncoderManager				= nil;
 	else
 		[[NSUserDefaults standardUserDefaults] removeObjectForKey:bundleIdentifier];
 }
-
-#if 0
-- (NSArray *) configuredEncoders
-{
-	return [[NSUserDefaults standardUserDefaults] arrayForKey:@"configuredEncoders"];
-}
-
-- (NSArray *) selectedEncoders
-{
-	NSPredicate *selectedEncodersPredicate = [NSPredicate predicateWithFormat:@"%K == 1", kEncoderSelectedKey];
-	return [self.configuredEncoders filteredArrayUsingPredicate:selectedEncodersPredicate];
-}
-#endif
 
 - (BOOL) encodeURL:(NSURL *)inputURL extractionRecord:(ExtractionRecord *)extractionRecord error:(NSError **)error
 {
