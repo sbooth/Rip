@@ -12,7 +12,6 @@
 {
 	IBOutlet NSArrayController *_trackController;
 	IBOutlet NSObjectController *_driveInformationController;
-	IBOutlet NSMenu *_musicDatabaseMenu;
 	IBOutlet NSTableView *_trackTable;
 	
 @private
@@ -22,6 +21,11 @@
 	
 	NSOperationQueue *_compactDiscOperationQueue;
 	NSOperationQueue *_networkOperationQueue;
+	
+	// State for the current extraction session
+	NSSet *_tracksToBeExtracted;
+	NSSet *_tracksAccuratelyExtracted;
+	NSArray *_tracksNotAccuratelyExtracted;
 }
 
 @property (readonly) NSArrayController * trackController;
@@ -50,12 +54,11 @@
 - (IBAction) readMCN:(id)sender;
 - (IBAction) readISRCs:(id)sender;
 
+- (IBAction) createCueSheet:(id)sender;
+
 - (IBAction) editTags:(id)sender;
 
 - (IBAction) queryDefaultMusicDatabase:(id)sender;
-- (IBAction) queryFreeDB:(id)sender;
-- (IBAction) queryMusicBrainz:(id)sender;
-- (IBAction) queryiTunes:(id)sender;
 
 - (IBAction) queryAccurateRip:(id)sender;
 
