@@ -17,19 +17,26 @@
 
 #import "CDDAUtilities.h"
 
+// ========================================
+// KVC key names for the encoder dictionaries
+// ========================================
+NSString * const	kReadOffsetKey							= @"readOffset";
+NSString * const	kConfidenceLevelKey						= @"confidenceLevel";
+
 @interface ReadOffsetCalculationOperation ()
 @property (assign) NSError * error;
-@property (assign) NSNumber * readOffset;
+@property (assign) NSArray * possibleReadOffsets;
+@property (assign) NSNumber * fractionComplete;
 @end
 
 @implementation ReadOffsetCalculationOperation
 
 @synthesize URL = _URL;
 @synthesize trackDescriptorID = _trackDescriptorID;
-@synthesize trackFirstSectorOffset = _trackFirstSectorOffset;
 @synthesize maximumOffsetToCheck = _maximumOffsetToCheck;
 @synthesize error = _error;
-@synthesize readOffset = _readOffset;
+@synthesize possibleReadOffsets = _possibleReadOffsets;
+@synthesize fractionComplete = _fractionComplete;
 
 - (void) main
 {
@@ -47,52 +54,74 @@
 		return;
 	}
 	
-	// Attempt to calculate the drive's offset by brute force
+	// Attempt to calculate the drive's offset using AccurateRip offset checksums
+	// The offset checksum is the checksum for one single frame of audio starting at exactly six
+	// seconds into the track
 	
 	// We will accomplish this by calculating AccurateRip checksums for the specified track using
 	// different read offsets until a match is found
 	TrackDescriptor *trackDescriptor = (TrackDescriptor *)managedObject;	
-	SectorRange *trackSectorRange = [trackDescriptor sectorRange];
 	
 	if(!trackDescriptor) {
 		self.error = [NSError errorWithDomain:NSCocoaErrorDomain code:1 userInfo:nil];
 		return;
 	}
 	
-	// Determine what AccurateRip checksum we are attempting to match
-	AccurateRipTrackRecord *accurateRipTrack = [trackDescriptor.session.disc.accurateRipDisc trackNumber:trackDescriptor.number.unsignedIntegerValue];
-
-	if(!accurateRipTrack) {
-		self.error = [NSError errorWithDomain:NSCocoaErrorDomain code:1 userInfo:nil];
-		return;
-	}
-
+	NSMutableArray *possibleReadOffsets = [NSMutableArray array];
+	
 	// Adjust the starting sector in the file
-	SectorRange *adjustedSectorRange = [SectorRange sectorRangeWithFirstSector:self.trackFirstSectorOffset.unsignedIntegerValue sectorCount:trackSectorRange.length];
+	SectorRange *singleSectorRange = [SectorRange sectorRangeWithFirstSector:(self.maximumOffsetToCheck.integerValue / AUDIO_FRAMES_PER_CDDA_SECTOR)
+																 sectorCount:1];
 	
 	NSInteger firstOffsetToTry = -1 * self.maximumOffsetToCheck.integerValue;
 	NSInteger lastOffsetToTry = self.maximumOffsetToCheck.integerValue;
 	NSInteger currentOffset;
 	
 	for(currentOffset = firstOffsetToTry; currentOffset <= lastOffsetToTry; ++currentOffset) {
+
+		// Allow cancellation
 		if(self.isCancelled)
 			break;
-
-		uint32_t trackActualAccurateRipChecksum = calculateAccurateRipChecksumForFileRegionUsingOffset(self.URL, 
-																									   adjustedSectorRange.firstSector,
-																									   adjustedSectorRange.lastSector,
-																									   NO,
-																									   NO,
-																									   currentOffset);
 		
-		if(accurateRipTrack.checksum.unsignedIntegerValue == trackActualAccurateRipChecksum) {
+		// Calculate the AccurateRip checksum for this track with the specified offset
+		uint32_t trackActualOffsetChecksum = calculateAccurateRipChecksumForFileRegionUsingOffset(self.URL, 
+																								  singleSectorRange.firstSector,
+																								  singleSectorRange.lastSector,
+																								  trackDescriptor.number.unsignedIntegerValue == trackDescriptor.session.firstTrack.number.unsignedIntegerValue,
+																								  trackDescriptor.number.unsignedIntegerValue == trackDescriptor.session.lastTrack.number.unsignedIntegerValue,
+																								  currentOffset);
+
+		// Check all the pressings that were found in AccurateRip for matching checksums
+		for(AccurateRipDiscRecord *accurateRipDisc in trackDescriptor.session.disc.accurateRipDiscs) {
+			
+			// Determine what AccurateRip checksum we are attempting to match
+			AccurateRipTrackRecord *accurateRipTrack = [accurateRipDisc trackNumber:trackDescriptor.number.unsignedIntegerValue];
+			
+			if(!accurateRipTrack) {
+				self.error = [NSError errorWithDomain:NSCocoaErrorDomain code:1 userInfo:nil];
+				continue;
+			}
+
+			// Ignore checksums of 0
+			if(trackActualOffsetChecksum && accurateRipTrack.offsetChecksum.unsignedIntegerValue == trackActualOffsetChecksum) {
 #if DEBUG
-			NSLog(@"Calculated drive offset of %i", currentOffset);
+				NSLog(@"Possible drive offset of %i (%@)", currentOffset, accurateRipTrack.confidenceLevel);
 #endif
-			self.readOffset = [NSNumber numberWithInteger:currentOffset];
-			return;
+				NSDictionary *offsetDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
+												  [NSNumber numberWithInteger:currentOffset], kReadOffsetKey,
+												  accurateRipTrack.confidenceLevel, kConfidenceLevelKey,
+												  nil];
+				
+				[possibleReadOffsets addObject:offsetDictionary];
+			}
 		}
+
+		// Update progress
+		self.fractionComplete = [NSNumber numberWithFloat:(fabsf(firstOffsetToTry - currentOffset) / (lastOffsetToTry - firstOffsetToTry))];
 	}
+	
+	if(possibleReadOffsets.count)
+		self.possibleReadOffsets = [possibleReadOffsets copy];
 }
 
 @end
