@@ -15,7 +15,7 @@ extern NSString * const		kEncoderSettingsKey; // NSDictionary *
 
 @interface EncoderManager : NSObject
 {
-	@private
+@private
 	NSOperationQueue *_queue;
 }
 
