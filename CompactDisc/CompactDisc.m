@@ -177,7 +177,7 @@ static NSInteger calculateFreeDBDiscIDForCDTOC(CDTOC *toc)
 
 // ========================================
 // Core Data relationships
-@dynamic accurateRipDisc;
+@dynamic accurateRipDiscs;
 @dynamic metadata;
 @dynamic sessions;
 

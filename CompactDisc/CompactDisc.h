@@ -29,7 +29,7 @@
 
 // ========================================
 // Core Data relationships
-@property (assign) AccurateRipDiscRecord * accurateRipDisc;
+@property (assign) NSSet * accurateRipDiscs;
 @property (assign) AlbumMetadata * metadata;
 @property (assign) NSSet * sessions;
 
@@ -57,4 +57,9 @@
 - (void) removeSessionsObject:(SessionDescriptor *)value;
 - (void) addSessions:(NSSet *)value;
 - (void) removeSessions:(NSSet *)value;
+
+- (void) addAccurateRipDiscsObject:(AccurateRipDiscRecord *)value;
+- (void) removeAccurateRipDiscsObject:(AccurateRipDiscRecord *)value;
+- (void) addAccurateRipDiscs:(NSSet *)value;
+- (void) removeAccurateRipDiscs:(NSSet *)value;
 @end

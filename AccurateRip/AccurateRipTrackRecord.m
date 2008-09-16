@@ -12,6 +12,7 @@
 @dynamic number;
 @dynamic confidenceLevel;
 @dynamic checksum;
+@dynamic offsetChecksum;
 
 // ========================================
 // Core Data relationships

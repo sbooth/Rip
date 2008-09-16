@@ -177,8 +177,8 @@ calculateAccurateRipChecksumForFileRegionUsingOffset(NSURL *fileURL, NSUInteger 
 	if(noErr != status)
 		goto cleanup;
 	
-	// The block range is inclusive
-	NSUInteger totalBlocks = lastSectorToRead - firstSectorToRead + 1;
+	// The block range is inclusive, but should indicate the number of complete blocks to be read
+	NSUInteger totalBlocks = lastSectorToRead - firstSectorToRead - readOffsetInSectors + 1;
 	NSUInteger blockNumber = 0;
 	
 	// Set up extraction buffers

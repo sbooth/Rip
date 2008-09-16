@@ -19,6 +19,7 @@
 @property (assign) NSNumber * number;
 @property (assign) NSNumber * confidenceLevel;
 @property (assign) NSNumber * checksum;
+@property (assign) NSNumber * offsetChecksum;
 
 // ========================================
 // Core Data relationships

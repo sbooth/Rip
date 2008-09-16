@@ -12,6 +12,8 @@
 #import "AccurateRipDiscRecord.h"
 #import "AccurateRipTrackRecord.h"
 
+#include <SystemConfiguration/SCNetwork.h>
+
 @interface AccurateRipQueryOperation ()
 @property (assign) NSError *error;
 @end
@@ -27,6 +29,18 @@
 {
 	NSAssert(nil != self.compactDiscID, @"self.compactDiscID may not be nil");
 
+	// Before doing anything, verify we can access the AccurateRip web site
+	SCNetworkConnectionFlags flags;
+	if(SCNetworkCheckReachabilityByName("www.accuraterip.com", &flags)) {
+		if(!(kSCNetworkFlagsReachable & flags && !(kSCNetworkFlagsConnectionRequired & flags))) {
+			NSMutableDictionary *errorDictionary = [NSMutableDictionary dictionary];
+			[errorDictionary setObject:[NSURL URLWithString:@"www.accuraterip.com"] forKey:NSErrorFailingURLStringKey];
+			
+			self.error = [NSError errorWithDomain:NSURLErrorDomain code:NSURLErrorCannotConnectToHost userInfo:errorDictionary];
+			return;
+		}
+	}
+	
 	// Create our own context for accessing the store
 	NSManagedObjectContext *managedObjectContext = [[NSManagedObjectContext alloc] init];
 	[managedObjectContext setPersistentStoreCoordinator:[[[NSApplication sharedApplication] delegate] persistentStoreCoordinator]];
@@ -71,108 +85,120 @@
 		return;
 	}
 	
-	// An Accurate Rip .bin file is formatted as follows:
-	//
-	// 1 byte for the number of tracks on the disc  [arTrackCount]
-	// 4 bytes (LE) for the Accurate Rip Disc ID 1  [arDiscID1]
-	// 4 bytes (LE) for the Accurate Rip Disc ID 2  [arDiscID2]
-	// 4 bytes (LE) for the disc's FreeDB ID		[arFreeDBID]
-	// 
-	// A variable number [arTrackCount] of track records:
-	//
-	//  1 byte for the confidence level				[arTrackConfidence]
-	//  4 bytes (LE) for the track's CRC			[arTrackCRC]
-	//  4 bytes ????
+	// Remove any existing AccurateRip data (it will be replaced)
+	NSSet *existingAccurateRipDiscs = [compactDisc.accurateRipDiscs copy];
+	[compactDisc removeAccurateRipDiscs:existingAccurateRipDiscs];
+	
+	// Delete them from the store
+	for(NSManagedObject *managedObjectToDelete in existingAccurateRipDiscs)
+		[managedObjectContext deleteObject:managedObjectToDelete];
 	
 	// Use the first session
 	NSArray *orderedTracks = compactDisc.firstSession.orderedTracks;
 	
-	uint8_t arTrackCount = 0;
-	[accurateRipResponseData getBytes:&arTrackCount range:NSMakeRange(0, 1)];
+	// An Accurate Rip .bin file is formatted as follows:
+	//
+	// A variable number of disc pressing records containing:
+	//
+	//  1 byte for the number of tracks on the disc		[arTrackCount]
+	//  4 bytes (LE) for the Accurate Rip Disc ID 1		[arDiscID1]
+	//  4 bytes (LE) for the Accurate Rip Disc ID 2		[arDiscID2]
+	//  4 bytes (LE) for the disc's FreeDB ID			[arFreeDBID]
+	// 
+	//  A variable number [arTrackCount] of track records:
+	//
+	//   1 byte for the confidence level				[arTrackConfidence]
+	//   4 bytes (LE) for the track's CRC				[arTrackCRC]
+	//   4 bytes (LE) for offset CRC					[arOffsetChecksum]
 	
-	uint32_t arDiscID1 = 0;
-	[accurateRipResponseData getBytes:&arDiscID1 range:NSMakeRange(1, 4)];
-	arDiscID1 = OSSwapLittleToHostInt32(arDiscID1);
+	NSUInteger accurateRipDiscDataSize = (1 + 4 + 4 + 4) + (orderedTracks.count * (1 + 4 + 4));
+	NSUInteger accurateRipPressingCount = [accurateRipResponseData length] / accurateRipDiscDataSize;
 	
-	uint32_t arDiscID2 = 0;
-	[accurateRipResponseData getBytes:&arDiscID2 range:NSMakeRange(5, 4)];
-	arDiscID2 = OSSwapLittleToHostInt32(arDiscID2);
-	
-	int32_t arFreeDBID = 0;
-	[accurateRipResponseData getBytes:&arFreeDBID range:NSMakeRange(9, 4)];
-	arFreeDBID = OSSwapLittleToHostInt32(arFreeDBID);
-
-	if(arTrackCount != orderedTracks.count || arDiscID1 != accurateRipID1 || arDiscID2 != accurateRipID2 || arFreeDBID != compactDisc.freeDBDiscID.intValue) {
-
-#if DEBUG
-		NSLog(@"AccurateRip track count or disc IDs don't match.");
-#endif
-
-		self.error = [NSError errorWithDomain:NSCocoaErrorDomain code:3 userInfo:nil];
-		return;
-	}
-	
-	// Create an AccurateRipDiscRecord object if one doesn't exist for this CompactDisc
-	AccurateRipDiscRecord *accurateRipDisc = compactDisc.accurateRipDisc;
-	if(!accurateRipDisc) {
-		accurateRipDisc = [NSEntityDescription insertNewObjectForEntityForName:@"AccurateRipDiscRecord" 
-														inManagedObjectContext:managedObjectContext];
+	NSUInteger pressingDataOffset = 0;
+	NSUInteger pressingIndex;
+	for(pressingIndex = 0; pressingIndex < accurateRipPressingCount; ++pressingIndex) {
+		uint8_t arTrackCount = 0;
+		[accurateRipResponseData getBytes:&arTrackCount range:NSMakeRange(pressingDataOffset, 1)];
 		
-		compactDisc.accurateRipDisc = accurateRipDisc;		
-	}
-	
-	accurateRipDisc.URL = accurateRipURL.absoluteString;
-	
-	NSUInteger i, offset = 13;
-	for(i = 0; i < arTrackCount; ++i) {
-		uint8_t arTrackConfidence = 0;
-		[accurateRipResponseData getBytes:&arTrackConfidence range:NSMakeRange(offset, 1)];
+		uint32_t arDiscID1 = 0;
+		[accurateRipResponseData getBytes:&arDiscID1 range:NSMakeRange(pressingDataOffset + 1, 4)];
+		arDiscID1 = OSSwapLittleToHostInt32(arDiscID1);
 		
-		// An AccurateRip track checksum is calculated as follows:
-		//
-		// Since this is CD-DA audio, a block (sector) is 2352 bytes in size and 1/75th of a second in duration
-		// A single 2352 byte block contains 588 audio frames at 16 bits per channel and 2 channels
-		//
-		// For checksum calculations, AccurateRip treats a single audio frame of as a 32-bit quantity
-		// This is bad, because math overflow can lead to discarded samples (bits) from the right channel
-		//
-		// Multiply the audio frame's value (as an (unsigned?) 32-bit integer) [f(n)] times it's frame number [n]
-		// The first four blocks and 587 frames of the first track are skipped (zero checksum value)
-		// The last six blocks of the last track are skipped (zero checksum value)
-		//
-		// The checksum is additive
+		uint32_t arDiscID2 = 0;
+		[accurateRipResponseData getBytes:&arDiscID2 range:NSMakeRange(pressingDataOffset + 5, 4)];
+		arDiscID2 = OSSwapLittleToHostInt32(arDiscID2);
 		
-		uint32_t arTrackChecksum = 0;
-		[accurateRipResponseData getBytes:&arTrackChecksum range:NSMakeRange(offset + 1, 4)];
-		arTrackChecksum = OSSwapLittleToHostInt32(arTrackChecksum);
+		int32_t arFreeDBID = 0;
+		[accurateRipResponseData getBytes:&arFreeDBID range:NSMakeRange(pressingDataOffset + 9, 4)];
+		arFreeDBID = OSSwapLittleToHostInt32(arFreeDBID);
 		
-#if DEBUG
-		uint32_t arOffsetChecksum = 0;
-		[accurateRipResponseData getBytes:&arOffsetChecksum range:NSMakeRange(offset + 1 + 4, 4)];
-		arOffsetChecksum = OSSwapLittleToHostInt32(arOffsetChecksum);
-		NSLog(@"arOffsetChecksum = %x", arOffsetChecksum);
-#endif
-		
-		// What are the next 4 bytes?
-		
-		offset += 9;
-		
-		// Add the AccurateRipTrackRecord to the AccurateRipDiscRecord if one doesn't exist for this track
-		AccurateRipTrackRecord *accurateRipTrack = [accurateRipDisc trackNumber:(1 + i)];
-		if(!accurateRipTrack) {
-			accurateRipTrack = [NSEntityDescription insertNewObjectForEntityForName:@"AccurateRipTrackRecord" 
-															 inManagedObjectContext:accurateRipDisc.managedObjectContext];	
+		if(arTrackCount != orderedTracks.count || arDiscID1 != accurateRipID1 || arDiscID2 != accurateRipID2 || arFreeDBID != compactDisc.freeDBDiscID.intValue) {
 			
-			accurateRipTrack.number = [NSNumber numberWithUnsignedInteger:(1 + i)];
+#if DEBUG
+			NSLog(@"AccurateRip track count or disc IDs don't match.");
+#endif
 			
-			[accurateRipDisc addTracksObject:accurateRipTrack];
+			self.error = [NSError errorWithDomain:NSCocoaErrorDomain code:3 userInfo:nil];
+			continue;
 		}
 		
-		accurateRipTrack.confidenceLevel = [NSNumber numberWithUnsignedChar:arTrackConfidence];
-		// Since Core Data only stores signed integers, cast the unsigned checksum to signed for storage
-		accurateRipTrack.checksum = [NSNumber numberWithInt:(int32_t)arTrackChecksum];
-	}	
+		// Create an AccurateRipDiscRecord object 
+		AccurateRipDiscRecord *accurateRipDisc = [NSEntityDescription insertNewObjectForEntityForName:@"AccurateRipDiscRecord" 
+																			   inManagedObjectContext:managedObjectContext];
+		
+		[compactDisc addAccurateRipDiscsObject:accurateRipDisc];
+		
+		accurateRipDisc.URL = accurateRipURL.absoluteString;
+		
+		NSUInteger i;
+		NSUInteger trackDataOffset = pressingDataOffset + (1 + 4 + 4 + 4);
+		for(i = 0; i < arTrackCount; ++i) {
+			uint8_t arTrackConfidence = 0;
+			[accurateRipResponseData getBytes:&arTrackConfidence range:NSMakeRange(trackDataOffset, 1)];
+			
+			// An AccurateRip track checksum is calculated as follows:
+			//
+			// Since this is CD-DA audio, a block (sector) is 2352 bytes in size and 1/75th of a second in duration
+			// A single 2352 byte block contains 588 audio frames at 16 bits per channel and 2 channels
+			//
+			// For checksum calculations, AccurateRip treats a single audio frame of as a 32-bit quantity
+			// This is bad, because math overflow can lead to discarded samples (bits) from the right channel
+			//
+			// Multiply the audio frame's value (as an (unsigned?) 32-bit integer) [f(n)] times it's frame number [n]
+			// The first four blocks and 587 frames of the first track are skipped (zero checksum value)
+			// The last six blocks of the last track are skipped (zero checksum value)
+			//
+			// The checksum is additive
+			
+			uint32_t arTrackChecksum = 0;
+			[accurateRipResponseData getBytes:&arTrackChecksum range:NSMakeRange(trackDataOffset + 1, 4)];
+			arTrackChecksum = OSSwapLittleToHostInt32(arTrackChecksum);
+			
+			uint32_t arOffsetChecksum = 0;
+			[accurateRipResponseData getBytes:&arOffsetChecksum range:NSMakeRange(trackDataOffset + 1 + 4, 4)];
+			arOffsetChecksum = OSSwapLittleToHostInt32(arOffsetChecksum);
 
+//			NSLog(@"arOffsetChecksum [track %i] = %x", 1 + i, arOffsetChecksum);
+			
+			trackDataOffset += (1 + 4 + 4);
+			
+			// Add the AccurateRipTrackRecord to the AccurateRipDiscRecord if one doesn't exist for this track
+			AccurateRipTrackRecord *accurateRipTrack = [NSEntityDescription insertNewObjectForEntityForName:@"AccurateRipTrackRecord" 
+																					 inManagedObjectContext:accurateRipDisc.managedObjectContext];	
+				
+			accurateRipTrack.number = [NSNumber numberWithUnsignedInteger:(1 + i)];
+			[accurateRipDisc addTracksObject:accurateRipTrack];
+			
+			accurateRipTrack.confidenceLevel = [NSNumber numberWithUnsignedChar:arTrackConfidence];
+
+			// Since Core Data only stores signed integers, cast the unsigned checksum to signed for storage
+			accurateRipTrack.checksum = [NSNumber numberWithInt:(int32_t)arTrackChecksum];
+			accurateRipTrack.offsetChecksum = [NSNumber numberWithInt:(int32_t)arOffsetChecksum];
+		}
+		
+		pressingDataOffset += accurateRipDiscDataSize;
+	}
+	
 	// Save the changes
 	if(managedObjectContext.hasChanges) {
 		if(![managedObjectContext save:&error])
