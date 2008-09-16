@@ -7,7 +7,7 @@
 
 @interface PlugInManager : NSObject
 {
-	@private
+@private
 	NSMutableDictionary *_plugIns;
 }
 
