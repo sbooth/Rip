@@ -7,7 +7,10 @@
 #import "ByteSizeValueTransformer.h"
 #import "DurationValueTransformer.h"
 #import "CompactDiscWindowController.h"
+#import "DriveInformation.h"
 #import "AquaticPrime.h"
+#import "MusicDatabaseManager.h"
+#import "ReadOffsetCalculatorSheetController.h"
 
 #include <CoreFoundation/CoreFoundation.h>
 #include <DiskArbitration/DiskArbitration.h>
@@ -39,6 +42,7 @@
 - (BOOL) validateLicenseURL:(NSURL *)licenseURL error:(NSError **)error;
 - (void) displayNagDialog;
 - (void) handleGetURLAppleEvent:(NSAppleEventDescriptor *)event withReplyEvent:(NSAppleEventDescriptor *)replyEvent;
+- (void) readOffsetNotConfiguredSheetDidEnd:(NSWindow *)sheet returnCode:(NSInteger)returnCode contextInfo:(void *)contextInfo;
 @end
 
 
@@ -146,9 +150,28 @@ diskDisappearedCallback(DADiskRef disk, void *context)
 	}
 	else
 		[self displayNagDialog];
-		
-	// Use DiskArbitration to request mount/unmount information for audio CDs
 	
+	// Build the "Lookup Metadata Using" menu so it includes all the loaded MusicDatabases
+	NSMenu *lookupMetadataUsingMenu = [[NSMenu alloc] initWithTitle:@"Lookup Metadata Using Menu"];
+	
+	MusicDatabaseManager *musicDatabaseManager = [MusicDatabaseManager sharedMusicDatabaseManager];
+	for(NSBundle *musicDatabaseBundle in musicDatabaseManager.availableMusicDatabases) {
+		NSMenuItem *menuItem = [[NSMenuItem alloc] initWithTitle:[musicDatabaseBundle objectForInfoDictionaryKey:@"MusicDatabaseName"]
+														  action:@selector(queryMusicDatabase:)
+												   keyEquivalent:@""];
+
+		[menuItem setRepresentedObject:musicDatabaseBundle];
+		
+		[lookupMetadataUsingMenu addItem:menuItem];
+	}
+	
+	// Add the menu
+	NSMenuItem *compactDiscMenuItem = [[[NSApplication sharedApplication] mainMenu] itemAtIndex:3];
+	NSMenu *compactDiscMenuItemSubmenu = [compactDiscMenuItem submenu];
+	NSMenuItem *lookupTagsUsingMenuItem = [compactDiscMenuItemSubmenu itemWithTag:1];
+	[lookupTagsUsingMenuItem setSubmenu:lookupMetadataUsingMenu];
+	
+	// Use DiskArbitration to request mount/unmount information for audio CDs
 	// Create a dictionary which will match IOMedia objects of type kIOCDMediaClass
 	CFMutableDictionaryRef matchDictionary = CFDictionaryCreateMutable(kCFAllocatorDefault, 0, &kCFCopyStringDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
 	if(NULL == matchDictionary) {
@@ -362,6 +385,20 @@ diskDisappearedCallback(DADiskRef disk, void *context)
 	}
 	else
 		[compactDiscWindow showWindow:self];
+	
+	// If the read offset for the drive isn't configured, give the user the opportunity to configure it now
+	if(1||!compactDiscWindow.driveInformation.readOffset) {		
+		NSBeginAlertSheet([NSString stringWithFormat:@"The read offset for \u201c%@ %@\u201d is unknown.  Would you like to determine the drive's read offset now?", compactDiscWindow.driveInformation.vendorName, compactDiscWindow.driveInformation.productName],
+						  @"Yes", 
+						  @"No",
+						  nil,
+						  compactDiscWindow.window,
+						  self,
+						  @selector(readOffsetNotConfiguredSheetDidEnd:returnCode:contextInfo:),
+						  NULL,
+						  compactDiscWindow, 
+						  @"Configuring a read offset will allow more accurate audio extraction by enabling use of the AccurateRip database.");
+	}
 }
 
 - (void) diskDisappeared:(DADiskRef)disk
@@ -473,6 +510,33 @@ diskDisappearedCallback(DADiskRef disk, void *context)
 #pragma unused(replyEvent)
 	
 	NSURL *url = [NSURL URLWithString:[[event paramDescriptorForKeyword:keyDirectObject] stringValue]];
+}
+
+- (void) readOffsetNotConfiguredSheetDidEnd:(NSWindow *)sheet returnCode:(NSInteger)returnCode contextInfo:(void *)contextInfo
+{	
+	NSParameterAssert(NULL != contextInfo);
+	
+	[sheet orderOut:self];
+	
+	// Default is YES, alternate is NO
+	if(NSAlertAlternateReturn == returnCode)
+		return;
+	
+	CompactDiscWindowController *compactDiscWindowController = (CompactDiscWindowController *)contextInfo;
+	
+	// Run the drive offset calculation routines
+	ReadOffsetCalculatorSheetController *readOffsetCalculatorSheetController = [[ReadOffsetCalculatorSheetController alloc] init];
+
+	readOffsetCalculatorSheetController.disk= compactDiscWindowController.disk;
+
+	[NSApp beginSheet:readOffsetCalculatorSheetController.window modalForWindow:compactDiscWindowController.window modalDelegate:self didEndSelector:@selector(foo:returnCode:contextInfo:) contextInfo:NULL];
+	[readOffsetCalculatorSheetController determineDriveOffset:self];
+}
+
+- (void) foo:(NSWindow *)sheet returnCode:(NSInteger)returnCode contextInfo:(void *)contextInfo
+{
+
+	[sheet orderOut:self];
 }
 
 @end
