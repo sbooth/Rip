@@ -8,11 +8,16 @@
 @interface MusicDatabasePreferencesViewController : NSViewController
 {
 	IBOutlet NSArrayController *_musicDatabaseArrayController;
+	IBOutlet NSView *_musicDatabaseSettingsView;
+	
+@private
+	NSViewController *_musicDatabaseSettingsViewController;
 }
+
+@property (readonly, assign) NSArray * availableMusicDatabases;
 
 // ========================================
 // Action methods
 - (IBAction) selectDefaultMusicDatabase:(id)sender;
-- (IBAction) editMusicDatabaseSettings:(id)sender;
 
 @end

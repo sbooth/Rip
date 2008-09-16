@@ -4,6 +4,7 @@
  */
 
 #import "PreferencesWindowController.h"
+#import "NSViewController+PreferencesViewControllerMethods.h"
 
 // ========================================
 // Identifiers for toolbar items
@@ -65,6 +66,16 @@ static PreferencesWindowController *sSharedPreferencesWindowController = nil;
 //	[[self window] center];
 }
 
+- (void) windowWillClose:(NSNotification *)notification
+{
+	
+#pragma unused (notification)
+
+	// Save the settings for the current preference pane
+	if([_preferencesViewController respondsToSelector:@selector(savePreferences:)])
+		[_preferencesViewController savePreferences:self];
+}
+
 - (void) selectPreferencePaneWithIdentifier:(NSString *)itemIdentifier
 {
 	NSParameterAssert(nil != itemIdentifier);
@@ -74,19 +85,24 @@ static PreferencesWindowController *sSharedPreferencesWindowController = nil;
 		[[[self window] toolbar] setSelectedItemIdentifier:itemIdentifier];
 	
 	// Remove any preference subviews that are currently being displayed
-	if(_preferencesViewController)
+	if(_preferencesViewController) {
+		// Save the settings first
+		if([_preferencesViewController respondsToSelector:@selector(savePreferences:)])
+			[_preferencesViewController savePreferences:self];
+
 		[_preferencesViewController.view removeFromSuperview];
+	}
 	
 	// Adjust the window and view's frame size to match the preference's view size
 	Class preferencesViewControllerClass = NSClassFromString([[[itemIdentifier componentsSeparatedByString:@"."] lastObject] stringByAppendingString:@"PreferencesViewController"]);
 	_preferencesViewController = [[preferencesViewControllerClass alloc] init];
 
-	// Calculate the difference between the current and target encoder settings view sizes
-	NSRect currentViewFrame = [_preferencesView frame];
-	NSRect targetViewFrame = [_preferencesViewController.view frame];
+	// Calculate the difference between the current and target preference view sizes
+	NSRect currentPreferencesViewFrame = [_preferencesView frame];
+	NSRect targetPreferencesViewFrame = [_preferencesViewController.view frame];
 	
-	CGFloat viewDeltaX = targetViewFrame.size.width - currentViewFrame.size.width;
-	CGFloat viewDeltaY = targetViewFrame.size.height - currentViewFrame.size.height;
+	CGFloat viewDeltaX = targetPreferencesViewFrame.size.width - currentPreferencesViewFrame.size.width;
+	CGFloat viewDeltaY = targetPreferencesViewFrame.size.height - currentPreferencesViewFrame.size.height;
 	
 	// Calculate the new window and view sizes
 	NSRect currentWindowFrame = [self.window frame];
@@ -97,7 +113,7 @@ static PreferencesWindowController *sSharedPreferencesWindowController = nil;
 	newWindowFrame.size.width += viewDeltaX;
 	newWindowFrame.size.height += viewDeltaY;
 	
-	NSRect newViewFrame = currentViewFrame;
+	NSRect newViewFrame = currentPreferencesViewFrame;
 	
 	newViewFrame.size.width += viewDeltaX;
 	newViewFrame.size.height += viewDeltaY;
@@ -107,16 +123,8 @@ static PreferencesWindowController *sSharedPreferencesWindowController = nil;
 	[_preferencesView setFrame:newViewFrame];
 	
 	// Now that the sizes are correct, add the view controller's view to the view hierarchy
-#if 0
-	if([_preferencesViewController respondsToSelector:@selector(willAddViewToWindow:)])
-		[_preferencesViewController willAddViewToWindow:[self window]];
-#endif
 	[_preferencesView addSubview:_preferencesViewController.view];
-#if 0
-	if([_preferencesViewController respondsToSelector:@selector(didAddViewToWindow:)])
-		[_preferencesViewController didAddViewToWindow:[self window]];
-#endif
-	
+
 	// Set the window's title to the name of the preference view
 	[[self window] setTitle:[_preferencesViewController title]];
 	
@@ -134,51 +142,34 @@ static PreferencesWindowController *sSharedPreferencesWindowController = nil;
 #pragma unused (toolbar)
 #pragma unused (flag)
 	
-    NSToolbarItem *toolbarItem = nil;
+    NSToolbarItem *toolbarItem = [[NSToolbarItem alloc] initWithItemIdentifier:itemIdentifier];
+
+	[toolbarItem setTarget:self];
+	[toolbarItem setAction:@selector(toolbarItemSelected:)];
 	
     if([itemIdentifier isEqualToString:GeneralPreferencesToolbarItemIdentifier]) {
-        toolbarItem = [[[NSToolbarItem alloc] initWithItemIdentifier:itemIdentifier] autorelease];
-		
 		[toolbarItem setLabel:NSLocalizedStringFromTable(@"General", @"Preferences", @"")];
 		[toolbarItem setPaletteLabel:NSLocalizedStringFromTable(@"General", @"Preferences", @"")];		
-		[toolbarItem setToolTip:NSLocalizedStringFromTable(@"Options that control the general behavior of Play", @"Preferences", @"")];
+		[toolbarItem setToolTip:NSLocalizedStringFromTable(@"Options that control the general behavior of Rip", @"Preferences", @"")];
 		[toolbarItem setImage:[NSImage imageNamed:@"NSPreferencesGeneral"]];
-		
-		[toolbarItem setTarget:self];
-		[toolbarItem setAction:@selector(toolbarItemSelected:)];
 	}
     else if([itemIdentifier isEqualToString:EncoderPreferencesToolbarItemIdentifier]) {
-        toolbarItem = [[[NSToolbarItem alloc] initWithItemIdentifier:itemIdentifier] autorelease];
-		
 		[toolbarItem setLabel:NSLocalizedStringFromTable(@"Encoders", @"Preferences", @"")];
 		[toolbarItem setPaletteLabel:NSLocalizedStringFromTable(@"Encoders", @"Preferences", @"")];
-		[toolbarItem setToolTip:NSLocalizedStringFromTable(@"Specify hot keys used to control Play", @"Preferences", @"")];
+		[toolbarItem setToolTip:NSLocalizedStringFromTable(@"Specify the audio encoder and settings used for extraction", @"Preferences", @"")];
 		[toolbarItem setImage:[NSImage imageNamed:@"HotKeyPreferencesToolbarImage"]];
-		
-		[toolbarItem setTarget:self];
-		[toolbarItem setAction:@selector(toolbarItemSelected:)];
 	}
     else if([itemIdentifier isEqualToString:MusicDatabasePreferencesToolbarItemIdentifier]) {
-        toolbarItem = [[[NSToolbarItem alloc] initWithItemIdentifier:itemIdentifier] autorelease];
-		
 		[toolbarItem setLabel:NSLocalizedStringFromTable(@"Metadata", @"Preferences", @"")];
 		[toolbarItem setPaletteLabel:NSLocalizedStringFromTable(@"Metadata", @"Preferences", @"")];
 		[toolbarItem setToolTip:NSLocalizedStringFromTable(@"Set the output device and replay gain used by Play", @"Preferences", @"")];
 		[toolbarItem setImage:[NSImage imageNamed:@"OutputPreferencesToolbarImage"]];
-		
-		[toolbarItem setTarget:self];
-		[toolbarItem setAction:@selector(toolbarItemSelected:)];
 	}
     else if([itemIdentifier isEqualToString:AdvancedPreferencesToolbarItemIdentifier]) {
-        toolbarItem = [[[NSToolbarItem alloc] initWithItemIdentifier:itemIdentifier] autorelease];
-		
 		[toolbarItem setLabel:NSLocalizedStringFromTable(@"Advanced", @"Preferences", @"")];
 		[toolbarItem setPaletteLabel:NSLocalizedStringFromTable(@"Advanced", @"Preferences", @"")];
 		[toolbarItem setToolTip:NSLocalizedStringFromTable(@"Control the size of the audio buffers used by Play", @"Preferences", @"")];
 		[toolbarItem setImage:[NSImage imageNamed:@"NSAdvanced"]];
-		
-		[toolbarItem setTarget:self];
-		[toolbarItem setAction:@selector(toolbarItemSelected:)];
 	}
 	
     return toolbarItem;

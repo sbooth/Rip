@@ -4,7 +4,7 @@
  */
 
 #import "EncoderPreferencesViewController.h"
-#import "EncoderSettingsSheetController.h"
+#import "NSViewController+PreferencesViewControllerMethods.h"
 #import "EncoderManager.h"
 #import "EncoderInterface/EncoderInterface.h"
 
@@ -72,7 +72,7 @@
 	
 	newViewFrame.size.width += viewDeltaX;
 	newViewFrame.size.height += viewDeltaY;
-
+	
 	// Set the new sizes
 	[self.view setFrame:newViewFrame];
 	[_encoderSettingsView setFrame:newEncoderSettingsViewFrame];
@@ -131,8 +131,25 @@
 	
 	// Remove any encoder settings subviews that are currently being displayed and save the settings
 	if(_encoderSettingsViewController) {
+
+#if USE_ANIMATION
+		NSMutableDictionary *fadeOutAnimationDictionary = [NSMutableDictionary dictionary];
+		
+		[fadeOutAnimationDictionary setObject:_encoderSettingsViewController.view forKey:NSViewAnimationTargetKey];
+        [fadeOutAnimationDictionary setObject:NSViewAnimationFadeOutEffect forKey:NSViewAnimationEffectKey];
+		
+		NSViewAnimation *fadeOutAnimation = [[NSViewAnimation alloc] initWithViewAnimations:[NSArray arrayWithObject:fadeOutAnimationDictionary]];
+		
+		[fadeOutAnimation setDuration:0.25];
+		[fadeOutAnimation setAnimationCurve:NSAnimationEaseIn];
+		[fadeOutAnimation setAnimationBlockingMode:NSAnimationBlocking];
+		
+		[fadeOutAnimation startAnimation];
+#endif
+		
 		[_encoderSettingsViewController.view removeFromSuperview];
-		encoderManager.defaultEncoderSettings = _encoderSettingsViewController.representedObject;
+		
+		[self savePreferences:sender];
 	}
 
 	// The newly selected encoder is now the default
@@ -141,9 +158,14 @@
 	Class encoderClass = [encoderBundle principalClass];
 	NSObject <EncoderInterface> *encoderInterface = [[encoderClass alloc] init];
 
-	// The encoder's view controller uses the representedObject property to hold the encoder settings
 	_encoderSettingsViewController = [encoderInterface configurationViewController];
 
+	// Some encoders may not allow user configuration
+	if(!_encoderSettingsViewController) {
+		NSLog(@"nil NSViewController subclasses aren't currently supported!");
+	}
+
+	// The encoder's view controller uses the representedObject property to hold the encoder settings
 	NSDictionary *encoderSettings = [encoderManager settingsForEncoder:encoderBundle];
 	[_encoderSettingsViewController setRepresentedObject:[encoderSettings mutableCopy]];
 
@@ -179,14 +201,64 @@
 	
 	newViewFrame.size.width += viewDeltaX;
 	newViewFrame.size.height += viewDeltaY;
-	
+
 	// Set the new sizes
+	[[[self view] window] setFrame:newWindowFrame display:YES animate:YES];
 	[self.view setFrame:newViewFrame];
 	[_encoderSettingsView setFrame:newEncoderSettingsViewFrame];
-	[[[self view] window] setFrame:newWindowFrame display:YES animate:YES];
-	
+		
 	// Now that the sizes are correct, add the view controller's view to the view hierarchy
 	[_encoderSettingsView addSubview:_encoderSettingsViewController.view];
+
+#if USE_ANIMATION
+	NSMutableDictionary *fadeInAnimationDictionary = [NSMutableDictionary dictionary];
+
+	[fadeInAnimationDictionary setObject:_encoderSettingsViewController.view forKey:NSViewAnimationTargetKey];	 
+	[fadeInAnimationDictionary setObject:NSViewAnimationFadeInEffect forKey:NSViewAnimationEffectKey];
+
+	NSViewAnimation *fadeInAnimation = [[NSViewAnimation alloc] initWithViewAnimations:[NSArray arrayWithObject:fadeInAnimationDictionary]];
+
+	[fadeInAnimation setDuration:0.25];
+	[fadeInAnimation setAnimationCurve:NSAnimationEaseIn];
+
+	[fadeInAnimation startAnimation];
+#endif
+}
+
+@end
+
+@implementation EncoderPreferencesViewController (PreferencesViewControllerMethods)
+
+- (IBAction) restoreDefaults:(id)sender
+{
+	
+#pragma unused (sender)
+	
+	// Determine which encoder bundle we are working with
+	NSDictionary *encoderDictionary = [_encoderArrayController.selectedObjects lastObject];	
+	NSBundle *encoderBundle = [encoderDictionary objectForKey:@"encoderBundle"];
+	
+	// If the bundle wasn't found, display an appropriate error
+	if(!encoderBundle) {
+		NSError *missingBundleError = [NSError errorWithDomain:NSCocoaErrorDomain code:ENOENT userInfo:nil];
+		[[NSApplication sharedApplication] presentError:missingBundleError];
+		return;
+	}
+	
+	EncoderManager *encoderManager = [EncoderManager sharedEncoderManager];
+	[encoderManager restoreDefaultSettingsForEncoder:encoderBundle];
+
+	NSDictionary *encoderSettings = [encoderManager settingsForEncoder:encoderBundle];
+	[_encoderSettingsViewController setRepresentedObject:[encoderSettings mutableCopy]];
+}
+
+- (IBAction) savePreferences:(id)sender
+{
+
+#pragma unused (sender)
+
+	EncoderManager *encoderManager = [EncoderManager sharedEncoderManager];
+	encoderManager.defaultEncoderSettings = _encoderSettingsViewController.representedObject;	
 }
 
 @end
