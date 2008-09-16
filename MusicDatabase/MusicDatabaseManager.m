@@ -9,6 +9,26 @@
 #import "MusicDatabaseInterface/MusicDatabaseQueryOperation.h"
 
 // ========================================
+// Sorting function for sorting bundles by music database names
+// ========================================
+static NSComparisonResult
+musicDatabaseBundleSortFunction(id bundleA, id bundleB, void *context)
+{
+	
+#pragma unused(context)
+	
+	NSCParameterAssert(nil != bundleA);
+	NSCParameterAssert(nil != bundleB);
+	NSCParameterAssert([bundleA isKindOfClass:[NSBundle class]]);
+	NSCParameterAssert([bundleB isKindOfClass:[NSBundle class]]);
+	
+	NSString *bundleAName = [bundleA objectForInfoDictionaryKey:@"MusicDatabaseName"];
+	NSString *bundleBName = [bundleB objectForInfoDictionaryKey:@"MusicDatabaseName"];
+	
+	return [bundleAName compare:bundleBName];;
+}
+
+// ========================================
 // KVC key names for the music database dictionaries
 // ========================================
 NSString * const	kMusicDatabaseBundleKey					= @"bundle";
@@ -38,9 +58,9 @@ static MusicDatabaseManager *sSharedMusicDatabaseManager	= nil;
 	PlugInManager *plugInManager = [PlugInManager sharedPlugInManager];
 	
 	NSError *error = nil;
-	NSArray *availableEncoders = [plugInManager plugInsConformingToProtocol:@protocol(MusicDatabaseInterface) error:&error];
+	NSArray *availableMusicDatabases = [plugInManager plugInsConformingToProtocol:@protocol(MusicDatabaseInterface) error:&error];
 	
-	return availableEncoders;	
+	return [availableMusicDatabases sortedArrayUsingFunction:musicDatabaseBundleSortFunction context:NULL];
 }
 
 - (NSBundle *) defaultMusicDatabase
