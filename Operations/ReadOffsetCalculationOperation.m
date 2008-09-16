@@ -76,7 +76,6 @@ NSString * const	kConfidenceLevelKey						= @"confidenceLevel";
 	NSInteger firstOffsetToTry = -1 * self.maximumOffsetToCheck.integerValue;
 	NSInteger lastOffsetToTry = self.maximumOffsetToCheck.integerValue;
 	NSInteger currentOffset;
-	
 	for(currentOffset = firstOffsetToTry; currentOffset <= lastOffsetToTry; ++currentOffset) {
 
 		// Allow cancellation
