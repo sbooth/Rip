@@ -42,8 +42,8 @@
 // ========================================
 // Computed properties
 @property (readonly) NSString * musicBrainzDiscID;
-@property (readonly) NSNumber * accurateRipID1;
-@property (readonly) NSNumber * accurateRipID2;
+@property (readonly) NSUInteger accurateRipID1;
+@property (readonly) NSUInteger accurateRipID2;
 
 // ========================================
 

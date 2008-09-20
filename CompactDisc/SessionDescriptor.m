@@ -10,6 +10,23 @@
 @implementation SessionDescriptor
 
 // ========================================
+// Key dependencies
++ (NSSet *) keyPathsForValuesAffectingOrderedTracks
+{
+	return [NSSet setWithObject:@"tracks"];
+}
+
++ (NSSet *) keyPathsForValuesAffectingFirstTrack
+{
+	return [NSSet setWithObject:@"tracks"];
+}
+
++ (NSSet *) keyPathsForValuesAffectingLastTrack
+{
+	return [NSSet setWithObject:@"tracks"];
+}
+
+// ========================================
 // Core Data properties
 @dynamic leadOut;
 @dynamic number;

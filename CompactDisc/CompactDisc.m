@@ -171,6 +171,23 @@ static NSInteger calculateFreeDBDiscIDForCDTOC(CDTOC *toc)
 }
 
 // ========================================
+// Key dependencies
++ (NSSet *) keyPathsForValuesAffectingOrderedSessions
+{
+	return [NSSet setWithObject:@"sessions"];
+}
+
++ (NSSet *) keyPathsForValuesAffectingFirstSession
+{
+	return [NSSet setWithObject:@"sessions"];
+}
+
++ (NSSet *) keyPathsForValuesAffectingLastSession
+{
+	return [NSSet setWithObject:@"sessions"];
+}
+
+// ========================================
 // Core Data properties
 @dynamic discTOC;
 @dynamic freeDBDiscID;
@@ -239,7 +256,7 @@ static NSInteger calculateFreeDBDiscIDForCDTOC(CDTOC *toc)
 	return musicBrainzDiscID;
 }
 
-- (NSNumber *) accurateRipID1
+- (NSUInteger) accurateRipID1
 {
 	// ID 1 is the sum of all the disc's offsets
 	// The lead out is treated as track n + 1, where n is the number of audio tracks
@@ -248,19 +265,18 @@ static NSInteger calculateFreeDBDiscIDForCDTOC(CDTOC *toc)
 	// Use the first session
 	SessionDescriptor *firstSession = self.firstSession;
 	if(!firstSession)
-		return nil;
+		return 0;
 
-	NSSet *tracks = firstSession.tracks;
-	for(TrackDescriptor *track in tracks)
+	for(TrackDescriptor *track in firstSession.tracks)
 		accurateRipID1 += track.firstSector.unsignedIntegerValue;
 	
 	// Adjust for lead out
 	accurateRipID1 += firstSession.leadOut.unsignedIntegerValue;
 	
-	return [NSNumber numberWithUnsignedInteger:accurateRipID1];
+	return accurateRipID1;
 }
 
-- (NSNumber *) accurateRipID2
+- (NSUInteger) accurateRipID2
 {
 	// ID 2 is the sum of all the disc's offsets times their track number
 	// The lead out is treated as track n + 1, where n is the number of audio tracks
@@ -269,7 +285,7 @@ static NSInteger calculateFreeDBDiscIDForCDTOC(CDTOC *toc)
 	// Use the first session
 	SessionDescriptor *firstSession = self.firstSession;
 	if(!firstSession)
-		return nil;
+		return 0;
 
 	NSSet *tracks = firstSession.tracks;
 	for(TrackDescriptor *track in tracks) {
@@ -280,7 +296,7 @@ static NSInteger calculateFreeDBDiscIDForCDTOC(CDTOC *toc)
 	// Adjust for lead out
 	accurateRipID2 += firstSession.leadOut.unsignedIntegerValue * (1 + tracks.count);
 
-	return [NSNumber numberWithUnsignedInteger:accurateRipID2];
+	return accurateRipID2;
 }
 
 // Disc track information
