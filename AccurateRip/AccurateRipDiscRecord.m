@@ -9,6 +9,28 @@
 @implementation AccurateRipDiscRecord
 
 // ========================================
+// Key dependencies
++ (NSSet *) keyPathsForValuesAffectingOrderedTracks
+{
+	return [NSSet setWithObject:@"tracks"];
+}
+
++ (NSSet *) keyPathsForValuesAffectingFirstTrack
+{
+	return [NSSet setWithObject:@"tracks"];
+}
+
++ (NSSet *) keyPathsForValuesAffectingLastTrack
+{
+	return [NSSet setWithObject:@"tracks"];
+}
+
++ (NSSet *) keyPathsForValuesAffectingIsKeyDisc
+{
+	return [NSSet setWithObject:@"tracks"];
+}
+
+// ========================================
 // Core Data properties
 @dynamic URL;
 
@@ -35,6 +57,16 @@
 {
 	NSArray *orderedTracks = self.orderedTracks;
 	return (0 == orderedTracks.count ? nil : orderedTracks.lastObject);
+}
+
+- (BOOL) isKeyDisc
+{
+	for(AccurateRipTrackRecord *trackRecord in self.tracks) {
+		if(!trackRecord.offsetChecksum)
+			return NO;
+	}
+	
+	return YES;
 }
 
 // ========================================

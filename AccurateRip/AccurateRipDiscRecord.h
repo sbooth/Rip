@@ -29,6 +29,7 @@
 @property (readonly) NSArray * orderedTracks;
 @property (readonly) AccurateRipTrackRecord * firstTrack;
 @property (readonly) AccurateRipTrackRecord * lastTrack;
+@property (readonly) BOOL isKeyDisc;
 
 // ========================================
 

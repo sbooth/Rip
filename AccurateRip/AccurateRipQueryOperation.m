@@ -54,8 +54,8 @@
 	
 	CompactDisc *compactDisc = (CompactDisc *)managedObject;
 
-	NSUInteger accurateRipID1 = compactDisc.accurateRipID1.unsignedIntegerValue;
-	NSUInteger accurateRipID2 = compactDisc.accurateRipID2.unsignedIntegerValue;
+	NSUInteger accurateRipID1 = compactDisc.accurateRipID1;
+	NSUInteger accurateRipID2 = compactDisc.accurateRipID2;
 
 	// Use the first session
 	NSSet *sessionTracks = compactDisc.firstSession.tracks;
@@ -149,7 +149,7 @@
 		[compactDisc addAccurateRipDiscsObject:accurateRipDisc];
 		
 		accurateRipDisc.URL = accurateRipURL.absoluteString;
-		
+
 		NSUInteger i;
 		NSUInteger trackDataOffset = pressingDataOffset + (1 + 4 + 4 + 4);
 		for(i = 0; i < arTrackCount; ++i) {
@@ -178,22 +178,28 @@
 			[accurateRipResponseData getBytes:&arOffsetChecksum range:NSMakeRange(trackDataOffset + 1 + 4, 4)];
 			arOffsetChecksum = OSSwapLittleToHostInt32(arOffsetChecksum);
 
-//			NSLog(@"arOffsetChecksum [track %i] = %x", 1 + i, arOffsetChecksum);
-			
 			trackDataOffset += (1 + 4 + 4);
 			
-			// Add the AccurateRipTrackRecord to the AccurateRipDiscRecord if one doesn't exist for this track
+			// Don't add tracks with no information
+			if(!arTrackConfidence && !arTrackChecksum && !arOffsetChecksum)
+				continue;
+			
+			// Add the AccurateRipTrackRecord to the AccurateRipDiscRecord
 			AccurateRipTrackRecord *accurateRipTrack = [NSEntityDescription insertNewObjectForEntityForName:@"AccurateRipTrackRecord" 
 																					 inManagedObjectContext:accurateRipDisc.managedObjectContext];	
 				
 			accurateRipTrack.number = [NSNumber numberWithUnsignedInteger:(1 + i)];
 			[accurateRipDisc addTracksObject:accurateRipTrack];
 			
-			accurateRipTrack.confidenceLevel = [NSNumber numberWithUnsignedChar:arTrackConfidence];
+			if(arTrackConfidence)
+				accurateRipTrack.confidenceLevel = [NSNumber numberWithUnsignedChar:arTrackConfidence];
 
 			// Since Core Data only stores signed integers, cast the unsigned checksum to signed for storage
-			accurateRipTrack.checksum = [NSNumber numberWithInt:(int32_t)arTrackChecksum];
-			accurateRipTrack.offsetChecksum = [NSNumber numberWithInt:(int32_t)arOffsetChecksum];
+			if(arTrackChecksum)
+				accurateRipTrack.checksum = [NSNumber numberWithInt:(int32_t)arTrackChecksum];
+			
+			if(arOffsetChecksum)
+				accurateRipTrack.offsetChecksum = [NSNumber numberWithInt:(int32_t)arOffsetChecksum];
 		}
 		
 		pressingDataOffset += accurateRipDiscDataSize;
