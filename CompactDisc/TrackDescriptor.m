@@ -25,7 +25,7 @@
 @dynamic isSelected;
 @dynamic lastSector;
 @dynamic number;
-@dynamic preGap;
+@dynamic pregap;
 
 // ========================================
 // Core Data relationships

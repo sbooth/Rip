@@ -26,7 +26,7 @@
 @property (assign) NSNumber * isSelected; // Transient
 @property (assign) NSNumber * lastSector;
 @property (assign) NSNumber * number;
-@property (assign) NSNumber * preGap;
+@property (assign) NSNumber * pregap;
 
 // ========================================
 // Core Data relationships
