@@ -10,7 +10,7 @@
 // An NSOperation subclass that scans a compact disc for the pregap
 // for a specified track
 // ========================================
-@interface PreGapDetectionOperation : NSOperation
+@interface PregapDetectionOperation : NSOperation
 {
 @private
 	DADiskRef _disk;				// The DADiskRef holding the CD to scan

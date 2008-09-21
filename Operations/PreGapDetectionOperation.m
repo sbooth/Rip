@@ -3,7 +3,7 @@
  *  All Rights Reserved
  */
 
-#import "PreGapDetectionOperation.h"
+#import "PregapDetectionOperation.h"
 #import "SectorRange.h"
 #import "Drive.h"
 #import "CompactDisc.h"
@@ -73,11 +73,11 @@ convertQSubChannelDataFromBCDToDecimal(struct QSubChannelData *qData)
 	qData->amsf.frame = convertBCDToDecimal(qData->amsf.frame);
 }
 
-@interface PreGapDetectionOperation ()
+@interface PregapDetectionOperation ()
 @property (assign) NSError * error;
 @end
 
-@implementation PreGapDetectionOperation
+@implementation PregapDetectionOperation
 
 @synthesize disk = _disk;
 @synthesize trackID = _trackID;
@@ -113,9 +113,9 @@ convertQSubChannelDataFromBCDToDecimal(struct QSubChannelData *qData)
 	// For the first track, the pre-gap is the area between the sector 0 and the track's first sector
 	if(1 == track.number.unsignedIntegerValue) {
 		if(0 != track.session.firstTrack.firstSector.unsignedIntegerValue)
-		   track.preGap = track.session.firstTrack.firstSector;
+		   track.pregap = track.session.firstTrack.firstSector;
 		else
-			track.preGap = [NSNumber numberWithUnsignedInteger:150];
+			track.pregap = [NSNumber numberWithUnsignedInteger:150];
 		   
 		// Save the changes
 		if(managedObjectContext.hasChanges) {
@@ -160,7 +160,7 @@ convertQSubChannelDataFromBCDToDecimal(struct QSubChannelData *qData)
 
 	// Since the pregap for a track is located at the end of the preceding track, perform a backwards search
 	NSUInteger startSector = lastSector;
-	NSUInteger preGapStart = 0;
+	NSUInteger pregapStart = 0;
 	
 	NSUInteger sectorsRemaining = lastSector - firstSector + 1;
 	while(0 < sectorsRemaining) {
@@ -208,16 +208,16 @@ convertQSubChannelDataFromBCDToDecimal(struct QSubChannelData *qData)
 			
 			// The pregap is encoded as index 0 with the subsequent track number
 			if(1 + trackToScan.number.unsignedIntegerValue == qData->tno && 0 == qData->index) {
-				preGapStart = readRange.firstSector + i;
+				pregapStart = readRange.firstSector + i;
 				break;
 			}
 		}
 		
 		// If no pregap was found, stop looking since this is a backwards search
-		if(0 == preGapStart)
+		if(0 == pregapStart)
 			break;
 		// If the pregap was found, ensure that the entirety was accounted for
-		else if(preGapStart != readRange.firstSector)
+		else if(pregapStart != readRange.firstSector)
 			break;
 		
 		// Housekeeping
@@ -229,8 +229,8 @@ convertQSubChannelDataFromBCDToDecimal(struct QSubChannelData *qData)
 			goto cleanup;
 	}
 
-	if(0 != preGapStart)
-		track.preGap = [NSNumber numberWithUnsignedInteger:(lastSector - preGapStart + 1)];
+	if(0 != pregapStart)
+		track.pregap = [NSNumber numberWithUnsignedInteger:(lastSector - pregapStart + 1)];
 	
 	// Save the changes
 	if(managedObjectContext.hasChanges) {
