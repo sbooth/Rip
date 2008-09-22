@@ -113,9 +113,29 @@ static NSString * const kNetworkOperationQueueKVOContext		= @"org.sbooth.Rip.Com
 @end
 
 // ========================================
-// DiskArbitration eject callback
+// DiskArbitration callback functions
 // ========================================
+void unmountCallback(DADiskRef disk, DADissenterRef dissenter, void *context);
 void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context);
+
+void unmountCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
+{
+	NSCParameterAssert(NULL != context);
+	
+	CompactDiscWindowController *compactDiscWindowController = (CompactDiscWindowController *)context;
+
+	// If there is a dissenter, the unmount did not succeed
+	if(dissenter)
+		[compactDiscWindowController presentError:[NSError errorWithDomain:NSMachErrorDomain code:DADissenterGetStatus(dissenter) userInfo:nil] 
+								   modalForWindow:compactDiscWindowController.window 
+										 delegate:nil 
+							   didPresentSelector:NULL 
+									  contextInfo:NULL];
+	// The disk was successfully unmounted, so register the eject request
+	else
+		DADiskEject(disk, kDADiskEjectOptionDefault, ejectCallback, context);
+}
+
 void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 {
 	
@@ -649,8 +669,8 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 
 #pragma unused(sender)
 
-	// Register the eject request
-	DADiskEject(self.disk, kDADiskEjectOptionDefault, ejectCallback, self);
+	// Register the unmount request- if it is successful the unmount callback will perform the eject
+	DADiskUnmount(self.disk, kDADiskUnmountOptionWhole, unmountCallback, self);
 }
 
 @end
