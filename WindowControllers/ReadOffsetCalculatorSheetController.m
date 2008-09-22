@@ -32,7 +32,7 @@
 // ========================================
 // Context objects for observeValueForKeyPath:ofObject:change:context:
 // ========================================
-NSString * const	kOperationQueueKVOContext				= @"org.sbooth.Rip.ReadOffsetCalculatorSheetController.OperationQueue.KVOContext";
+static NSString * const kOperationQueueKVOContext			= @"org.sbooth.Rip.ReadOffsetCalculatorSheetController.OperationQueue.KVOContext";
 
 @interface ReadOffsetCalculatorSheetController ()
 @property (assign) CompactDisc * compactDisc;
@@ -197,10 +197,9 @@ NSString * const	kOperationQueueKVOContext				= @"org.sbooth.Rip.ReadOffsetCalcu
 		[self.operationQueue addOperation:self.accurateRipQueryOperation];
 	}
 
-	// Extract the first track on the disc that isn't track #1 and is at least six seconds long
-	NSSet *potentialTracksToScan = [self.compactDisc.firstSession.tracks filteredSetUsingPredicate:[NSPredicate predicateWithFormat:@"number >= 2"]];
+	// Extract a portion of the first track on the disc that is at least six seconds long
 	TrackDescriptor *trackToExtract = nil;
-	for(TrackDescriptor *potentialTrack in potentialTracksToScan) {
+	for(TrackDescriptor *potentialTrack in self.compactDisc.firstSession.tracks) {
 		// The track must be at least six seconds long (plus the buffer); if it isn't, skip it
 		if(((6 * CDDA_SECTORS_PER_SECOND) + MAXIMUM_OFFSET_TO_CHECK_IN_SECTORS) > potentialTrack.sectorCount.unsignedIntegerValue)
 			continue;
@@ -221,16 +220,13 @@ NSString * const	kOperationQueueKVOContext				= @"org.sbooth.Rip.ReadOffsetCalcu
 	
 	SectorRange *sectorsToExtract = [SectorRange sectorRangeWithFirstSector:(sixSecondPointSector - MAXIMUM_OFFSET_TO_CHECK_IN_SECTORS)
 																sectorCount:(2 * MAXIMUM_OFFSET_TO_CHECK_IN_SECTORS)];
-	
-	// Create a temporary URL for the extracted audio
-	NSURL *temporaryURL = temporaryURLWithExtension(@"wav");
-	
+
 	self.extractionOperation = [[ExtractionOperation alloc] init];
 	
 	self.extractionOperation.disk = self.disk;
 	self.extractionOperation.sectors = sectorsToExtract;
 	self.extractionOperation.allowedSectors = self.compactDisc.firstSession.sectorRange;
-	self.extractionOperation.URL = temporaryURL;
+	self.extractionOperation.URL = temporaryURLWithExtension(@"wav");
 
 	// Offset calculation
 	self.offsetCalculationOperation = [[ReadOffsetCalculationOperation alloc] init];

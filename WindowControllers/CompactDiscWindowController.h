@@ -19,7 +19,6 @@
 	CompactDisc *_compactDisc;
 	DriveInformation *_driveInformation;
 	
-	NSOperationQueue *_compactDiscOperationQueue;
 	NSOperationQueue *_networkOperationQueue;
 	
 	// State for the current extraction session
@@ -30,7 +29,6 @@
 
 @property (readonly) NSArrayController * trackController;
 @property (readonly) NSObjectController * driveInformationController;
-@property (readonly) NSOperationQueue * compactDiscOperationQueue;
 @property (readonly) NSOperationQueue * networkOperationQueue;
 
 // ========================================
@@ -39,6 +37,9 @@
 @property (assign) DADiskRef disk;
 @property (readonly, assign) CompactDisc * compactDisc;
 @property (readonly, assign) DriveInformation * driveInformation;
+
+@property (readonly) NSManagedObjectContext * managedObjectContext;
+@property (readonly) id managedObjectModel;
 
 // ========================================
 // Action Methods
@@ -49,7 +50,7 @@
 - (IBAction) copySelectedTracks:(id)sender;
 - (IBAction) copyImage:(id)sender;
 
-- (IBAction) detectPreGaps:(id)sender;
+- (IBAction) detectPregaps:(id)sender;
 
 - (IBAction) readMCN:(id)sender;
 - (IBAction) readISRCs:(id)sender;
@@ -59,6 +60,7 @@
 - (IBAction) editTags:(id)sender;
 
 - (IBAction) queryDefaultMusicDatabase:(id)sender;
+- (IBAction) queryMusicDatabase:(id)sender;
 
 - (IBAction) queryAccurateRip:(id)sender;
 
