@@ -50,7 +50,7 @@ NSString * const	kConfidenceLevelKey						= @"confidenceLevel";
 	// Fetch the TrackDescriptor object from the context and ensure it is the correct class
 	NSManagedObject *managedObject = [managedObjectContext objectWithID:self.trackDescriptorID];
 	if(![managedObject isKindOfClass:[TrackDescriptor class]]) {
-		self.error = [NSError errorWithDomain:NSCocoaErrorDomain code:2 userInfo:nil];
+		self.error = [NSError errorWithDomain:NSOSStatusErrorDomain code:paramErr userInfo:nil];
 		return;
 	}
 	
@@ -63,7 +63,7 @@ NSString * const	kConfidenceLevelKey						= @"confidenceLevel";
 	TrackDescriptor *trackDescriptor = (TrackDescriptor *)managedObject;	
 	
 	if(!trackDescriptor) {
-		self.error = [NSError errorWithDomain:NSCocoaErrorDomain code:1 userInfo:nil];
+		self.error = [NSError errorWithDomain:NSOSStatusErrorDomain code:paramErr userInfo:nil];
 		return;
 	}
 	
@@ -86,26 +86,26 @@ NSString * const	kConfidenceLevelKey						= @"confidenceLevel";
 		uint32_t trackActualOffsetChecksum = calculateAccurateRipChecksumForFileRegionUsingOffset(self.URL, 
 																								  singleSectorRange.firstSector,
 																								  singleSectorRange.lastSector,
-																								  trackDescriptor.number.unsignedIntegerValue == trackDescriptor.session.firstTrack.number.unsignedIntegerValue,
-																								  trackDescriptor.number.unsignedIntegerValue == trackDescriptor.session.lastTrack.number.unsignedIntegerValue,
+																								  NO,
+																								  NO,
 																								  currentOffset);
 
 		// Check all the pressings that were found in AccurateRip for matching checksums
 		for(AccurateRipDiscRecord *accurateRipDisc in trackDescriptor.session.disc.accurateRipDiscs) {
 			
+			// Only key discs contain track offset information
+			if(!accurateRipDisc.isKeyDisc)
+				continue;
+			
 			// Determine what AccurateRip checksum we are attempting to match
 			AccurateRipTrackRecord *accurateRipTrack = [accurateRipDisc trackNumber:trackDescriptor.number.unsignedIntegerValue];
 			
 			if(!accurateRipTrack) {
-				self.error = [NSError errorWithDomain:NSCocoaErrorDomain code:1 userInfo:nil];
+				self.error = [NSError errorWithDomain:NSOSStatusErrorDomain code:paramErr userInfo:nil];
 				continue;
 			}
 
-			// Ignore checksums of 0
-			if(trackActualOffsetChecksum && accurateRipTrack.offsetChecksum.unsignedIntegerValue == trackActualOffsetChecksum) {
-#if DEBUG
-				NSLog(@"Possible drive offset of %i (%@)", currentOffset, accurateRipTrack.confidenceLevel);
-#endif
+			if(accurateRipTrack.offsetChecksum.unsignedIntegerValue == trackActualOffsetChecksum) {
 				NSDictionary *offsetDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
 												  [NSNumber numberWithInteger:currentOffset], kReadOffsetKey,
 												  accurateRipTrack.confidenceLevel, kConfidenceLevelKey,

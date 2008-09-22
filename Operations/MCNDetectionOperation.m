@@ -39,7 +39,7 @@
 	// Fetch the CompactDisc object from the context and ensure it is the correct class
 	NSManagedObject *managedObject = [managedObjectContext objectWithID:self.compactDiscID];
 	if(![managedObject isKindOfClass:[CompactDisc class]]) {
-		self.error = [NSError errorWithDomain:NSCocoaErrorDomain code:2 userInfo:nil];
+		self.error = [NSError errorWithDomain:NSOSStatusErrorDomain code:paramErr userInfo:nil];
 		return;
 	}
 	
