@@ -35,7 +35,7 @@
 
 // ========================================
 // Computed properties
-@property (readonly) NSNumber * sectorCount;
+@property (readonly) NSUInteger sectorCount;
 @property (readonly) SectorRange * sectorRange;
 
 @end

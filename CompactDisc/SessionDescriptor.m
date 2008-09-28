@@ -38,9 +38,9 @@
 
 // ========================================
 // Computed properties
-- (NSNumber *) sectorCount
+- (NSUInteger) sectorCount
 {
-	return [NSNumber numberWithUnsignedInteger:self.sectorRange.length];
+	return self.sectorRange.length;
 }
 
 - (SectorRange *) sectorRange
