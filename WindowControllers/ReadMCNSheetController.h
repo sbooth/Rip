@@ -11,6 +11,8 @@
 // ========================================
 @interface ReadMCNSheetController : NSWindowController
 {
+	IBOutlet NSProgressIndicator *_progressIndicator;
+
 @private
 	DADiskRef _disk;
 	NSManagedObjectID *_compactDiscID;
@@ -25,8 +27,6 @@
 // ========================================
 // Action Methods
 - (IBAction) readMCN:(id)sender;
-
-//- (IBAction) ok:(id)sender;
 - (IBAction) cancel:(id)sender;
 
 @end

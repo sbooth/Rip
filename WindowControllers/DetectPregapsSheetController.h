@@ -11,10 +11,14 @@
 // ========================================
 @interface DetectPregapsSheetController : NSWindowController
 {
+	IBOutlet NSProgressIndicator *_progressIndicator;
+	IBOutlet NSTextField *_statusTextField;
+
 @private
 	DADiskRef _disk;
-	NSArray *_tracksIDs;
+	NSArray *_trackIDs;
 	NSOperationQueue *_operationQueue;
+	NSManagedObjectContext *_managedObjectContext;
 }
 
 // ========================================
@@ -25,8 +29,6 @@
 // ========================================
 // Action Methods
 - (IBAction) detectPregaps:(id)sender;
-
-//- (IBAction) ok:(id)sender;
 - (IBAction) cancel:(id)sender;
 
 @end

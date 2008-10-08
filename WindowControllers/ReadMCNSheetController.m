@@ -34,20 +34,30 @@ static NSString * const kOperationQueueKVOContext		= @"org.sbooth.Rip.ReadMCNShe
 	return self;
 }
 
-- (void) awakeFromNib
-{
-}
-
 - (void) observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
 {
 	if(kOperationQueueKVOContext == context) {
-		if([keyPath isEqualToString:@"isFinished"]) {
-			NSOperation *operation = (NSOperation *)object;
+		if([keyPath isEqualToString:@"isCancelled"]) {
+			MCNDetectionOperation *operation = (MCNDetectionOperation *)object;
+			
+			[operation removeObserver:self forKeyPath:@"isCancelled"];
+			[operation removeObserver:self forKeyPath:@"isFinished"];
+			
+			[_progressIndicator unbind:@"animate"];
+			
+			if(operation.error)
+				[self presentError:operation.error modalForWindow:self.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
+		}
+		else if([keyPath isEqualToString:@"isFinished"]) {
+			MCNDetectionOperation *operation = (MCNDetectionOperation *)object;
+
+			[operation removeObserver:self forKeyPath:@"isCancelled"];
 			[operation removeObserver:self forKeyPath:@"isFinished"];
 
-			NSError *error = [operation valueForKey:@"error"];
-			if(error)
-				[self presentError:error modalForWindow:self.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
+			[_progressIndicator unbind:@"animate"];
+			
+			if(operation.error)
+				[self presentError:operation.error modalForWindow:self.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
 			else if([operation isFinished])
 				[[NSApplication sharedApplication] endSheet:self.window returnCode:NSOKButton];
 		}
@@ -66,8 +76,11 @@ static NSString * const kOperationQueueKVOContext		= @"org.sbooth.Rip.ReadMCNShe
 	operation.disk = self.disk;
 	operation.compactDiscID = self.compactDiscID;
 	
-	[operation addObserver:self forKeyPath:@"isFinished" options:0 context:kOperationQueueKVOContext];
+	[operation addObserver:self forKeyPath:@"isFinished" options:NSKeyValueObservingOptionNew context:kOperationQueueKVOContext];
+	[operation addObserver:self forKeyPath:@"isCancelled" options:NSKeyValueObservingOptionNew context:kOperationQueueKVOContext];
 
+	[_progressIndicator bind:@"animate" toObject:operation withKeyPath:@"isExecuting" options:nil];
+	
 	[self.operationQueue addOperation:operation];
 }
 
@@ -77,7 +90,6 @@ static NSString * const kOperationQueueKVOContext		= @"org.sbooth.Rip.ReadMCNShe
 #pragma unused(sender)
 	
 	[self.operationQueue cancelAllOperations];
-	
 	[[NSApplication sharedApplication] endSheet:self.window returnCode:NSCancelButton];
 }
 
