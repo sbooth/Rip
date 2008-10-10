@@ -13,7 +13,7 @@
 @interface PregapDetectionOperation : NSOperation
 {
 @private
-	DADiskRef _disk;				// The DADiskRef holding the CD to scan
+	__strong DADiskRef _disk;		// The DADiskRef holding the CD to scan
 	NSManagedObjectID *_trackID;	// The CD will be scanned for the pre-gap of this track
 	
 	NSError *_error;				// Holds the first error (if any) occurring during scanning

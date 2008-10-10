@@ -12,7 +12,7 @@
 @interface ISRCDetectionOperation : NSOperation
 {
 @private
-	DADiskRef _disk;				// The DADiskRef holding the CD to scan
+	__strong DADiskRef _disk;		// The DADiskRef holding the CD to scan
 	NSManagedObjectID *_trackID;	// The track to be scanned
 	
 	NSError *_error;				// Holds the first error (if any) occurring during scanning
