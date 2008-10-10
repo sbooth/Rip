@@ -124,6 +124,9 @@ diskDisappearedCallback(DADiskRef disk, void *context)
 	[defaultsDictionary setObject:@"org.sbooth.Rip.MusicDatabase.MusicBrainz" forKey:@"defaultMusicDatabase"];
 	[defaultsDictionary setObject:@"org.sbooth.Rip.Encoder.FLAC" forKey:@"defaultEncoder"];
 	
+	// Enable Sparkle system profiling
+	[defaultsDictionary setObject:[NSNumber numberWithBool:YES] forKey:@"SUEnableSystemProfiling"];
+	
 	[[NSUserDefaults standardUserDefaults] registerDefaults:defaultsDictionary];
 }
 
@@ -387,7 +390,7 @@ diskDisappearedCallback(DADiskRef disk, void *context)
 		[compactDiscWindow showWindow:self];
 	
 	// If the read offset for the drive isn't configured, give the user the opportunity to configure it now
-	if(1||!compactDiscWindow.driveInformation.readOffset) {		
+	if(!compactDiscWindow.driveInformation.readOffset) {		
 		NSBeginAlertSheet([NSString stringWithFormat:@"The read offset for \u201c%@ %@\u201d is unknown.  Would you like to determine the drive's read offset now?", compactDiscWindow.driveInformation.vendorName, compactDiscWindow.driveInformation.productName],
 						  @"Yes", 
 						  @"No",
@@ -487,7 +490,7 @@ diskDisappearedCallback(DADiskRef disk, void *context)
 			[userInfo setObject:NSLocalizedStringFromTable(@"Unable to read the license file", @"Errors", @"") forKey:NSLocalizedDescriptionKey];
 			[userInfo setObject:NSLocalizedStringFromTable(@"The license could be incomplete or might contain an invalid key.", @"Errors", @"") forKey:NSLocalizedRecoverySuggestionErrorKey];
 			
-			*error = [NSError errorWithDomain:@"org.sbooth.Rip.ErrorDomain" code:20 userInfo:userInfo];
+			*error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadUnknownError userInfo:userInfo];
 		}
 		
 		return NO;		
