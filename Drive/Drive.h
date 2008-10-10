@@ -23,7 +23,7 @@ enum {
 @interface Drive : NSObject
 {
 @private
-	DADiskRef _disk;
+	__strong DADiskRef _disk;
 	int _fd;
 	NSUInteger _cacheSize;
 	NSError *_error;
