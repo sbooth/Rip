@@ -7,18 +7,12 @@
 #include <DiskArbitration/DiskArbitration.h>
 
 @class CompactDisc, DriveInformation;
-@class AccurateRipQueryOperation, ExtractionOperation, ReadOffsetCalculationOperation;
 
 @interface ReadOffsetCalculatorSheetController : NSWindowController
 {
-	IBOutlet NSProgressIndicator *_accurateRipQueryProgressIndicator;
-	IBOutlet NSProgressIndicator *_extractionProgressIndicator;
-	IBOutlet NSProgressIndicator *_offsetCalculationProgressIndicator;
-
-	IBOutlet NSTextField *_accurateRipQueryTextField;
-	IBOutlet NSTextField *_extractionTextField;
-	IBOutlet NSTextField *_offsetCalculationTextField;
-
+	IBOutlet NSProgressIndicator *_progressIndicator;
+	IBOutlet NSTextField *_statusTextField;
+	
 	IBOutlet NSTextField *_suggestedOffsetTextField;
 	IBOutlet NSArrayController *_possibleOffsetsArrayController;
 	
@@ -29,10 +23,8 @@
 	DADiskRef _disk;
 	CompactDisc *_compactDisc;
 	DriveInformation *_driveInformation;
+	NSManagedObjectContext *_managedObjectContext;
 	NSOperationQueue *_operationQueue;
-	AccurateRipQueryOperation *_accurateRipQueryOperation;
-	ExtractionOperation *_extractionOperation;
-	ReadOffsetCalculationOperation *_offsetCalculationOperation;
 	BOOL _possibleOffsetsShown;
 }
 
@@ -43,16 +35,10 @@
 @property (readonly, assign) CompactDisc * compactDisc;
 @property (readonly, assign) DriveInformation * driveInformation;
 
-@property (readonly) NSOperationQueue * operationQueue;
-
-@property (readonly, assign) AccurateRipQueryOperation * accurateRipQueryOperation;
-@property (readonly, assign) ExtractionOperation * extractionOperation;
-@property (readonly, assign) ReadOffsetCalculationOperation * offsetCalculationOperation;
+@property (readonly, assign) NSManagedObjectContext * managedObjectContext;
+@property (readonly, assign) NSOperationQueue * operationQueue;
 
 @property (readonly, assign) BOOL possibleOffsetsShown;
-
-@property (readonly) NSManagedObjectContext * managedObjectContext;
-@property (readonly) id managedObjectModel;
 
 // ========================================
 // Action Methods

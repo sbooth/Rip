@@ -32,15 +32,20 @@
 // ========================================
 // Context objects for observeValueForKeyPath:ofObject:change:context:
 // ========================================
-static NSString * const kOperationQueueKVOContext			= @"org.sbooth.Rip.ReadOffsetCalculatorSheetController.OperationQueue.KVOContext";
+static NSString * const kQueryAccurateRipKVOContext		= @"org.sbooth.Rip.ReadOffsetCalculatorSheetController.AccurateRipQueryKVOContext";
+static NSString * const kExtractAudioKVOContext			= @"org.sbooth.Rip.ReadOffsetCalculatorSheetController.ExtractAudioKVOContext";
+static NSString * const kCalculateOffsetsKVOContext		= @"org.sbooth.Rip.ReadOffsetCalculatorSheetController.CalculateOffsetsKVOContext";
 
 @interface ReadOffsetCalculatorSheetController ()
 @property (assign) CompactDisc * compactDisc;
 @property (assign) DriveInformation * driveInformation;
-@property (assign) AccurateRipQueryOperation * accurateRipQueryOperation;
-@property (assign) ExtractionOperation * extractionOperation;
-@property (assign) ReadOffsetCalculationOperation * offsetCalculationOperation;
+@property (assign) NSManagedObjectContext * managedObjectContext;
+@property (assign) NSOperationQueue * operationQueue;
 @property (assign) BOOL possibleOffsetsShown;
+@end
+
+@interface ReadOffsetCalculatorSheetController (Callbacks)
+- (void) didPresentErrorWithRecovery:(BOOL)didRecover contextInfo:(void *)contextInfo;
 @end
 
 @implementation ReadOffsetCalculatorSheetController
@@ -49,19 +54,21 @@ static NSString * const kOperationQueueKVOContext			= @"org.sbooth.Rip.ReadOffse
 @synthesize compactDisc = _compactDisc;
 @synthesize driveInformation = _driveInformation;
 
+@synthesize managedObjectContext = _managedObjectContext;
 @synthesize operationQueue = _operationQueue;
-
-@synthesize accurateRipQueryOperation = _accurateRipQueryOperation;
-@synthesize extractionOperation = _extractionOperation;
-@synthesize offsetCalculationOperation = _offsetCalculationOperation;
 
 @synthesize possibleOffsetsShown = _possibleOffsetsShown;
 
 - (id) init
 {
 	if((self = [super initWithWindowNibName:@"ReadOffsetCalculatorSheet"])) {
-		_operationQueue = [[NSOperationQueue alloc] init];
-		_possibleOffsetsShown = YES;		
+		// Create our own context for accessing the store
+		self.managedObjectContext = [[NSManagedObjectContext alloc] init];
+		[self.managedObjectContext setPersistentStoreCoordinator:[[[NSApplication sharedApplication] delegate] persistentStoreCoordinator]];
+
+		self.operationQueue = [[NSOperationQueue alloc] init];
+
+		_possibleOffsetsShown = YES;
 	}
 	return self;
 }
@@ -76,10 +83,6 @@ static NSString * const kOperationQueueKVOContext			= @"org.sbooth.Rip.ReadOffse
 
 - (void) awakeFromNib
 {
-	[_accurateRipQueryTextField setTextColor:[NSColor disabledControlTextColor]];
-	[_extractionTextField setTextColor:[NSColor disabledControlTextColor]];
-	[_offsetCalculationTextField setTextColor:[NSColor disabledControlTextColor]];
-
 	[self togglePossibleOffsetsShown:self];
 	
 	// Automatically sort the possible offsets based on confidence level
@@ -89,42 +92,80 @@ static NSString * const kOperationQueueKVOContext			= @"org.sbooth.Rip.ReadOffse
 
 - (void) observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
 {
-	if(kOperationQueueKVOContext == context) {
-		if(object == self.accurateRipQueryOperation) {
-			if([keyPath isEqualToString:@"isExecuting"])
-				[_accurateRipQueryTextField setTextColor:(self.accurateRipQueryOperation.isExecuting ? [NSColor controlTextColor] : [NSColor disabledControlTextColor])];
-			else if([keyPath isEqualToString:@"isFinished"])
-				[_accurateRipQueryTextField setTextColor:(self.accurateRipQueryOperation.isFinished ? [NSColor disabledControlTextColor] : [NSColor controlTextColor])];
+	if(kQueryAccurateRipKVOContext == context) {
+		AccurateRipQueryOperation *operation = (AccurateRipQueryOperation *)object;
+		
+		if([keyPath isEqualToString:@"isExecuting"]) {
+			if([operation isExecuting])
+				[_statusTextField setStringValue:NSLocalizedString(@"Checking for disc in AccurateRip", @"")];
 		}
-		else if(object == self.extractionOperation) {
-			if([keyPath isEqualToString:@"isExecuting"])
-				[_extractionTextField setTextColor:(self.extractionOperation.isExecuting ? [NSColor controlTextColor] : [NSColor disabledControlTextColor])];
-			else if([keyPath isEqualToString:@"isFinished"])
-				[_extractionTextField setTextColor:(self.extractionOperation.isFinished ? [NSColor disabledControlTextColor] : [NSColor controlTextColor])];
+		else if([keyPath isEqualToString:@"isCancelled"]) {
+			[operation removeObserver:self forKeyPath:@"isExecuting"];
+			[operation removeObserver:self forKeyPath:@"isCancelled"];
+			[operation removeObserver:self forKeyPath:@"isFinished"];
 		}
-		else if(object == self.offsetCalculationOperation) {
-			if([keyPath isEqualToString:@"isExecuting"])
-				[_offsetCalculationTextField setTextColor:(self.offsetCalculationOperation.isExecuting ? [NSColor controlTextColor] : [NSColor disabledControlTextColor])];
-			else if([keyPath isEqualToString:@"isFinished"]) {
-				[_offsetCalculationTextField setTextColor:(self.offsetCalculationOperation.isFinished ? [NSColor disabledControlTextColor] : [NSColor controlTextColor])];
+		else if([keyPath isEqualToString:@"isFinished"]) {
+			[operation removeObserver:self forKeyPath:@"isExecuting"];
+			[operation removeObserver:self forKeyPath:@"isCancelled"];
+			[operation removeObserver:self forKeyPath:@"isFinished"];
+		}		
+	}
+	else if(kExtractAudioKVOContext == context) {
+		ExtractionOperation *operation = (ExtractionOperation *)object;
+		
+		if([keyPath isEqualToString:@"isExecuting"]) {
+			if([operation isExecuting])
+				[_statusTextField setStringValue:NSLocalizedString(@"Extracting audio", @"")];
+		}
+		else if([keyPath isEqualToString:@"isCancelled"]) {
+			[operation removeObserver:self forKeyPath:@"isExecuting"];
+			[operation removeObserver:self forKeyPath:@"isCancelled"];
+			[operation removeObserver:self forKeyPath:@"isFinished"];
+		}
+		else if([keyPath isEqualToString:@"isFinished"]) {
+			[operation removeObserver:self forKeyPath:@"isExecuting"];
+			[operation removeObserver:self forKeyPath:@"isCancelled"];
+			[operation removeObserver:self forKeyPath:@"isFinished"];
+		}
+		
+	}
+	else if(kCalculateOffsetsKVOContext == context) {
+		ReadOffsetCalculationOperation *operation = (ReadOffsetCalculationOperation *)object;
+		
+		if([keyPath isEqualToString:@"isExecuting"]) {
+			if([operation isExecuting])
+				[_statusTextField setStringValue:NSLocalizedString(@"Calculating possible read offsets", @"")];
+		}
+		else if([keyPath isEqualToString:@"isCancelled"]) {
+			[operation removeObserver:self forKeyPath:@"isExecuting"];
+			[operation removeObserver:self forKeyPath:@"isCancelled"];
+			[operation removeObserver:self forKeyPath:@"isFinished"];
+		}
+		else if([keyPath isEqualToString:@"isFinished"]) {
+			if([operation isFinished]) {
+				[_possibleOffsetsArrayController addObjects:operation.possibleReadOffsets];
 
-				if(self.offsetCalculationOperation.isFinished) {
-					[_possibleOffsetsArrayController addObjects:self.offsetCalculationOperation.possibleReadOffsets];
-					
-					// The user may have reordered the table, so we can't rely on the first object in arrangedObjects
-					// being the offset with the highest confidence level
-					NSSortDescriptor *confidenceLevelSortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"confidenceLevel" ascending:NO];
-					NSArray *sortedPossibleOffsets = [[_possibleOffsetsArrayController arrangedObjects] sortedArrayUsingDescriptors:[NSArray arrayWithObject:confidenceLevelSortDescriptor]];
-
-					NSDictionary *highestConfidenceLevel = nil;
-					if([sortedPossibleOffsets count])
-						highestConfidenceLevel = [sortedPossibleOffsets objectAtIndex:0];
-					
-					if(highestConfidenceLevel)
-						[_suggestedOffsetTextField setIntegerValue:[[highestConfidenceLevel valueForKey:kReadOffsetKey] integerValue]];
-				}
+				[_statusTextField setStringValue:[NSString stringWithFormat:NSLocalizedString(@"Detected %i possible read offsets", @""), [[_possibleOffsetsArrayController arrangedObjects] count]]];
+				[_progressIndicator stopAnimation:self];
+				
+				// The user may have reordered the table, so we can't rely on the first object in arrangedObjects
+				// being the offset with the highest confidence level
+				NSSortDescriptor *confidenceLevelSortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"confidenceLevel" ascending:NO];
+				NSArray *sortedPossibleOffsets = [[_possibleOffsetsArrayController arrangedObjects] sortedArrayUsingDescriptors:[NSArray arrayWithObject:confidenceLevelSortDescriptor]];
+				
+				NSDictionary *highestConfidenceLevel = nil;
+				if([sortedPossibleOffsets count])
+					highestConfidenceLevel = [sortedPossibleOffsets objectAtIndex:0];
+				
+				if(highestConfidenceLevel)
+					[_suggestedOffsetTextField setIntegerValue:[[highestConfidenceLevel valueForKey:kReadOffsetKey] integerValue]];
 			}
+			
+			[operation removeObserver:self forKeyPath:@"isExecuting"];
+			[operation removeObserver:self forKeyPath:@"isCancelled"];
+			[operation removeObserver:self forKeyPath:@"isFinished"];
 		}
+		
 	}
 	else
 		[super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
@@ -151,19 +192,6 @@ static NSString * const kOperationQueueKVOContext			= @"org.sbooth.Rip.ReadOffse
 		return YES;
 }
 
-#pragma mark Core Data
-
-// All instances of this class share the application's ManagedObjectContext and ManagedObjectModel
-- (NSManagedObjectContext *) managedObjectContext
-{
-	return [[[NSApplication sharedApplication] delegate] managedObjectContext];
-}
-
-- (id) managedObjectModel
-{
-	return [[[NSApplication sharedApplication] delegate] managedObjectModel];
-}
-
 - (void) setDisk:(DADiskRef)disk
 {
 	if(disk != _disk) {
@@ -175,6 +203,7 @@ static NSString * const kOperationQueueKVOContext			= @"org.sbooth.Rip.ReadOffse
 		
 		if(disk) {
 			_disk = DADiskCopyWholeDisk(disk);
+
 			self.compactDisc = [CompactDisc compactDiscWithDADiskRef:self.disk inManagedObjectContext:self.managedObjectContext];
 			self.driveInformation = [DriveInformation driveInformationWithDADiskRef:self.disk inManagedObjectContext:self.managedObjectContext];
 		}
@@ -186,22 +215,19 @@ static NSString * const kOperationQueueKVOContext			= @"org.sbooth.Rip.ReadOffse
 	
 #pragma unused(sender)
 	
-	// Set up  operations for querying AccurateRip and extracting the audio
-	if(!self.accurateRipQueryOperation) {
-		self.accurateRipQueryOperation = [[AccurateRipQueryOperation alloc] init];
-		self.accurateRipQueryOperation.compactDiscID = self.compactDisc.objectID;
-		
-		[self.accurateRipQueryOperation addObserver:self forKeyPath:@"isExecuting" options:0 context:kOperationQueueKVOContext];
-		[self.accurateRipQueryOperation addObserver:self forKeyPath:@"isFinished" options:0 context:kOperationQueueKVOContext];
-		
-		[self.operationQueue addOperation:self.accurateRipQueryOperation];
-	}
+	[_progressIndicator startAnimation:sender];
 
+	// Set up  operations for querying AccurateRip and extracting the audio
+	AccurateRipQueryOperation *accurateRipQueryOperation = [[AccurateRipQueryOperation alloc] init];
+	
+	accurateRipQueryOperation = [[AccurateRipQueryOperation alloc] init];
+	accurateRipQueryOperation.compactDiscID = self.compactDisc.objectID;
+	
 	// Extract a portion of the first track on the disc that is at least six seconds long
 	TrackDescriptor *trackToExtract = nil;
 	for(TrackDescriptor *potentialTrack in self.compactDisc.firstSession.tracks) {
 		// The track must be at least six seconds long (plus the buffer); if it isn't, skip it
-		if(((6 * CDDA_SECTORS_PER_SECOND) + MAXIMUM_OFFSET_TO_CHECK_IN_SECTORS) > potentialTrack.sectorCount.unsignedIntegerValue)
+		if(((6 * CDDA_SECTORS_PER_SECOND) + MAXIMUM_OFFSET_TO_CHECK_IN_SECTORS) > potentialTrack.sectorCount)
 			continue;
 		
 		trackToExtract = potentialTrack;
@@ -210,6 +236,7 @@ static NSString * const kOperationQueueKVOContext			= @"org.sbooth.Rip.ReadOffse
 	
 	if(!trackToExtract) {
 		NSBeep();
+		// TODO: Descriptive error message
 		return;
 	}
 
@@ -221,34 +248,42 @@ static NSString * const kOperationQueueKVOContext			= @"org.sbooth.Rip.ReadOffse
 	SectorRange *sectorsToExtract = [SectorRange sectorRangeWithFirstSector:(sixSecondPointSector - MAXIMUM_OFFSET_TO_CHECK_IN_SECTORS)
 																sectorCount:(2 * MAXIMUM_OFFSET_TO_CHECK_IN_SECTORS)];
 
-	self.extractionOperation = [[ExtractionOperation alloc] init];
+	ExtractionOperation *extractionOperation = [[ExtractionOperation alloc] init];
 	
-	self.extractionOperation.disk = self.disk;
-	self.extractionOperation.sectors = sectorsToExtract;
-	self.extractionOperation.allowedSectors = self.compactDisc.firstSession.sectorRange;
-	self.extractionOperation.URL = temporaryURLWithExtension(@"wav");
+	extractionOperation.disk = self.disk;
+	extractionOperation.sectors = sectorsToExtract;
+	extractionOperation.allowedSectors = self.compactDisc.firstSession.sectorRange;
+	extractionOperation.URL = temporaryURLWithExtension(@"wav");
 
 	// Offset calculation
-	self.offsetCalculationOperation = [[ReadOffsetCalculationOperation alloc] init];
+	ReadOffsetCalculationOperation *offsetCalculationOperation = [[ReadOffsetCalculationOperation alloc] init];
 	
-	self.offsetCalculationOperation.URL = self.extractionOperation.URL;
-	self.offsetCalculationOperation.trackDescriptorID = trackToExtract.objectID;
-	self.offsetCalculationOperation.maximumOffsetToCheck = [NSNumber numberWithUnsignedInteger:(MAXIMUM_OFFSET_TO_CHECK_IN_SECTORS * AUDIO_FRAMES_PER_CDDA_SECTOR)];
+	offsetCalculationOperation.URL = extractionOperation.URL;
+	offsetCalculationOperation.trackDescriptorID = trackToExtract.objectID;
+	offsetCalculationOperation.sixSecondPointSector = MAXIMUM_OFFSET_TO_CHECK_IN_SECTORS;
+	offsetCalculationOperation.maximumOffsetToCheck = (MAXIMUM_OFFSET_TO_CHECK_IN_SECTORS * AUDIO_FRAMES_PER_CDDA_SECTOR);
 
-	// Observe the operations
-	[self.extractionOperation addObserver:self forKeyPath:@"isExecuting" options:0 context:kOperationQueueKVOContext];
-	[self.extractionOperation addObserver:self forKeyPath:@"isFinished" options:0 context:kOperationQueueKVOContext];
-	
-	[self.offsetCalculationOperation addObserver:self forKeyPath:@"isExecuting" options:0 context:kOperationQueueKVOContext];
-	[self.offsetCalculationOperation addObserver:self forKeyPath:@"isFinished" options:0 context:kOperationQueueKVOContext];
-	
 	// Set up operation dependencies
-	[self.extractionOperation addDependency:self.accurateRipQueryOperation];
-	[self.offsetCalculationOperation addDependency:self.extractionOperation];
+	[extractionOperation addDependency:accurateRipQueryOperation];
+	[offsetCalculationOperation addDependency:extractionOperation];
+	
+	// Observe the operations' state
+	[accurateRipQueryOperation addObserver:self forKeyPath:@"isExecuting" options:NSKeyValueObservingOptionNew context:kQueryAccurateRipKVOContext];
+	[accurateRipQueryOperation addObserver:self forKeyPath:@"isCancelled" options:NSKeyValueObservingOptionNew context:kQueryAccurateRipKVOContext];
+	[accurateRipQueryOperation addObserver:self forKeyPath:@"isFinished" options:NSKeyValueObservingOptionNew context:kQueryAccurateRipKVOContext];
+	
+	[extractionOperation addObserver:self forKeyPath:@"isExecuting" options:NSKeyValueObservingOptionNew context:kExtractAudioKVOContext];
+	[extractionOperation addObserver:self forKeyPath:@"isCancelled" options:NSKeyValueObservingOptionNew context:kExtractAudioKVOContext];
+	[extractionOperation addObserver:self forKeyPath:@"isFinished" options:NSKeyValueObservingOptionNew context:kExtractAudioKVOContext];
+	
+	[offsetCalculationOperation addObserver:self forKeyPath:@"isExecuting" options:NSKeyValueObservingOptionNew context:kCalculateOffsetsKVOContext];
+	[offsetCalculationOperation addObserver:self forKeyPath:@"isCancelled" options:NSKeyValueObservingOptionNew context:kCalculateOffsetsKVOContext];
+	[offsetCalculationOperation addObserver:self forKeyPath:@"isFinished" options:NSKeyValueObservingOptionNew context:kCalculateOffsetsKVOContext];
 	
 	// Go!
-	[self.operationQueue addOperation:self.extractionOperation];
-	[self.operationQueue addOperation:self.offsetCalculationOperation];
+	[self.operationQueue addOperation:accurateRipQueryOperation];
+	[self.operationQueue addOperation:extractionOperation];
+	[self.operationQueue addOperation:offsetCalculationOperation];
 }
 
 - (IBAction) acceptSuggestedOffset:(id)sender
@@ -271,6 +306,15 @@ static NSString * const kOperationQueueKVOContext			= @"org.sbooth.Rip.ReadOffse
 	if(highestConfidenceLevel)
 		self.driveInformation.readOffset = [highestConfidenceLevel valueForKey:kReadOffsetKey];
 	
+	// Save the changes
+	if(self.managedObjectContext.hasChanges) {
+		NSError *error = nil;
+		if(![self.managedObjectContext save:&error])
+			[self presentError:error modalForWindow:self.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
+	}
+
+	self.disk = NULL;
+	
 	[[NSApplication sharedApplication] endSheet:self.window returnCode:NSOKButton];
 }
 
@@ -280,7 +324,8 @@ static NSString * const kOperationQueueKVOContext			= @"org.sbooth.Rip.ReadOffse
 #pragma unused(sender)
 
 	[self.operationQueue cancelAllOperations];
-	
+	self.disk = NULL;
+
 	[[NSApplication sharedApplication] endSheet:self.window returnCode:NSCancelButton];
 }
 
@@ -324,7 +369,28 @@ static NSString * const kOperationQueueKVOContext			= @"org.sbooth.Rip.ReadOffse
 	
 	self.driveInformation.readOffset = [[_possibleOffsetsArrayController selection] valueForKey:kReadOffsetKey];
 	
+	// Save the changes
+	if(self.managedObjectContext.hasChanges) {
+		NSError *error = nil;
+		if(![self.managedObjectContext save:&error])
+			[self presentError:error modalForWindow:self.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
+	}
+	
+	self.disk = NULL;
+
 	[[NSApplication sharedApplication] endSheet:self.window returnCode:NSOKButton];
+}
+
+@end
+
+@implementation ReadOffsetCalculatorSheetController (Callbacks)
+
+- (void) didPresentErrorWithRecovery:(BOOL)didRecover contextInfo:(void *)contextInfo
+{
+	
+#pragma unused(contextInfo)
+	
+	[[NSApplication sharedApplication] endSheet:self.window returnCode:(didRecover ? NSOKButton : NSCancelButton)];	
 }
 
 @end
