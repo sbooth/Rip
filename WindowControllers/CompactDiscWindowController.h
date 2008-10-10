@@ -10,9 +10,11 @@
 
 @interface CompactDiscWindowController : NSWindowController
 {
-	IBOutlet NSArrayController *_trackController;
 	IBOutlet NSObjectController *_driveInformationController;
+	IBOutlet NSObjectController *_compactDiscController;
+	IBOutlet NSArrayController *_trackController;
 	IBOutlet NSTableView *_trackTable;
+	IBOutlet NSDrawer *_metadataDrawer;
 	
 @private
 	DADiskRef _disk;
@@ -20,11 +22,6 @@
 	DriveInformation *_driveInformation;
 	
 	NSOperationQueue *_networkOperationQueue;
-	
-	// State for the current extraction session
-	NSSet *_tracksToBeExtracted;
-	NSSet *_tracksAccuratelyExtracted;
-	NSArray *_tracksNotAccuratelyExtracted;
 }
 
 @property (readonly) NSArrayController * trackController;
@@ -47,6 +44,8 @@
 - (IBAction) selectAllTracks:(id)sender;
 - (IBAction) deselectAllTracks:(id)sender;
 
+- (IBAction) toggleMetadataDrawer:(id)sender;
+
 - (IBAction) copySelectedTracks:(id)sender;
 - (IBAction) copyImage:(id)sender;
 
@@ -56,8 +55,6 @@
 - (IBAction) readISRCs:(id)sender;
 
 - (IBAction) createCueSheet:(id)sender;
-
-- (IBAction) editTags:(id)sender;
 
 - (IBAction) queryDefaultMusicDatabase:(id)sender;
 - (IBAction) queryMusicDatabase:(id)sender;
