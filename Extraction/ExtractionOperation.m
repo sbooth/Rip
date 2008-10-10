@@ -23,7 +23,7 @@
 @property (assign) BitArray * errorFlags;
 @property (assign) NSString * MD5;
 @property (assign) NSString * SHA1;
-@property (assign) NSNumber * fractionComplete;
+@property (assign) float fractionComplete;
 @end
 
 @interface ExtractionOperation (Private)
@@ -170,7 +170,7 @@
 	// Setup C2 error flag tracking
 	self.errorFlags = [[BitArray alloc] initWithBitCount:self.sectorsRead.length];
 	
-	self.fractionComplete = [NSNumber numberWithInt:0];
+	self.fractionComplete = 0;
 	
 	// ========================================
 	// EXTRACTION PHASE 1: PREPEND SILENCE AS NECESSARY
@@ -276,7 +276,7 @@
 		
 		// Housekeeping
 		sectorsRemaining -= sectorsRead;
-		self.fractionComplete = [NSNumber numberWithFloat:(1.f - (sectorsRemaining / (float)self.sectorsRead.length))];
+		self.fractionComplete = (1.f - (sectorsRemaining / (float)self.sectorsRead.length));
 		
 		// Stop if requested
 		if(self.isCancelled)
@@ -316,7 +316,7 @@
 	// ========================================
 	// COMPLETE EXTRACTION
 	
-	self.fractionComplete = [NSNumber numberWithInt:1];
+	self.fractionComplete = 1;
 
 	// Complete the MD5 and SHA1 calculations and store the result
 	unsigned char md5Digest [CC_MD5_DIGEST_LENGTH];

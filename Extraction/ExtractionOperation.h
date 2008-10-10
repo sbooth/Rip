@@ -16,14 +16,14 @@
 @interface ExtractionOperation : NSOperation
 {
 @private
-	DADiskRef _disk;				// The DADiskRef holding the CD from which to extract
+	__strong DADiskRef _disk;		// The DADiskRef holding the CD from which to extract
 	SectorRange *_sectors;			// The sectors to be extracted (not adjusted for read offset) 
 	SectorRange *_allowedSectors;	// The range of sectors to which extraction will be limited
 	NSURL *_URL;					// The URL of the output file
 	NSNumber *_readOffset;			// The read offset (in audio frames) to use for extraction
 	NSArray *_trackIDs;				// The CD track(s) being extracted (if applicable)
 	
-	NSNumber *_fractionComplete;	// A float [0, 1] indicating the extraction progress
+	float _fractionComplete;		// A float [0, 1] indicating the extraction progress
 	
 	SectorRange *_sectorsRead;		// The sectors that were actually read (sectors adjusted for read offset)
 	NSError *_error;				// Holds the first error (if any) occurring during extraction
@@ -43,7 +43,7 @@
 
 // ========================================
 // Properties set during extraction
-@property (readonly, assign) NSNumber * fractionComplete;
+@property (readonly, assign) float fractionComplete;
 
 // ========================================
 // Properties set after extraction is complete (or cancelled)
