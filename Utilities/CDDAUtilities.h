@@ -1,9 +1,10 @@
 /*
- *  Copyright (C) 2007 Stephen F. Booth <me@sbooth.org>
+ *  Copyright (C) 2007 - 2008 Stephen F. Booth <me@sbooth.org>
  *  All Rights Reserved
  */
 
 #include <CoreAudio/CoreAudioTypes.h>
+#include <IOKit/storage/IOCDTypes.h>
 
 // ========================================
 // Useful macros
@@ -20,3 +21,8 @@ AudioStreamBasicDescription getStreamDescriptionForCDDA();
 // Verify an AudioStreamBasicDescription describes CDDA audio
 // ========================================
 BOOL streamDescriptionIsCDDA(const AudioStreamBasicDescription *asbd);
+
+// ========================================
+// Utility function for adding CDMSF structures
+// ========================================
+CDMSF addCDMSF(CDMSF a, CDMSF b);

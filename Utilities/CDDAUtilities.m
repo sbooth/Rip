@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2007 Stephen F. Booth <me@sbooth.org>
+ *  Copyright (C) 2007 - 2008 Stephen F. Booth <me@sbooth.org>
  *  All Rights Reserved
  */
 
@@ -51,3 +51,29 @@ BOOL streamDescriptionIsCDDA(const AudioStreamBasicDescription *asbd)
 	
 	return YES;
 }
+
+// ========================================
+// Utility function for adding CDMSF structures
+// ========================================
+CDMSF addCDMSF(CDMSF a, CDMSF b)
+{
+	CDMSF result;
+	memset(&result, 0, sizeof(CDMSF));
+	
+	result.frame = a.frame + b.frame;
+	if(75 < result.frame) {
+		result.frame -= 75;
+		result.second += 1;
+	}
+	
+	result.second += a.second + b.second;
+	if(60 < result.second) {
+		result.second -= 60;
+		result.minute += 1;
+	}
+	
+	result.minute += a.minute + b.minute;
+	
+	return result;
+}
+
