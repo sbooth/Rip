@@ -37,9 +37,9 @@ static NSString * const kOperationQueueKVOContext		= @"org.sbooth.Rip.ReadMCNShe
 - (void) observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
 {
 	if(kOperationQueueKVOContext == context) {
+		MCNDetectionOperation *operation = (MCNDetectionOperation *)object;
+		
 		if([keyPath isEqualToString:@"isCancelled"]) {
-			MCNDetectionOperation *operation = (MCNDetectionOperation *)object;
-			
 			[operation removeObserver:self forKeyPath:@"isCancelled"];
 			[operation removeObserver:self forKeyPath:@"isFinished"];
 			
@@ -49,8 +49,6 @@ static NSString * const kOperationQueueKVOContext		= @"org.sbooth.Rip.ReadMCNShe
 				[self presentError:operation.error modalForWindow:self.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
 		}
 		else if([keyPath isEqualToString:@"isFinished"]) {
-			MCNDetectionOperation *operation = (MCNDetectionOperation *)object;
-
 			[operation removeObserver:self forKeyPath:@"isCancelled"];
 			[operation removeObserver:self forKeyPath:@"isFinished"];
 

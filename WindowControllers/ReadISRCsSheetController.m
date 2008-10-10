@@ -46,9 +46,9 @@ static NSString * const kOperationQueueKVOContext		= @"org.sbooth.Rip.ReadISRCsS
 - (void) observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
 {
 	if(kOperationQueueKVOContext == context) {
+		ISRCDetectionOperation *operation = (ISRCDetectionOperation *)object;
+		
 		if([keyPath isEqualToString:@"isExecuting"]) {
-			ISRCDetectionOperation *operation = (ISRCDetectionOperation *)object;
-			
 			if([operation isExecuting]) {
 				NSManagedObjectID *trackID = operation.trackID;
 				
@@ -69,8 +69,6 @@ static NSString * const kOperationQueueKVOContext		= @"org.sbooth.Rip.ReadISRCsS
 			}
 		}
 		else if([keyPath isEqualToString:@"isCancelled"]) {
-			ISRCDetectionOperation *operation = (ISRCDetectionOperation *)object;
-			
 			[operation removeObserver:self forKeyPath:@"isExecuting"];
 			[operation removeObserver:self forKeyPath:@"isCancelled"];
 			[operation removeObserver:self forKeyPath:@"isFinished"];
@@ -79,8 +77,6 @@ static NSString * const kOperationQueueKVOContext		= @"org.sbooth.Rip.ReadISRCsS
 				[self presentError:operation.error modalForWindow:self.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
 		}
 		else if([keyPath isEqualToString:@"isFinished"]) {
-			ISRCDetectionOperation *operation = (ISRCDetectionOperation *)object;
-			
 			[operation removeObserver:self forKeyPath:@"isExecuting"];
 			[operation removeObserver:self forKeyPath:@"isCancelled"];
 			[operation removeObserver:self forKeyPath:@"isFinished"];

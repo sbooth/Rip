@@ -46,9 +46,9 @@ static NSString * const kOperationQueueKVOContext		= @"org.sbooth.Rip.DetectPreg
 - (void) observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
 {
 	if(kOperationQueueKVOContext == context) {
+		PregapDetectionOperation *operation = (PregapDetectionOperation *)object;
+		
 		if([keyPath isEqualToString:@"isExecuting"]) {
-			PregapDetectionOperation *operation = (PregapDetectionOperation *)object;
-			
 			if([operation isExecuting]) {
 				NSManagedObjectID *trackID = operation.trackID;
 				
@@ -69,8 +69,6 @@ static NSString * const kOperationQueueKVOContext		= @"org.sbooth.Rip.DetectPreg
 			}
 		}
 		else if([keyPath isEqualToString:@"isCancelled"]) {
-			PregapDetectionOperation *operation = (PregapDetectionOperation *)object;
-			
 			[operation removeObserver:self forKeyPath:@"isExecuting"];
 			[operation removeObserver:self forKeyPath:@"isCancelled"];
 			[operation removeObserver:self forKeyPath:@"isFinished"];
@@ -79,8 +77,6 @@ static NSString * const kOperationQueueKVOContext		= @"org.sbooth.Rip.DetectPreg
 				[self presentError:operation.error modalForWindow:self.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
 		}
 		else if([keyPath isEqualToString:@"isFinished"]) {
-			PregapDetectionOperation *operation = (PregapDetectionOperation *)object;
-			
 			[operation removeObserver:self forKeyPath:@"isExecuting"];
 			[operation removeObserver:self forKeyPath:@"isCancelled"];
 			[operation removeObserver:self forKeyPath:@"isFinished"];
