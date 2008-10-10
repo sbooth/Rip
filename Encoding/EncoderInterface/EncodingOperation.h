@@ -31,7 +31,7 @@ extern NSString * const		kMetadataMusicBrainzIDKey;
 // ========================================
 @interface EncodingOperation : NSOperation
 {
-	@private
+@protected
 	NSURL *_inputURL;
 	NSURL *_outputURL;
 	NSDictionary *_settings;
