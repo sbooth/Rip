@@ -22,17 +22,19 @@
 // ========================================
 NSString * const	kReadOffsetKey							= @"readOffset";
 NSString * const	kConfidenceLevelKey						= @"confidenceLevel";
+NSString * const	kAccurateRipTrackIDKey					= @"accurateRipTrackID";
 
 @interface ReadOffsetCalculationOperation ()
 @property (assign) NSError * error;
 @property (assign) NSArray * possibleReadOffsets;
-@property (assign) NSNumber * fractionComplete;
+@property (assign) float fractionComplete;
 @end
 
 @implementation ReadOffsetCalculationOperation
 
 @synthesize URL = _URL;
 @synthesize trackDescriptorID = _trackDescriptorID;
+@synthesize sixSecondPointSector = _sixSecondPointSector;
 @synthesize maximumOffsetToCheck = _maximumOffsetToCheck;
 @synthesize error = _error;
 @synthesize possibleReadOffsets = _possibleReadOffsets;
@@ -70,11 +72,10 @@ NSString * const	kConfidenceLevelKey						= @"confidenceLevel";
 	NSMutableArray *possibleReadOffsets = [NSMutableArray array];
 	
 	// Adjust the starting sector in the file
-	SectorRange *singleSectorRange = [SectorRange sectorRangeWithFirstSector:(self.maximumOffsetToCheck.integerValue / AUDIO_FRAMES_PER_CDDA_SECTOR)
-																 sectorCount:1];
+	SectorRange *singleSectorRange = [SectorRange sectorRangeWithFirstSector:self.sixSecondPointSector sectorCount:1];
 	
-	NSInteger firstOffsetToTry = -1 * self.maximumOffsetToCheck.integerValue;
-	NSInteger lastOffsetToTry = self.maximumOffsetToCheck.integerValue;
+	NSInteger firstOffsetToTry = -1 * self.maximumOffsetToCheck;
+	NSInteger lastOffsetToTry = self.maximumOffsetToCheck;
 	NSInteger currentOffset;
 	for(currentOffset = firstOffsetToTry; currentOffset <= lastOffsetToTry; ++currentOffset) {
 
@@ -109,6 +110,7 @@ NSString * const	kConfidenceLevelKey						= @"confidenceLevel";
 				NSDictionary *offsetDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
 												  [NSNumber numberWithInteger:currentOffset], kReadOffsetKey,
 												  accurateRipTrack.confidenceLevel, kConfidenceLevelKey,
+												  [accurateRipTrack objectID], kAccurateRipTrackIDKey,
 												  nil];
 				
 				[possibleReadOffsets addObject:offsetDictionary];
@@ -116,7 +118,7 @@ NSString * const	kConfidenceLevelKey						= @"confidenceLevel";
 		}
 
 		// Update progress
-		self.fractionComplete = [NSNumber numberWithFloat:(fabsf(firstOffsetToTry - currentOffset) / (lastOffsetToTry - firstOffsetToTry))];
+		self.fractionComplete = fabsf(firstOffsetToTry - currentOffset) / (float)(lastOffsetToTry - firstOffsetToTry);
 	}
 	
 	if(possibleReadOffsets.count)

@@ -10,10 +10,14 @@
 // ========================================
 extern NSString * const		kReadOffsetKey; // NSNumber *, in sample frames
 extern NSString * const		kConfidenceLevelKey; // NSNumber *
+extern NSString * const		kAccurateRipTrackIDKey; // NSManagedObjectID * for an AccurateRipTrackDescriptor *
 
 // ========================================
-// An NSOperation subclass which uses AccurateRip data to detect a drive's read offset
-// URL is assumed to point to a file containing CDDA audio with 2n sectors
+// An NSOperation subclass which uses AccurateRip data to detect extracted audio's read offset
+// URL is assumed to point to a file containing CDDA audio with the six second
+// point of the track to check occurring at sixSecondPoint
+// Offsets ranging from  -maximumOffsetToCheck to +maximumOffsetToCheck will be
+// checked
 // The 2n sectors must be centered around the six second point in the specified track
 // Graphically:
 // |---------|----------|
@@ -24,9 +28,10 @@ extern NSString * const		kConfidenceLevelKey; // NSNumber *
 @private
 	NSURL *_URL;
 	NSManagedObjectID *_trackDescriptorID;
-	NSNumber *_maximumOffsetToCheck;
+	NSUInteger _sixSecondPointSector;
+	NSUInteger _maximumOffsetToCheck;
 	
-	NSNumber *_fractionComplete;
+	float _fractionComplete;
 	
 	NSError *_error;
 	NSArray *_possibleReadOffsets;
@@ -36,11 +41,12 @@ extern NSString * const		kConfidenceLevelKey; // NSNumber *
 // Properties affecting scanning
 @property (assign) NSURL * URL;
 @property (assign) NSManagedObjectID * trackDescriptorID;
-@property (assign) NSNumber * maximumOffsetToCheck; // In sample frames,  should be a multiple of AUDIO_FRAMES_PER_CDDA_SECTOR
+@property (assign) NSUInteger sixSecondPointSector; // In CDDA sectors
+@property (assign) NSUInteger maximumOffsetToCheck; // In sample frames,  should be a multiple of AUDIO_FRAMES_PER_CDDA_SECTOR
 
 // ========================================
 // Properties set during calculation
-@property (readonly, assign) NSNumber * fractionComplete;
+@property (readonly, assign) float fractionComplete;
 
 // ========================================
 // Properties set after offset calculation is complete (or cancelled)
