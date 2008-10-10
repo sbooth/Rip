@@ -26,7 +26,7 @@
 {
 	NSParameterAssert(nil != decoder);
 
-	if((self = [super initWithCoder:decoder])) {
+	if((self = [super init])) {
 		self.bitCount = (NSUInteger)[decoder decodeIntegerForKey:@"BABitCount"];
 
 		NSUInteger length = 0;
@@ -41,8 +41,6 @@
 - (void) encodeWithCoder:(NSCoder *)encoder
 {
 	NSParameterAssert(nil != encoder);
-
-//	[super encodeWithCoder:encoder];
 	
 	[encoder encodeInteger:(NSInteger)self.bitCount forKey:@"BABitCount"];
 	[encoder encodeBytes:(const uint8_t *)_bits length:(self.arrayLength * sizeof(NSUInteger)) forKey:@"BABits"];
@@ -120,7 +118,7 @@
 	
 	NSUInteger i;
 	for(i = 0; i < lastArrayIndex; ++i) {
-		if(0x00000000 != _bits[i])
+		if(0 != _bits[i])
 			return NO;
 	}
 	
@@ -163,7 +161,7 @@
 	
 	NSUInteger i;
 	for(i = 0; i < lastArrayIndex; ++i)
-		_bits[i] = 0x00000000;
+		_bits[i] = 0;
 	
 	for(i = 0; i < lastBitIndex; ++i)
 		_bits[lastArrayIndex] &= ~(1 << i);
@@ -178,7 +176,7 @@
 	
 	NSUInteger i;
 	for(i = 0; i < lastArrayIndex; ++i) {
-		if(0xFFFFFFFF != _bits[i])
+		if(NSUIntegerMax != _bits[i])
 			return NO;
 	}
 	
@@ -221,7 +219,7 @@
 
 	NSUInteger i;
 	for(i = 0; i < lastArrayIndex; ++i)
-		_bits[i] = 0xFFFFFFFF;
+		_bits[i] = NSUIntegerMax;
 	
 	for(i = 0; i < lastBitIndex; ++i)
 		_bits[lastArrayIndex] |= 1 << i;
