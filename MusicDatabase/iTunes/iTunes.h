@@ -182,6 +182,7 @@ typedef enum {
 
 @property (copy, readonly) SBObject *container;  // the container of the item
 - (NSInteger) id;  // the id of the item
+@property (readonly) NSInteger index;  // The index of the item in internal application order.
 @property (copy) NSString *name;  // the name of the item
 @property (copy, readonly) NSString *persistentID;  // the id of the item as a hexidecimal string. This id does not change over time.
 
@@ -243,7 +244,6 @@ typedef enum {
 - (SBElementArray *) tracks;
 
 @property (readonly) NSInteger duration;  // the total length of all songs (in seconds)
-@property (readonly) NSInteger index;  // the index of the playlist in internal application order
 @property (copy) NSString *name;  // the name of the playlist
 @property (copy, readonly) iTunesPlaylist *parent;  // folder which contains this playlist (if any)
 @property BOOL shuffle;  // play the songs in this playlist in random order?
