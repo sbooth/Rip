@@ -28,6 +28,15 @@
 
 #import "CopyTracksSheetController.h"
 
+#import "CDMSFFormatter.h"
+#import "PregapFormatter.h"
+#import "DurationFormatter.h"
+#import "YesNoFormatter.h"
+
+#import "BitArray.h"
+#import "ExtractionRecord.h"
+#import "ExtractedTrackRecord.h"
+
 #import "EncoderManager.h"
 #import "MusicDatabaseManager.h"
 
@@ -65,6 +74,7 @@ static NSString * const kNetworkOperationQueueKVOContext		= @"org.sbooth.Rip.Com
 - (void) musicDatabaseQueryOperationStopped:(MusicDatabaseQueryOperation *)operation;
 
 - (BOOL) writeCueSheetToURL:(NSURL *)cueSheetURL error:(NSError **)error;
+- (BOOL) writeLogFileToURL:(NSURL *)logFileURL forExtractionRecords:(NSArray *)extractionRecords error:(NSError **)error;
 
 - (void) diskWasEjected;
 
@@ -410,41 +420,6 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 {
 
 #pragma unused(sender)
-#if 0
-	// Only allow one operation on the compact disc at a time
-	if(self.compactDiscOperationQueue.operations.count) {
-		NSBeep();
-		return;
-	}
-	
-	// Store the tracks to be extracted
-	self.tracksToBeExtracted = self.compactDisc.firstSession.tracks;
-
-	// Use the specified temporary directory if it exists, otherwise try the default and fall back to /tmp
-	NSString *temporaryDirectory = [[NSUserDefaults standardUserDefaults] stringForKey:@"Temporary Directory"];
-	if(!temporaryDirectory)
-		temporaryDirectory = NSTemporaryDirectory();
-	if(!temporaryDirectory)
-		temporaryDirectory = @"/tmp";
-
-	ExtractionOperation *imageExtractionOperation = [[ExtractionOperation alloc] init];
-	
-	// Generate a random filename
-	NSString *temporaryFilename = nil;
-	do {
-		NSString *randomFilename = [NSString stringWithFormat:@"Rip %x.wav", random()];
-		temporaryFilename = [temporaryDirectory stringByAppendingPathComponent:randomFilename];
-	} while([[NSFileManager defaultManager] fileExistsAtPath:temporaryFilename]);
-	
-	imageExtractionOperation.disk = self.disk;
-	imageExtractionOperation.sectors = self.compactDisc.firstSession.sectorRange;
-	imageExtractionOperation.allowedSectors = self.compactDisc.firstSession.sectorRange;
-	imageExtractionOperation.trackIDs = [self.compactDisc.firstSession.tracks valueForKey:@"objectID"];
-	imageExtractionOperation.readOffset = self.driveInformation.readOffset;
-	imageExtractionOperation.URL = [NSURL fileURLWithPath:temporaryFilename];
-	
-	[self.compactDiscOperationQueue addOperation:imageExtractionOperation];
-#endif
 }
 
 - (IBAction) detectPregaps:(id)sender
@@ -669,13 +644,21 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 
 - (void) showCopyTracksSheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode contextInfo:(void *)contextInfo
 {
-	
-#pragma unused(returnCode)
-#pragma unused(contextInfo)
-	
 	NSParameterAssert(nil != sheet);
 	
 	[sheet orderOut:self];
+	
+	if(NSCancelButton == returnCode)
+		return;
+	
+	CopyTracksSheetController *sheetController = (CopyTracksSheetController *)contextInfo;
+	
+	// Save an extraction log file
+	NSURL *logFileURL = [NSURL fileURLWithPath:[@"~/Music/Extraction.log" stringByExpandingTildeInPath]];
+	
+	NSError *error = nil;
+	if(![self writeLogFileToURL:logFileURL forExtractionRecords:sheetController.extractionRecords error:&error])
+		[self presentError:error modalForWindow:self.window delegate:nil didPresentSelector:NULL contextInfo:NULL];
 }
 
 @end
@@ -880,6 +863,119 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 	}
 
 	return [cueSheetString writeToURL:cueSheetURL atomically:YES encoding:NSUTF8StringEncoding error:error];
+}
+
+
+- (BOOL) writeLogFileToURL:(NSURL *)logFileURL forExtractionRecords:(NSArray *)extractionRecords error:(NSError **)error
+{
+	NSParameterAssert(nil != logFileURL);
+	NSParameterAssert(nil != extractionRecords);
+	
+	// Formatters used for presenting values to the user
+	CDMSFFormatter *msfFormatter = [[CDMSFFormatter alloc] init];
+	PregapFormatter *pregapFormatter = [[PregapFormatter alloc] init];
+	DurationFormatter *durationFormatter = [[DurationFormatter alloc] init];
+	YesNoFormatter *yesNoFormatter = [[YesNoFormatter alloc] init];
+	NSNumberFormatter *numberFormatter = [[NSNumberFormatter alloc] init];
+
+	[numberFormatter setFormatterBehavior:NSNumberFormatterBehavior10_4];
+	[numberFormatter setUsesGroupingSeparator:YES];
+	[numberFormatter setPaddingCharacter:@" "];
+	
+	NSMutableString *logFileString = [NSMutableString string];
+	
+	// Log file header
+	NSString *appName = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleName"];
+	NSString *versionNumber = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"];
+	[logFileString appendFormat:@"%@ %@ Audio Extraction Log\n", appName, versionNumber];
+	
+	[logFileString appendString:@"\n"];
+
+	// Drive information
+	[logFileString appendFormat:@"Drive used:         %@ %@", self.driveInformation.vendorName, self.driveInformation.productName];
+	if(self.driveInformation.productRevisionLevel)
+		[logFileString appendFormat:@" (%@)", self.driveInformation.productRevisionLevel];
+	[logFileString appendString:@"\n"];
+	if(self.driveInformation.productSerialNumber)
+		[logFileString appendFormat:@"Serial number:      %@\n", self.driveInformation.productSerialNumber];
+	[logFileString appendFormat:@"Stream accurate:    %@\n", [yesNoFormatter stringForObjectValue:self.driveInformation.hasAccurateStream]];
+	[logFileString appendFormat:@"Interconnect type:  %@\n", self.driveInformation.physicalInterconnectType];
+	[logFileString appendFormat:@"Location:           %@\n", self.driveInformation.physicalInterconnectLocation];
+	[logFileString appendFormat:@"Read offset:        %@\n", [numberFormatter stringFromNumber:self.driveInformation.readOffset]];
+	
+	[logFileString appendString:@"\n"];
+	
+	// Disc information
+	[logFileString appendString:@"Disc name:          "];
+	if(self.compactDisc.metadata.artist)
+		[logFileString appendString:self.compactDisc.metadata.artist];
+	else
+		[logFileString appendString:NSLocalizedString(@"Unknown Artist", @"")];
+	[logFileString appendString:NSLocalizedString(@" - ", @"")];	
+	if(self.compactDisc.metadata.title)
+		[logFileString appendString:self.compactDisc.metadata.title];
+	else
+		[logFileString appendString:NSLocalizedString(@"Unknown Artist", @"")];
+	[logFileString appendString:@"\n"];
+	[logFileString appendFormat:@"FreeDB ID:          %08lx\n", self.compactDisc.freeDBDiscID.integerValue];
+	[logFileString appendFormat:@"MusicBrainz ID:     %@\n", self.compactDisc.musicBrainzDiscID];
+	[logFileString appendString:@"Disc TOC:\n"];
+//	[logFileString appendString:@"     Track |   Start  | Duration |  Pregap  | First sector | Last sector\n"];
+//	[logFileString appendString:@"    -------+----------+----------+----------+--------------+-------------\n"];
+	[logFileString appendString:@"     Track |   Start  | Duration | First sector | Last sector\n"];
+	[logFileString appendString:@"    -------+----------+----------+--------------+-------------\n"];
+		
+	for(TrackDescriptor *trackDescriptor in self.compactDisc.firstSession.orderedTracks) {
+		// Track number
+		[logFileString appendString:@"       "];
+		[numberFormatter setFormatWidth:2];
+		[logFileString appendString:[numberFormatter stringFromNumber:trackDescriptor.number]];
+		[logFileString appendString:@"  | "];
+
+		// Start sector and duration
+		[logFileString appendString:[msfFormatter stringForObjectValue:[NSNumber numberWithUnsignedInteger:(trackDescriptor.firstSector.unsignedIntegerValue - 150)]]];
+		[logFileString appendString:@" | "];
+		[logFileString appendString:[msfFormatter stringForObjectValue:[NSNumber numberWithUnsignedInteger:(trackDescriptor.sectorCount - 150)]]];
+		[logFileString appendString:@" | "];
+
+		// Pregap
+//		if(trackDescriptor.pregap)
+//			[logFileString appendString:[pregapFormatter stringForObjectValue:trackDescriptor.pregap]];
+//		else
+//			[logFileString appendString:@"        "];
+//		[logFileString appendString:@" | "];
+		
+		// First and last sector number
+		[numberFormatter setFormatWidth:10];
+		[logFileString appendString:[numberFormatter stringFromNumber:trackDescriptor.firstSector]];
+		[logFileString appendString:@"   |   "];
+		[numberFormatter setFormatWidth:7];
+		[logFileString appendString:[numberFormatter stringFromNumber:trackDescriptor.lastSector]];		
+		[logFileString appendString:@"\n"];
+	}
+
+	[logFileString appendString:@"\n"];
+	
+	[numberFormatter setFormatWidth:0];
+
+	for(ExtractionRecord *extractionRecord in extractionRecords) {
+		if(1 == [extractionRecord.orderedTracks count]) {
+			ExtractedTrackRecord *extractedTrackRecord = [extractionRecord.orderedTracks lastObject];
+			
+			[logFileString appendFormat:@"Track %@ saved to %@\n", extractedTrackRecord.track.number, [extractionRecord.URL path]];
+			
+			if([extractionRecord.errorFlags countOfOnes])
+				[logFileString appendFormat:@"    C2 error count:         %@\n", [numberFormatter stringForObjectValue:[NSNumber numberWithUnsignedInteger:[extractionRecord.errorFlags countOfOnes]]]];
+			[logFileString appendFormat:@"    AccurateRip checksum:   %lx\n", extractedTrackRecord.accurateRipChecksum.unsignedIntegerValue];
+			[logFileString appendFormat:@"    Audio MD5 hash:         %@\n", extractionRecord.MD5];
+			[logFileString appendFormat:@"    Audio SHA1 hash:        %@\n", extractionRecord.SHA1];
+		}
+		else {
+			NSLog(@"FIXME: LOG FILE FOR IMAGE EXTRACTION");
+		}
+	}
+	
+	return [logFileString writeToURL:logFileURL atomically:YES encoding:NSUTF8StringEncoding error:error];
 }
 
 @end
