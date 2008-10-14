@@ -8,7 +8,7 @@
 #include <DiskArbitration/DiskArbitration.h>
 #include <IOKit/storage/IOCDTypes.h>
 
-@class SessionDescriptor, TrackDescriptor, SectorRange, AccurateRipDiscRecord, AlbumMetadata;
+@class SessionDescriptor, TrackDescriptor, SectorRange, AccurateRipDiscRecord, AlbumMetadata, ExtractionRecord;
 
 // ========================================
 // This class simplifies access to a CDDA disc
@@ -32,6 +32,7 @@
 @property (assign) NSSet * accurateRipDiscs;
 @property (assign) AlbumMetadata * metadata;
 @property (assign) NSSet * sessions;
+@property (assign) NSSet * extractionRecords;
 
 // ========================================
 // Other properties
@@ -62,4 +63,9 @@
 - (void) removeAccurateRipDiscsObject:(AccurateRipDiscRecord *)value;
 - (void) addAccurateRipDiscs:(NSSet *)value;
 - (void) removeAccurateRipDiscs:(NSSet *)value;
+
+- (void) addExtractionRecordsObject:(ExtractionRecord *)value;
+- (void) removeExtractionRecordsObject:(ExtractionRecord *)value;
+- (void) addExtractionRecords:(NSSet *)value;
+- (void) removeExtractionRecords:(NSSet *)value;
 @end

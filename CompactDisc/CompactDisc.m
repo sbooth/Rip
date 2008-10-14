@@ -197,6 +197,7 @@ static NSInteger calculateFreeDBDiscIDForCDTOC(CDTOC *toc)
 @dynamic accurateRipDiscs;
 @dynamic metadata;
 @dynamic sessions;
+@dynamic extractionRecords;
 
 - (void) awakeFromInsert
 {

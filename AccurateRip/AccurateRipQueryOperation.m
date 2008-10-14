@@ -90,8 +90,8 @@
 	[compactDisc removeAccurateRipDiscs:existingAccurateRipDiscs];
 	
 	// Delete them from the store
-	for(NSManagedObject *managedObjectToDelete in existingAccurateRipDiscs)
-		[managedObjectContext deleteObject:managedObjectToDelete];
+//	for(NSManagedObject *managedObjectToDelete in existingAccurateRipDiscs)
+//		[managedObjectContext deleteObject:managedObjectToDelete];
 	
 	// Use the first session
 	NSArray *orderedTracks = compactDisc.firstSession.orderedTracks;

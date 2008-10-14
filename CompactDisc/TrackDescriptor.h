@@ -5,8 +5,7 @@
 
 #import <Cocoa/Cocoa.h>
 
-@class SessionDescriptor, SectorRange;
-@class TrackMetadata;
+@class SessionDescriptor, SectorRange, TrackMetadata, ExtractedTrackRecord;
 
 // ========================================
 // This class encapsulates useful information about a single track on a CDDA disc
@@ -32,10 +31,18 @@
 // Core Data relationships
 @property (assign) TrackMetadata * metadata;
 @property (assign) SessionDescriptor * session;
+@property (assign) NSSet * extractedTrackRecords;
 
 // ========================================
 // Computed properties
 @property (readonly) NSUInteger sectorCount;
 @property (readonly) SectorRange * sectorRange;
 
+@end
+
+@interface TrackDescriptor (CoreDataGeneratedAccessors)
+- (void) addExtractedTrackRecordsObject:(ExtractedTrackRecord *)value;
+- (void) removeExtractedTrackRecordsObject:(ExtractedTrackRecord *)value;
+- (void) addExtractedTrackRecords:(NSSet *)value;
+- (void) removeExtractedTrackRecords:(NSSet *)value;
 @end
