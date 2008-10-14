@@ -43,7 +43,7 @@ static NSString * const kOperationQueueKVOContext		= @"org.sbooth.Rip.ReadMCNShe
 			[operation removeObserver:self forKeyPath:@"isCancelled"];
 			[operation removeObserver:self forKeyPath:@"isFinished"];
 			
-			[_progressIndicator unbind:@"animate"];
+			[_progressIndicator stopAnimation:self];
 			
 			if(operation.error)
 				[self presentError:operation.error modalForWindow:self.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
@@ -52,7 +52,7 @@ static NSString * const kOperationQueueKVOContext		= @"org.sbooth.Rip.ReadMCNShe
 			[operation removeObserver:self forKeyPath:@"isCancelled"];
 			[operation removeObserver:self forKeyPath:@"isFinished"];
 
-			[_progressIndicator unbind:@"animate"];
+			[_progressIndicator stopAnimation:self];
 			
 			if(operation.error)
 				[self presentError:operation.error modalForWindow:self.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
@@ -66,8 +66,7 @@ static NSString * const kOperationQueueKVOContext		= @"org.sbooth.Rip.ReadMCNShe
 
 - (IBAction) readMCN:(id)sender
 {
-	
-#pragma unused(sender)
+	[_progressIndicator startAnimation:sender];
 	
 	MCNDetectionOperation *operation = [[MCNDetectionOperation alloc] init];
 	
@@ -77,8 +76,6 @@ static NSString * const kOperationQueueKVOContext		= @"org.sbooth.Rip.ReadMCNShe
 	[operation addObserver:self forKeyPath:@"isFinished" options:NSKeyValueObservingOptionNew context:kOperationQueueKVOContext];
 	[operation addObserver:self forKeyPath:@"isCancelled" options:NSKeyValueObservingOptionNew context:kOperationQueueKVOContext];
 
-	[_progressIndicator bind:@"animate" toObject:operation withKeyPath:@"isExecuting" options:nil];
-	
 	[self.operationQueue addOperation:operation];
 }
 

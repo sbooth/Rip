@@ -90,6 +90,7 @@ static NSString * const kOperationQueueKVOContext		= @"org.sbooth.Rip.DetectPreg
 	else
 		[super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
 }
+
 - (IBAction) detectPregaps:(id)sender
 {
 	[_progressIndicator startAnimation:sender];
