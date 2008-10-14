@@ -20,15 +20,16 @@
 @private
 	DADiskRef _disk;
 	NSArray *_trackIDs;
-	
+	BOOL _extractAsImage;
+
+	NSMutableArray *_extractionRecords;
+
 	CompactDisc *_compactDisc;
 	DriveInformation *_driveInformation;
 	NSManagedObjectContext *_managedObjectContext;
 
 	NSOperationQueue *_operationQueue;
 	NSMutableArray *_tracksToBeExtracted;
-	NSMutableArray *_tracksSuccessfullyExtracted;
-//	NSMutableArray *_tracksToCopy;
 }
 
 // ========================================
@@ -36,6 +37,9 @@
 // ========================================
 @property (assign) DADiskRef disk;
 @property (assign) NSArray * trackIDs;
+@property (assign) BOOL extractAsImage;
+
+@property (readonly) NSArray * extractionRecords;
 
 @property (readonly, assign) CompactDisc * compactDisc;
 @property (readonly, assign) DriveInformation * driveInformation;
