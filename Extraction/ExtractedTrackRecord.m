@@ -15,5 +15,6 @@
 // Core Data relationships
 @dynamic extractionRecord;
 @dynamic track;
+@dynamic accurateRipTrackRecord;
 
 @end

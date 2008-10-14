@@ -5,7 +5,7 @@
 
 #import <Cocoa/Cocoa.h>
 
-@class ExtractionRecord, TrackDescriptor;
+@class ExtractionRecord, TrackDescriptor, AccurateRipTrackRecord;
 
 // ========================================
 // This class represents a single track extracted from a CDDA disc
@@ -22,5 +22,6 @@
 // Core Data relationships
 @property (assign) ExtractionRecord * extractionRecord;
 @property (assign) TrackDescriptor * track;
+@property (assign) AccurateRipTrackRecord * accurateRipTrackRecord;
 
 @end
