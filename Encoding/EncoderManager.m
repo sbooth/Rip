@@ -129,7 +129,7 @@ static EncoderManager *sSharedEncoderManager				= nil;
 
 @implementation EncoderManager
 
-//@synthesize queue = _queue;
+@synthesize queue = _queue;
 
 + (id) sharedEncoderManager
 {
@@ -294,11 +294,18 @@ static EncoderManager *sSharedEncoderManager				= nil;
 	
 	encodingOperation.inputURL = inputURL;
 	NSURL *outputFolderURL = [NSUnarchiver unarchiveObjectWithData:[[NSUserDefaults standardUserDefaults] dataForKey:@"outputDirectory"]];
-	encodingOperation.outputURL = [NSURL fileURLWithPath:[@"~/Music/fnord" stringByExpandingTildeInPath]];
+	encodingOperation.outputURL = [NSURL fileURLWithPath:[[outputFolderURL path] stringByAppendingPathComponent:@"fnord"]];
 	encodingOperation.settings = encoderSettings;
 	encodingOperation.metadata = metadataForExtractionRecord(extractionRecord);
 	
-	[_queue addOperation:encodingOperation];
+#if DEBUG
+	NSLog(@"Encoding %@ to %@ using %@", [encodingOperation.inputURL path], [encodingOperation.outputURL path], [encoderBundle objectForInfoDictionaryKey:@"EncoderName"]);
+#endif
+
+	[self.queue addOperation:encodingOperation];
+	
+	// Communicate the output URL back to the caller
+	extractionRecord.URL = encodingOperation.outputURL;
 	
 	return YES;
 }

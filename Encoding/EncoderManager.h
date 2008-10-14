@@ -19,13 +19,8 @@ extern NSString * const		kEncoderSettingsKey; // NSDictionary *
 	NSOperationQueue *_queue;
 }
 
-// Returns an array of NSDictionary * for all encoders the user has configured
-//@property (readonly) NSArray * configuredEncoders;
-
-// Returns an array of NSDictionary * for all encoders the user has configured and selected
-//@property (readonly) NSArray * selectedEncoders;
-
-//@property (readonly) NSOperationQueue * queue; 
+// The operation queue used for encoding
+@property (readonly) NSOperationQueue * queue; 
 
 // ========================================
 // Returns an array of NSBundle * objects whose principalClasses implement the EncoderInterface protocol
@@ -46,6 +41,7 @@ extern NSString * const		kEncoderSettingsKey; // NSDictionary *
 - (void) storeSettings:(NSDictionary *)encoderSettings forEncoder:(NSBundle *)encoder;
 - (void) restoreDefaultSettingsForEncoder:(NSBundle *)encoder;
 
+// ========================================
 // Queue an encoding request
 - (BOOL) encodeURL:(NSURL *)inputURL extractionRecord:(ExtractionRecord *)extractionRecord error:(NSError **)error;
 

@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		32E9F8F90DD7584500E8ACCA /* CoreAudioSettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 32E9F8F80DD7584500E8ACCA /* CoreAudioSettingsViewController.m */; };
+		32E9F9020DD758BF00E8ACCA /* CoreAudioSettings.xib in Resources */ = {isa = PBXBuildFile; fileRef = 32E9F9000DD758BF00E8ACCA /* CoreAudioSettings.xib */; };
 		8C3C195D0D73EAAB001BAC88 /* CoreAudioEncodeOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C3C195A0D73EAAB001BAC88 /* CoreAudioEncodeOperation.m */; };
 		8C3C195E0D73EAAB001BAC88 /* CoreAudioEncoderInterface.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C3C195C0D73EAAB001BAC88 /* CoreAudioEncoderInterface.m */; };
 		8C3C19970D73EC72001BAC88 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8C3C19960D73EC72001BAC88 /* AudioToolbox.framework */; };
@@ -38,6 +40,9 @@
 		089C167FFE841241C02AAC07 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		1058C7ADFEA557BF11CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
 		32DBCF630370AF2F00C91783 /* CoreAudio_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CoreAudio_Prefix.pch; sourceTree = "<group>"; };
+		32E9F8F70DD7584500E8ACCA /* CoreAudioSettingsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CoreAudioSettingsViewController.h; sourceTree = "<group>"; };
+		32E9F8F80DD7584500E8ACCA /* CoreAudioSettingsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CoreAudioSettingsViewController.m; sourceTree = "<group>"; };
+		32E9F9010DD758BF00E8ACCA /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/CoreAudioSettings.xib; sourceTree = "<group>"; };
 		8C3C19590D73EAAB001BAC88 /* CoreAudioEncodeOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CoreAudioEncodeOperation.h; sourceTree = "<group>"; };
 		8C3C195A0D73EAAB001BAC88 /* CoreAudioEncodeOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CoreAudioEncodeOperation.m; sourceTree = "<group>"; };
 		8C3C195B0D73EAAB001BAC88 /* CoreAudioEncoderInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CoreAudioEncoderInterface.h; sourceTree = "<group>"; };
@@ -89,6 +94,7 @@
 			children = (
 				8D5B49B7048680CD000E48DA /* Info.plist */,
 				089C167DFE841241C02AAC07 /* InfoPlist.strings */,
+				32E9F9000DD758BF00E8ACCA /* CoreAudioSettings.xib */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -100,6 +106,8 @@
 				8C3C195A0D73EAAB001BAC88 /* CoreAudioEncodeOperation.m */,
 				8C3C195B0D73EAAB001BAC88 /* CoreAudioEncoderInterface.h */,
 				8C3C195C0D73EAAB001BAC88 /* CoreAudioEncoderInterface.m */,
+				32E9F8F70DD7584500E8ACCA /* CoreAudioSettingsViewController.h */,
+				32E9F8F80DD7584500E8ACCA /* CoreAudioSettingsViewController.m */,
 			);
 			name = Classes;
 			sourceTree = "<group>";
@@ -209,6 +217,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				8D5B49B0048680CD000E48DA /* InfoPlist.strings in Resources */,
+				32E9F9020DD758BF00E8ACCA /* CoreAudioSettings.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -221,6 +230,7 @@
 			files = (
 				8C3C195D0D73EAAB001BAC88 /* CoreAudioEncodeOperation.m in Sources */,
 				8C3C195E0D73EAAB001BAC88 /* CoreAudioEncoderInterface.m in Sources */,
+				32E9F8F90DD7584500E8ACCA /* CoreAudioSettingsViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -241,6 +251,14 @@
 				089C167EFE841241C02AAC07 /* English */,
 			);
 			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		32E9F9000DD758BF00E8ACCA /* CoreAudioSettings.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				32E9F9010DD758BF00E8ACCA /* English */,
+			);
+			name = CoreAudioSettings.xib;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */

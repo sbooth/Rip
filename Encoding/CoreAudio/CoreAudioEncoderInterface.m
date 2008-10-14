@@ -5,6 +5,7 @@
 
 #import "CoreAudioEncoderInterface.h"
 #import "CoreAudioEncodeOperation.h"
+#import "CoreAudioSettingsViewController.h"
 
 @implementation CoreAudioEncoderInterface
 
@@ -34,7 +35,7 @@
 
 - (NSViewController *) configurationViewController
 {
-	return nil;
+	return [[CoreAudioSettingsViewController alloc] init];
 }
 
 - (EncodingOperation *) encodingOperation
