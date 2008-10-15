@@ -16,6 +16,8 @@
 #import "ExtractedTrackRecord.h"
 #import "ExtractionRecord.h"
 
+#import "FileUtilities.h"
+
 // ========================================
 // Flatten the metadata objects into a single NSDictionary
 // ========================================
@@ -94,6 +96,48 @@ metadataForExtractionRecord(ExtractionRecord *extractionRecord)
 	}
 	
 	return metadata;
+}
+
+// ========================================
+// Create the output filename to use for the given ExtractionRecord
+// ========================================
+static NSString *
+filenameForExtractionRecord(ExtractionRecord *extractionRecord)
+{
+	NSCParameterAssert(nil != extractionRecord);
+	
+	NSString *filename = nil;
+	
+	// Only a single track was extracted
+	if(1 == extractionRecord.tracks.count) {
+		TrackDescriptor *track = extractionRecord.firstTrack.track;
+
+		NSString *title = track.metadata.title;
+		if(nil == title)
+			title = NSLocalizedString(@"Unknown Title", @"");
+		
+		// Build up the sanitized track name
+		filename = [NSString stringWithFormat:@"%02lu %@", track.number.unsignedIntegerValue, makeStringSafeForFilename(title)];
+	}
+	else {
+		CompactDisc *disc = extractionRecord.disc;
+		
+		NSString *title = disc.metadata.title;
+		if(nil == title)
+			title = NSLocalizedString(@"Unknown Album", @"");
+		
+		// Build up the sanitized file name
+		if(extractionRecord.tracks.count != disc.firstSession.tracks.count) {
+			ExtractedTrackRecord *firstTrack = extractionRecord.firstTrack;
+			ExtractedTrackRecord *lastTrack = extractionRecord.lastTrack;
+			
+			filename = [NSString stringWithFormat:@"%@ (%@ - %@)", makeStringSafeForFilename(title), firstTrack.track.number, lastTrack.track.number];
+		}
+		else
+			filename = makeStringSafeForFilename(title);
+	}
+	
+	return filename;
 }
 
 // ========================================
@@ -272,6 +316,29 @@ static EncoderManager *sSharedEncoderManager				= nil;
 		[[NSUserDefaults standardUserDefaults] removeObjectForKey:bundleIdentifier];
 }
 
+- (NSURL *) outputURLForCompactDisc:(CompactDisc *)disc
+{
+	NSParameterAssert(nil != disc);
+	
+	NSString *title = disc.metadata.title;
+	if(nil == title)
+		title = NSLocalizedString(@"Unknown Album", @"");
+	
+	NSString *artist = disc.metadata.artist;
+	if(nil == artist)
+		artist = NSLocalizedString(@"Unknown Artist", @"");
+	
+	// Build up the sanitized Artist/Album structure
+	NSArray *pathComponents = [NSArray arrayWithObjects:makeStringSafeForFilename(artist), makeStringSafeForFilename(title), nil];
+	NSString *path = [NSString pathWithComponents:pathComponents];
+	
+	// Append it to the output folder
+	NSURL *outputFolderURL = [NSUnarchiver unarchiveObjectWithData:[[NSUserDefaults standardUserDefaults] dataForKey:@"outputDirectory"]];
+	NSString *outputPath = [[outputFolderURL path] stringByAppendingPathComponent:path];
+	
+	return [NSURL fileURLWithPath:outputPath];
+}
+
 - (BOOL) encodeURL:(NSURL *)inputURL extractionRecord:(ExtractionRecord *)extractionRecord error:(NSError **)error
 {
 	NSParameterAssert(nil != inputURL);
@@ -290,11 +357,23 @@ static EncoderManager *sSharedEncoderManager				= nil;
 	Class encoderClass = [encoderBundle principalClass];
 	NSObject <EncoderInterface> *encoderInterface = [[encoderClass alloc] init];
 	
+	// Build the filename for the output from the disc's folder, the track's name and number,
+	// and the encoder's output path extension
+	NSURL *baseURL = [self outputURLForCompactDisc:extractionRecord.disc];
+	NSString *filename = filenameForExtractionRecord(extractionRecord);
+	NSString *pathExtension = [encoderInterface pathExtensionForSettings:encoderSettings];
+	NSString *pathname = [filename stringByAppendingPathExtension:pathExtension];
+	NSString *outputPath = [[baseURL path] stringByAppendingPathComponent:pathname];
+	
+	// Ensure the output folder exists
+	if(![[NSFileManager defaultManager] createDirectoryAtPath:[baseURL path] withIntermediateDirectories:YES attributes:nil error:error]) {
+		return NO;
+	}
+	
 	EncodingOperation *encodingOperation = [encoderInterface encodingOperation];
 	
 	encodingOperation.inputURL = inputURL;
-	NSURL *outputFolderURL = [NSUnarchiver unarchiveObjectWithData:[[NSUserDefaults standardUserDefaults] dataForKey:@"outputDirectory"]];
-	encodingOperation.outputURL = [NSURL fileURLWithPath:[[outputFolderURL path] stringByAppendingPathComponent:@"fnord"]];
+	encodingOperation.outputURL = [NSURL fileURLWithPath:outputPath];
 	encodingOperation.settings = encoderSettings;
 	encodingOperation.metadata = metadataForExtractionRecord(extractionRecord);
 	

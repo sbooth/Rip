@@ -11,7 +11,7 @@
 extern NSString * const		kEncoderBundleKey; // NSBundle *
 extern NSString * const		kEncoderSettingsKey; // NSDictionary *
 
-@class ExtractionRecord;
+@class CompactDisc, ExtractionRecord;
 
 @interface EncoderManager : NSObject
 {
@@ -40,6 +40,10 @@ extern NSString * const		kEncoderSettingsKey; // NSDictionary *
 - (NSDictionary *) settingsForEncoder:(NSBundle *)encoder;
 - (void) storeSettings:(NSDictionary *)encoderSettings forEncoder:(NSBundle *)encoder;
 - (void) restoreDefaultSettingsForEncoder:(NSBundle *)encoder;
+
+// ========================================
+// Get the URL for the output folder to use for the given disc
+- (NSURL *) outputURLForCompactDisc:(CompactDisc *)disc;
 
 // ========================================
 // Queue an encoding request
