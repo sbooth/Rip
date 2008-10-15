@@ -22,4 +22,7 @@
 // Provide an instance of an EncodingOperation subclass
 - (EncodingOperation *) encodingOperation;
 
+// Determine which filename extension should be used for output based on the given settings
+- (NSString *) pathExtensionForSettings:(NSDictionary *)settings;
+
 @end

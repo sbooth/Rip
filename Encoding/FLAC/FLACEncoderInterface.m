@@ -29,4 +29,9 @@
 	return [[FLACEncodeOperation alloc] init];
 }
 
+- (NSString *) pathExtensionForSettings:(NSDictionary *)settings
+{
+	return @"flac";
+}
+
 @end

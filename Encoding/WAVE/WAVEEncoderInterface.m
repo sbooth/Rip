@@ -48,4 +48,9 @@
 	return [[CoreAudioEncodeOperation alloc] init];
 }
 
+- (NSString *) pathExtensionForSettings:(NSDictionary *)settings
+{
+	return @"wav";
+}
+
 @end

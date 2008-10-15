@@ -43,4 +43,9 @@
 	return [[CoreAudioEncodeOperation alloc] init];
 }
 
+- (NSString *) pathExtensionForSettings:(NSDictionary *)settings
+{
+	return @"m4a";
+}
+
 @end
