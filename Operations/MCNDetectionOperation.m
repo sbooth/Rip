@@ -9,13 +9,12 @@
 #import "Drive.h"
 
 @interface MCNDetectionOperation ()
-@property (assign) NSError * error;
+@property (copy) NSError * error;
 @end
 
 @implementation MCNDetectionOperation
 
 @synthesize disk = _disk;
-@synthesize compactDiscID = _compactDiscID;
 @synthesize error = _error;
 
 - (id) initWithDADiskRef:(DADiskRef)disk
@@ -30,20 +29,13 @@
 - (void) main
 {
 	NSAssert(NULL != self.disk, @"self.disk may not be NULL");
-	NSAssert(nil != self.compactDiscID, @"self.compactDiscID may not be nil");
 	
 	// Create our own context for accessing the store
 	NSManagedObjectContext *managedObjectContext = [[NSManagedObjectContext alloc] init];
 	[managedObjectContext setPersistentStoreCoordinator:[[[NSApplication sharedApplication] delegate] persistentStoreCoordinator]];
-	
-	// Fetch the CompactDisc object from the context and ensure it is the correct class
-	NSManagedObject *managedObject = [managedObjectContext objectWithID:self.compactDiscID];
-	if(![managedObject isKindOfClass:[CompactDisc class]]) {
-		self.error = [NSError errorWithDomain:NSOSStatusErrorDomain code:paramErr userInfo:nil];
-		return;
-	}
-	
-	CompactDisc *disc = (CompactDisc *)managedObject;
+
+	// Fetch the compact disc object
+	CompactDisc *disc = [CompactDisc compactDiscWithDADiskRef:self.disk inManagedObjectContext:managedObjectContext];
 	
 	// Open the CD media for reading
 	Drive *drive = [[Drive alloc] initWithDADiskRef:self.disk];

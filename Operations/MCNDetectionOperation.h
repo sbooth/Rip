@@ -12,20 +12,17 @@
 @interface MCNDetectionOperation : NSOperation
 {
 @private
-	__strong DADiskRef _disk;			// The DADiskRef holding the CD to scan
-	NSManagedObjectID *_compactDiscID;	// The CD to be scanned
-	
+	__strong DADiskRef _disk;			// The DADiskRef holding the CD to scan	
 	NSError *_error;					// Holds the first error (if any) occurring during scanning
 }
 
 // ========================================
 // Properties affecting scanning
 @property (assign) DADiskRef disk;
-@property (assign) NSManagedObjectID * compactDiscID;
 
 // ========================================
 // Properties set after scanning is complete (or cancelled)
-@property (readonly, assign) NSError * error;
+@property (readonly, copy) NSError * error;
 
 // ========================================
 // Initialization

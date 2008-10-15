@@ -9,7 +9,7 @@
 #import "Drive.h"
 
 @interface ISRCDetectionOperation ()
-@property (assign) NSError * error;
+@property (copy) NSError * error;
 @end
 
 @implementation ISRCDetectionOperation

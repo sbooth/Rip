@@ -18,11 +18,11 @@
 #define BUFFER_SIZE_IN_SECTORS 775u
 
 @interface ExtractionOperation ()
-@property (assign) SectorRange * sectorsRead;
-@property (assign) NSError * error;
-@property (assign) BitArray * errorFlags;
-@property (assign) NSString * MD5;
-@property (assign) NSString * SHA1;
+@property (copy) SectorRange * sectorsRead;
+@property (copy) NSError * error;
+@property (copy) BitArray * errorFlags;
+@property (copy) NSString * MD5;
+@property (copy) NSString * SHA1;
 @property (assign) float fractionComplete;
 @end
 

@@ -25,8 +25,8 @@ NSString * const	kConfidenceLevelKey						= @"confidenceLevel";
 NSString * const	kAccurateRipTrackIDKey					= @"accurateRipTrackID";
 
 @interface ReadOffsetCalculationOperation ()
-@property (assign) NSError * error;
-@property (assign) NSArray * possibleReadOffsets;
+@property (copy) NSError * error;
+@property (copy) NSArray * possibleReadOffsets;
 @property (assign) float fractionComplete;
 @end
 
@@ -122,7 +122,7 @@ NSString * const	kAccurateRipTrackIDKey					= @"accurateRipTrackID";
 	}
 	
 	if(possibleReadOffsets.count)
-		self.possibleReadOffsets = [possibleReadOffsets copy];
+		self.possibleReadOffsets = possibleReadOffsets;
 }
 
 @end

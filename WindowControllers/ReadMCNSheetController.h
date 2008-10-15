@@ -14,15 +14,13 @@
 	IBOutlet NSProgressIndicator *_progressIndicator;
 
 @private
-	DADiskRef _disk;
-	NSManagedObjectID *_compactDiscID;
+	__strong DADiskRef _disk;
 	NSOperationQueue *_operationQueue;
 }
 
 // ========================================
 // Properties affecting MCN reading
 @property (assign) DADiskRef disk;
-@property (assign) NSManagedObjectID * compactDiscID;
 
 // ========================================
 // Action Methods

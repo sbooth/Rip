@@ -15,7 +15,7 @@
 #include <SystemConfiguration/SCNetwork.h>
 
 @interface AccurateRipQueryOperation ()
-@property (assign) NSError *error;
+@property (copy) NSError *error;
 @end
 
 @implementation AccurateRipQueryOperation

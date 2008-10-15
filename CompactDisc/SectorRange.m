@@ -68,6 +68,30 @@
 	return [self initWithFirstSector:(lastSector - sectorCount + 1) sectorCount:sectorCount];
 }
 
+#pragma mark NSCoding
+
+- (id) initWithCoder:(NSCoder *)decoder
+{
+	NSParameterAssert(nil != decoder);
+	
+	if((self = [super init])) {
+		self.firstSector = (NSUInteger)[decoder decodeIntegerForKey:@"SRFirstSector"];
+		self.lastSector = (NSUInteger)[decoder decodeIntegerForKey:@"SRLastSector"];
+	}
+	
+	return self;
+}
+
+- (void) encodeWithCoder:(NSCoder *)encoder
+{
+	NSParameterAssert(nil != encoder);
+	
+	[encoder encodeInteger:(NSInteger)self.firstSector forKey:@"SRFirstSector"];
+	[encoder encodeInteger:(NSInteger)self.lastSector forKey:@"SRLastSector"];
+}
+
+#pragma mark NSCopying
+
 - (id) copyWithZone:(NSZone *)zone
 {
 	SectorRange *copy = [[SectorRange allocWithZone:zone] init];

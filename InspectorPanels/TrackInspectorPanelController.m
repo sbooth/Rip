@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2007 Stephen F. Booth <me@sbooth.org>
+ *  Copyright (C) 2007 - 2008 Stephen F. Booth <me@sbooth.org>
  *  All Rights Reserved
  */
 
@@ -26,14 +26,14 @@
 - (void) windowDidLoad
 {
 	[self activeDocumentChanged];
-	[[NSApplication sharedApplication] addObserver:self forKeyPath:@"mainWindow.windowController" options:0 context:[TrackInspectorPanelController class]];
+	[[NSApplication sharedApplication] addObserver:self forKeyPath:@"mainWindow.windowController" options:0 context:[self class]];
 
 	[super windowDidLoad];
 }
 
 - (void) observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
 {
-	if(context == [TrackInspectorPanelController class])
+	if(context == [self class])
 		[self activeDocumentChanged];
 	else
 		[super observeValueForKeyPath:keyPath ofObject:object change:change context:context];

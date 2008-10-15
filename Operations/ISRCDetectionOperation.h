@@ -21,11 +21,11 @@
 // ========================================
 // Properties affecting scanning
 @property (assign) DADiskRef disk;
-@property (assign) NSManagedObjectID * trackID;
+@property (copy) NSManagedObjectID * trackID;
 
 // ========================================
 // Properties set after scanning is complete (or cancelled)
-@property (readonly, assign) NSError * error;
+@property (readonly, copy) NSError * error;
 
 // ========================================
 // Initialization

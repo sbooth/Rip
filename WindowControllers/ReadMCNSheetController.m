@@ -22,7 +22,6 @@ static NSString * const kOperationQueueKVOContext		= @"org.sbooth.Rip.ReadMCNShe
 @implementation ReadMCNSheetController
 
 @synthesize disk = _disk;
-@synthesize compactDiscID = _compactDiscID;
 @synthesize operationQueue = _operationQueue;
 
 - (id) init
@@ -71,7 +70,6 @@ static NSString * const kOperationQueueKVOContext		= @"org.sbooth.Rip.ReadMCNShe
 	MCNDetectionOperation *operation = [[MCNDetectionOperation alloc] init];
 	
 	operation.disk = self.disk;
-	operation.compactDiscID = self.compactDiscID;
 	
 	[operation addObserver:self forKeyPath:@"isFinished" options:NSKeyValueObservingOptionNew context:kOperationQueueKVOContext];
 	[operation addObserver:self forKeyPath:@"isCancelled" options:NSKeyValueObservingOptionNew context:kOperationQueueKVOContext];

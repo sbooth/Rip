@@ -15,7 +15,7 @@
 	IBOutlet NSTextField *_statusTextField;
 
 @private
-	DADiskRef _disk;
+	__strong DADiskRef _disk;
 	NSArray *_trackIDs;
 	NSOperationQueue *_operationQueue;
 	NSManagedObjectContext *_managedObjectContext;
@@ -24,7 +24,7 @@
 // ========================================
 // Properties affecting MCN reading
 @property (assign) DADiskRef disk;
-@property (assign) NSArray * trackIDs;
+@property (copy) NSArray * trackIDs;
 
 // ========================================
 // Action Methods

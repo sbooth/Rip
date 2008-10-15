@@ -39,8 +39,8 @@ extern NSString * const		kAccurateRipTrackIDKey; // NSManagedObjectID * for an A
 
 // ========================================
 // Properties affecting scanning
-@property (assign) NSURL * URL;
-@property (assign) NSManagedObjectID * trackDescriptorID;
+@property (copy) NSURL * URL;
+@property (copy) NSManagedObjectID * trackDescriptorID;
 @property (assign) NSUInteger sixSecondPointSector; // In CDDA sectors
 @property (assign) NSUInteger maximumOffsetToCheck; // In sample frames,  should be a multiple of AUDIO_FRAMES_PER_CDDA_SECTOR
 
@@ -50,7 +50,7 @@ extern NSString * const		kAccurateRipTrackIDKey; // NSManagedObjectID * for an A
 
 // ========================================
 // Properties set after offset calculation is complete (or cancelled)
-@property (readonly, assign) NSError * error;
-@property (readonly, assign) NSArray * possibleReadOffsets; // NSArray of NSDictionaries, see keys above
+@property (readonly, copy) NSError * error;
+@property (readonly, copy) NSArray * possibleReadOffsets; // NSArray of NSDictionaries, see keys above
 
 @end

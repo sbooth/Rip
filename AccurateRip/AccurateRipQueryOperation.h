@@ -19,10 +19,10 @@
 
 // ========================================
 // Properties affecting the query
-@property (assign) NSManagedObjectID * compactDiscID;
+@property (copy) NSManagedObjectID * compactDiscID;
 
 // ========================================
 // Properties set after the query is complete (or cancelled)
-@property (readonly, assign) NSError * error;
+@property (readonly, copy) NSError * error;
 
 @end

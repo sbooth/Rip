@@ -74,7 +74,7 @@ convertQSubChannelDataFromBCDToDecimal(struct QSubChannelData *qData)
 }
 
 @interface PregapDetectionOperation ()
-@property (assign) NSError * error;
+@property (copy) NSError * error;
 @end
 
 @implementation PregapDetectionOperation

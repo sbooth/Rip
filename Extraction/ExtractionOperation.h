@@ -35,11 +35,11 @@
 // ========================================
 // Properties affecting extraction
 @property (assign) DADiskRef disk;
-@property (assign) SectorRange * sectors;
-@property (assign) SectorRange * allowedSectors;
-@property (assign) NSURL * URL;
-@property (assign) NSNumber * readOffset;
-@property (assign) NSArray * trackIDs;
+@property (copy) SectorRange * sectors;
+@property (copy) SectorRange * allowedSectors;
+@property (copy) NSURL * URL;
+@property (copy) NSNumber * readOffset;
+@property (copy) NSArray * trackIDs;
 
 // ========================================
 // Properties set during extraction
@@ -47,11 +47,11 @@
 
 // ========================================
 // Properties set after extraction is complete (or cancelled)
-@property (readonly, assign) SectorRange * sectorsRead;
-@property (readonly, assign) NSError * error;
-@property (readonly, assign) BitArray * errorFlags;
-@property (readonly, assign) NSString * MD5;
-@property (readonly, assign) NSString * SHA1;
+@property (readonly, copy) SectorRange * sectorsRead;
+@property (readonly, copy) NSError * error;
+@property (readonly, copy) BitArray * errorFlags;
+@property (readonly, copy) NSString * MD5;
+@property (readonly, copy) NSString * SHA1;
 
 // ========================================
 // Initialization
