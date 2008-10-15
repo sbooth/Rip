@@ -452,7 +452,6 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 	ReadMCNSheetController *sheetController = [[ReadMCNSheetController alloc] init];
 	
 	sheetController.disk = self.disk;
-	sheetController.compactDiscID = self.compactDisc.objectID;
 	
 	[[NSApplication sharedApplication] beginSheet:sheetController.window 
 								   modalForWindow:self.window
@@ -654,7 +653,31 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 	CopyTracksSheetController *sheetController = (CopyTracksSheetController *)contextInfo;
 	
 	// Save an extraction log file
-	NSURL *logFileURL = [NSURL fileURLWithPath:[@"~/Music/Extraction.log" stringByExpandingTildeInPath]];
+	NSString *title = self.compactDisc.metadata.title;
+	if(nil == title)
+		title = NSLocalizedString(@"Unknown Album", @"");
+	
+	NSURL *baseURL = [[EncoderManager sharedEncoderManager] outputURLForCompactDisc:self.compactDisc];
+	NSString *filename = makeStringSafeForFilename(title);
+	NSString *pathname = [filename stringByAppendingPathExtension:@"log"];
+	NSString *outputPath = [[baseURL path] stringByAppendingPathComponent:pathname];
+	NSURL *logFileURL = [NSURL fileURLWithPath:outputPath];
+	
+	// Don't overwrite existing log files
+	if([[NSFileManager defaultManager] fileExistsAtPath:[logFileURL path]]) {
+		
+		NSString *backupFilename = [filename copy];
+		NSString *backupPathname = nil;
+		NSString *backupPath = nil;
+		
+		do {
+			backupFilename = [backupFilename stringByAppendingPathExtension:@"old"];
+			backupPathname = [backupFilename stringByAppendingPathExtension:@"log"];
+			backupPath = [[baseURL path] stringByAppendingPathComponent:backupPathname];
+		} while([[NSFileManager defaultManager] fileExistsAtPath:backupPath]);
+		
+		[[NSFileManager defaultManager] movePath:[logFileURL path] toPath:backupPath handler:nil];
+	}
 	
 	NSError *error = nil;
 	if(![self writeLogFileToURL:logFileURL forExtractionRecords:sheetController.extractionRecords error:&error])
@@ -873,14 +896,17 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 	
 	// Formatters used for presenting values to the user
 	CDMSFFormatter *msfFormatter = [[CDMSFFormatter alloc] init];
-	PregapFormatter *pregapFormatter = [[PregapFormatter alloc] init];
-	DurationFormatter *durationFormatter = [[DurationFormatter alloc] init];
 	YesNoFormatter *yesNoFormatter = [[YesNoFormatter alloc] init];
 	NSNumberFormatter *numberFormatter = [[NSNumberFormatter alloc] init];
+	NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
 
 	[numberFormatter setFormatterBehavior:NSNumberFormatterBehavior10_4];
 	[numberFormatter setUsesGroupingSeparator:YES];
 	[numberFormatter setPaddingCharacter:@" "];
+	
+	[dateFormatter setFormatterBehavior:NSDateFormatterBehavior10_4];
+	[dateFormatter setDateStyle:NSDateFormatterFullStyle];
+	[dateFormatter setTimeStyle:NSDateFormatterFullStyle];
 	
 	NSMutableString *logFileString = [NSMutableString string];
 	
@@ -888,6 +914,8 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 	NSString *appName = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleName"];
 	NSString *versionNumber = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"];
 	[logFileString appendFormat:@"%@ %@ Audio Extraction Log\n", appName, versionNumber];
+	[logFileString appendString:[dateFormatter stringFromDate:[NSDate date]]];
+	[logFileString appendString:@"\n"];
 	
 	[logFileString appendString:@"\n"];
 
@@ -920,8 +948,6 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 	[logFileString appendFormat:@"FreeDB ID:          %08lx\n", self.compactDisc.freeDBDiscID.integerValue];
 	[logFileString appendFormat:@"MusicBrainz ID:     %@\n", self.compactDisc.musicBrainzDiscID];
 	[logFileString appendString:@"Disc TOC:\n"];
-//	[logFileString appendString:@"     Track |   Start  | Duration |  Pregap  | First sector | Last sector\n"];
-//	[logFileString appendString:@"    -------+----------+----------+----------+--------------+-------------\n"];
 	[logFileString appendString:@"     Track |   Start  | Duration | First sector | Last sector\n"];
 	[logFileString appendString:@"    -------+----------+----------+--------------+-------------\n"];
 		
@@ -937,13 +963,6 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 		[logFileString appendString:@" | "];
 		[logFileString appendString:[msfFormatter stringForObjectValue:[NSNumber numberWithUnsignedInteger:(trackDescriptor.sectorCount - 150)]]];
 		[logFileString appendString:@" | "];
-
-		// Pregap
-//		if(trackDescriptor.pregap)
-//			[logFileString appendString:[pregapFormatter stringForObjectValue:trackDescriptor.pregap]];
-//		else
-//			[logFileString appendString:@"        "];
-//		[logFileString appendString:@" | "];
 		
 		// First and last sector number
 		[numberFormatter setFormatWidth:10];
@@ -958,17 +977,27 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 	
 	[numberFormatter setFormatWidth:0];
 
-	for(ExtractionRecord *extractionRecord in extractionRecords) {
+	NSSortDescriptor *extractionRecordsSortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"firstTrack.track.number" ascending:YES];
+	NSArray *sortedExtractionRecords = [extractionRecords sortedArrayUsingDescriptors:[NSArray arrayWithObject:extractionRecordsSortDescriptor]];
+	
+	for(ExtractionRecord *extractionRecord in sortedExtractionRecords) {
 		if(1 == [extractionRecord.orderedTracks count]) {
 			ExtractedTrackRecord *extractedTrackRecord = [extractionRecord.orderedTracks lastObject];
 			
-			[logFileString appendFormat:@"Track %@ saved to %@\n", extractedTrackRecord.track.number, [extractionRecord.URL path]];
+			[logFileString appendFormat:@"Track %@ saved to %@\n", extractedTrackRecord.track.number, [[extractionRecord.URL path] lastPathComponent]];
 			
-			if([extractionRecord.errorFlags countOfOnes])
-				[logFileString appendFormat:@"    C2 error count:         %@\n", [numberFormatter stringForObjectValue:[NSNumber numberWithUnsignedInteger:[extractionRecord.errorFlags countOfOnes]]]];
-			[logFileString appendFormat:@"    AccurateRip checksum:   %lx\n", extractedTrackRecord.accurateRipChecksum.unsignedIntegerValue];
 			[logFileString appendFormat:@"    Audio MD5 hash:         %@\n", extractionRecord.MD5];
 			[logFileString appendFormat:@"    Audio SHA1 hash:        %@\n", extractionRecord.SHA1];
+			if([extractionRecord.errorFlags countOfOnes])
+				[logFileString appendFormat:@"    C2 error count:         %@\n", [numberFormatter stringForObjectValue:[NSNumber numberWithUnsignedInteger:[extractionRecord.errorFlags countOfOnes]]]];
+			[logFileString appendFormat:@"    AccurateRip checksum:   %08lx\n", extractedTrackRecord.accurateRipChecksum.unsignedIntegerValue];
+			
+			if(extractedTrackRecord.accurateRipTrackRecord && extractedTrackRecord.accurateRipTrackRecord.checksum.unsignedIntegerValue == extractedTrackRecord.accurateRipChecksum.unsignedIntegerValue) {
+				[logFileString appendFormat:@"    Accurately ripped:      %@\n", [yesNoFormatter stringForObjectValue:[NSNumber numberWithBool:YES]]];
+				[logFileString appendFormat:@"    Confidence level:       %@\n", [numberFormatter stringFromNumber:extractedTrackRecord.accurateRipTrackRecord.confidenceLevel]];
+			}
+
+			[logFileString appendString:@"\n"];
 		}
 		else {
 			NSLog(@"FIXME: LOG FILE FOR IMAGE EXTRACTION");

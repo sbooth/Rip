@@ -17,7 +17,7 @@
 	IBOutlet NSDrawer *_metadataDrawer;
 	
 @private
-	DADiskRef _disk;
+	__strong DADiskRef _disk;
 	CompactDisc *_compactDisc;
 	DriveInformation *_driveInformation;
 	
