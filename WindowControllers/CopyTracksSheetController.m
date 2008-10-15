@@ -29,6 +29,7 @@
 #import "ReadMCNSheetController.h"
 #import "ReadISRCsSheetController.h"
 #import "DetectPregapsSheetController.h"
+#import "CalculateAccurateRipOffsetsSheetController.h"
 
 #import "EncoderManager.h"
 
@@ -39,7 +40,6 @@
 // Context objects for observeValueForKeyPath:ofObject:change:context:
 // ========================================
 static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.CopyTracksSheetController.ExtractAudioKVOContext";
-static NSString * const kOffsetVerificationKVOContext	= @"org.sbooth.Rip.CopyTracksSheetController.OffsetVerificationKVOContext";
 
 // ========================================
 // The number of sectors which will be scanned during offset verification
@@ -52,12 +52,13 @@ static NSString * const kOffsetVerificationKVOContext	= @"org.sbooth.Rip.CopyTra
 @property (assign) NSManagedObjectContext * managedObjectContext;
 
 @property (assign) NSOperationQueue * operationQueue;
+
+@property (assign) AccurateRipDiscRecord * accurateRipPressingToMatch;
 @end
 
 @interface CopyTracksSheetController (Callbacks)
 - (void) didPresentErrorWithRecovery:(BOOL)didRecover contextInfo:(void *)contextInfo;
 - (void) audioExtractionTimerFired:(NSTimer *)timer;
-- (void) offsetVerificationTimerFired:(NSTimer *)timer;
 @end
 
 @interface CopyTracksSheetController (Private)
@@ -69,7 +70,6 @@ static NSString * const kOffsetVerificationKVOContext	= @"org.sbooth.Rip.CopyTra
 - (void) startExtractingNextTrack;
 
 - (void) processExtractionOperation:(ExtractionOperation *)operation;
-- (void) processExtractionOperation:(ExtractionOperation *)operation withOffsetVerificationOperation:(ReadOffsetCalculationOperation *)offsetVerificationOperation;
 
 - (ExtractionRecord *) createExtractionRecordForOperation:(ExtractionOperation *)operation accurateRipChecksums:(NSDictionary *)checksums;
 @end
@@ -88,6 +88,8 @@ static NSString * const kOffsetVerificationKVOContext	= @"org.sbooth.Rip.CopyTra
 
 @synthesize operationQueue = _operationQueue;
 
+@synthesize accurateRipPressingToMatch = _accurateRipPressingToMatch;
+
 - (id) init
 {
 	if((self = [super initWithWindowNibName:@"CopyTracksSheet"])) {
@@ -97,6 +99,8 @@ static NSString * const kOffsetVerificationKVOContext	= @"org.sbooth.Rip.CopyTra
 
 		self.operationQueue = [[NSOperationQueue alloc] init];
 		[self.operationQueue setMaxConcurrentOperationCount:1];
+		
+		_activeTimers = [NSMapTable mapTableWithStrongToStrongObjects];
 	}
 	return self;
 }
@@ -123,6 +127,7 @@ static NSString * const kOffsetVerificationKVOContext	= @"org.sbooth.Rip.CopyTra
 				// Schedule a timer which will update the UI
 				NSTimer *timer = [NSTimer timerWithTimeInterval:0.5 target:self selector:@selector(audioExtractionTimerFired:) userInfo:operation repeats:YES];
 				[[NSRunLoop mainRunLoop] addTimer:timer forMode:NSRunLoopCommonModes];
+				[_activeTimers setObject:timer forKey:operation];
 				
 				NSString *trackDescription = nil;
 				NSArray *trackIDs = operation.trackIDs;
@@ -154,40 +159,17 @@ static NSString * const kOffsetVerificationKVOContext	= @"org.sbooth.Rip.CopyTra
 			[operation removeObserver:self forKeyPath:@"isCancelled"];
 			[operation removeObserver:self forKeyPath:@"isFinished"];
 
-			// If this disc wasn't found in AccurateRip, handle the extracted audio now
-			if(!self.compactDisc.accurateRipDiscs) {
-				[self processExtractionOperation:operation];
+			// Invalidate the operations' timer
+			NSTimer *timer = [_activeTimers objectForKey:operation];
+			[timer invalidate];
+			[_activeTimers removeObjectForKey:operation];
+			
+			// Process the extracted audio
+			[self processExtractionOperation:operation];
 
-				// If no tracks are being processed and none remain to be extracted, we are finished			
-				if(![[self.operationQueue operations] count] && ![_tracksToBeExtracted count])
-					[[NSApplication sharedApplication] endSheet:self.window returnCode:NSOKButton];
-			}
-		}
-	}
-	else if(kOffsetVerificationKVOContext == context) {
-		ReadOffsetCalculationOperation *operation = (ReadOffsetCalculationOperation *)object;
-		
-		if([keyPath isEqualToString:@"isExecuting"]) {
-			if([operation isExecuting]) {
-				// Schedule a timer which will update the UI
-				NSTimer *timer = [NSTimer timerWithTimeInterval:0.5 target:self selector:@selector(offsetVerificationTimerFired:) userInfo:operation repeats:YES];
-				[[NSRunLoop mainRunLoop] addTimer:timer forMode:NSRunLoopCommonModes];
-				
-				[_statusTextField setStringValue:@"Verifying the offset of the extracted audio"];
-			}
-		}
-		else if([keyPath isEqualToString:@"isCancelled"] || [keyPath isEqualToString:@"isFinished"]) {
-			[operation removeObserver:self forKeyPath:@"isExecuting"];
-			[operation removeObserver:self forKeyPath:@"isCancelled"];
-			[operation removeObserver:self forKeyPath:@"isFinished"];
-			
-			// Use AccurateRip to verify the results
-			ExtractionOperation *extractionOperation = [[operation dependencies] lastObject];
-			[self processExtractionOperation:extractionOperation withOffsetVerificationOperation:operation];
-			
 			// If no tracks are being processed and none remain to be extracted, we are finished			
 			if(![[self.operationQueue operations] count] && ![_tracksToBeExtracted count])
-				[[NSApplication sharedApplication] endSheet:self.window returnCode:NSOKButton];			
+				[[NSApplication sharedApplication] endSheet:self.window returnCode:NSOKButton];
 		}
 	}
 	else
@@ -284,19 +266,6 @@ static NSString * const kOffsetVerificationKVOContext	= @"org.sbooth.Rip.CopyTra
 	//	NSLog(@"C2 errors: %i", [operation.errorFlags countOfOnes]);
 }
 
-- (void) offsetVerificationTimerFired:(NSTimer *)timer
-{
-	ReadOffsetCalculationOperation *operation = (ReadOffsetCalculationOperation *)[timer userInfo];
-	
-	if([operation isFinished] || [operation isCancelled]) {
-		[timer invalidate];
-		return;
-	}
-	
-	[_progressIndicator setDoubleValue:operation.fractionComplete];
-	//	NSLog(@"C2 errors: %i", [operation.errorFlags countOfOnes]);
-}
-
 @end
 
 @implementation CopyTracksSheetController (SheetCallbacks)
@@ -362,6 +331,49 @@ static NSString * const kOffsetVerificationKVOContext	= @"org.sbooth.Rip.CopyTra
 	[self performCopyTracks];
 }
 
+- (void) showCalculateAccurateRipOffsetsSheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode contextInfo:(void *)contextInfo
+{
+	NSParameterAssert(nil != sheet);
+	NSParameterAssert(nil != contextInfo);
+	
+	[sheet orderOut:self];
+	
+	if(NSCancelButton == returnCode) {
+		[self cancel:self];
+		return;
+	}
+	
+	CalculateAccurateRipOffsetsSheetController *sheetController = (CalculateAccurateRipOffsetsSheetController *)contextInfo;
+	
+	NSPredicate *zeroOffsetPredicate = [NSPredicate predicateWithFormat:@"%K == 0", kReadOffsetKey];
+	NSArray *matchingPressingsWithZeroOffset = [sheetController.accurateRipOffsets filteredArrayUsingPredicate:zeroOffsetPredicate];
+	if([matchingPressingsWithZeroOffset count]) {
+		NSManagedObjectID *accurateRipTrackID = [[matchingPressingsWithZeroOffset lastObject] objectForKey:kAccurateRipTrackIDKey];
+		
+		// Fetch the AccurateRipTrackRecord object from the context and ensure it is the correct class
+		NSManagedObject *managedObject = [self.managedObjectContext objectWithID:accurateRipTrackID];
+		if(![managedObject isKindOfClass:[AccurateRipTrackRecord class]]) {
+//			[self presentError:error modalForWindow:self.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
+			return;
+		}
+		
+		AccurateRipTrackRecord *accurateRipTrack = (AccurateRipTrackRecord *)managedObject;
+		self.accurateRipPressingToMatch = accurateRipTrack.disc;
+	}
+	else
+		NSLog(@"FIXME: USE ALTERNATE AR PRESSING");
+
+	// Copy the array containing the tracks to be extracted
+	_tracksToBeExtracted = [self.trackIDs mutableCopy];
+	
+	// Set up the extraction records
+	_extractionRecords = [NSMutableArray array];
+	
+	// Get started on the first one
+	if([_tracksToBeExtracted count])
+		[self startExtractingNextTrack];
+}
+
 @end
 
 
@@ -374,7 +386,6 @@ static NSString * const kOffsetVerificationKVOContext	= @"org.sbooth.Rip.CopyTra
 		ReadMCNSheetController *sheetController = [[ReadMCNSheetController alloc] init];
 		
 		sheetController.disk = self.disk;
-		sheetController.compactDiscID = self.compactDisc.objectID;
 		
 		[[NSApplication sharedApplication] beginSheet:sheetController.window 
 									   modalForWindow:self.window
@@ -472,17 +483,37 @@ static NSString * const kOffsetVerificationKVOContext	= @"org.sbooth.Rip.CopyTra
 		return NO;
 }
 
+- (void) calculateAccurateRipOffsets
+{
+	CalculateAccurateRipOffsetsSheetController *sheetController = [[CalculateAccurateRipOffsetsSheetController alloc] init];
+	
+	sheetController.disk = self.disk;
+	
+	[[NSApplication sharedApplication] beginSheet:sheetController.window 
+								   modalForWindow:self.window
+									modalDelegate:self 
+								   didEndSelector:@selector(showCalculateAccurateRipOffsetsSheetDidEnd:returnCode:contextInfo:) 
+									  contextInfo:sheetController];
+	
+	[sheetController calculateAccurateRipOffsets:self];
+}
+
 - (void) performCopyTracks
 {
-	// Copy the array containing the tracks to be extracted
-	_tracksToBeExtracted = [self.trackIDs mutableCopy];
-	
-	// Set up the extraction records
-	_extractionRecords = [NSMutableArray array];
-	
-	// Get started on the first one
-	if([_tracksToBeExtracted count])
-		[self startExtractingNextTrack];
+	// The first step is to determine which AccurateRip pressing to use if an AR
+	if(self.compactDisc.accurateRipDiscs)
+		[self calculateAccurateRipOffsets];
+	else {
+		// Copy the array containing the tracks to be extracted
+		_tracksToBeExtracted = [self.trackIDs mutableCopy];
+		
+		// Set up the extraction records
+		_extractionRecords = [NSMutableArray array];
+		
+		// Get started on the first one
+		if([_tracksToBeExtracted count])
+			[self startExtractingNextTrack];
+	}	
 }
 
 - (void) startExtractingNextTrack
@@ -522,37 +553,9 @@ static NSString * const kOffsetVerificationKVOContext	= @"org.sbooth.Rip.CopyTra
 
 	// Do it.  Do it.  Do it.
 	[self.operationQueue addOperation:extractionOperation];
-
-	// Offset verification is only applicable if the disc was found in AccurateRip
-	if(self.compactDisc.accurateRipDiscs) {
-		// AccurateRip offset checksums start at six seconds into the file
-		NSUInteger sixSecondPointSector = (6 * CDDA_SECTORS_PER_SECOND);
-		
-		ReadOffsetCalculationOperation *offsetCalculationOperation = [[ReadOffsetCalculationOperation alloc] init];
-		
-		offsetCalculationOperation.URL = extractionOperation.URL;
-		offsetCalculationOperation.trackDescriptorID = track.objectID;
-		offsetCalculationOperation.sixSecondPointSector = sixSecondPointSector;
-		offsetCalculationOperation.maximumOffsetToCheck = (MAXIMUM_OFFSET_TO_CHECK_IN_SECTORS * AUDIO_FRAMES_PER_CDDA_SECTOR);
-		
-		// Set up operation dependencies
-		[offsetCalculationOperation addDependency:extractionOperation];
-
-		// Observe the operation's progress
-		[offsetCalculationOperation addObserver:self forKeyPath:@"isExecuting" options:NSKeyValueObservingOptionNew context:kOffsetVerificationKVOContext];
-		[offsetCalculationOperation addObserver:self forKeyPath:@"isCancelled" options:NSKeyValueObservingOptionNew context:kOffsetVerificationKVOContext];
-		[offsetCalculationOperation addObserver:self forKeyPath:@"isFinished" options:NSKeyValueObservingOptionNew context:kOffsetVerificationKVOContext];
-
-		[self.operationQueue addOperation:offsetCalculationOperation];
-	}
 }
 
 - (void) processExtractionOperation:(ExtractionOperation *)operation
-{
-	[self processExtractionOperation:operation withOffsetVerificationOperation:nil];
-}
-
-- (void) processExtractionOperation:(ExtractionOperation *)operation withOffsetVerificationOperation:(ReadOffsetCalculationOperation *)offsetVerificationOperation
 {
 	NSParameterAssert(nil != operation);
 	
@@ -573,10 +576,10 @@ static NSString * const kOffsetVerificationKVOContext	= @"org.sbooth.Rip.CopyTra
 	
 	// Create a dictionary to hold the actual checksums of the extracted audio
 	NSMutableDictionary *actualAccurateRipChecksums = nil;
-	NSMutableDictionary *accurateRipTracksUsed = nil;
 	
 	// If trackIDs is set, the ExtractionOperation represents one or more whole tracks (and not an arbitrary range of sectors)
 	// If this is the case, calculate the AccurateRip checksum(s) for the extracted tracks
+	// This will allow tracks to be verified later if for some reason AccurateRip isn't available during ripping
 	if(operation.trackIDs) {
 		NSUInteger sectorOffset = 0;
 		actualAccurateRipChecksums = [NSMutableDictionary dictionary];
@@ -607,9 +610,8 @@ static NSString * const kOffsetVerificationKVOContext	= @"org.sbooth.Rip.CopyTra
 	}
 	
 	// If this disc was found in Accurate Rip, verify the checksum(s) if whole tracks were extracted
-	if(self.compactDisc.accurateRipDiscs && operation.trackIDs) {
+	if(self.accurateRipPressingToMatch && operation.trackIDs) {
 		BOOL allTracksWereAccuratelyExtracted = YES;
-		accurateRipTracksUsed = [NSMutableArray array];
 		
 		for(NSManagedObjectID *trackID in operation.trackIDs) {
 			NSManagedObject *managedObject = [self.managedObjectContext objectWithID:trackID];
@@ -617,39 +619,10 @@ static NSString * const kOffsetVerificationKVOContext	= @"org.sbooth.Rip.CopyTra
 				continue;
 			
 			TrackDescriptor *track = (TrackDescriptor *)managedObject;			
-			
-			// A disc may have multiple pressings in AccurateRip; try to use the one that matches
-			// the configured read offset for the drive
-			AccurateRipDiscRecord *accurateRipPressingToUse = nil;
-			
-			if(offsetVerificationOperation) {
-				NSPredicate *zeroOffsetPredicate = [NSPredicate predicateWithFormat:@"%K == 0", kReadOffsetKey];
-				NSArray *matchingPressingsWithZeroOffset = [offsetVerificationOperation.possibleReadOffsets filteredArrayUsingPredicate:zeroOffsetPredicate];
-				if([matchingPressingsWithZeroOffset count]) {
-					NSManagedObjectID *accurateRipTrackID = [[matchingPressingsWithZeroOffset lastObject] objectForKey:kAccurateRipTrackIDKey];
-					
-					// Fetch the AccurateRipTrackRecord object from the context and ensure it is the correct class
-					managedObject = [self.managedObjectContext objectWithID:accurateRipTrackID];
-					if(![managedObject isKindOfClass:[AccurateRipTrackRecord class]]) {
-//						[self presentError:error modalForWindow:self.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
-						return;
-					}
-					
-					AccurateRipTrackRecord *accurateRipTrack = (AccurateRipTrackRecord *)managedObject;
-					accurateRipPressingToUse = accurateRipTrack.disc;
-				}
-			}
-			
-			if(!accurateRipPressingToUse) {
-				NSLog(@"USE ALTERNATE AR PRESSING !!!");
-				return;
-			}
-			
-			AccurateRipTrackRecord *accurateRipTrack = [accurateRipPressingToUse trackNumber:track.number.unsignedIntegerValue];
+			AccurateRipTrackRecord *accurateRipTrack = [self.accurateRipPressingToMatch trackNumber:track.number.unsignedIntegerValue];
 			NSNumber *trackActualAccurateRipChecksum = [actualAccurateRipChecksums objectForKey:track.objectID];
 			
 			if(accurateRipTrack && accurateRipTrack.checksum.unsignedIntegerValue == trackActualAccurateRipChecksum.unsignedIntegerValue) {
-				[accurateRipTracksUsed setObject:accurateRipTrack forKey:track.objectID];
 #if DEBUG
 				NSLog(@"Track %@ accurately ripped, confidence %@", track.number, accurateRipTrack.confidenceLevel);
 #endif
@@ -668,6 +641,9 @@ static NSString * const kOffsetVerificationKVOContext	= @"org.sbooth.Rip.CopyTra
 			[[EncoderManager sharedEncoderManager] encodeURL:operation.URL extractionRecord:extractionRecord error:NULL];
 			
 			[self.extractionRecords addObject:extractionRecord];
+			
+			if([_tracksToBeExtracted count])
+				[self startExtractingNextTrack];
 		}
 	}
 	// Re-rip the tracks if any C2 error flags were returned
@@ -710,7 +686,7 @@ static NSString * const kOffsetVerificationKVOContext	= @"org.sbooth.Rip.CopyTra
 			
 			extractedTrackRecord.track = track;		
 			extractedTrackRecord.accurateRipChecksum = [checksums objectForKey:track.objectID];
-//			extractedTrackRecord.accurateRipTrackRecord = [tracks objectForKey:track.objectID];
+			extractedTrackRecord.accurateRipTrackRecord = [self.accurateRipPressingToMatch trackNumber:track.number.unsignedIntegerValue];
 			
 			[extractionRecord addTracksObject:extractedTrackRecord];
 		}

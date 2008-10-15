@@ -6,7 +6,7 @@
 #import <Cocoa/Cocoa.h>
 #include <DiskArbitration/DiskArbitration.h>
 
-@class CompactDisc, DriveInformation;
+@class CompactDisc, DriveInformation, AccurateRipDiscRecord;
 
 // ========================================
 // An NSWindowController subclass for customizing the extraction
@@ -18,10 +18,11 @@
 	IBOutlet NSTextField *_statusTextField;
 	
 @private
-	DADiskRef _disk;
+	__strong DADiskRef _disk;
 	NSArray *_trackIDs;
 	BOOL _extractAsImage;
 
+	NSMapTable *_activeTimers;
 	NSMutableArray *_extractionRecords;
 
 	CompactDisc *_compactDisc;
@@ -30,13 +31,15 @@
 
 	NSOperationQueue *_operationQueue;
 	NSMutableArray *_tracksToBeExtracted;
+	
+	AccurateRipDiscRecord *_accurateRipPressingToMatch;
 }
 
 // ========================================
 // Properties
 // ========================================
 @property (assign) DADiskRef disk;
-@property (assign) NSArray * trackIDs;
+@property (copy) NSArray * trackIDs;
 @property (assign) BOOL extractAsImage;
 
 @property (readonly) NSArray * extractionRecords;
@@ -46,6 +49,8 @@
 @property (readonly, assign) NSManagedObjectContext * managedObjectContext;
 
 @property (readonly) NSOperationQueue * operationQueue;
+
+@property (readonly, assign) AccurateRipDiscRecord * accurateRipPressingToMatch;
 
 // ========================================
 // Action methods
