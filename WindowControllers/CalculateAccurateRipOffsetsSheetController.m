@@ -135,6 +135,7 @@ static NSString * const kCalculateOffsetsKVOContext		= @"org.sbooth.Rip.Determin
 				[_progressIndicator stopAnimation:self];
 
 				[[NSApplication sharedApplication] endSheet:self.window returnCode:NSOKButton];
+				[self.window orderOut:self];
 			}
 		}
 		
@@ -174,12 +175,17 @@ static NSString * const kCalculateOffsetsKVOContext		= @"org.sbooth.Rip.Determin
 	}
 }
 
-- (IBAction) calculateAccurateRipOffsets:(id)sender
+- (void) beginCalculateAccurateRipOffsetsSheetForWindow:(NSWindow *)window modalDelegate:(id)modalDelegate didEndSelector:(SEL)didEndSelector contextInfo:(void *)contextInfo
 {
+	NSParameterAssert(nil != window);
 	
-#pragma unused(sender)
+	[[NSApplication sharedApplication] beginSheet:self.window
+								   modalForWindow:window
+									modalDelegate:modalDelegate
+								   didEndSelector:didEndSelector
+									  contextInfo:contextInfo];
 	
-	[_progressIndicator startAnimation:sender];
+	[_progressIndicator startAnimation:self];
 	
 	// Set up  operations for querying AccurateRip and extracting the audio
 	AccurateRipQueryOperation *accurateRipQueryOperation = [[AccurateRipQueryOperation alloc] init];
@@ -253,13 +259,13 @@ static NSString * const kCalculateOffsetsKVOContext		= @"org.sbooth.Rip.Determin
 
 - (IBAction) cancel:(id)sender
 {
-	
-#pragma unused(sender)
-	
+	[_progressIndicator stopAnimation:sender];
 	[self.operationQueue cancelAllOperations];
+	
 	self.disk = NULL;
 	
 	[[NSApplication sharedApplication] endSheet:self.window returnCode:NSCancelButton];
+	[self.window orderOut:sender];
 }
 
 @end
@@ -272,6 +278,7 @@ static NSString * const kCalculateOffsetsKVOContext		= @"org.sbooth.Rip.Determin
 #pragma unused(contextInfo)
 	
 	[[NSApplication sharedApplication] endSheet:self.window returnCode:(didRecover ? NSOKButton : NSCancelButton)];	
+	[self.window orderOut:self];
 }
 
 @end

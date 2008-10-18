@@ -28,7 +28,10 @@
 
 // ========================================
 // Action Methods
-- (IBAction) detectPregaps:(id)sender;
 - (IBAction) cancel:(id)sender;
+
+// ========================================
+// The meat & potatoes
+- (void) beginDetectPregapsSheetForWindow:(NSWindow *)window modalDelegate:(id)modalDelegate didEndSelector:(SEL)didEndSelector contextInfo:(void *)contextInfo;
 
 @end

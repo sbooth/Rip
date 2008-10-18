@@ -31,16 +31,14 @@
 
 // ========================================
 // Other Properties
-@property (readonly, assign) CompactDisc * compactDisc;
-@property (readonly, assign) DriveInformation * driveInformation;
-
-@property (readonly, assign) NSManagedObjectContext * managedObjectContext;
-
 @property (readonly, copy) NSArray * accurateRipOffsets;
 
 // ========================================
 // Action Methods
-- (IBAction) calculateAccurateRipOffsets:(id)sender;
 - (IBAction) cancel:(id)sender;
+
+// ========================================
+// The meat & potatoes
+- (void) beginCalculateAccurateRipOffsetsSheetForWindow:(NSWindow *)window modalDelegate:(id)modalDelegate didEndSelector:(SEL)didEndSelector contextInfo:(void *)contextInfo;
 
 @end

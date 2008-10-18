@@ -27,8 +27,11 @@
 @property (copy) NSArray * trackIDs;
 
 // ========================================
+// The meat & potatoes
+- (void) beginReadISRCsSheetForWindow:(NSWindow *)window modalDelegate:(id)modalDelegate didEndSelector:(SEL)didEndSelector contextInfo:(void *)contextInfo;
+
+// ========================================
 // Action Methods
-- (IBAction) readISRCs:(id)sender;
 - (IBAction) cancel:(id)sender;
 
 @end

@@ -210,12 +210,17 @@ static NSString * const kCalculateOffsetsKVOContext		= @"org.sbooth.Rip.ReadOffs
 	}
 }
 
-- (IBAction) determineDriveOffset:(id)sender
+- (void) beginReadOffsetCalculatorSheetForWindow:(NSWindow *)window modalDelegate:(id)modalDelegate didEndSelector:(SEL)didEndSelector contextInfo:(void *)contextInfo
 {
+	NSParameterAssert(nil != window);
+
+	[[NSApplication sharedApplication] beginSheet:self.window
+								   modalForWindow:window
+									modalDelegate:modalDelegate
+								   didEndSelector:didEndSelector
+									  contextInfo:contextInfo];
 	
-#pragma unused(sender)
-	
-	[_progressIndicator startAnimation:sender];
+	[_progressIndicator startAnimation:self];
 
 	// Set up  operations for querying AccurateRip and extracting the audio
 	AccurateRipQueryOperation *accurateRipQueryOperation = [[AccurateRipQueryOperation alloc] init];
@@ -288,9 +293,6 @@ static NSString * const kCalculateOffsetsKVOContext		= @"org.sbooth.Rip.ReadOffs
 
 - (IBAction) acceptSuggestedOffset:(id)sender
 {
-	
-#pragma unused(sender)
-
 	if(self.operationQueue.operations.count) {
 		NSBeep();
 		return;
@@ -316,17 +318,16 @@ static NSString * const kCalculateOffsetsKVOContext		= @"org.sbooth.Rip.ReadOffs
 	self.disk = NULL;
 	
 	[[NSApplication sharedApplication] endSheet:self.window returnCode:NSOKButton];
+	[self.window orderOut:sender];
 }
 
 - (IBAction) cancel:(id)sender
 {
-	
-#pragma unused(sender)
-
 	[self.operationQueue cancelAllOperations];
 	self.disk = NULL;
 
 	[[NSApplication sharedApplication] endSheet:self.window returnCode:NSCancelButton];
+	[self.window orderOut:sender];
 }
 
 - (IBAction) togglePossibleOffsetsShown:(id)sender
@@ -379,6 +380,7 @@ static NSString * const kCalculateOffsetsKVOContext		= @"org.sbooth.Rip.ReadOffs
 	self.disk = NULL;
 
 	[[NSApplication sharedApplication] endSheet:self.window returnCode:NSOKButton];
+	[self.window orderOut:sender];
 }
 
 @end
@@ -391,6 +393,7 @@ static NSString * const kCalculateOffsetsKVOContext		= @"org.sbooth.Rip.ReadOffs
 #pragma unused(contextInfo)
 	
 	[[NSApplication sharedApplication] endSheet:self.window returnCode:(didRecover ? NSOKButton : NSCancelButton)];	
+	[self.window orderOut:self];
 }
 
 @end

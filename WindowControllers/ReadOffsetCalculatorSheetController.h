@@ -30,21 +30,16 @@
 
 // ========================================
 // Properties
-// ========================================
 @property (assign) DADiskRef disk;
-@property (readonly, assign) CompactDisc * compactDisc;
-@property (readonly, assign) DriveInformation * driveInformation;
-
-@property (readonly, assign) NSManagedObjectContext * managedObjectContext;
-@property (readonly, assign) NSOperationQueue * operationQueue;
 
 @property (readonly, assign) BOOL possibleOffsetsShown;
 
 // ========================================
-// Action Methods
-// ========================================
-- (IBAction) determineDriveOffset:(id)sender;
+// The meat & potatoes
+- (void) beginReadOffsetCalculatorSheetForWindow:(NSWindow *)window modalDelegate:(id)modalDelegate didEndSelector:(SEL)didEndSelector contextInfo:(void *)contextInfo;
 
+// ========================================
+// Action Methods
 - (IBAction) acceptSuggestedOffset:(id)sender;
 - (IBAction) cancel:(id)sender;
 

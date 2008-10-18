@@ -23,8 +23,11 @@
 @property (assign) DADiskRef disk;
 
 // ========================================
+// The meat & potatoes
+- (void) beginReadMCNSheetForWindow:(NSWindow *)window modalDelegate:(id)modalDelegate didEndSelector:(SEL)didEndSelector contextInfo:(void *)contextInfo;
+
+// ========================================
 // Action Methods
-- (IBAction) readMCN:(id)sender;
 - (IBAction) cancel:(id)sender;
 
 @end

@@ -55,17 +55,27 @@ static NSString * const kOperationQueueKVOContext		= @"org.sbooth.Rip.ReadMCNShe
 			
 			if(operation.error)
 				[self presentError:operation.error modalForWindow:self.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
-			else if([operation isFinished])
+			else if([operation isFinished]) {
 				[[NSApplication sharedApplication] endSheet:self.window returnCode:NSOKButton];
+				[self.window orderOut:self];
+			}
 		}
 	}
 	else
 		[super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
 }
 
-- (IBAction) readMCN:(id)sender
+- (void) beginReadMCNSheetForWindow:(NSWindow *)window modalDelegate:(id)modalDelegate didEndSelector:(SEL)didEndSelector contextInfo:(void *)contextInfo
 {
-	[_progressIndicator startAnimation:sender];
+	NSParameterAssert(nil != window);
+	
+	[[NSApplication sharedApplication] beginSheet:self.window
+								   modalForWindow:window 
+									modalDelegate:modalDelegate 
+								   didEndSelector:didEndSelector 
+									  contextInfo:contextInfo];
+	
+	[_progressIndicator startAnimation:self];
 	
 	MCNDetectionOperation *operation = [[MCNDetectionOperation alloc] init];
 	
@@ -79,11 +89,11 @@ static NSString * const kOperationQueueKVOContext		= @"org.sbooth.Rip.ReadMCNShe
 
 - (IBAction) cancel:(id)sender
 {
-	
-#pragma unused(sender)
-	
+	[_progressIndicator stopAnimation:sender];
 	[self.operationQueue cancelAllOperations];
+	
 	[[NSApplication sharedApplication] endSheet:self.window returnCode:NSCancelButton];
+	[self.window orderOut:sender];
 }
 
 @end
@@ -92,10 +102,11 @@ static NSString * const kOperationQueueKVOContext		= @"org.sbooth.Rip.ReadMCNShe
 
 - (void) didPresentErrorWithRecovery:(BOOL)didRecover contextInfo:(void *)contextInfo
 {
-	
+
 #pragma unused(contextInfo)
 	
 	[[NSApplication sharedApplication] endSheet:self.window returnCode:(didRecover ? NSOKButton : NSCancelButton)];	
+	[self.window orderOut:self];
 }
 
 @end

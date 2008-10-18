@@ -83,17 +83,27 @@ static NSString * const kOperationQueueKVOContext		= @"org.sbooth.Rip.ReadISRCsS
 
 			if(operation.error)
 				[self presentError:operation.error modalForWindow:self.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
-			else if([operation isFinished] && 0 == [[self.operationQueue operations] count])
+			else if([operation isFinished] && 0 == [[self.operationQueue operations] count]) {
 				[[NSApplication sharedApplication] endSheet:self.window returnCode:NSOKButton];
+				[self.window orderOut:self];
+			}
 		}
 	}
 	else
 		[super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
 }
 
-- (IBAction) readISRCs:(id)sender
+- (void) beginReadISRCsSheetForWindow:(NSWindow *)window modalDelegate:(id)modalDelegate didEndSelector:(SEL)didEndSelector contextInfo:(void *)contextInfo
 {
-	[_progressIndicator startAnimation:sender];
+	NSParameterAssert(nil != window);
+	
+	[[NSApplication sharedApplication] beginSheet:self.window
+								   modalForWindow:window
+									modalDelegate:modalDelegate
+								   didEndSelector:didEndSelector
+									  contextInfo:contextInfo];
+
+	[_progressIndicator startAnimation:self];
 
 	for(NSManagedObjectID *objectID in self.trackIDs) {
 		ISRCDetectionOperation *operation = [[ISRCDetectionOperation alloc] init];
@@ -111,11 +121,11 @@ static NSString * const kOperationQueueKVOContext		= @"org.sbooth.Rip.ReadISRCsS
 
 - (IBAction) cancel:(id)sender
 {
-	
-#pragma unused(sender)
-	
+	[_progressIndicator stopAnimation:sender];
 	[self.operationQueue cancelAllOperations];
+	
 	[[NSApplication sharedApplication] endSheet:self.window returnCode:NSCancelButton];
+	[self.window orderOut:sender];
 }
 
 @end
@@ -127,8 +137,10 @@ static NSString * const kOperationQueueKVOContext		= @"org.sbooth.Rip.ReadISRCsS
 	
 #pragma unused(contextInfo)
 
-	if(0 == [[self.operationQueue operations] count])
+	if(0 == [[self.operationQueue operations] count]) {
 		[[NSApplication sharedApplication] endSheet:self.window returnCode:(didRecover ? NSOKButton : NSCancelButton)];	
+		[self.window orderOut:self];
+	}
 }
 
 @end
