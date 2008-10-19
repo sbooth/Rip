@@ -11,7 +11,7 @@
 extern NSString * const		kEncoderBundleKey; // NSBundle *
 extern NSString * const		kEncoderSettingsKey; // NSDictionary *
 
-@class CompactDisc, ExtractionRecord;
+@class CompactDisc, TrackExtractionRecord, ExtractedImageRecord;
 
 @interface EncoderManager : NSObject
 {
@@ -47,6 +47,7 @@ extern NSString * const		kEncoderSettingsKey; // NSDictionary *
 
 // ========================================
 // Queue an encoding request
-- (BOOL) encodeURL:(NSURL *)inputURL extractionRecord:(ExtractionRecord *)extractionRecord error:(NSError **)error;
+- (BOOL) encodeURL:(NSURL *)inputURL forTrackExtractionRecord:(TrackExtractionRecord *)TrackExtractionRecord error:(NSError **)error;
+- (BOOL) encodeURL:(NSURL *)inputURL forExtractedImageRecord:(ExtractedImageRecord *)extractedImageRecord error:(NSError **)error;
 
 @end

@@ -13,8 +13,8 @@
 #import "TrackDescriptor.h"
 #import "SessionDescriptor.h"
 #import "CompactDisc.h"
-#import "ExtractedTrackRecord.h"
-#import "ExtractionRecord.h"
+#import "TrackExtractionRecord.h"
+#import "ImageExtractionRecord.h"
 
 #import "FileUtilities.h"
 
@@ -22,121 +22,130 @@
 // Flatten the metadata objects into a single NSDictionary
 // ========================================
 static NSDictionary *
-metadataForExtractionRecord(ExtractionRecord *extractionRecord)
+metadataForTrackExtractionRecord(TrackExtractionRecord *trackExtractionRecord)
 {
-	NSCParameterAssert(nil != extractionRecord);
+	NSCParameterAssert(nil != trackExtractionRecord);
 	
 	NSMutableDictionary *metadata = [NSMutableDictionary dictionary];
 	
 	// Only a single track was extracted
-	if(1 == extractionRecord.tracks.count) {
-		TrackMetadata *trackMetadata = extractionRecord.firstTrack.track.metadata;
-		AlbumMetadata *albumMetadata = trackMetadata.track.session.disc.metadata;
+	TrackMetadata *trackMetadata = trackExtractionRecord.track.metadata;
+	AlbumMetadata *albumMetadata = trackMetadata.track.session.disc.metadata;
 
-		// Track number and total
-		if(trackMetadata.track.number)
-			[metadata setObject:trackMetadata.track.number forKey:kMetadataTrackNumberKey];
-		if(trackMetadata.track.session.tracks.count)
-			[metadata setObject:[NSNumber numberWithUnsignedInteger:trackMetadata.track.session.tracks.count] forKey:kMetadataTrackTotalKey];
-		
-		// Album metadata
-		if(albumMetadata.artist)
-			[metadata setObject:albumMetadata.artist forKey:kMetadataAlbumArtistKey];
-		if(albumMetadata.date)
-			[metadata setObject:albumMetadata.date forKey:kMetadataReleaseDateKey];
-		if(albumMetadata.discNumber)
-			[metadata setObject:albumMetadata.discNumber forKey:kMetadataDiscNumberKey];
-		if(albumMetadata.discTotal)
-			[metadata setObject:albumMetadata.discTotal forKey:kMetadataDiscTotalKey];
-		if(albumMetadata.isCompilation)
-			[metadata setObject:albumMetadata.isCompilation forKey:kMetadataCompilationKey];
-		if(albumMetadata.MCN)
-			[metadata setObject:albumMetadata.MCN forKey:kMetadataMCNKey];
-		if(albumMetadata.title)
-			[metadata setObject:albumMetadata.title forKey:kMetadataAlbumTitleKey];
-		
-		// Track metadata
-		if(trackMetadata.artist)
-			[metadata setObject:trackMetadata.artist forKey:kMetadataArtistKey];
-		if(trackMetadata.composer)
-			[metadata setObject:trackMetadata.composer forKey:kMetadataComposerKey];
-		if(trackMetadata.date)
-			[metadata setObject:trackMetadata.date forKey:kMetadataReleaseDateKey];
-		if(trackMetadata.genre)
-			[metadata setObject:trackMetadata.genre forKey:kMetadataGenreKey];
-		if(trackMetadata.ISRC)
-			[metadata setObject:trackMetadata.ISRC forKey:kMetadataISRCKey];
-		if(trackMetadata.title)
-			[metadata setObject:trackMetadata.title forKey:kMetadataTitleKey];
-	}
-	// Multiple tracks were extracted, so fill in album details only
-	else {
-		TrackMetadata *trackMetadata = extractionRecord.firstTrack.track.metadata;
-		AlbumMetadata *albumMetadata = trackMetadata.track.session.disc.metadata;
-		
-		// Track number and total
-		if(trackMetadata.track.session.tracks.count)
-			[metadata setObject:[NSNumber numberWithUnsignedInteger:trackMetadata.track.session.tracks.count] forKey:kMetadataTrackTotalKey];
-		
-		// Album metadata
-		if(albumMetadata.artist)
-			[metadata setObject:albumMetadata.artist forKey:kMetadataAlbumArtistKey];
-		if(albumMetadata.date)
-			[metadata setObject:albumMetadata.date forKey:kMetadataReleaseDateKey];
-		if(albumMetadata.discNumber)
-			[metadata setObject:albumMetadata.discNumber forKey:kMetadataDiscNumberKey];
-		if(albumMetadata.discTotal)
-			[metadata setObject:albumMetadata.discTotal forKey:kMetadataDiscTotalKey];
-		if(albumMetadata.isCompilation)
-			[metadata setObject:albumMetadata.isCompilation forKey:kMetadataCompilationKey];
-		if(albumMetadata.MCN)
-			[metadata setObject:albumMetadata.MCN forKey:kMetadataMCNKey];
-		if(albumMetadata.title)
-			[metadata setObject:albumMetadata.title forKey:kMetadataAlbumTitleKey];
-	}
+	// Track number and total
+	if(trackMetadata.track.number)
+		[metadata setObject:trackMetadata.track.number forKey:kMetadataTrackNumberKey];
+	if(trackMetadata.track.session.tracks.count)
+		[metadata setObject:[NSNumber numberWithUnsignedInteger:trackMetadata.track.session.tracks.count] forKey:kMetadataTrackTotalKey];
 	
-	return metadata;
+	// Album metadata
+	if(albumMetadata.artist)
+		[metadata setObject:albumMetadata.artist forKey:kMetadataAlbumArtistKey];
+	if(albumMetadata.date)
+		[metadata setObject:albumMetadata.date forKey:kMetadataReleaseDateKey];
+	if(albumMetadata.discNumber)
+		[metadata setObject:albumMetadata.discNumber forKey:kMetadataDiscNumberKey];
+	if(albumMetadata.discTotal)
+		[metadata setObject:albumMetadata.discTotal forKey:kMetadataDiscTotalKey];
+	if(albumMetadata.isCompilation)
+		[metadata setObject:albumMetadata.isCompilation forKey:kMetadataCompilationKey];
+	if(albumMetadata.MCN)
+		[metadata setObject:albumMetadata.MCN forKey:kMetadataMCNKey];
+	if(albumMetadata.title)
+		[metadata setObject:albumMetadata.title forKey:kMetadataAlbumTitleKey];
+	
+	// Track metadata
+	if(trackMetadata.artist)
+		[metadata setObject:trackMetadata.artist forKey:kMetadataArtistKey];
+	if(trackMetadata.composer)
+		[metadata setObject:trackMetadata.composer forKey:kMetadataComposerKey];
+	if(trackMetadata.date)
+		[metadata setObject:trackMetadata.date forKey:kMetadataReleaseDateKey];
+	if(trackMetadata.genre)
+		[metadata setObject:trackMetadata.genre forKey:kMetadataGenreKey];
+	if(trackMetadata.ISRC)
+		[metadata setObject:trackMetadata.ISRC forKey:kMetadataISRCKey];
+	if(trackMetadata.title)
+		[metadata setObject:trackMetadata.title forKey:kMetadataTitleKey];
+
+	return [metadata copy];
+}
+
+static NSDictionary *
+metadataForExtractedImageRecord(ExtractedImageRecord *imageExtractionRecord)
+{
+	NSCParameterAssert(nil != imageExtractionRecord);
+	
+	NSMutableDictionary *metadata = [NSMutableDictionary dictionary];
+#if 0
+	// Multiple tracks were extracted, so fill in album details only
+	TrackMetadata *trackMetadata = imageExtractionRecord.firstTrack.track.metadata;
+	AlbumMetadata *albumMetadata = trackMetadata.track.session.disc.metadata;
+	
+	// Track number and total
+	if(trackMetadata.track.session.tracks.count)
+		[metadata setObject:[NSNumber numberWithUnsignedInteger:trackMetadata.track.session.tracks.count] forKey:kMetadataTrackTotalKey];
+	
+	// Album metadata
+	if(albumMetadata.artist)
+		[metadata setObject:albumMetadata.artist forKey:kMetadataAlbumArtistKey];
+	if(albumMetadata.date)
+		[metadata setObject:albumMetadata.date forKey:kMetadataReleaseDateKey];
+	if(albumMetadata.discNumber)
+		[metadata setObject:albumMetadata.discNumber forKey:kMetadataDiscNumberKey];
+	if(albumMetadata.discTotal)
+		[metadata setObject:albumMetadata.discTotal forKey:kMetadataDiscTotalKey];
+	if(albumMetadata.isCompilation)
+		[metadata setObject:albumMetadata.isCompilation forKey:kMetadataCompilationKey];
+	if(albumMetadata.MCN)
+		[metadata setObject:albumMetadata.MCN forKey:kMetadataMCNKey];
+	if(albumMetadata.title)
+		[metadata setObject:albumMetadata.title forKey:kMetadataAlbumTitleKey];
+#endif
+	return [metadata copy];
 }
 
 // ========================================
 // Create the output filename to use for the given ExtractionRecord
 // ========================================
 static NSString *
-filenameForExtractionRecord(ExtractionRecord *extractionRecord)
+filenameForTrackExtractionRecord(TrackExtractionRecord *trackExtractionRecord)
 {
-	NSCParameterAssert(nil != extractionRecord);
+	NSCParameterAssert(nil != trackExtractionRecord);
+		
+	// Only a single track was extracted
+	TrackDescriptor *track = trackExtractionRecord.track;
+
+	NSString *title = track.metadata.title;
+	if(nil == title)
+		title = NSLocalizedString(@"Unknown Title", @"");
+	
+	// Build up the sanitized track name
+	return [NSString stringWithFormat:@"%02lu %@", track.number.unsignedIntegerValue, makeStringSafeForFilename(title)];
+}
+
+static NSString *
+filenameForExtractedImageRecord(ImageExtractionRecord *imageExtractionRecord)
+{
+	NSCParameterAssert(nil != imageExtractionRecord);
 	
 	NSString *filename = nil;
+	CompactDisc *disc = imageExtractionRecord.disc;
+#if 0
+	NSString *title = disc.metadata.title;
+	if(nil == title)
+		title = NSLocalizedString(@"Unknown Album", @"");
 	
-	// Only a single track was extracted
-	if(1 == extractionRecord.tracks.count) {
-		TrackDescriptor *track = extractionRecord.firstTrack.track;
-
-		NSString *title = track.metadata.title;
-		if(nil == title)
-			title = NSLocalizedString(@"Unknown Title", @"");
+	// Build up the sanitized file name
+	if(imageExtractionRecord.tracks.count != disc.firstSession.tracks.count) {
+		TrackExtractionRecord *firstTrack = imageExtractionRecord.firstTrack;
+		TrackExtractionRecord *lastTrack = extractionRecord.lastTrack;
 		
-		// Build up the sanitized track name
-		filename = [NSString stringWithFormat:@"%02lu %@", track.number.unsignedIntegerValue, makeStringSafeForFilename(title)];
+		filename = [NSString stringWithFormat:@"%@ (%@ - %@)", makeStringSafeForFilename(title), firstTrack.track.number, lastTrack.track.number];
 	}
-	else {
-		CompactDisc *disc = extractionRecord.disc;
-		
-		NSString *title = disc.metadata.title;
-		if(nil == title)
-			title = NSLocalizedString(@"Unknown Album", @"");
-		
-		// Build up the sanitized file name
-		if(extractionRecord.tracks.count != disc.firstSession.tracks.count) {
-			ExtractedTrackRecord *firstTrack = extractionRecord.firstTrack;
-			ExtractedTrackRecord *lastTrack = extractionRecord.lastTrack;
-			
-			filename = [NSString stringWithFormat:@"%@ (%@ - %@)", makeStringSafeForFilename(title), firstTrack.track.number, lastTrack.track.number];
-		}
-		else
-			filename = makeStringSafeForFilename(title);
-	}
-	
+	else
+		filename = makeStringSafeForFilename(title);
+#endif
 	return filename;
 }
 
@@ -159,6 +168,11 @@ encoderBundleSortFunction(id bundleA, id bundleB, void *context)
 
 	return [bundleAName compare:bundleBName];;
 }
+
+// ========================================
+// Context objects for observeValueForKeyPath:ofObject:change:context:
+// ========================================
+static NSString * const kEncodingOperationKVOContext		= @"org.sbooth.Rip.EncoderManager.EncodingOperationKVOContext";
 
 // ========================================
 // KVC key names for the encoder dictionaries
@@ -192,6 +206,26 @@ static EncoderManager *sSharedEncoderManager				= nil;
 	if((self = [super init]))
 		_queue = [[NSOperationQueue alloc] init];
 	return self;
+}
+
+- (void) observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
+{
+	if(kEncodingOperationKVOContext == context) {
+		EncodingOperation *operation = (EncodingOperation *)object;
+		
+		if([keyPath isEqualToString:@"isCancelled"] || [keyPath isEqualToString:@"isFinished"]) {
+//			[operation removeObserver:self forKeyPath:@"isExecuting"];
+			[operation removeObserver:self forKeyPath:@"isCancelled"];
+			[operation removeObserver:self forKeyPath:@"isFinished"];
+			
+			// Remove the temporary file
+			NSError *error = nil;
+			if(![[NSFileManager defaultManager] removeItemAtPath:[operation.inputURL path] error:&error])
+				[[NSApplication sharedApplication] presentError:error];
+		}
+	}
+	else
+		[super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
 }
 
 - (NSArray *) availableEncoders
@@ -339,10 +373,10 @@ static EncoderManager *sSharedEncoderManager				= nil;
 	return [NSURL fileURLWithPath:outputPath];
 }
 
-- (BOOL) encodeURL:(NSURL *)inputURL extractionRecord:(ExtractionRecord *)extractionRecord error:(NSError **)error
+- (BOOL) encodeURL:(NSURL *)inputURL forTrackExtractionRecord:(TrackExtractionRecord *)TrackExtractionRecord error:(NSError **)error;
 {
 	NSParameterAssert(nil != inputURL);
-	NSParameterAssert(nil != extractionRecord);
+	NSParameterAssert(nil != TrackExtractionRecord);
 	
 	NSString *defaultEncoder = [[NSUserDefaults standardUserDefaults] stringForKey:@"defaultEncoder"];
 	
@@ -359,14 +393,24 @@ static EncoderManager *sSharedEncoderManager				= nil;
 	
 	// Build the filename for the output from the disc's folder, the track's name and number,
 	// and the encoder's output path extension
-	NSURL *baseURL = [self outputURLForCompactDisc:extractionRecord.disc];
-	NSString *filename = filenameForExtractionRecord(extractionRecord);
+	NSURL *baseURL = [self outputURLForCompactDisc:TrackExtractionRecord.track.session.disc];
+	NSString *filename = filenameForTrackExtractionRecord(TrackExtractionRecord);
 	NSString *pathExtension = [encoderInterface pathExtensionForSettings:encoderSettings];
 	NSString *pathname = [filename stringByAppendingPathExtension:pathExtension];
 	NSString *outputPath = [[baseURL path] stringByAppendingPathComponent:pathname];
 	
 	// Ensure the output folder exists
-	if(![[NSFileManager defaultManager] createDirectoryAtPath:[baseURL path] withIntermediateDirectories:YES attributes:nil error:error]) {
+	if(![[NSFileManager defaultManager] createDirectoryAtPath:[baseURL path] withIntermediateDirectories:YES attributes:nil error:error])
+		return NO;
+	
+	// Don't overwrite existing output files
+	if([[NSFileManager defaultManager] fileExistsAtPath:outputPath]) {
+#if DEBUG
+		NSLog(@"Output file %@ exists", [outputPath lastPathComponent]);
+#endif
+		if(error)
+			*error = [NSError errorWithDomain:NSPOSIXErrorDomain code:EEXIST userInfo:nil];
+
 		return NO;
 	}
 	
@@ -375,8 +419,13 @@ static EncoderManager *sSharedEncoderManager				= nil;
 	encodingOperation.inputURL = inputURL;
 	encodingOperation.outputURL = [NSURL fileURLWithPath:outputPath];
 	encodingOperation.settings = encoderSettings;
-	encodingOperation.metadata = metadataForExtractionRecord(extractionRecord);
+	encodingOperation.metadata = metadataForTrackExtractionRecord(TrackExtractionRecord);
 	
+	// Observe the operation's progress
+//	[encodingOperation addObserver:self forKeyPath:@"isExecuting" options:NSKeyValueObservingOptionNew context:kEncodingOperationKVOContext];
+	[encodingOperation addObserver:self forKeyPath:@"isCancelled" options:NSKeyValueObservingOptionNew context:kEncodingOperationKVOContext];
+	[encodingOperation addObserver:self forKeyPath:@"isFinished" options:NSKeyValueObservingOptionNew context:kEncodingOperationKVOContext];
+
 #if DEBUG
 	NSLog(@"Encoding %@ to %@ using %@", [encodingOperation.inputURL path], [encodingOperation.outputURL path], [encoderBundle objectForInfoDictionaryKey:@"EncoderName"]);
 #endif
@@ -384,9 +433,14 @@ static EncoderManager *sSharedEncoderManager				= nil;
 	[self.queue addOperation:encodingOperation];
 	
 	// Communicate the output URL back to the caller
-	extractionRecord.URL = encodingOperation.outputURL;
+	TrackExtractionRecord.URL = encodingOperation.outputURL;
 	
 	return YES;
+}
+
+- (BOOL) encodeURL:(NSURL *)inputURL forExtractedImageRecord:(ExtractedImageRecord *)extractedImageRecord error:(NSError **)error
+{
+	NSBeep();
 }
 
 @end
