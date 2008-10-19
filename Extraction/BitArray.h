@@ -15,12 +15,19 @@
 	__strong NSUInteger *_bits;
 }
 
+// ========================================
+// Properties
 @property (assign) NSUInteger bitCount;
 @property (readonly) BOOL allZeroes;
 @property (readonly) BOOL allOnes;
 @property (readonly) NSUInteger countOfZeroes;
 @property (readonly) NSUInteger countOfOnes;
+@property (readonly) NSIndexSet * indexSetForZeroes;
+@property (readonly) NSIndexSet * indexSetForOnes;
 
+// ========================================
+// Creation
++ (id) bitArrayWithBitCount:(NSUInteger)bitCount;
 - (id) initWithBitCount:(NSUInteger)bitCount;
 
 // ========================================

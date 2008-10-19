@@ -13,6 +13,11 @@
 
 @synthesize bitCount = _bitCount;
 
++ (id) bitArrayWithBitCount:(NSUInteger)bitCount
+{
+	return [[BitArray alloc] initWithBitCount:bitCount];
+}
+
 - (id) initWithBitCount:(NSUInteger)bitCount
 {
 	if((self = [super init]))
@@ -167,6 +172,31 @@
 		_bits[lastArrayIndex] &= ~(1 << i);
 }
 
+- (NSIndexSet *) indexSetForZeroes
+{
+	NSUInteger lastArrayIndex = self.bitCount / (8 * sizeof(NSUInteger));
+	NSUInteger lastBitIndex = self.bitCount % (8 * sizeof(NSUInteger));
+
+	NSMutableIndexSet *indexSet = [NSMutableIndexSet indexSet];
+	
+	NSUInteger i, j;
+	for(i = 0; i < lastArrayIndex; ++i) {
+		if(!_bits[i]) {
+			for(j = 0; j < (8 * sizeof(NSUInteger)); ++j) {
+				if(!(_bits[i] & (1 << j)))
+					[indexSet addIndex:((i * (8 * sizeof(NSUInteger))) + j)];
+			}
+		}
+	}
+	
+	for(i = 0; i < lastBitIndex; ++i) {
+		if(!(_bits[lastArrayIndex] & (1 << i)))
+			[indexSet addIndex:((lastArrayIndex * (8 * sizeof(NSUInteger))) + i)];
+	}
+	
+	return [indexSet copy];
+}
+
 #pragma mark One methods
 
 - (BOOL) allOnes
@@ -223,6 +253,31 @@
 	
 	for(i = 0; i < lastBitIndex; ++i)
 		_bits[lastArrayIndex] |= 1 << i;
+}
+
+- (NSIndexSet *) indexSetForOnes
+{
+	NSUInteger lastArrayIndex = self.bitCount / (8 * sizeof(NSUInteger));
+	NSUInteger lastBitIndex = self.bitCount % (8 * sizeof(NSUInteger));
+
+	NSMutableIndexSet *indexSet = [NSMutableIndexSet indexSet];
+	
+	NSUInteger i, j;
+	for(i = 0; i < lastArrayIndex; ++i) {
+		if(_bits[i]) {
+			for(j = 0; j < (8 * sizeof(NSUInteger)); ++j) {
+				if(_bits[i] & (1 << j)) 
+					[indexSet addIndex:((i * (8 * sizeof(NSUInteger))) + j)];
+			}
+		}
+	}
+	
+	for(i = 0; i < lastBitIndex; ++i) {
+		if(_bits[lastArrayIndex] & (1 << i))
+			[indexSet addIndex:((lastArrayIndex * (8 * sizeof(NSUInteger))) + i)];
+	}
+	
+	return [indexSet copy];
 }
 
 - (NSString *) description
