@@ -13,11 +13,21 @@
 	NSArray *_matches;
 }
 
+// ========================================
+// Properties
 @property (copy) NSArray * matches;
 
+// ========================================
+// The meat & potatoes
+- (void) beginMusicDatabaseMatchesSheetForWindow:(NSWindow *)window modalDelegate:(id)modalDelegate didEndSelector:(SEL)didEndSelector contextInfo:(void *)contextInfo;
+
+// ========================================
+// Action methods
 - (IBAction) ok:(id)sender;
 - (IBAction) cancel:(id)sender;
 
+// ========================================
+// A KVC-compliant object holding the data retrieved
 - (id) selectedMatch;
 
 @end

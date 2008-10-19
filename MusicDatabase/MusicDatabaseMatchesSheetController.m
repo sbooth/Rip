@@ -14,6 +14,17 @@
 	return [super initWithWindowNibName:@"MusicDatabaseMatchesSheet"];
 }
 
+- (void) beginMusicDatabaseMatchesSheetForWindow:(NSWindow *)window modalDelegate:(id)modalDelegate didEndSelector:(SEL)didEndSelector contextInfo:(void *)contextInfo
+{
+	NSParameterAssert(nil != window);
+	
+	[[NSApplication sharedApplication] beginSheet:self.window
+								   modalForWindow:window
+									modalDelegate:modalDelegate
+								   didEndSelector:didEndSelector
+									  contextInfo:contextInfo];
+}
+
 - (IBAction) ok:(id)sender
 {
 
