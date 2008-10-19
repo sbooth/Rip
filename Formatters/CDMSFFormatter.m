@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2007 Stephen F. Booth <me@sbooth.org>
+ *  Copyright (C) 2007 - 2008 Stephen F. Booth <me@sbooth.org>
  *  All Rights Reserved
  */
 
@@ -15,7 +15,7 @@
 		return nil;
 	
 	NSUInteger offset = [anObject integerValue];
-	CDMSF msf = CDConvertLBAToMSF(offset /* - 150 */);
+	CDMSF msf = CDConvertLBAToMSF(offset);
 
 	return [NSString stringWithFormat:@"%02i:%02i.%02i", msf.minute, msf.second, msf.frame];
 }
