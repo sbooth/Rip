@@ -35,15 +35,15 @@
 	}
 	
 	switch(divisions) {
-		case 1:		[_numberFormatter setPositiveSuffix:NSLocalizedStringFromTable(@" bytes", @"General", @"")];	break;
-		case 2:		[_numberFormatter setPositiveSuffix:NSLocalizedStringFromTable(@" KB", @"General", @"")];		break;
-		case 3:		[_numberFormatter setPositiveSuffix:NSLocalizedStringFromTable(@" MB", @"General", @"")];		break;
-		case 4:		[_numberFormatter setPositiveSuffix:NSLocalizedStringFromTable(@" GB", @"General", @"")];		break;
-		case 5:		[_numberFormatter setPositiveSuffix:NSLocalizedStringFromTable(@" TB", @"General", @"")];		break;
-		case 6:		[_numberFormatter setPositiveSuffix:NSLocalizedStringFromTable(@" PB", @"General", @"")];		break;
-		case 7:		[_numberFormatter setPositiveSuffix:NSLocalizedStringFromTable(@" EB", @"General", @"")];		break;
-		case 8:		[_numberFormatter setPositiveSuffix:NSLocalizedStringFromTable(@" ZB", @"General", @"")];		break;
-		case 9:		[_numberFormatter setPositiveSuffix:NSLocalizedStringFromTable(@" YB", @"General", @"")];		break;
+		case 1:		[_numberFormatter setPositiveSuffix:NSLocalizedString(@" bytes", @"")];				break;
+		case 2:		[_numberFormatter setPositiveSuffix:NSLocalizedString(@" KB", @"kilobytes")];		break;
+		case 3:		[_numberFormatter setPositiveSuffix:NSLocalizedString(@" MB", @"megabytes")];		break;
+		case 4:		[_numberFormatter setPositiveSuffix:NSLocalizedString(@" GB", @"gigabytes")];		break;
+		case 5:		[_numberFormatter setPositiveSuffix:NSLocalizedString(@" TB", @"terabytes")];		break;
+		case 6:		[_numberFormatter setPositiveSuffix:NSLocalizedString(@" PB", @"petabytes")];		break;
+		case 7:		[_numberFormatter setPositiveSuffix:NSLocalizedString(@" EB", @"exabytes")];		break;
+		case 8:		[_numberFormatter setPositiveSuffix:NSLocalizedString(@" ZB", @"zettabytes")];		break;
+		case 9:		[_numberFormatter setPositiveSuffix:NSLocalizedString(@" YB", @"yottabytes")];		break;
 	}
 	
 	return [_numberFormatter stringForObjectValue:[NSNumber numberWithFloat:size]];

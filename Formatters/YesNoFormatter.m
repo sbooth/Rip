@@ -13,9 +13,9 @@
 		return nil;
 	
 	if([anObject integerValue])
-		return NSLocalizedStringFromTable(@"Yes", @"General", @"");
+		return NSLocalizedString(@"Yes", @"");
 	else
-		return NSLocalizedStringFromTable(@"No", @"General", @"");
+		return NSLocalizedString(@"No", @"");
 }
 
 - (BOOL) getObjectValue:(id *)object forString:(NSString *)string errorDescription:(NSString  **)error
@@ -23,11 +23,11 @@
 	BOOL result = NO;
 	BOOL value = NO;
 
-	if([string hasPrefix:NSLocalizedStringFromTable(@"Yes", @"General", @"")]) {
+	if([string hasPrefix:NSLocalizedString(@"Yes", @"")]) {
 		value = YES;
 		result = YES;
 	}
-	else if([string hasPrefix:NSLocalizedStringFromTable(@"No", @"General", @"")]) {
+	else if([string hasPrefix:NSLocalizedString(@"No", @"")]) {
 		value = NO;
 		result = YES;
 	}

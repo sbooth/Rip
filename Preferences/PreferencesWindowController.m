@@ -148,27 +148,27 @@ static PreferencesWindowController *sSharedPreferencesWindowController = nil;
 	[toolbarItem setAction:@selector(toolbarItemSelected:)];
 	
     if([itemIdentifier isEqualToString:GeneralPreferencesToolbarItemIdentifier]) {
-		[toolbarItem setLabel:NSLocalizedStringFromTable(@"General", @"Preferences", @"")];
-		[toolbarItem setPaletteLabel:NSLocalizedStringFromTable(@"General", @"Preferences", @"")];		
-		[toolbarItem setToolTip:NSLocalizedStringFromTable(@"Options that control the general behavior of Rip", @"Preferences", @"")];
+		[toolbarItem setLabel:NSLocalizedString(@"General", @"General preference pane name")];
+		[toolbarItem setPaletteLabel:NSLocalizedString(@"General", @"")];		
+		[toolbarItem setToolTip:NSLocalizedString(@"Options that control the general behavior of Rip", @"")];
 		[toolbarItem setImage:[NSImage imageNamed:@"NSPreferencesGeneral"]];
 	}
     else if([itemIdentifier isEqualToString:EncoderPreferencesToolbarItemIdentifier]) {
-		[toolbarItem setLabel:NSLocalizedStringFromTable(@"Encoders", @"Preferences", @"")];
-		[toolbarItem setPaletteLabel:NSLocalizedStringFromTable(@"Encoders", @"Preferences", @"")];
-		[toolbarItem setToolTip:NSLocalizedStringFromTable(@"Specify the audio encoder and settings used for extraction", @"Preferences", @"")];
+		[toolbarItem setLabel:NSLocalizedString(@"Encoders", @"Encoders preference pane name")];
+		[toolbarItem setPaletteLabel:NSLocalizedString(@"Encoders", @"")];
+		[toolbarItem setToolTip:NSLocalizedString(@"Specify the audio encoder and settings used for extraction", @"")];
 		[toolbarItem setImage:[NSImage imageNamed:@"HotKeyPreferencesToolbarImage"]];
 	}
     else if([itemIdentifier isEqualToString:MusicDatabasePreferencesToolbarItemIdentifier]) {
-		[toolbarItem setLabel:NSLocalizedStringFromTable(@"Metadata", @"Preferences", @"")];
-		[toolbarItem setPaletteLabel:NSLocalizedStringFromTable(@"Metadata", @"Preferences", @"")];
-		[toolbarItem setToolTip:NSLocalizedStringFromTable(@"Set the output device and replay gain used by Play", @"Preferences", @"")];
+		[toolbarItem setLabel:NSLocalizedString(@"Metadata", @"Metadata preference pane name")];
+		[toolbarItem setPaletteLabel:NSLocalizedString(@"Metadata", @"")];
+		[toolbarItem setToolTip:NSLocalizedString(@"Set the output device and replay gain used by Play", @"")];
 		[toolbarItem setImage:[NSImage imageNamed:@"OutputPreferencesToolbarImage"]];
 	}
     else if([itemIdentifier isEqualToString:AdvancedPreferencesToolbarItemIdentifier]) {
-		[toolbarItem setLabel:NSLocalizedStringFromTable(@"Advanced", @"Preferences", @"")];
-		[toolbarItem setPaletteLabel:NSLocalizedStringFromTable(@"Advanced", @"Preferences", @"")];
-		[toolbarItem setToolTip:NSLocalizedStringFromTable(@"Control the size of the audio buffers used by Play", @"Preferences", @"")];
+		[toolbarItem setLabel:NSLocalizedString(@"Advanced", @"Advanced preference pane name")];
+		[toolbarItem setPaletteLabel:NSLocalizedString(@"Advanced", @"")];
+		[toolbarItem setToolTip:NSLocalizedString(@"Control the size of the audio buffers used by Play", @"")];
 		[toolbarItem setImage:[NSImage imageNamed:@"NSAdvanced"]];
 	}
 	
