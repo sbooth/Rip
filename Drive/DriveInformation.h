@@ -6,6 +6,8 @@
 #import <Cocoa/Cocoa.h>
 #include <DiskArbitration/DiskArbitration.h>
 
+@class ImageExtractionRecord, TrackExtractionRecord;
+
 // ========================================
 // This class represents the information available about an IOKit device that can read IOCDMedia, 
 // along with the read offset stored for the device.
@@ -26,6 +28,11 @@
 @property (assign) NSNumber * readOffset;
 
 // ========================================
+// Core Data relationships
+@property (assign) NSSet * extractedImages;
+@property (assign) NSSet * extractedTracks;
+
+// ========================================
 // Other properties
 @property (readonly, assign) NSDictionary * deviceProperties;
 
@@ -43,4 +50,18 @@
 @property (readonly) NSString * physicalInterconnectType;
 @property (readonly) NSString * physicalInterconnectLocation;
 
+@end
+
+// ========================================
+// KVC accesors
+@interface DriveInformation (CoreDataGeneratedAccessors)
+- (void) addExtractedImagesObject:(ImageExtractionRecord *)value;
+- (void) removeExtractedImagesObject:(ImageExtractionRecord *)value;
+- (void) addExtractedImages:(NSSet *)value;
+- (void) removeExtractedImages:(NSSet *)value;
+
+- (void) addExtractedTracksObject:(TrackExtractionRecord *)value;
+- (void) removeExtractedTracksObject:(TrackExtractionRecord *)value;
+- (void) addExtractedTracks:(NSSet *)value;
+- (void) removeExtractedTracks:(NSSet *)value;
 @end

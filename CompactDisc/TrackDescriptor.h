@@ -5,7 +5,7 @@
 
 #import <Cocoa/Cocoa.h>
 
-@class SessionDescriptor, SectorRange, TrackMetadata, ExtractedTrackRecord;
+@class SessionDescriptor, SectorRange, TrackMetadata, TrackExtractionRecord;
 
 // ========================================
 // This class encapsulates useful information about a single track on a CDDA disc
@@ -29,9 +29,9 @@
 
 // ========================================
 // Core Data relationships
+@property (assign) NSSet * extractedTracks;
 @property (assign) TrackMetadata * metadata;
 @property (assign) SessionDescriptor * session;
-@property (assign) NSSet * extractedTrackRecords;
 
 // ========================================
 // Computed properties
@@ -40,9 +40,11 @@
 
 @end
 
+// ========================================
+// KVC accessors
 @interface TrackDescriptor (CoreDataGeneratedAccessors)
-- (void) addExtractedTrackRecordsObject:(ExtractedTrackRecord *)value;
-- (void) removeExtractedTrackRecordsObject:(ExtractedTrackRecord *)value;
-- (void) addExtractedTrackRecords:(NSSet *)value;
-- (void) removeExtractedTrackRecords:(NSSet *)value;
+- (void) addExtractedTracksObject:(TrackExtractionRecord *)value;
+- (void) removeExtractedTracksObject:(TrackExtractionRecord *)value;
+- (void) addExtractedTracks:(NSSet *)value;
+- (void) removeExtractedTracks:(NSSet *)value;
 @end

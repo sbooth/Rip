@@ -166,6 +166,11 @@ static NSDictionary * getDevicePropertiesForDADiskRef(DADiskRef disk)
 @dynamic readOffset;
 
 // ========================================
+// Core Data relationships
+@dynamic extractedImages;
+@dynamic extractedTracks;
+
+// ========================================
 // Other properties
 @synthesize deviceProperties = _deviceProperties;
 
@@ -211,23 +216,23 @@ static NSDictionary * getDevicePropertiesForDADiskRef(DADiskRef disk)
 	
 	if(physicalInterconnectType) {
 		if([physicalInterconnectType isEqualToString:@ kIOPropertyPhysicalInterconnectTypeATA])
-			return NSLocalizedStringFromTable(@"ATA", @"Drive", @"kIOPropertyPhysicalInterconnectTypeATA");
+			return NSLocalizedString(@"ATA", @"kIOPropertyPhysicalInterconnectTypeATA");
 		else if([physicalInterconnectType isEqualToString:@ kIOPropertyPhysicalInterconnectTypeSerialATA])
-			return NSLocalizedStringFromTable(@"Serial ATA", @"Drive", @"kIOPropertyPhysicalInterconnectTypeSerialATA");
+			return NSLocalizedString(@"Serial ATA", @"kIOPropertyPhysicalInterconnectTypeSerialATA");
 		else if([physicalInterconnectType isEqualToString:@ kIOPropertyPhysicalInterconnectTypeSerialAttachedSCSI])
-			return NSLocalizedStringFromTable(@"SAS", @"Drive", @"kIOPropertyPhysicalInterconnectTypeSerialAttachedSCSI");
+			return NSLocalizedString(@"SAS", @"kIOPropertyPhysicalInterconnectTypeSerialAttachedSCSI");
 		else if([physicalInterconnectType isEqualToString:@ kIOPropertyPhysicalInterconnectTypeATAPI])
-			return NSLocalizedStringFromTable(@"ATAPI", @"Drive", @"kIOPropertyPhysicalInterconnectTypeATAPI");
+			return NSLocalizedString(@"ATAPI", @"kIOPropertyPhysicalInterconnectTypeATAPI");
 		else if([physicalInterconnectType isEqualToString:@ kIOPropertyPhysicalInterconnectTypeUSB])
-			return NSLocalizedStringFromTable(@"USB", @"Drive", @"kIOPropertyPhysicalInterconnectTypeUSB");
+			return NSLocalizedString(@"USB", @"kIOPropertyPhysicalInterconnectTypeUSB");
 		else if([physicalInterconnectType isEqualToString:@ kIOPropertyPhysicalInterconnectTypeFireWire])
-			return NSLocalizedStringFromTable(@"FireWire", @"Drive", @"kIOPropertyPhysicalInterconnectTypeFireWire");
+			return NSLocalizedString(@"FireWire", @"kIOPropertyPhysicalInterconnectTypeFireWire");
 		else if([physicalInterconnectType isEqualToString:@ kIOPropertyPhysicalInterconnectTypeSCSIParallel])
-			return NSLocalizedStringFromTable(@"SCSI Parallel Interface", @"Drive", @"kIOPropertyPhysicalInterconnectTypeSCSIParallel");
+			return NSLocalizedString(@"SCSI Parallel Interface", @"kIOPropertyPhysicalInterconnectTypeSCSIParallel");
 		else if([physicalInterconnectType isEqualToString:@ kIOPropertyPhysicalInterconnectTypeFibreChannel])
-			return NSLocalizedStringFromTable(@"Fibre Channel Interface", @"Drive", @"kIOPropertyPhysicalInterconnectTypeFibreChannel");
+			return NSLocalizedString(@"Fibre Channel Interface", @"kIOPropertyPhysicalInterconnectTypeFibreChannel");
 		else if([physicalInterconnectType isEqualToString:@ kIOPropertyPhysicalInterconnectTypeVirtual])
-			return NSLocalizedStringFromTable(@"Virtual Interface", @"Drive", @"kIOPropertyPhysicalInterconnectTypeVirtual");
+			return NSLocalizedString(@"Virtual Interface", @"kIOPropertyPhysicalInterconnectTypeVirtual");
 		else
 			return physicalInterconnectType;
 	}
@@ -242,15 +247,15 @@ static NSDictionary * getDevicePropertiesForDADiskRef(DADiskRef disk)
 	
 	if(physicalInterconnectLocation) {
 		if([physicalInterconnectLocation isEqualToString:@ kIOPropertyInternalKey])
-			return NSLocalizedStringFromTable(@"Internal", @"Drive", @"kIOPropertyInternalKey");
+			return NSLocalizedString(@"Internal", @"kIOPropertyInternalKey");
 		else if([physicalInterconnectLocation isEqualToString:@ kIOPropertyExternalKey])
-			return NSLocalizedStringFromTable(@"External", @"Drive", @"kIOPropertyExternalKey");
+			return NSLocalizedString(@"External", @"kIOPropertyExternalKey");
 		else if([physicalInterconnectLocation isEqualToString:@ kIOPropertyInternalExternalKey])
-			return NSLocalizedStringFromTable(@"Internal/External", @"Drive", @"kIOPropertyInternalExternalKey");
+			return NSLocalizedString(@"Internal/External", @"kIOPropertyInternalExternalKey");
 		else if([physicalInterconnectLocation isEqualToString:@ kIOPropertyInterconnectFileKey])
-			return NSLocalizedStringFromTable(@"File", @"Drive", @"kIOPropertyInterconnectFileKey");
+			return NSLocalizedString(@"File", @"kIOPropertyInterconnectFileKey");
 		else if([physicalInterconnectLocation isEqualToString:@ kIOPropertyInterconnectRAMKey])
-			return NSLocalizedStringFromTable(@"RAM", @"Drive", @"kIOPropertyInterconnectRAMKey");
+			return NSLocalizedString(@"RAM", @"kIOPropertyInterconnectRAMKey");
 		else
 			return physicalInterconnectLocation;
 	}

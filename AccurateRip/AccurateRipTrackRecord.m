@@ -17,6 +17,5 @@
 // ========================================
 // Core Data relationships
 @dynamic disc;
-@dynamic extractedTrackRecords;
 
 @end

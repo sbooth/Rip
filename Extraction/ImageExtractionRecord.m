@@ -3,11 +3,10 @@
  *  All Rights Reserved
  */
 
-#import "ExtractionRecord.h"
-#import "ExtractedTrackRecord.h"
+#import "ImageExtractionRecord.h"
 #import "TrackDescriptor.h"
 
-@implementation ExtractionRecord
+@implementation ImageExtractionRecord
 
 // ========================================
 // Core Data properties
@@ -21,8 +20,8 @@
 // Core Data relationships
 @dynamic disc;
 @dynamic drive;
-@dynamic tracks;
 
+#if 0
 // ========================================
 // Other properties
 - (NSArray *) orderedTracks
@@ -31,13 +30,13 @@
 	return [self.tracks.allObjects sortedArrayUsingDescriptors:[NSArray arrayWithObject:trackNumberSortDescriptor]];
 }
 
-- (ExtractedTrackRecord *) firstTrack
+- (TrackExtractionRecord *) firstTrack
 {
 	NSArray *orderedTracks = self.orderedTracks;
 	return (0 == orderedTracks.count ? nil : [orderedTracks objectAtIndex:0]);
 }
 
-- (ExtractedTrackRecord *) lastTrack
+- (TrackExtractionRecord *) lastTrack
 {
 	NSArray *orderedTracks = self.orderedTracks;
 	return (0 == orderedTracks.count ? nil : orderedTracks.lastObject);
@@ -50,14 +49,14 @@
 	return (nil != [self trackNumber:number]);
 }
 
-- (ExtractedTrackRecord *) trackNumber:(NSUInteger)number
+- (TrackExtractionRecord *) trackNumber:(NSUInteger)number
 {
-	for(ExtractedTrackRecord *track in self.tracks) {
+	for(TrackExtractionRecord *track in self.tracks) {
 		if(track.track.number.unsignedIntegerValue == number)
 			return track;
 	}
 	
 	return nil;
 }
-
+#endif
 @end

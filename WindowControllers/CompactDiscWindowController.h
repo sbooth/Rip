@@ -21,22 +21,22 @@
 	CompactDisc *_compactDisc;
 	DriveInformation *_driveInformation;
 	
-	NSOperationQueue *_networkOperationQueue;
+	NSOperationQueue *_operationQueue;
 }
 
+// ========================================
+// Properties useful for binding
+// ========================================
 @property (readonly) NSArrayController * trackController;
 @property (readonly) NSObjectController * driveInformationController;
-@property (readonly) NSOperationQueue * networkOperationQueue;
 
 // ========================================
 // Properties
 // ========================================
 @property (assign) DADiskRef disk;
+
 @property (readonly, assign) CompactDisc * compactDisc;
 @property (readonly, assign) DriveInformation * driveInformation;
-
-@property (readonly) NSManagedObjectContext * managedObjectContext;
-@property (readonly) id managedObjectModel;
 
 // ========================================
 // Action Methods

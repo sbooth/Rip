@@ -55,9 +55,9 @@
 		NSString *menuTitle = nil;
 
 		if(!self.isWindowLoaded || !self.window.isVisible || !self. window.isKeyWindow)
-			menuTitle = NSLocalizedStringFromTable(@"Show Drive Inspector", @"Menus", @"");
+			menuTitle = NSLocalizedString(@"Show Drive Inspector", @"Menu Item");
 		else
-			menuTitle = NSLocalizedStringFromTable(@"Hide Drive Inspector", @"Menus", @"");
+			menuTitle = NSLocalizedString(@"Hide Drive Inspector", @"Menu Item");
 
 		[menuItem setTitle:menuTitle];
 	}

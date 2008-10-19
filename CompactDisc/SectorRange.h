@@ -10,15 +10,20 @@
 // ========================================
 @interface SectorRange : NSObject <NSCopying, NSCoding>
 {
+@private
 	NSUInteger _firstSector;
 	NSUInteger _lastSector;
 }
 
+// ========================================
+// Properties
 @property (readonly, assign) NSUInteger firstSector;
 @property (readonly, assign) NSUInteger lastSector;
 @property (readonly) NSUInteger length;
 @property (readonly) NSUInteger byteSize;
 
+// ========================================
+// Creation
 + (id) sectorRangeWithSector:(NSUInteger)sector;
 + (id) sectorRangeWithFirstSector:(NSUInteger)firstSector lastSector:(NSUInteger)lastSector;
 + (id) sectorRangeWithFirstSector:(NSUInteger)firstSector sectorCount:(NSUInteger)sectorCount;
@@ -29,6 +34,8 @@
 - (id) initWithFirstSector:(NSUInteger)firstSector sectorCount:(NSUInteger)sectorCount;
 - (id) initWithLastSector:(NSUInteger)lastSector sectorCount:(NSUInteger)sectorCount;
 
+// ========================================
+// Utilities
 - (NSUInteger) indexForSector:(NSUInteger)sector;
 - (NSUInteger) sectorForIndex:(NSUInteger)index;
 

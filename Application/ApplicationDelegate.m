@@ -9,6 +9,7 @@
 #import "CompactDiscWindowController.h"
 #import "DriveInformation.h"
 #import "AquaticPrime.h"
+#import "EncoderManager.h"
 #import "MusicDatabaseManager.h"
 #import "ReadOffsetCalculatorSheetController.h"
 
@@ -148,8 +149,10 @@ diskDisappearedCallback(DADiskRef disk, void *context)
 	NSURL *licenseURL = [self locateLicenseURL];
 	if(licenseURL) {
 		NSError *error = nil;
-		if(![self validateLicenseURL:licenseURL error:&error])
+		if(![self validateLicenseURL:licenseURL error:&error]) {
 			[[NSApplication sharedApplication] presentError:error];
+			[[NSApplication sharedApplication] terminate:self];
+		}
 	}
 	else
 		[self displayNagDialog];
@@ -204,6 +207,17 @@ diskDisappearedCallback(DADiskRef disk, void *context)
 	
 	NSApplicationTerminateReply reply = NSTerminateNow;
 
+	// Don't automatically cancel all encoding operations
+	if(0 != [[[[EncoderManager sharedEncoderManager] queue] operations] count]) {
+		NSInteger alertReturn = NSRunAlertPanel(NSLocalizedString(@"Encoding is in progress", @""), 
+												NSLocalizedString(@"Quitting now may result in incomplete files. Quit anyway?", @""), 
+												NSLocalizedString(@"Quit", @"Button"), 
+												NSLocalizedString(@"Cancel", @"Button"), 
+												nil);
+		if(NSAlertAlternateReturn == alertReturn)
+			reply = NSTerminateCancel;
+	}
+	
 	if(nil != self.managedObjectContext) {
 		if([self.managedObjectContext commitEditing]) {
 			NSError *error = nil;
@@ -213,7 +227,11 @@ diskDisappearedCallback(DADiskRef disk, void *context)
 				if(errorResult)
 					reply = NSTerminateCancel;
 				else {
-					NSInteger alertReturn = NSRunAlertPanel(nil, @"Could not save changes while quitting. Quit anyway?" , @"Quit", @"Cancel", nil);
+					NSInteger alertReturn = NSRunAlertPanel(nil, 
+															NSLocalizedString(@"Could not save changes while quitting. Quit anyway?", @""), 
+															NSLocalizedString(@"Quit", @"Button"), 
+															NSLocalizedString(@"Cancel", @"Button"), 
+															nil);
 					if(NSAlertAlternateReturn == alertReturn)
 						reply = NSTerminateCancel;	
 				}
@@ -231,13 +249,18 @@ diskDisappearedCallback(DADiskRef disk, void *context)
 	
 #pragma unused(aNotification)
 	
-	// Unregister our disk appeared and disappeared callbacks
-	DAUnregisterCallback(_diskArbitrationSession, diskAppearedCallback, self);
-	DAUnregisterCallback(_diskArbitrationSession, diskDisappearedCallback, self);
-	
-	// Unschedule and dispose of the DiskArbitration session created for this run loop
-	DASessionUnscheduleFromRunLoop(_diskArbitrationSession, CFRunLoopGetCurrent(), kCFRunLoopDefaultMode);
-	CFRelease(_diskArbitrationSession), _diskArbitrationSession = NULL;
+	// Stop any encoding operations
+	[[[EncoderManager sharedEncoderManager] queue] cancelAllOperations];
+
+	if(_diskArbitrationSession) {
+		// Unregister our disk appeared and disappeared callbacks
+		DAUnregisterCallback(_diskArbitrationSession, diskAppearedCallback, self);
+		DAUnregisterCallback(_diskArbitrationSession, diskDisappearedCallback, self);
+		
+		// Unschedule and dispose of the DiskArbitration session created for this run loop
+		DASessionUnscheduleFromRunLoop(_diskArbitrationSession, CFRunLoopGetCurrent(), kCFRunLoopDefaultMode);
+		CFRelease(_diskArbitrationSession), _diskArbitrationSession = NULL;
+	}
 }
 
 - (BOOL) application:(NSApplication *)theApplication openFile:(NSString *)filename
@@ -391,16 +414,16 @@ diskDisappearedCallback(DADiskRef disk, void *context)
 	
 	// If the read offset for the drive isn't configured, give the user the opportunity to configure it now
 	if(!compactDiscWindow.driveInformation.readOffset) {		
-		NSBeginAlertSheet([NSString stringWithFormat:@"The read offset for \u201c%@ %@\u201d is unknown.  Would you like to determine the drive's read offset now?", compactDiscWindow.driveInformation.vendorName, compactDiscWindow.driveInformation.productName],
-						  @"Yes", 
-						  @"No",
+		NSBeginAlertSheet([NSString stringWithFormat:NSLocalizedString(@"The read offset for \u201c%@ %@\u201d is unknown.  Would you like to determine the drive's read offset now?", @""), compactDiscWindow.driveInformation.vendorName, compactDiscWindow.driveInformation.productName],
+						  NSLocalizedString(@"Yes", @""), 
+						  NSLocalizedString(@"No", @""),
 						  nil,
 						  compactDiscWindow.window,
 						  self,
 						  @selector(readOffsetNotConfiguredSheetDidEnd:returnCode:contextInfo:),
 						  NULL,
 						  compactDiscWindow, 
-						  @"Configuring a read offset will allow more accurate audio extraction by enabling use of the AccurateRip database.");
+						  NSLocalizedString(@"Configuring a read offset will allow more accurate audio extraction by enabling use of the AccurateRip database.", @""));
 	}
 }
 
@@ -487,10 +510,10 @@ diskDisappearedCallback(DADiskRef disk, void *context)
 		if(error) {
 			NSMutableDictionary *userInfo = [NSMutableDictionary dictionary];
 			[userInfo setObject:licenseURL.path forKey:NSFilePathErrorKey];
-			[userInfo setObject:NSLocalizedStringFromTable(@"Unable to read the license file", @"Errors", @"") forKey:NSLocalizedDescriptionKey];
-			[userInfo setObject:NSLocalizedStringFromTable(@"The license could be incomplete or might contain an invalid key.", @"Errors", @"") forKey:NSLocalizedRecoverySuggestionErrorKey];
+			[userInfo setObject:NSLocalizedString(@"Your license is invalid or corrupted.", @"") forKey:NSLocalizedDescriptionKey];
+			[userInfo setObject:NSLocalizedString(@"The license file could be incomplete or might contain an invalid key.", @"") forKey:NSLocalizedRecoverySuggestionErrorKey];
 			
-			*error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadUnknownError userInfo:userInfo];
+			*error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadCorruptFileError userInfo:userInfo];
 		}
 		
 		return NO;		
@@ -502,9 +525,9 @@ diskDisappearedCallback(DADiskRef disk, void *context)
 
 - (void) displayNagDialog
 {
-	NSRunAlertPanel(NSLocalizedStringFromTable(@"This copy of Rip is unregistered.", @"", @""), 
-					NSLocalizedStringFromTable(@"You may purchase a license from http://sbooth.org/Rip/", @"", @""), 
-					NSLocalizedStringFromTable(@"OK", @"Buttons", @""), nil, nil);
+	NSRunAlertPanel(NSLocalizedString(@"This copy of Rip is unregistered.", @""), 
+					NSLocalizedString(@"You may purchase a license from http://sbooth.org/Rip/", @""), 
+					NSLocalizedString(@"OK", @"Button"), nil, nil);
 }
 
 - (void) handleGetURLAppleEvent:(NSAppleEventDescriptor *)event withReplyEvent:(NSAppleEventDescriptor *)replyEvent
@@ -528,18 +551,11 @@ diskDisappearedCallback(DADiskRef disk, void *context)
 	CompactDiscWindowController *compactDiscWindowController = (CompactDiscWindowController *)contextInfo;
 	
 	// Run the drive offset calculation routines
-	ReadOffsetCalculatorSheetController *readOffsetCalculatorSheetController = [[ReadOffsetCalculatorSheetController alloc] init];
+	ReadOffsetCalculatorSheetController *sheetController = [[ReadOffsetCalculatorSheetController alloc] init];
 
-	readOffsetCalculatorSheetController.disk= compactDiscWindowController.disk;
+	sheetController.disk = compactDiscWindowController.disk;
 
-	[NSApp beginSheet:readOffsetCalculatorSheetController.window modalForWindow:compactDiscWindowController.window modalDelegate:self didEndSelector:@selector(foo:returnCode:contextInfo:) contextInfo:NULL];
-	[readOffsetCalculatorSheetController determineDriveOffset:self];
-}
-
-- (void) foo:(NSWindow *)sheet returnCode:(NSInteger)returnCode contextInfo:(void *)contextInfo
-{
-
-	[sheet orderOut:self];
+	[sheetController beginReadOffsetCalculatorSheetForWindow:compactDiscWindowController.window modalDelegate:nil didEndSelector:NULL contextInfo:NULL];
 }
 
 @end

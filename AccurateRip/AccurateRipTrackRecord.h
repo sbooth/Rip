@@ -5,7 +5,7 @@
 
 #import <Cocoa/Cocoa.h>
 
-@class AccurateRipDiscRecord, ExtractedTrackRecord;
+@class AccurateRipDiscRecord;
 
 // ========================================
 // A single track record from a disc in the AccurateRip database
@@ -24,13 +24,5 @@
 // ========================================
 // Core Data relationships
 @property (assign) AccurateRipDiscRecord * disc;
-@property (assign) NSSet * extractedTrackRecords;
 
-@end
-
-@interface AccurateRipTrackRecord (CoreDataGeneratedAccessors)
-- (void) addExtractedTrackRecordsObject:(ExtractedTrackRecord *)value;
-- (void) removeExtractedTrackRecordsObject:(ExtractedTrackRecord *)value;
-- (void) addExtractedTrackRecords:(NSSet *)value;
-- (void) removeExtractedTrackRecords:(NSSet *)value;
 @end

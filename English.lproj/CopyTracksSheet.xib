@@ -8,6 +8,7 @@
 		<string key="IBDocument.HIToolboxVersion">352.00</string>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
+			<integer value="2"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -27,21 +28,21 @@
 			<object class="NSWindowTemplate" id="1005">
 				<int key="NSWindowStyleMask">7</int>
 				<int key="NSWindowBacking">2</int>
-				<string key="NSWindowRect">{{196, 220}, {563, 290}}</string>
+				<string key="NSWindowRect">{{196, 367}, {356, 143}}</string>
 				<int key="NSWTFlags">536870912</int>
 				<string key="NSWindowTitle">Copy Selected Tracks</string>
 				<string key="NSWindowClass">NSWindow</string>
 				<nil key="NSViewClass"/>
 				<string key="NSWindowContentMaxSize">{3.40282e+38, 3.40282e+38}</string>
 				<object class="NSView" key="NSWindowView" id="1006">
-					<nil key="NSNextResponder"/>
+					<reference key="NSNextResponder"/>
 					<int key="NSvFlags">256</int>
 					<object class="NSMutableArray" key="NSSubviews">
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="NSButton" id="137001130">
 							<reference key="NSNextResponder" ref="1006"/>
 							<int key="NSvFlags">289</int>
-							<string key="NSFrame">{{305, 12}, {96, 32}}</string>
+							<string key="NSFrame">{{246, 12}, {96, 32}}</string>
 							<reference key="NSSuperview" ref="1006"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="583023695">
@@ -66,7 +67,7 @@
 							<reference key="NSNextResponder" ref="1006"/>
 							<int key="NSvFlags">1292</int>
 							<object class="NSPSMatrix" key="NSDrawMatrix"/>
-							<string key="NSFrame">{{18, 225}, {96, 20}}</string>
+							<string key="NSFrame">{{18, 78}, {320, 20}}</string>
 							<reference key="NSSuperview" ref="1006"/>
 							<int key="NSpiFlags">16392</int>
 							<double key="NSMaxValue">1.000000e+00</double>
@@ -74,7 +75,7 @@
 						<object class="NSTextField" id="208924569">
 							<reference key="NSNextResponder" ref="1006"/>
 							<int key="NSvFlags">268</int>
-							<string key="NSFrame">{{17, 253}, {286, 17}}</string>
+							<string key="NSFrame">{{17, 106}, {322, 17}}</string>
 							<reference key="NSSuperview" ref="1006"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="270765701">
@@ -106,21 +107,26 @@
 						<object class="NSTextField" id="233440994">
 							<reference key="NSNextResponder" ref="1006"/>
 							<int key="NSvFlags">268</int>
-							<string key="NSFrame">{{42, 153}, {68, 17}}</string>
+							<string key="NSFrame">{{17, 60}, {322, 14}}</string>
 							<reference key="NSSuperview" ref="1006"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="529936452">
 								<int key="NSCellFlags">68288064</int>
 								<int key="NSCellFlags2">272630784</int>
-								<string key="NSContents">C2 errors:</string>
-								<reference key="NSSupport" ref="8200585"/>
+								<string key="NSContents">Detailed status</string>
+								<object class="NSFont" key="NSSupport">
+									<string key="NSName">LucidaGrande</string>
+									<double key="NSSize">1.100000e+01</double>
+									<int key="NSfFlags">16</int>
+								</object>
 								<reference key="NSControlView" ref="233440994"/>
 								<reference key="NSBackgroundColor" ref="815697356"/>
 								<reference key="NSTextColor" ref="460718065"/>
 							</object>
 						</object>
 					</object>
-					<string key="NSFrameSize">{563, 290}</string>
+					<string key="NSFrameSize">{356, 143}</string>
+					<reference key="NSSuperview"/>
 				</object>
 				<string key="NSScreenRect">{{0, 0}, {1680, 1028}}</string>
 				<string key="NSMaxSize">{3.40282e+38, 3.40282e+38}</string>
@@ -160,6 +166,14 @@
 						<reference key="destination" ref="208924569"/>
 					</object>
 					<int key="connectionID">100</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">_detailedStatusTextField</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="233440994"/>
+					</object>
+					<int key="connectionID">103</int>
 				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -205,10 +219,10 @@
 						<reference key="object" ref="1006"/>
 						<object class="NSMutableArray" key="children">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<reference ref="137001130"/>
 							<reference ref="208924569"/>
 							<reference ref="285346719"/>
 							<reference ref="233440994"/>
+							<reference ref="137001130"/>
 						</object>
 						<reference key="parent" ref="1005"/>
 					</object>
@@ -288,9 +302,9 @@
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{127, 538}, {563, 290}}</string>
+					<string>{{127, 685}, {356, 143}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{127, 538}, {563, 290}}</string>
+					<string>{{127, 685}, {356, 143}}</string>
 					<integer value="0"/>
 					<string>{196, 240}</string>
 					<string>{{357, 418}, {480, 270}}</string>
@@ -324,7 +338,7 @@
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">102</int>
+			<int key="maxID">103</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -333,27 +347,20 @@
 					<string key="className">CopyTracksSheetController</string>
 					<string key="superclassName">NSWindowController</string>
 					<object class="NSMutableDictionary" key="actions">
-						<bool key="EncodedWithXMLCoder">YES</bool>
-						<object class="NSMutableArray" key="dict.sortedKeys">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>cancel:</string>
-							<string>copyTracks:</string>
-						</object>
-						<object class="NSMutableArray" key="dict.values">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>id</string>
-							<string>id</string>
-						</object>
+						<string key="NS.key.0">cancel:</string>
+						<string key="NS.object.0">id</string>
 					</object>
 					<object class="NSMutableDictionary" key="outlets">
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="NSMutableArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>_detailedStatusTextField</string>
 							<string>_progressIndicator</string>
 							<string>_statusTextField</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>NSTextField</string>
 							<string>NSProgressIndicator</string>
 							<string>NSTextField</string>
 						</object>

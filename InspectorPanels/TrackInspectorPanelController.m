@@ -55,9 +55,9 @@
 		NSString *menuTitle = nil;
 
 		if(!self.isWindowLoaded || !self.window.isVisible || !self. window.isKeyWindow)
-			menuTitle = NSLocalizedStringFromTable(@"Show Track Inspector", @"Menus", @"");
+			menuTitle = NSLocalizedString(@"Show Track Inspector", @"Menu Item");
 		else
-			menuTitle = NSLocalizedStringFromTable(@"Hide Track Inspector", @"Menus", @"");
+			menuTitle = NSLocalizedString(@"Hide Track Inspector", @"Menu Item");
 
 		[menuItem setTitle:menuTitle];
 	}

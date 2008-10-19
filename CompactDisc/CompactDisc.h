@@ -8,7 +8,7 @@
 #include <DiskArbitration/DiskArbitration.h>
 #include <IOKit/storage/IOCDTypes.h>
 
-@class SessionDescriptor, TrackDescriptor, SectorRange, AccurateRipDiscRecord, AlbumMetadata, ExtractionRecord;
+@class SessionDescriptor, TrackDescriptor, SectorRange, AccurateRipDiscRecord, AlbumMetadata, ImageExtractionRecord;
 
 // ========================================
 // This class simplifies access to a CDDA disc
@@ -30,9 +30,9 @@
 // ========================================
 // Core Data relationships
 @property (assign) NSSet * accurateRipDiscs;
+@property (assign) NSSet * extractedImages;
 @property (assign) AlbumMetadata * metadata;
 @property (assign) NSSet * sessions;
-@property (assign) NSSet * extractionRecords;
 
 // ========================================
 // Other properties
@@ -53,6 +53,8 @@
 
 @end
 
+// ========================================
+// KVC accessors
 @interface CompactDisc (CoreDataGeneratedAccessors)
 - (void) addSessionsObject:(SessionDescriptor *)value;
 - (void) removeSessionsObject:(SessionDescriptor *)value;
@@ -64,8 +66,9 @@
 - (void) addAccurateRipDiscs:(NSSet *)value;
 - (void) removeAccurateRipDiscs:(NSSet *)value;
 
-- (void) addExtractionRecordsObject:(ExtractionRecord *)value;
-- (void) removeExtractionRecordsObject:(ExtractionRecord *)value;
-- (void) addExtractionRecords:(NSSet *)value;
-- (void) removeExtractionRecords:(NSSet *)value;
+- (void) addExtractedImagesObject:(ImageExtractionRecord *)value;
+- (void) removeExtractedImagesObject:(ImageExtractionRecord *)value;
+- (void) addExtractedImages:(NSSet *)value;
+- (void) removeExtractedImages:(NSSet *)value;
+
 @end

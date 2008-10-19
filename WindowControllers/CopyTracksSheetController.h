@@ -6,7 +6,7 @@
 #import <Cocoa/Cocoa.h>
 #include <DiskArbitration/DiskArbitration.h>
 
-@class CompactDisc, DriveInformation, AccurateRipDiscRecord;
+@class CompactDisc, DriveInformation, AccurateRipDiscRecord, ImageExtractionRecord;
 
 // ========================================
 // An NSWindowController subclass for customizing the extraction
@@ -16,47 +16,52 @@
 {
 	IBOutlet NSProgressIndicator *_progressIndicator;
 	IBOutlet NSTextField *_statusTextField;
+	IBOutlet NSTextField *_detailedStatusTextField;
 	
 @private
 	__strong DADiskRef _disk;
 	NSArray *_trackIDs;
 	BOOL _extractAsImage;
 
-	NSMapTable *_activeTimers;
-	NSMutableArray *_extractionRecords;
-
+	NSWindow *_sheetOwner;
+	id _sheetModalDelegate;
+	SEL _sheetDidEndSelector;
+	void *_sheetContextInfo;
+	
 	CompactDisc *_compactDisc;
 	DriveInformation *_driveInformation;
 	NSManagedObjectContext *_managedObjectContext;
 
+	NSMutableArray *_activeTimers;
 	NSOperationQueue *_operationQueue;
+
 	NSMutableArray *_tracksToBeExtracted;
+	NSMutableArray *_tracksExtractedButNotVerified;
+	NSMutableArray *_trackExtractionRecords;
+	
+	ImageExtractionRecord *_imageExtractionRecord;
 	
 	AccurateRipDiscRecord *_accurateRipPressingToMatch;
+	NSInteger _accurateRipPressingOffset;
 }
 
 // ========================================
 // Properties
-// ========================================
 @property (assign) DADiskRef disk;
 @property (copy) NSArray * trackIDs;
 @property (assign) BOOL extractAsImage;
 
-@property (readonly) NSArray * extractionRecords;
-
-@property (readonly, assign) CompactDisc * compactDisc;
-@property (readonly, assign) DriveInformation * driveInformation;
-@property (readonly, assign) NSManagedObjectContext * managedObjectContext;
-
-@property (readonly) NSOperationQueue * operationQueue;
-
 @property (readonly, assign) AccurateRipDiscRecord * accurateRipPressingToMatch;
+
+@property (readonly) NSArray * trackExtractionRecords;
+@property (readonly) ImageExtractionRecord * imageExtractionRecord;
+
+// ========================================
+// The meat & potatoes
+- (void) beginCopyTracksSheetForWindow:(NSWindow *)window modalDelegate:(id)modalDelegate didEndSelector:(SEL)didEndSelector contextInfo:(void *)contextInfo;
 
 // ========================================
 // Action methods
-// ========================================
-
-- (IBAction) copyTracks:(id)sender;
 - (IBAction) cancel:(id)sender;
 
 @end

@@ -5,12 +5,12 @@
 
 #import <Cocoa/Cocoa.h>
 
-@class BitArray, CompactDisc, DriveInformation, ExtractedTrackRecord;
+@class BitArray, CompactDisc, DriveInformation;
 
 // ========================================
 // This class represents one or more tracks extracted from a CDDA disc
 // ========================================
-@interface ExtractionRecord : NSManagedObject
+@interface ImageExtractionRecord : NSManagedObject
 {
 }
 
@@ -26,26 +26,16 @@
 // Core Data relationships
 @property (assign) CompactDisc * disc;
 @property (assign) DriveInformation * drive;
-@property (assign) NSSet * tracks;
 
+#if 0
 // ========================================
 // Other properties
 @property (readonly) NSArray * orderedTracks;
-@property (readonly) ExtractedTrackRecord * firstTrack;
-@property (readonly) ExtractedTrackRecord * lastTrack;
 
 // ========================================
 
 - (BOOL) containsTrackNumber:(NSUInteger)number;
-- (ExtractedTrackRecord *) trackNumber:(NSUInteger)number;
+- (TrackExtractionRecord *) trackNumber:(NSUInteger)number;
+#endif
 
-@end
-
-// ========================================
-// KVC accessors
-@interface ExtractionRecord (CoreDataGeneratedAccessors)
-- (void) addTracksObject:(ExtractedTrackRecord *)value;
-- (void) removeTracksObject:(ExtractedTrackRecord *)value;
-- (void) addTracks:(NSSet *)value;
-- (void) removeTracks:(NSSet *)value;
 @end

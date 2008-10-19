@@ -29,9 +29,9 @@
 
 // ========================================
 // Core Data relationships
+@dynamic extractedTracks;
 @dynamic metadata;
 @dynamic session;
-@dynamic extractedTrackRecords;
 
 // ========================================
 // Computed properties
