@@ -6,6 +6,20 @@
 	objectVersion = 45;
 	objects = {
 
+/* Begin PBXAggregateTarget section */
+		328373480EA9ADD00011EB44 /* Generate gitcommit */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = 3283734B0EA9ADEE0011EB44 /* Build configuration list for PBXAggregateTarget "Generate gitcommit" */;
+			buildPhases = (
+				328373470EA9ADD00011EB44 /* ShellScript */,
+			);
+			dependencies = (
+			);
+			name = "Generate gitcommit";
+			productName = "Generate gitcommit";
+		};
+/* End PBXAggregateTarget section */
+
 /* Begin PBXBuildFile section */
 		321B6B9B0DE11F14003B8E6A /* Rip.xcclassmodel in Resources */ = {isa = PBXBuildFile; fileRef = 321B6B9A0DE11F14003B8E6A /* Rip.xcclassmodel */; };
 		324EC6740DA2D411002A3CA7 /* Rip.icns in Resources */ = {isa = PBXBuildFile; fileRef = 324EC6730DA2D411002A3CA7 /* Rip.icns */; };
@@ -24,6 +38,11 @@
 		325B2D490E78D83000696A1A /* CDDAUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 325B2D480E78D83000696A1A /* CDDAUtilities.m */; };
 		325B2FDD0E7B6B4300696A1A /* ReadOffsetCalculatorSheet.xib in Resources */ = {isa = PBXBuildFile; fileRef = 325B2FDB0E7B6B4300696A1A /* ReadOffsetCalculatorSheet.xib */; };
 		326EED150E8C97C60090F370 /* CopyTracksSheetController.m in Sources */ = {isa = PBXBuildFile; fileRef = 326EED140E8C97C60090F370 /* CopyTracksSheetController.m */; };
+		328371610EA7DCFB0011EB44 /* EncoderWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 328371600EA7DCFB0011EB44 /* EncoderWindowController.m */; };
+		328371680EA7DD650011EB44 /* EncoderWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 328371660EA7DD650011EB44 /* EncoderWindow.xib */; };
+		328374400EAA691D0011EB44 /* TrackExtractionRecord.m in Sources */ = {isa = PBXBuildFile; fileRef = 3283743F0EAA691D0011EB44 /* TrackExtractionRecord.m */; };
+		328374620EAA6B580011EB44 /* ImageExtractionRecord.m in Sources */ = {isa = PBXBuildFile; fileRef = 328374610EAA6B580011EB44 /* ImageExtractionRecord.m */; };
+		328374FB0EAB07340011EB44 /* CompactDiscWindowController+LogFileGeneration.m in Sources */ = {isa = PBXBuildFile; fileRef = 328374FA0EAB07340011EB44 /* CompactDiscWindowController+LogFileGeneration.m */; };
 		328DE0AA0E58A63100F5BD13 /* CopyTracksSheet.xib in Resources */ = {isa = PBXBuildFile; fileRef = 328DE0A80E58A63100F5BD13 /* CopyTracksSheet.xib */; };
 		328DE21C0E5E628700F5BD13 /* PregapFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = 328DE21B0E5E628700F5BD13 /* PregapFormatter.m */; };
 		328DE4C20E5FBFE500F5BD13 /* MusicBrainz.bundle in Copy PlugIns */ = {isa = PBXBuildFile; fileRef = 328DE4C00E5FBFBF00F5BD13 /* MusicBrainz.bundle */; };
@@ -83,8 +102,6 @@
 		8C4C8CEF0D5D699C00DC0279 /* MusicDatabaseMatchesSheetController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C4C8CEE0D5D699C00DC0279 /* MusicDatabaseMatchesSheetController.m */; };
 		8C4C8E020D5E2A0600DC0279 /* BitArray.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C4C8DFF0D5E2A0600DC0279 /* BitArray.m */; };
 		8C4C8E030D5E2A0600DC0279 /* ExtractionOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C4C8E010D5E2A0600DC0279 /* ExtractionOperation.m */; };
-		8C4C8E080D5E2ADB00DC0279 /* ExtractionRecord.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C4C8E070D5E2ADB00DC0279 /* ExtractionRecord.m */; };
-		8C4C8E0C0D5E2BB900DC0279 /* ExtractedTrackRecord.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C4C8E0B0D5E2BB900DC0279 /* ExtractedTrackRecord.m */; };
 		8C7D314A0D05235200CEEE44 /* DriveInspectorPanel.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8C7D31480D05235200CEEE44 /* DriveInspectorPanel.xib */; };
 		8C807ABF0D3F069300B48E7A /* Rip.xcdatamodel in Sources */ = {isa = PBXBuildFile; fileRef = 8C807ABE0D3F069300B48E7A /* Rip.xcdatamodel */; };
 		8C8502D80D2C282A0081DB75 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 13E42FBA07B3F13500E4EEF1 /* CoreData.framework */; };
@@ -119,6 +136,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = 8D5B49AC048680CD000E48DA;
 			remoteInfo = FLAC;
+		};
+		3283736D0EA9B0690011EB44 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 2A37F4A9FDCFA73011CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 328373480EA9ADD00011EB44 /* Generate gitcommit */;
+			remoteInfo = "Generate gitcommit";
 		};
 		328DE28A0E5F831600F5BD13 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -289,6 +313,15 @@
 		325B2FDC0E7B6B4300696A1A /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/ReadOffsetCalculatorSheet.xib; sourceTree = "<group>"; };
 		326EED130E8C97C60090F370 /* CopyTracksSheetController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CopyTracksSheetController.h; sourceTree = "<group>"; };
 		326EED140E8C97C60090F370 /* CopyTracksSheetController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CopyTracksSheetController.m; sourceTree = "<group>"; };
+		3283715F0EA7DCFB0011EB44 /* EncoderWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EncoderWindowController.h; sourceTree = "<group>"; };
+		328371600EA7DCFB0011EB44 /* EncoderWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EncoderWindowController.m; sourceTree = "<group>"; };
+		328371670EA7DD650011EB44 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/EncoderWindow.xib; sourceTree = "<group>"; };
+		3283743E0EAA691D0011EB44 /* TrackExtractionRecord.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TrackExtractionRecord.h; sourceTree = "<group>"; };
+		3283743F0EAA691D0011EB44 /* TrackExtractionRecord.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TrackExtractionRecord.m; sourceTree = "<group>"; };
+		328374600EAA6B580011EB44 /* ImageExtractionRecord.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImageExtractionRecord.h; sourceTree = "<group>"; };
+		328374610EAA6B580011EB44 /* ImageExtractionRecord.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ImageExtractionRecord.m; sourceTree = "<group>"; };
+		328374F90EAB07340011EB44 /* CompactDiscWindowController+LogFileGeneration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "CompactDiscWindowController+LogFileGeneration.h"; sourceTree = "<group>"; };
+		328374FA0EAB07340011EB44 /* CompactDiscWindowController+LogFileGeneration.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "CompactDiscWindowController+LogFileGeneration.m"; sourceTree = "<group>"; };
 		328DE0A90E58A63100F5BD13 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/CopyTracksSheet.xib; sourceTree = "<group>"; };
 		328DE21A0E5E628700F5BD13 /* PregapFormatter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PregapFormatter.h; sourceTree = "<group>"; };
 		328DE21B0E5E628700F5BD13 /* PregapFormatter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PregapFormatter.m; sourceTree = "<group>"; };
@@ -386,10 +419,6 @@
 		8C4C8DFF0D5E2A0600DC0279 /* BitArray.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BitArray.m; sourceTree = "<group>"; };
 		8C4C8E000D5E2A0600DC0279 /* ExtractionOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExtractionOperation.h; sourceTree = "<group>"; };
 		8C4C8E010D5E2A0600DC0279 /* ExtractionOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ExtractionOperation.m; sourceTree = "<group>"; };
-		8C4C8E060D5E2ADB00DC0279 /* ExtractionRecord.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExtractionRecord.h; sourceTree = "<group>"; };
-		8C4C8E070D5E2ADB00DC0279 /* ExtractionRecord.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ExtractionRecord.m; sourceTree = "<group>"; };
-		8C4C8E0A0D5E2BB900DC0279 /* ExtractedTrackRecord.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExtractedTrackRecord.h; sourceTree = "<group>"; };
-		8C4C8E0B0D5E2BB900DC0279 /* ExtractedTrackRecord.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ExtractedTrackRecord.m; sourceTree = "<group>"; };
 		8C7D31490D05235200CEEE44 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/DriveInspectorPanel.xib; sourceTree = "<group>"; };
 		8C807ABE0D3F069300B48E7A /* Rip.xcdatamodel */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = wrapper.xcdatamodel; name = Rip.xcdatamodel; path = Models/Rip.xcdatamodel; sourceTree = "<group>"; };
 		8C8EFBA30D6E7AC1009E9299 /* ISRCDetectionOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ISRCDetectionOperation.h; sourceTree = "<group>"; };
@@ -509,6 +538,10 @@
 				324F318A0E86E2E2000E4E4E /* ReadOffsetCalculatorSheetController.m */,
 				329251DF0EA5404400DF820C /* CalculateAccurateRipOffsetsSheetController.h */,
 				329251E00EA5404400DF820C /* CalculateAccurateRipOffsetsSheetController.m */,
+				3283715F0EA7DCFB0011EB44 /* EncoderWindowController.h */,
+				328371600EA7DCFB0011EB44 /* EncoderWindowController.m */,
+				328374F90EAB07340011EB44 /* CompactDiscWindowController+LogFileGeneration.h */,
+				328374FA0EAB07340011EB44 /* CompactDiscWindowController+LogFileGeneration.m */,
 			);
 			path = WindowControllers;
 			sourceTree = "<group>";
@@ -525,6 +558,7 @@
 		2A37F4B8FDCFA73011CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				328371660EA7DD650011EB44 /* EncoderWindow.xib */,
 				3292521A0EA55CBC00DF820C /* CalculateAccurateRipOffsetsSheet.xib */,
 				32B1A37B0E8F10B1005A9AD9 /* DiscInspectorPanel.xib */,
 				324F32480E87007A000E4E4E /* DetectPregapsSheet.xib */,
@@ -739,10 +773,10 @@
 		8C4C8DFC0D5E29A300DC0279 /* Extraction */ = {
 			isa = PBXGroup;
 			children = (
-				8C4C8E0A0D5E2BB900DC0279 /* ExtractedTrackRecord.h */,
-				8C4C8E0B0D5E2BB900DC0279 /* ExtractedTrackRecord.m */,
-				8C4C8E060D5E2ADB00DC0279 /* ExtractionRecord.h */,
-				8C4C8E070D5E2ADB00DC0279 /* ExtractionRecord.m */,
+				328374600EAA6B580011EB44 /* ImageExtractionRecord.h */,
+				328374610EAA6B580011EB44 /* ImageExtractionRecord.m */,
+				3283743E0EAA691D0011EB44 /* TrackExtractionRecord.h */,
+				3283743F0EAA691D0011EB44 /* TrackExtractionRecord.m */,
 				8C4C8DFE0D5E2A0600DC0279 /* BitArray.h */,
 				8C4C8DFF0D5E2A0600DC0279 /* BitArray.m */,
 				8C4C8E000D5E2A0600DC0279 /* ExtractionOperation.h */,
@@ -882,6 +916,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				3283736E0EA9B0690011EB44 /* PBXTargetDependency */,
 				8C3C19490D73EA21001BAC88 /* PBXTargetDependency */,
 				328DE3400E5F8B5100F5BD13 /* PBXTargetDependency */,
 				328DE7350E5FE47700F5BD13 /* PBXTargetDependency */,
@@ -943,6 +978,7 @@
 			);
 			projectRoot = "";
 			targets = (
+				328373480EA9ADD00011EB44 /* Generate gitcommit */,
 				8D15AC270486D014006FF6A4 /* Rip */,
 			);
 		};
@@ -1035,10 +1071,28 @@
 				324F324A0E87007A000E4E4E /* DetectPregapsSheet.xib in Resources */,
 				32B1A37D0E8F10B1005A9AD9 /* DiscInspectorPanel.xib in Resources */,
 				3292521C0EA55CBC00DF820C /* CalculateAccurateRipOffsetsSheet.xib in Resources */,
+				328371680EA7DD650011EB44 /* EncoderWindow.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		328373470EA9ADD00011EB44 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+				"$(SRCROOT)/gitcommit.h",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "PATH=\"$PATH:/opt/local/bin:/usr/local/bin:/sw/bin\"\nCOMMIT=`git log --pretty=format:%h -1 origin/master`\n\n## GIT_COMMIT is a hexadecimal string\necho \"/* This file is automatically generated */\" > $SCRIPT_OUTPUT_FILE_0\necho \"#define GIT_COMMIT \\\"$COMMIT\\\"\" >> $SCRIPT_OUTPUT_FILE_0\necho \"#define GIT_COMMIT_UNQUOTED $COMMIT\" >> $SCRIPT_OUTPUT_FILE_0\n\nexit 0";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		8D15AC300486D014006FF6A4 /* Sources */ = {
@@ -1071,8 +1125,6 @@
 				8C4C8CEF0D5D699C00DC0279 /* MusicDatabaseMatchesSheetController.m in Sources */,
 				8C4C8E020D5E2A0600DC0279 /* BitArray.m in Sources */,
 				8C4C8E030D5E2A0600DC0279 /* ExtractionOperation.m in Sources */,
-				8C4C8E080D5E2ADB00DC0279 /* ExtractionRecord.m in Sources */,
-				8C4C8E0C0D5E2BB900DC0279 /* ExtractedTrackRecord.m in Sources */,
 				8C8EFBA50D6E7AC1009E9299 /* ISRCDetectionOperation.m in Sources */,
 				8C8EFBCA0D6E7C21009E9299 /* MCNDetectionOperation.m in Sources */,
 				8C8EFC400D706471009E9299 /* AlbumArtwork.m in Sources */,
@@ -1098,6 +1150,10 @@
 				326EED150E8C97C60090F370 /* CopyTracksSheetController.m in Sources */,
 				32B1A36F0E8F0D35005A9AD9 /* DiscInspectorPanelController.m in Sources */,
 				329251E10EA5404400DF820C /* CalculateAccurateRipOffsetsSheetController.m in Sources */,
+				328371610EA7DCFB0011EB44 /* EncoderWindowController.m in Sources */,
+				328374400EAA691D0011EB44 /* TrackExtractionRecord.m in Sources */,
+				328374620EAA6B580011EB44 /* ImageExtractionRecord.m in Sources */,
+				328374FB0EAB07340011EB44 /* CompactDiscWindowController+LogFileGeneration.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1108,6 +1164,11 @@
 			isa = PBXTargetDependency;
 			name = FLAC;
 			targetProxy = 3252C1C80DD2387500856BFE /* PBXContainerItemProxy */;
+		};
+		3283736E0EA9B0690011EB44 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 328373480EA9ADD00011EB44 /* Generate gitcommit */;
+			targetProxy = 3283736D0EA9B0690011EB44 /* PBXContainerItemProxy */;
 		};
 		328DE3400E5F8B5100F5BD13 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -1193,6 +1254,14 @@
 				325B2FDC0E7B6B4300696A1A /* English */,
 			);
 			name = ReadOffsetCalculatorSheet.xib;
+			sourceTree = "<group>";
+		};
+		328371660EA7DD650011EB44 /* EncoderWindow.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				328371670EA7DD650011EB44 /* English */,
+			);
+			name = EncoderWindow.xib;
 			sourceTree = "<group>";
 		};
 		328DE0A80E58A63100F5BD13 /* CopyTracksSheet.xib */ = {
@@ -1311,6 +1380,27 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		328373490EA9ADD00011EB44 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				PRODUCT_NAME = "Generate gitcommit";
+			};
+			name = Debug;
+		};
+		3283734A0EA9ADD00011EB44 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				PRODUCT_NAME = "Generate gitcommit";
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
 		C05733C808A9546B00998B17 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1328,6 +1418,9 @@
 				GCC_PREPROCESSOR_DEFINITIONS = "DEBUG=1";
 				GCC_WARN_UNINITIALIZED_AUTOS = NO;
 				INFOPLIST_FILE = Info.plist;
+				INFOPLIST_OTHER_PREPROCESSOR_FLAGS = "-traditional";
+				INFOPLIST_PREFIX_HEADER = "$(SRCROOT)/gitcommit.h";
+				INFOPLIST_PREPROCESS = YES;
 				INSTALL_PATH = "$(HOME)/Applications";
 				OTHER_LDFLAGS = "-lcrypto";
 				PRODUCT_NAME = Rip;
@@ -1349,6 +1442,9 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = Rip_Prefix.pch;
 				INFOPLIST_FILE = Info.plist;
+				INFOPLIST_OTHER_PREPROCESSOR_FLAGS = "-traditional";
+				INFOPLIST_PREFIX_HEADER = "$(SRCROOT)/gitcommit.h";
+				INFOPLIST_PREPROCESS = YES;
 				INSTALL_PATH = "$(HOME)/Applications";
 				OTHER_LDFLAGS = "-lcrypto";
 				PRODUCT_NAME = Rip;
@@ -1420,6 +1516,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		3283734B0EA9ADEE0011EB44 /* Build configuration list for PBXAggregateTarget "Generate gitcommit" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				328373490EA9ADD00011EB44 /* Debug */,
+				3283734A0EA9ADD00011EB44 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		C05733C708A9546B00998B17 /* Build configuration list for PBXNativeTarget "Rip" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

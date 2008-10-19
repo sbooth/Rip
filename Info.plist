@@ -103,9 +103,11 @@
 		</dict>
 	</array>
 	<key>CFBundleSignature</key>
-	<string>????</string>
+	<string>riPP</string>
 	<key>CFBundleVersion</key>
-	<string>1.0</string>
+	<string>GIT_COMMIT_UNQUOTED</string>
+	<key>CFBundleShortVersionString</key>
+	<string>1.0a</string>
 	<key>NSMainNibFile</key>
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
