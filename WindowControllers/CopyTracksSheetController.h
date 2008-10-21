@@ -6,11 +6,15 @@
 #import <Cocoa/Cocoa.h>
 #include <DiskArbitration/DiskArbitration.h>
 
-@class CompactDisc, DriveInformation, AccurateRipDiscRecord, ImageExtractionRecord;
+@class CompactDisc, DriveInformation, AccurateRipDiscRecord;
 
 // ========================================
 // An NSWindowController subclass for customizing the extraction
 // of one or more tracks from a CD
+//
+// The general extraction strategy looks like:
+//  - Extract the entire track (copy)
+//  - Compare
 // ========================================
 @interface CopyTracksSheetController : NSWindowController
 {
@@ -21,7 +25,6 @@
 @private
 	__strong DADiskRef _disk;
 	NSArray *_trackIDs;
-	BOOL _extractAsImage;
 
 	NSWindow *_sheetOwner;
 	id _sheetModalDelegate;
@@ -36,10 +39,11 @@
 	NSOperationQueue *_operationQueue;
 
 	NSMutableArray *_tracksToBeExtracted;
-	NSMutableArray *_tracksExtractedButNotVerified;
+	NSMutableDictionary *_tracksExtractedButNotVerified;
+	NSMutableDictionary *_sectorIndexesNeedingVerification;
+	NSMutableArray *_trackPartialExtractions;
+
 	NSMutableArray *_trackExtractionRecords;
-	
-	ImageExtractionRecord *_imageExtractionRecord;
 	
 	AccurateRipDiscRecord *_accurateRipPressingToMatch;
 	NSInteger _accurateRipPressingOffset;
@@ -49,12 +53,10 @@
 // Properties
 @property (assign) DADiskRef disk;
 @property (copy) NSArray * trackIDs;
-@property (assign) BOOL extractAsImage;
 
 @property (readonly, assign) AccurateRipDiscRecord * accurateRipPressingToMatch;
 
 @property (readonly) NSArray * trackExtractionRecords;
-@property (readonly) ImageExtractionRecord * imageExtractionRecord;
 
 // ========================================
 // The meat & potatoes
