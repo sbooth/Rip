@@ -3,6 +3,8 @@
  *  All Rights Reserved
  */
 
+#pragma once
+
 #include <CoreAudio/CoreAudioTypes.h>
 #include <IOKit/storage/IOCDTypes.h>
 
