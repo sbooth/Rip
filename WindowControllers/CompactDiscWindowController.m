@@ -673,14 +673,8 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 	}
 	
 	NSError *error = nil;
-	if(sheetController.extractAsImage) {
-		if(![self writeLogFileToURL:logFileURL forImageExtractionRecord:sheetController.imageExtractionRecord error:&error])
-			[self presentError:error modalForWindow:self.window delegate:nil didPresentSelector:NULL contextInfo:NULL];
-	}
-	else {
-		if(![self writeLogFileToURL:logFileURL forTrackExtractionRecords:sheetController.trackExtractionRecords error:&error])
-			[self presentError:error modalForWindow:self.window delegate:nil didPresentSelector:NULL contextInfo:NULL];
-	}
+	if(![self writeLogFileToURL:logFileURL forTrackExtractionRecords:sheetController.trackExtractionRecords error:&error])
+		[self presentError:error modalForWindow:self.window delegate:nil didPresentSelector:NULL contextInfo:NULL];
 	
 	// Save a cue sheet
 }
