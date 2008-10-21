@@ -3,9 +3,9 @@
  *  All Rights Reserved
  */
 
-#import <Cocoa/Cocoa.h>
-
 #pragma once
+
+#import <Cocoa/Cocoa.h>
 
 // Generate a URL pointing to a unique temporary file
 NSURL * temporaryURLWithExtension(NSString *extension);

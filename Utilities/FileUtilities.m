@@ -20,7 +20,7 @@ temporaryURLWithExtension(NSString *extension)
 	// Generate a random filename
 	NSString *temporaryFilename = nil;
 	do {
-		NSString *randomFilename = [NSString stringWithFormat:@"Rip %x.%@", random(), extension];
+		NSString *randomFilename = [NSString stringWithFormat:@"%lx.%@", random(), extension];
 		temporaryFilename = [temporaryDirectory stringByAppendingPathComponent:randomFilename];
 	} while([[NSFileManager defaultManager] fileExistsAtPath:temporaryFilename]);
 	
