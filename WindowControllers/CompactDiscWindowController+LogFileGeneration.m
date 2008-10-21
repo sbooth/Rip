@@ -54,21 +54,35 @@
 	NSSortDescriptor *trackNumberSortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"track.number" ascending:YES];
 	NSArray *sortedExtractionRecords = [trackExtractionRecords sortedArrayUsingDescriptors:[NSArray arrayWithObject:trackNumberSortDescriptor]];
 	
+	[result appendString:@"Extracted Audio\n"];
+	[result appendString:@"========================================\n"];
+	
 	for(TrackExtractionRecord *extractionRecord in sortedExtractionRecords) {		
 		[result appendFormat:@"Track %@ saved to %@\n", extractionRecord.track.number, [[extractionRecord.URL path] lastPathComponent]];
 		
+		[result appendString:@"\n"];
+
 		[result appendFormat:@"    Audio MD5 hash:         %@\n", extractionRecord.MD5];
 		[result appendFormat:@"    Audio SHA1 hash:        %@\n", extractionRecord.SHA1];
+		[result appendFormat:@"    AccurateRip checksum:   %08lx\n", extractionRecord.accurateRipChecksum.unsignedIntegerValue];
+
 		if([extractionRecord.errorFlags countOfOnes]) {
+			[result appendString:@"\n"];
 			[result appendFormat:@"    C2 error count:         %@\n", [numberFormatter stringForObjectValue:[NSNumber numberWithUnsignedInteger:[extractionRecord.errorFlags countOfOnes]]]];
 			
 //			NSIndexSet *onesIndexSet = [extractionRecord.errorFlags indexSetForOnes];
 		}
-		[result appendFormat:@"    AccurateRip checksum:   %08lx\n", extractionRecord.accurateRipChecksum.unsignedIntegerValue];
 		
 		if(extractionRecord.accurateRipConfidenceLevel) {
+			[result appendString:@"\n"];
+			
 			[result appendFormat:@"    Accurately ripped:      %@\n", [yesNoFormatter stringForObjectValue:[NSNumber numberWithBool:YES]]];
 			[result appendFormat:@"    Confidence level:       %@\n", [numberFormatter stringFromNumber:extractionRecord.accurateRipConfidenceLevel]];
+			
+			if(extractionRecord.accurateRipAlternatePressingChecksum) {
+				[result appendFormat:@"    Alt pressing offset:    %@\n", [numberFormatter stringFromNumber:extractionRecord.accurateRipAlternatePressingOffset]];
+				[result appendFormat:@"    Alt pressing checksum:  %@\n", [numberFormatter stringFromNumber:extractionRecord.accurateRipAlternatePressingChecksum]];
+			}
 		}
 		
 		[result appendString:@"\n"];
@@ -115,6 +129,7 @@
 	NSMutableString *result = [NSMutableString string];
 	
 	[result appendFormat:@"%@ %@ (%@) Audio Extraction Log\n", appName, shortVersionNumber, versionNumber];
+	[result appendString:@"========================================\n"];
 	[result appendString:[dateFormatter stringFromDate:[NSDate date]]];
 	[result appendString:@"\n"];
 	
@@ -131,6 +146,8 @@
 	
 	NSMutableString *result = [NSMutableString string];
 	
+	[result appendString:@"Drive Information\n"];
+	[result appendString:@"========================================\n"];
 	[result appendFormat:@"Drive used:         %@ %@", self.driveInformation.vendorName, self.driveInformation.productName];
 	if(self.driveInformation.productRevisionLevel)
 		[result appendFormat:@" (%@)", self.driveInformation.productRevisionLevel];
@@ -156,7 +173,9 @@
 
 	NSMutableString *result = [NSMutableString string];
 
-	[result appendString:@"Disc name:          "];
+	[result appendString:@"Compact Disc Information\n"];
+	[result appendString:@"========================================\n"];
+	[result appendString:@"Name:               "];
 	if(self.compactDisc.metadata.artist)
 		[result appendString:self.compactDisc.metadata.artist];
 	else
@@ -169,16 +188,17 @@
 	[result appendString:@"\n"];
 	[result appendFormat:@"FreeDB ID:          %08lx\n", self.compactDisc.freeDBDiscID.integerValue];
 	[result appendFormat:@"MusicBrainz ID:     %@\n", self.compactDisc.musicBrainzDiscID];
-	[result appendString:@"Disc TOC:\n"];
-	
-	[result appendString:@"+-------+------------+------------+------------+----------+----------+---------+\n"];
-	[result appendString:@"| Track |   Start    |    Stop    |  Duration  |  First   |   Last   |  Total  |\n"];
-	[result appendString:@"|  Num. |  MM:SS.FF  |  MM:SS.FF  |  MM:SS.FF  |  Sector  |  Sector  | Sectors |\n"];
-	[result appendString:@"+-------+------------+------------+------------+----------+----------+---------+\n"];
+	[result appendString:@"TOC:\n"];
+
+	[result appendString:@"\n"];
+
+	[result appendString:@" Track |   Start    |    Stop    |  Duration  |  First   |   Last   |  Total\n"];
+	[result appendString:@"  Num  |  MM:SS.FF  |  MM:SS.FF  |  MM:SS.FF  |  Sector  |  Sector  | Sectors\n"];
+	[result appendString:@"-------+------------+------------+------------+----------+----------+---------\n"];
 	
 	for(TrackDescriptor *trackDescriptor in self.compactDisc.firstSession.orderedTracks) {
 		// Track number
-		[result appendString:@"|   "];
+		[result appendString:@"   "];
 		[numberFormatter setFormatWidth:2];
 		[result appendString:[numberFormatter stringFromNumber:trackDescriptor.number]];
 		[result appendString:@"  |  "];
@@ -206,10 +226,10 @@
 		
 		// Total sectors
 		[result appendString:[numberFormatter stringFromNumber:[NSNumber numberWithUnsignedInteger:trackDescriptor.sectorCount]]];
-		[result appendString:@" |\n"];
+		[result appendString:@"\n"];
 	}
 	
-	[result appendString:@"+-------+------------+------------+------------+----------+----------+---------+\n"];
+//	[result appendString:@"+-------+------------+------------+------------+----------+----------+---------+\n"];
 
 	return [result copy];
 }
