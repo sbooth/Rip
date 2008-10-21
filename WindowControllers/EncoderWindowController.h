@@ -7,6 +7,7 @@
 
 @interface EncoderWindowController : NSWindowController
 {
+	IBOutlet NSTableView *_tableView;
 	IBOutlet NSArrayController *_arrayController;
 }
 

@@ -24,7 +24,9 @@ static NSString * const kEncoderOperationQueueKVOContext		= @"org.sbooth.Rip.Enc
 
 - (void) awakeFromNib
 {
-	
+	NSPathCell *pathCell = [[NSPathCell alloc] init];
+	[pathCell setPathStyle:NSPathStylePopUp];
+	[[[_tableView tableColumns] objectAtIndex:0] setDataCell:pathCell];
 }
 
 - (void) observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
