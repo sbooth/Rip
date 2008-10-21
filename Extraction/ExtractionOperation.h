@@ -23,6 +23,7 @@
 	NSNumber *_readOffset;			// The read offset (in audio frames) to use for extraction
 	NSArray *_trackIDs;				// The CD track(s) being extracted (if applicable)
 	
+	NSDate *_startTime;				// The time the operation started
 	float _fractionComplete;		// A float [0, 1] indicating the extraction progress
 	
 	SectorRange *_sectorsRead;		// The sectors that were actually read (sectors adjusted for read offset)
@@ -43,6 +44,7 @@
 
 // ========================================
 // Properties set during extraction
+@property (readonly, assign) NSDate * startTime;
 @property (readonly, assign) float fractionComplete;
 
 // ========================================

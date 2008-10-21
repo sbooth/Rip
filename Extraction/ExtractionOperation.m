@@ -24,6 +24,7 @@
 @property (copy) NSString * MD5;
 @property (copy) NSString * SHA1;
 @property (assign) float fractionComplete;
+@property (assign) NSDate * startTime;
 @end
 
 @interface ExtractionOperation (Private)
@@ -44,6 +45,7 @@
 @synthesize MD5 = _MD5;
 @synthesize SHA1 = _SHA1;
 @synthesize fractionComplete = _fractionComplete;
+@synthesize startTime = _startTime;
 
 - (id) initWithDADiskRef:(DADiskRef)disk
 {
@@ -60,6 +62,9 @@
 	NSAssert(nil != self.sectors, @"self.sectors may not be nil");
 	NSAssert(nil != self.URL, @"self.URL may not be nil");
 
+	// Record the start time
+	self.startTime = [NSDate date];
+	
 	// ========================================
 	// GENERAL SETUP
 
