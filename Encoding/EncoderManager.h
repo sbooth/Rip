@@ -11,6 +11,16 @@
 extern NSString * const		kEncoderBundleKey; // NSBundle *
 extern NSString * const		kEncoderSettingsKey; // NSDictionary *
 
+// ========================================
+// Enum for user defaults output file handling
+// ========================================
+enum _eExistingOutputFileHandling {
+	eExistingOutputFileHandlingOverwrite = 1,
+	eExistingOutputFileHandlingRename = 2,
+	eExistingOutputFileHandlingAsk = 3
+};
+typedef enum _eExistingOutputFileHandling eExistingOutputFileHandling;
+
 @class CompactDisc, TrackExtractionRecord, ExtractedImageRecord;
 
 @interface EncoderManager : NSObject
@@ -32,6 +42,10 @@ extern NSString * const		kEncoderSettingsKey; // NSDictionary *
 @property (assign) NSDictionary * defaultEncoderSettings;
 
 // ========================================
+// Specifies how to handle existing output files
+@property (assign) eExistingOutputFileHandling existingOutputFileHandling;
+
+// ========================================
 // The shared instance
 + (id) sharedEncoderManager;
 
@@ -47,7 +61,7 @@ extern NSString * const		kEncoderSettingsKey; // NSDictionary *
 
 // ========================================
 // Queue an encoding request
-- (BOOL) encodeURL:(NSURL *)inputURL forTrackExtractionRecord:(TrackExtractionRecord *)TrackExtractionRecord error:(NSError **)error;
+- (BOOL) encodeURL:(NSURL *)inputURL forTrackExtractionRecord:(TrackExtractionRecord *)trackExtractionRecord error:(NSError **)error;
 - (BOOL) encodeURL:(NSURL *)inputURL forExtractedImageRecord:(ExtractedImageRecord *)extractedImageRecord error:(NSError **)error;
 
 @end

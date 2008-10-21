@@ -80,6 +80,7 @@ diskDisappearedCallback(DADiskRef disk, void *context)
 	NSDictionary *ripDefaults = [NSDictionary dictionaryWithObjectsAndKeys:
 								 [NSNumber numberWithInteger:1], @"preferencesVersion",
 								 [NSArchiver archivedDataWithRootObject:[NSURL fileURLWithPath:[@"~/Music" stringByExpandingTildeInPath]]], @"outputDirectory",
+								 [NSNumber numberWithInteger:eExistingOutputFileHandlingRename], @"existingOutputFileHandling",
 								 [NSNumber numberWithBool:YES], @"automaticallyQueryAccurateRip",
 								 [NSNumber numberWithBool:YES], @"automaticallyQueryMusicDatabase",
 								 [NSNumber numberWithInteger:0], @"defaultMusicDatabase",
@@ -121,6 +122,8 @@ diskDisappearedCallback(DADiskRef disk, void *context)
 
 	NSURL *musicFolderURL = [NSURL URLWithString:[@"~/Music" stringByExpandingTildeInPath]];
 	[defaultsDictionary setObject:[NSArchiver archivedDataWithRootObject:musicFolderURL] forKey:@"outputDirectory"];
+
+	[defaultsDictionary setObject:[NSNumber numberWithInteger:eExistingOutputFileHandlingRename] forKey:@"existingOutputFileHandling"];
 
 	[defaultsDictionary setObject:@"org.sbooth.Rip.MusicDatabase.MusicBrainz" forKey:@"defaultMusicDatabase"];
 	[defaultsDictionary setObject:@"org.sbooth.Rip.Encoder.FLAC" forKey:@"defaultEncoder"];

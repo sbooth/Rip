@@ -214,7 +214,6 @@ static EncoderManager *sSharedEncoderManager				= nil;
 		EncodingOperation *operation = (EncodingOperation *)object;
 		
 		if([keyPath isEqualToString:@"isCancelled"] || [keyPath isEqualToString:@"isFinished"]) {
-//			[operation removeObserver:self forKeyPath:@"isExecuting"];
 			[operation removeObserver:self forKeyPath:@"isCancelled"];
 			[operation removeObserver:self forKeyPath:@"isFinished"];
 			
@@ -282,6 +281,16 @@ static EncoderManager *sSharedEncoderManager				= nil;
 - (void) setDefaultEncoderSettings:(NSDictionary *)encoderSettings
 {
 	[self storeSettings:encoderSettings forEncoder:self.defaultEncoder];
+}
+
+- (eExistingOutputFileHandling) existingOutputFileHandling
+{
+	return [[NSUserDefaults standardUserDefaults] integerForKey:@"existingOutputFileHandling"];
+}
+
+- (void) setExistingOutputFileHandling:(eExistingOutputFileHandling)outputFileHandling
+{
+	[[NSUserDefaults standardUserDefaults] setInteger:outputFileHandling forKey:@"existingOutputFileHadling"];
 }
 
 - (NSDictionary *) settingsForEncoder:(NSBundle *)encoder
@@ -373,10 +382,10 @@ static EncoderManager *sSharedEncoderManager				= nil;
 	return [NSURL fileURLWithPath:outputPath];
 }
 
-- (BOOL) encodeURL:(NSURL *)inputURL forTrackExtractionRecord:(TrackExtractionRecord *)TrackExtractionRecord error:(NSError **)error;
+- (BOOL) encodeURL:(NSURL *)inputURL forTrackExtractionRecord:(TrackExtractionRecord *)trackExtractionRecord error:(NSError **)error;
 {
 	NSParameterAssert(nil != inputURL);
-	NSParameterAssert(nil != TrackExtractionRecord);
+	NSParameterAssert(nil != trackExtractionRecord);
 	
 	NSString *defaultEncoder = [[NSUserDefaults standardUserDefaults] stringForKey:@"defaultEncoder"];
 	
@@ -393,8 +402,8 @@ static EncoderManager *sSharedEncoderManager				= nil;
 	
 	// Build the filename for the output from the disc's folder, the track's name and number,
 	// and the encoder's output path extension
-	NSURL *baseURL = [self outputURLForCompactDisc:TrackExtractionRecord.track.session.disc];
-	NSString *filename = filenameForTrackExtractionRecord(TrackExtractionRecord);
+	NSURL *baseURL = [self outputURLForCompactDisc:trackExtractionRecord.track.session.disc];
+	NSString *filename = filenameForTrackExtractionRecord(trackExtractionRecord);
 	NSString *pathExtension = [encoderInterface pathExtensionForSettings:encoderSettings];
 	NSString *pathname = [filename stringByAppendingPathExtension:pathExtension];
 	NSString *outputPath = [[baseURL path] stringByAppendingPathComponent:pathname];
@@ -403,15 +412,62 @@ static EncoderManager *sSharedEncoderManager				= nil;
 	if(![[NSFileManager defaultManager] createDirectoryAtPath:[baseURL path] withIntermediateDirectories:YES attributes:nil error:error])
 		return NO;
 	
-	// Don't overwrite existing output files
+	// Handle existing output files
 	if([[NSFileManager defaultManager] fileExistsAtPath:outputPath]) {
-#if DEBUG
-		NSLog(@"Output file %@ exists", [outputPath lastPathComponent]);
-#endif
-		if(error)
-			*error = [NSError errorWithDomain:NSPOSIXErrorDomain code:EEXIST userInfo:nil];
-
-		return NO;
+		eExistingOutputFileHandling existingOutputFileBehavior = [self existingOutputFileHandling];
+		
+		if(eExistingOutputFileHandlingOverwrite == existingOutputFileBehavior) {
+			if(![[NSFileManager defaultManager] removeItemAtPath:outputPath error:error])
+				return NO;
+		}
+		else if(eExistingOutputFileHandlingRename == existingOutputFileBehavior) {
+			NSString *backupFilename = [filename copy];
+			NSString *backupPathname = nil;
+			NSString *backupPath = nil;
+			
+			do {
+				backupFilename = [backupFilename stringByAppendingPathExtension:@"old"];
+				backupPathname = [backupFilename stringByAppendingPathExtension:pathExtension];
+				backupPath = [[baseURL path] stringByAppendingPathComponent:backupPathname];
+			} while([[NSFileManager defaultManager] fileExistsAtPath:backupPath]);
+			
+			[[NSFileManager defaultManager] movePath:outputPath toPath:backupPath handler:nil];
+		}
+		else if(eExistingOutputFileHandlingAsk == existingOutputFileBehavior) {
+			NSInteger alertReturn = NSRunAlertPanel([NSString stringWithFormat:NSLocalizedString(@"The file \u201c%@\u201d exists. Would you like to rename it?", @""), [outputPath lastPathComponent]], 
+													NSLocalizedString(@"If you select overwrite the file will be permanently deleted.", @""), 
+													NSLocalizedString(@"Rename", @"Button"), 
+													NSLocalizedString(@"Overwrite", @"Button"), 
+													NSLocalizedString(@"Cancel", @"Button"));
+			if(NSAlertDefaultReturn == alertReturn) {
+				NSString *backupFilename = [filename copy];
+				NSString *backupPathname = nil;
+				NSString *backupPath = nil;
+				
+				do {
+					backupFilename = [backupFilename stringByAppendingPathExtension:@"old"];
+					backupPathname = [backupFilename stringByAppendingPathExtension:pathExtension];
+					backupPath = [[baseURL path] stringByAppendingPathComponent:backupPathname];
+				} while([[NSFileManager defaultManager] fileExistsAtPath:backupPath]);
+				
+				[[NSFileManager defaultManager] movePath:outputPath toPath:backupPath handler:nil];
+			}
+			else if(NSAlertAlternateReturn == alertReturn) {
+				if(![[NSFileManager defaultManager] removeItemAtPath:outputPath error:error])
+					return NO;
+			}
+			else if(NSAlertOtherReturn == alertReturn) {
+				if(error)
+					*error = [NSError errorWithDomain:NSPOSIXErrorDomain code:EEXIST userInfo:nil];
+				return NO;
+			}
+		}
+		// The default is to preserve existing files
+		else {
+			if(error)
+				*error = [NSError errorWithDomain:NSPOSIXErrorDomain code:EEXIST userInfo:nil];
+			return NO;
+		}
 	}
 	
 	EncodingOperation *encodingOperation = [encoderInterface encodingOperation];
@@ -419,10 +475,9 @@ static EncoderManager *sSharedEncoderManager				= nil;
 	encodingOperation.inputURL = inputURL;
 	encodingOperation.outputURL = [NSURL fileURLWithPath:outputPath];
 	encodingOperation.settings = encoderSettings;
-	encodingOperation.metadata = metadataForTrackExtractionRecord(TrackExtractionRecord);
+	encodingOperation.metadata = metadataForTrackExtractionRecord(trackExtractionRecord);
 	
-	// Observe the operation's progress
-//	[encodingOperation addObserver:self forKeyPath:@"isExecuting" options:NSKeyValueObservingOptionNew context:kEncodingOperationKVOContext];
+	// Observe the operation's progress so the input file can be deleted when it completes
 	[encodingOperation addObserver:self forKeyPath:@"isCancelled" options:NSKeyValueObservingOptionNew context:kEncodingOperationKVOContext];
 	[encodingOperation addObserver:self forKeyPath:@"isFinished" options:NSKeyValueObservingOptionNew context:kEncodingOperationKVOContext];
 
@@ -433,7 +488,7 @@ static EncoderManager *sSharedEncoderManager				= nil;
 	[self.queue addOperation:encodingOperation];
 	
 	// Communicate the output URL back to the caller
-	TrackExtractionRecord.URL = encodingOperation.outputURL;
+	trackExtractionRecord.URL = encodingOperation.outputURL;
 	
 	return YES;
 }
