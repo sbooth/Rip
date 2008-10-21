@@ -110,6 +110,7 @@
 
 - (BOOL)			containsSector:(NSUInteger)sector				{ return (self.firstSector <= sector && self.lastSector >= sector); }
 - (BOOL)			containsSectorRange:(SectorRange *)range		{ return ([self containsSector:range.firstSector] && [self containsSector:range.lastSector]); }
+- (BOOL)			intersectsSectorRange:(SectorRange *)range		{ return ([self containsSector:range.firstSector] || [self containsSector:range.lastSector]); }
 
 - (NSString *) description
 {

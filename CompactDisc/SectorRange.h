@@ -41,5 +41,6 @@
 
 - (BOOL) containsSector:(NSUInteger)sector;
 - (BOOL) containsSectorRange:(SectorRange *)range;
+- (BOOL) intersectsSectorRange:(SectorRange *)range;
 
 @end
