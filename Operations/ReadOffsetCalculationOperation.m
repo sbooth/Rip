@@ -101,10 +101,8 @@ NSString * const	kAccurateRipTrackIDKey					= @"accurateRipTrackID";
 			// Determine what AccurateRip checksum we are attempting to match
 			AccurateRipTrackRecord *accurateRipTrack = [accurateRipDisc trackNumber:trackDescriptor.number.unsignedIntegerValue];
 			
-			if(!accurateRipTrack) {
-				self.error = [NSError errorWithDomain:NSOSStatusErrorDomain code:paramErr userInfo:nil];
+			if(!accurateRipTrack)
 				continue;
-			}
 
 			if(accurateRipTrack.offsetChecksum.unsignedIntegerValue == trackActualOffsetChecksum) {
 				NSDictionary *offsetDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
