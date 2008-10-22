@@ -4,7 +4,7 @@
  */
 
 #import "AppleLosslessEncoderInterface.h"
-#import "CoreAudioEncodeOperation.h"
+#import "AppleLosslessEncodeOperation.h"
 #import "AppleLosslessSettingsViewController.h"
 
 @implementation AppleLosslessEncoderInterface
@@ -40,11 +40,14 @@
 
 - (EncodingOperation *) encodingOperation
 {
-	return [[CoreAudioEncodeOperation alloc] init];
+	return [[AppleLosslessEncodeOperation alloc] init];
 }
 
 - (NSString *) pathExtensionForSettings:(NSDictionary *)settings
 {
+	
+#pragma unused(settings)
+	
 	return @"m4a";
 }
 

@@ -31,6 +31,9 @@
 
 - (NSString *) pathExtensionForSettings:(NSDictionary *)settings
 {
+
+#pragma unused(settings)
+	
 	return @"flac";
 }
 

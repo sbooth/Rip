@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		328378360EAEDEF50011EB44 /* AppleLosslessEncodeOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 328378350EAEDEF50011EB44 /* AppleLosslessEncodeOperation.m */; };
+		328378530EAEE2EB0011EB44 /* AtomicParsley in Resources */ = {isa = PBXBuildFile; fileRef = 328378520EAEE2EB0011EB44 /* AtomicParsley */; };
 		32C5ABCC0E6D1A27007C1E7A /* AppleLosslessSettings.xib in Resources */ = {isa = PBXBuildFile; fileRef = 32C5ABCA0E6D1A27007C1E7A /* AppleLosslessSettings.xib */; };
 		32C5ABD00E6D1A9B007C1E7A /* CoreAudioEncodeOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 32C5ABCF0E6D1A9B007C1E7A /* CoreAudioEncodeOperation.m */; };
 		32E9F8F90DD7584500E8ACCA /* AppleLosslessSettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 32E9F8F80DD7584500E8ACCA /* AppleLosslessSettingsViewController.m */; };
@@ -39,6 +41,9 @@
 		089C167EFE841241C02AAC07 /* English */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		089C167FFE841241C02AAC07 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		1058C7ADFEA557BF11CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
+		328378340EAEDEF50011EB44 /* AppleLosslessEncodeOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppleLosslessEncodeOperation.h; sourceTree = "<group>"; };
+		328378350EAEDEF50011EB44 /* AppleLosslessEncodeOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppleLosslessEncodeOperation.m; sourceTree = "<group>"; };
+		328378520EAEE2EB0011EB44 /* AtomicParsley */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = AtomicParsley; sourceTree = "<group>"; };
 		32C5ABCB0E6D1A27007C1E7A /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/AppleLosslessSettings.xib; sourceTree = "<group>"; };
 		32C5ABCE0E6D1A9B007C1E7A /* CoreAudioEncodeOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CoreAudioEncodeOperation.h; path = ../CoreAudio/CoreAudioEncodeOperation.h; sourceTree = SOURCE_ROOT; };
 		32C5ABCF0E6D1A9B007C1E7A /* CoreAudioEncodeOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CoreAudioEncodeOperation.m; path = ../CoreAudio/CoreAudioEncodeOperation.m; sourceTree = SOURCE_ROOT; };
@@ -92,6 +97,7 @@
 		089C167CFE841241C02AAC07 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				328378520EAEE2EB0011EB44 /* AtomicParsley */,
 				32C5ABCA0E6D1A27007C1E7A /* AppleLosslessSettings.xib */,
 				8D5B49B7048680CD000E48DA /* Info.plist */,
 				089C167DFE841241C02AAC07 /* InfoPlist.strings */,
@@ -108,6 +114,8 @@
 				8C3C195C0D73EAAB001BAC88 /* AppleLosslessEncoderInterface.m */,
 				32E9F8F70DD7584500E8ACCA /* AppleLosslessSettingsViewController.h */,
 				32E9F8F80DD7584500E8ACCA /* AppleLosslessSettingsViewController.m */,
+				328378340EAEDEF50011EB44 /* AppleLosslessEncodeOperation.h */,
+				328378350EAEDEF50011EB44 /* AppleLosslessEncodeOperation.m */,
 			);
 			name = Classes;
 			sourceTree = "<group>";
@@ -218,6 +226,7 @@
 			files = (
 				8D5B49B0048680CD000E48DA /* InfoPlist.strings in Resources */,
 				32C5ABCC0E6D1A27007C1E7A /* AppleLosslessSettings.xib in Resources */,
+				328378530EAEE2EB0011EB44 /* AtomicParsley in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -231,6 +240,7 @@
 				8C3C195E0D73EAAB001BAC88 /* AppleLosslessEncoderInterface.m in Sources */,
 				32E9F8F90DD7584500E8ACCA /* AppleLosslessSettingsViewController.m in Sources */,
 				32C5ABD00E6D1A9B007C1E7A /* CoreAudioEncodeOperation.m in Sources */,
+				328378360EAEDEF50011EB44 /* AppleLosslessEncodeOperation.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -301,6 +311,7 @@
 			buildSettings = {
 				GCC_ENABLE_OBJC_GC = required;
 				GCC_TREAT_IMPLICIT_FUNCTION_DECLARATIONS_AS_ERRORS = YES;
+				GCC_VERSION = 4.2;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
@@ -334,6 +345,7 @@
 				ARCHS = "$(NATIVE_ARCH)";
 				GCC_ENABLE_OBJC_GC = required;
 				GCC_TREAT_IMPLICIT_FUNCTION_DECLARATIONS_AS_ERRORS = YES;
+				GCC_VERSION = 4.2;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
