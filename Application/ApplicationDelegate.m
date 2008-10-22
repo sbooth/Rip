@@ -553,12 +553,7 @@ diskDisappearedCallback(DADiskRef disk, void *context)
 	
 	CompactDiscWindowController *compactDiscWindowController = (CompactDiscWindowController *)contextInfo;
 	
-	// Run the drive offset calculation routines
-	ReadOffsetCalculatorSheetController *sheetController = [[ReadOffsetCalculatorSheetController alloc] init];
-
-	sheetController.disk = compactDiscWindowController.disk;
-
-	[sheetController beginReadOffsetCalculatorSheetForWindow:compactDiscWindowController.window modalDelegate:nil didEndSelector:NULL contextInfo:NULL];
+	[compactDiscWindowController determineDriveReadOffset:self];
 }
 
 @end

@@ -20,6 +20,7 @@
 #import "MusicDatabaseInterface/MusicDatabaseQueryOperation.h"
 #import "MusicDatabaseMatchesSheetController.h"
 
+#import "ReadOffsetCalculatorSheetController.h"
 #import "ReadMCNSheetController.h"
 #import "ReadISRCsSheetController.h"
 #import "DetectPregapsSheetController.h"
@@ -30,6 +31,8 @@
 #import "MusicDatabaseManager.h"
 
 #import "FileUtilities.h"
+#import "AccurateRipDiscRecord.h"
+#import "AccurateRipTrackRecord.h"
 
 #define WINDOW_BORDER_THICKNESS ((CGFloat)20)
 
@@ -206,6 +209,14 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 		else
 			[anItem setTitle:NSLocalizedString(@"Hide Metadata", @"")];
 		
+		return YES;
+	}
+	else if([anItem action] == @selector(determineDriveReadOffset:)) {
+		if(self.driveInformation.productName)
+			[anItem setTitle:[NSString stringWithFormat:NSLocalizedString(@"Determine Read Offset for \u201c%@ %@\u201d", @""), self.driveInformation.vendorName, self.driveInformation.productName]];
+		else
+			[anItem setTitle:NSLocalizedString(@"Determine Read Offset", @"")];
+			
 		return YES;
 	}
 	else if([self respondsToSelector:[anItem action]])
@@ -414,17 +425,31 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 }
 
 // ========================================
+// Run the drive offset calculation routines
+- (IBAction) determineDriveReadOffset:(id)sender
+{
+	
+#pragma unused(sender)
+	
+	ReadOffsetCalculatorSheetController *sheetController = [[ReadOffsetCalculatorSheetController alloc] init];
+	
+	sheetController.disk = self.disk;
+	
+	[sheetController beginReadOffsetCalculatorSheetForWindow:self.window 
+											   modalDelegate:nil 
+											  didEndSelector:NULL 
+												 contextInfo:NULL];
+}
+
+// ========================================
 // Copy the selected tracks to intermediate WAV files, then send to the encoder
 - (IBAction) copySelectedTracks:(id)sender
 {
 	
 #pragma unused(sender)
 	
-	SessionDescriptor *firstSession = self.compactDisc.firstSession;
-	NSSet *selectedTracks = firstSession.selectedTracks;
-	
-	// Only allow one operation on the compact disc at a time
-	if(0 == selectedTracks.count || [[self.operationQueue operations] count]) {
+	NSSet *selectedTracks = self.compactDisc.firstSession.selectedTracks;
+	if(0 == selectedTracks.count) {
 		NSBeep();
 		return;
 	}
@@ -432,7 +457,7 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 	CopyTracksSheetController *sheetController = [[CopyTracksSheetController alloc] init];
 	
 	sheetController.disk = self.disk;
-	sheetController.trackIDs = [[selectedTracks allObjects] valueForKey:@"objectID"];
+	sheetController.trackIDs = [selectedTracks valueForKey:@"objectID"];
 	
 	[sheetController beginCopyTracksSheetForWindow:self.window
 									 modalDelegate:self 
@@ -444,6 +469,14 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 {
 
 #pragma unused(sender)
+	
+	for(AccurateRipDiscRecord *arDisc in self.compactDisc.accurateRipDiscs) {
+		NSLog(@"%@",arDisc);
+		for(AccurateRipTrackRecord *arTrack in arDisc.tracks) {
+			NSLog(@"Track %@ [%@]",arTrack.number, arTrack.confidenceLevel);
+		}
+		NSLog(@"\n");			
+	}
 }
 
 - (IBAction) detectPregaps:(id)sender
@@ -451,7 +484,7 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 
 #pragma unused(sender)
 	
-	NSSet *selectedTracks = self.compactDisc.firstSession.selectedTracks;	
+	NSSet *selectedTracks = self.compactDisc.firstSession.selectedTracks;
 	if(0 == selectedTracks.count) {
 		NSBeep();
 		return;
@@ -460,7 +493,7 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 	DetectPregapsSheetController *sheetController = [[DetectPregapsSheetController alloc] init];
 	
 	sheetController.disk = self.disk;
-	sheetController.trackIDs = [[selectedTracks allObjects] valueForKey:@"objectID"];
+	sheetController.trackIDs = [selectedTracks valueForKey:@"objectID"];
 	
 	[sheetController beginDetectPregapsSheetForWindow:self.window
 										modalDelegate:nil 
@@ -488,7 +521,7 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 
 #pragma unused(sender)
 	
-	NSSet *selectedTracks = self.compactDisc.firstSession.selectedTracks;	
+	NSSet *selectedTracks = self.compactDisc.firstSession.selectedTracks;
 	if(0 == selectedTracks.count) {
 		NSBeep();
 		return;
@@ -497,7 +530,7 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 	ReadISRCsSheetController *sheetController = [[ReadISRCsSheetController alloc] init];
 	
 	sheetController.disk = self.disk;
-	sheetController.trackIDs = [[selectedTracks allObjects] valueForKey:@"objectID"];
+	sheetController.trackIDs = [selectedTracks valueForKey:@"objectID"];
 	
 	[sheetController beginReadISRCsSheetForWindow:self.window
 									modalDelegate:nil 
@@ -514,9 +547,12 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 	NSSavePanel *savePanel = [NSSavePanel savePanel];
 	
 	[savePanel setRequiredFileType:@"cue"];
-	
-	[savePanel beginSheetForDirectory:nil
-								 file:self.compactDisc.metadata.title
+
+	// The default directory
+	NSURL *baseURL = [[EncoderManager sharedEncoderManager] outputURLForCompactDisc:self.compactDisc];
+
+	[savePanel beginSheetForDirectory:[baseURL path]
+								 file:makeStringSafeForFilename(self.compactDisc.metadata.title)
 					   modalForWindow:self.window
 						modalDelegate:self
 					   didEndSelector:@selector(createCueSheetSavePanelDidEnd:returnCode:contextInfo:)

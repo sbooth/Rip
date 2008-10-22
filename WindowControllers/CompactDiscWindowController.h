@@ -46,6 +46,8 @@
 
 - (IBAction) toggleMetadataDrawer:(id)sender;
 
+- (IBAction) determineDriveReadOffset:(id)sender;
+
 - (IBAction) copySelectedTracks:(id)sender;
 - (IBAction) copyImage:(id)sender;
 
