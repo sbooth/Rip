@@ -16,7 +16,7 @@
 
 @private
 	__strong DADiskRef _disk;
-	NSArray *_trackIDs;
+	NSSet *_trackIDs;
 	NSOperationQueue *_operationQueue;
 	NSManagedObjectContext *_managedObjectContext;
 }
@@ -24,7 +24,7 @@
 // ========================================
 // Properties affecting MCN reading
 @property (assign) DADiskRef disk;
-@property (copy) NSArray * trackIDs;
+@property (copy) NSSet * trackIDs;
 
 // ========================================
 // The meat & potatoes
