@@ -43,6 +43,7 @@
 		328374400EAA691D0011EB44 /* TrackExtractionRecord.m in Sources */ = {isa = PBXBuildFile; fileRef = 3283743F0EAA691D0011EB44 /* TrackExtractionRecord.m */; };
 		328374620EAA6B580011EB44 /* ImageExtractionRecord.m in Sources */ = {isa = PBXBuildFile; fileRef = 328374610EAA6B580011EB44 /* ImageExtractionRecord.m */; };
 		328374FB0EAB07340011EB44 /* CompactDiscWindowController+LogFileGeneration.m in Sources */ = {isa = PBXBuildFile; fileRef = 328374FA0EAB07340011EB44 /* CompactDiscWindowController+LogFileGeneration.m */; };
+		328375F60EABB7D30011EB44 /* AudioUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 328375F50EABB7D30011EB44 /* AudioUtilities.m */; };
 		328DE0AA0E58A63100F5BD13 /* CopyTracksSheet.xib in Resources */ = {isa = PBXBuildFile; fileRef = 328DE0A80E58A63100F5BD13 /* CopyTracksSheet.xib */; };
 		328DE21C0E5E628700F5BD13 /* PregapFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = 328DE21B0E5E628700F5BD13 /* PregapFormatter.m */; };
 		328DE4C20E5FBFE500F5BD13 /* MusicBrainz.bundle in Copy PlugIns */ = {isa = PBXBuildFile; fileRef = 328DE4C00E5FBFBF00F5BD13 /* MusicBrainz.bundle */; };
@@ -141,7 +142,7 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = 2A37F4A9FDCFA73011CA2CEA /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 328373480EA9ADD00011EB44 /* Generate gitcommit */;
+			remoteGlobalIDString = 328373480EA9ADD00011EB44;
 			remoteInfo = "Generate gitcommit";
 		};
 		328DE28A0E5F831600F5BD13 /* PBXContainerItemProxy */ = {
@@ -322,6 +323,8 @@
 		328374610EAA6B580011EB44 /* ImageExtractionRecord.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ImageExtractionRecord.m; sourceTree = "<group>"; };
 		328374F90EAB07340011EB44 /* CompactDiscWindowController+LogFileGeneration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "CompactDiscWindowController+LogFileGeneration.h"; sourceTree = "<group>"; };
 		328374FA0EAB07340011EB44 /* CompactDiscWindowController+LogFileGeneration.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "CompactDiscWindowController+LogFileGeneration.m"; sourceTree = "<group>"; };
+		328375F40EABB7D30011EB44 /* AudioUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AudioUtilities.h; path = Utilities/AudioUtilities.h; sourceTree = "<group>"; };
+		328375F50EABB7D30011EB44 /* AudioUtilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AudioUtilities.m; path = Utilities/AudioUtilities.m; sourceTree = "<group>"; };
 		328DE0A90E58A63100F5BD13 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/CopyTracksSheet.xib; sourceTree = "<group>"; };
 		328DE21A0E5E628700F5BD13 /* PregapFormatter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PregapFormatter.h; sourceTree = "<group>"; };
 		328DE21B0E5E628700F5BD13 /* PregapFormatter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PregapFormatter.m; sourceTree = "<group>"; };
@@ -676,6 +679,8 @@
 		8C1BBC620D43DEF800DAC484 /* Utilities */ = {
 			isa = PBXGroup;
 			children = (
+				328375F40EABB7D30011EB44 /* AudioUtilities.h */,
+				328375F50EABB7D30011EB44 /* AudioUtilities.m */,
 				325B2D470E78D83000696A1A /* CDDAUtilities.h */,
 				325B2D480E78D83000696A1A /* CDDAUtilities.m */,
 				8C1BBC630D43DF0D00DAC484 /* GenreUtilities.h */,
@@ -1154,6 +1159,7 @@
 				328374400EAA691D0011EB44 /* TrackExtractionRecord.m in Sources */,
 				328374620EAA6B580011EB44 /* ImageExtractionRecord.m in Sources */,
 				328374FB0EAB07340011EB44 /* CompactDiscWindowController+LogFileGeneration.m in Sources */,
+				328375F60EABB7D30011EB44 /* AudioUtilities.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1457,6 +1463,7 @@
 			buildSettings = {
 				GCC_ENABLE_OBJC_GC = required;
 				GCC_TREAT_IMPLICIT_FUNCTION_DECLARATIONS_AS_ERRORS = YES;
+				GCC_VERSION = 4.2;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
@@ -1488,6 +1495,7 @@
 				ARCHS = "$(NATIVE_ARCH)";
 				GCC_ENABLE_OBJC_GC = required;
 				GCC_TREAT_IMPLICIT_FUNCTION_DECLARATIONS_AS_ERRORS = YES;
+				GCC_VERSION = 4.2;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
