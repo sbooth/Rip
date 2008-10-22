@@ -58,12 +58,6 @@
 
 // ========================================
 // Other properties
-- (NSSet *) selectedTracks
-{
-	NSPredicate *selectedTracksPredicate = [NSPredicate predicateWithFormat:@"isSelected == 1"];
-	return [self.tracks filteredSetUsingPredicate:selectedTracksPredicate];
-}
-
 - (NSArray *) orderedTracks
 {
 	NSSortDescriptor *trackNumberSortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"number" ascending:YES];
@@ -80,6 +74,18 @@
 {
 	NSArray *orderedTracks = self.orderedTracks;
 	return (0 == orderedTracks.count ? nil : orderedTracks.lastObject);
+}
+
+- (NSSet *) selectedTracks
+{
+	NSPredicate *selectedTracksPredicate = [NSPredicate predicateWithFormat:@"isSelected == 1"];
+	return [self.tracks filteredSetUsingPredicate:selectedTracksPredicate];
+}
+
+- (NSArray *) orderedSelectedTracks
+{
+	NSSortDescriptor *trackNumberSortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"number" ascending:YES];
+	return [self.selectedTracks.allObjects sortedArrayUsingDescriptors:[NSArray arrayWithObject:trackNumberSortDescriptor]];
 }
 
 // ========================================

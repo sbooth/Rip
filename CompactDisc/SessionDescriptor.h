@@ -31,10 +31,12 @@
 
 // ========================================
 // Other properties
-@property (readonly) NSSet * selectedTracks;
 @property (readonly) NSArray * orderedTracks;
 @property (readonly) TrackDescriptor * firstTrack;
 @property (readonly) TrackDescriptor * lastTrack;
+
+@property (readonly) NSSet * selectedTracks;
+@property (readonly) NSArray * orderedSelectedTracks;
 
 // ========================================
 
