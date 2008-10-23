@@ -230,7 +230,7 @@ static NSString * const kCalculateOffsetsKVOContext		= @"org.sbooth.Rip.Determin
 	ReadOffsetCalculationOperation *offsetCalculationOperation = [[ReadOffsetCalculationOperation alloc] init];
 	
 	offsetCalculationOperation.URL = extractionOperation.URL;
-	offsetCalculationOperation.trackDescriptorID = trackToExtract.objectID;
+	offsetCalculationOperation.trackID = trackToExtract.objectID;
 	offsetCalculationOperation.sixSecondPointSector = MAXIMUM_OFFSET_TO_CHECK_IN_SECTORS;
 	offsetCalculationOperation.maximumOffsetToCheck = (MAXIMUM_OFFSET_TO_CHECK_IN_SECTORS * AUDIO_FRAMES_PER_CDDA_SECTOR);
 	
