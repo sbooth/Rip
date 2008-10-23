@@ -148,7 +148,7 @@
 		
 		[compactDisc addAccurateRipDiscsObject:accurateRipDisc];
 		
-		accurateRipDisc.URL = accurateRipURL.absoluteString;
+		accurateRipDisc.URL = accurateRipURL;
 
 		NSUInteger i;
 		NSUInteger trackDataOffset = pressingDataOffset + (1 + 4 + 4 + 4);

@@ -17,7 +17,7 @@
 
 // ========================================
 // Core Data properties
-@property (assign) NSString * URL;
+@property (assign) NSURL * URL;
 
 // ========================================
 // Core Data relationships
