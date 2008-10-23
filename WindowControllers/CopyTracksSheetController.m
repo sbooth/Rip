@@ -60,8 +60,9 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.CopyTrack
 
 @property (assign) NSOperationQueue * operationQueue;
 
-@property (assign) AccurateRipDiscRecord * accurateRipPressingToMatch;
-@property (assign) NSInteger accurateRipPressingOffset;
+@property (readonly) NSArray * orderedTracks;
+@property (readonly) NSArray * orderedTracksRemainingToBeExtracted;
+
 @end
 
 @interface CopyTracksSheetController (Callbacks)
@@ -73,14 +74,12 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.CopyTrack
 - (void) showReadMCNSheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode contextInfo:(void *)contextInfo;
 - (void) showReadISRCsSheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode contextInfo:(void *)contextInfo;
 - (void) showDetectPregapsSheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode contextInfo:(void *)contextInfo;
-- (void) showCalculateAccurateRipOffsetsSheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode contextInfo:(void *)contextInfo;
 @end
 
 @interface CopyTracksSheetController (Private)
 - (void) beginReadMCNSheet;
 - (void) beginReadISRCsSheet;
 - (void) beginDetectPregapsSheet;
-- (void) beginCalculateAccurateRipOffsetsSheet;
 - (void) performShowCopyTracksSheet;
 
 - (void) startExtractingNextTrack;
@@ -96,8 +95,10 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.CopyTrack
 - (void) processExtractionOperationForPartialTrack:(ExtractionOperation *)operation;
 
 - (NSNumber *) calculateAccurateRipChecksumForExtractionOperation:(ExtractionOperation *)operation;
+- (NSArray *) determinePossibleAccurateRipOffsetForTrack:(TrackDescriptor *)track URL:(NSURL *)URL;
 
 - (TrackExtractionRecord *) createTrackExtractionRecordForOperation:(ExtractionOperation *)operation accurateRipChecksum:(NSNumber *)checksum;
+
 @end
 
 @implementation CopyTracksSheetController
@@ -112,9 +113,6 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.CopyTrack
 @synthesize managedObjectContext = _managedObjectContext;
 
 @synthesize operationQueue = _operationQueue;
-
-@synthesize accurateRipPressingToMatch = _accurateRipPressingToMatch;
-@synthesize accurateRipPressingOffset = _accurateRipPressingOffset;
 
 - (id) init
 {
@@ -255,6 +253,52 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.CopyTrack
 	[self.window orderOut:sender];
 }
 
+- (NSArray *) orderedTracks
+{
+	// Fetch the tracks to be extracted and sort them by track number
+	NSPredicate *trackPredicate  = [NSPredicate predicateWithFormat:@"self IN %@", [self.trackIDs allObjects]];
+	NSSortDescriptor *trackNumberSortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"number" ascending:YES];
+	NSEntityDescription *trackEntityDescription = [NSEntityDescription entityForName:@"TrackDescriptor" inManagedObjectContext:self.managedObjectContext];
+	
+	NSFetchRequest *trackFetchRequest = [[NSFetchRequest alloc] init];
+	
+	[trackFetchRequest setEntity:trackEntityDescription];
+	[trackFetchRequest setPredicate:trackPredicate];
+	[trackFetchRequest setSortDescriptors:[NSArray arrayWithObject:trackNumberSortDescriptor]];
+	
+	NSError *error = nil;
+	NSArray *tracks = [self.managedObjectContext executeFetchRequest:trackFetchRequest error:&error];
+	if(!tracks) {
+		[self presentError:error modalForWindow:self.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
+		return nil;
+	}
+	
+	return tracks;
+}
+
+- (NSArray *) orderedTracksRemainingToBeExtracted
+{
+	// Fetch the tracks to be extracted and sort them by track number
+	NSPredicate *trackPredicate  = [NSPredicate predicateWithFormat:@"self IN %@", [_tracksToBeExtracted allObjects]];
+	NSSortDescriptor *trackNumberSortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"number" ascending:YES];
+	NSEntityDescription *trackEntityDescription = [NSEntityDescription entityForName:@"TrackDescriptor" inManagedObjectContext:self.managedObjectContext];
+	
+	NSFetchRequest *trackFetchRequest = [[NSFetchRequest alloc] init];
+	
+	[trackFetchRequest setEntity:trackEntityDescription];
+	[trackFetchRequest setPredicate:trackPredicate];
+	[trackFetchRequest setSortDescriptors:[NSArray arrayWithObject:trackNumberSortDescriptor]];
+	
+	NSError *error = nil;
+	NSArray *tracks = [self.managedObjectContext executeFetchRequest:trackFetchRequest error:&error];
+	if(!tracks) {
+		[self presentError:error modalForWindow:self.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
+		return nil;
+	}
+	
+	return tracks;
+}
+
 @end
 
 @implementation CopyTracksSheetController (Callbacks)
@@ -344,50 +388,7 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.CopyTrack
 		return;
 	}
 	
-	[self beginCalculateAccurateRipOffsetsSheet];
-}
-
-- (void) showCalculateAccurateRipOffsetsSheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode contextInfo:(void *)contextInfo
-{
-	NSParameterAssert(nil != sheet);
-	NSParameterAssert(nil != contextInfo);
-	
-	[sheet orderOut:self];
-	
-	CalculateAccurateRipOffsetsSheetController *sheetController = (CalculateAccurateRipOffsetsSheetController *)contextInfo;
-
-	if(NSCancelButton == returnCode) {
-		sheetController = nil;
-		[self cancel:self];
-		return;
-	}
-	
-	NSPredicate *zeroOffsetPredicate = [NSPredicate predicateWithFormat:@"%K == 0", kReadOffsetKey];
-	NSArray *matchingPressingsWithZeroOffset = [sheetController.accurateRipOffsets filteredArrayUsingPredicate:zeroOffsetPredicate];
-	if([matchingPressingsWithZeroOffset count]) {
-		NSManagedObjectID *accurateRipTrackID = [[matchingPressingsWithZeroOffset lastObject] objectForKey:kAccurateRipTrackIDKey];
-		
-		// Fetch the AccurateRipTrackRecord object from the context and ensure it is the correct class
-		NSManagedObject *managedObject = [self.managedObjectContext objectWithID:accurateRipTrackID];
-		if(![managedObject isKindOfClass:[AccurateRipTrackRecord class]]) {
-//			[self presentError:error modalForWindow:self.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
-			return;
-		}
-		
-		AccurateRipTrackRecord *accurateRipTrack = (AccurateRipTrackRecord *)managedObject;
-		self.accurateRipPressingToMatch = accurateRipTrack.disc;
-		self.accurateRipPressingOffset = 0;
-	}
-	else {
-		NSLog(@"FIXME: USE ALTERNATE AR PRESSING");
-		NSLog(@"Possibilities: %@", sheetController.accurateRipOffsets);
-		
-		self.accurateRipPressingOffset = 10;
-	}
-
-	sheetController = nil;
-	
-	[self performShowCopyTracksSheet];	
+	[self performShowCopyTracksSheet];
 }
 
 @end
@@ -417,17 +418,7 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.CopyTrack
 	NSMutableArray *tracksWithoutISRCs = [NSMutableArray array];
 	
 	// Ensure ISRCs have been read for the selected tracks
-	for(NSManagedObjectID *objectID in self.trackIDs) {
-		
-		// Fetch the TrackDescriptor object from the context and ensure it is the correct class
-		NSManagedObject *managedObject = [self.managedObjectContext objectWithID:objectID];
-		if(![managedObject isKindOfClass:[TrackDescriptor class]]) {
-//			[self presentError:error modalForWindow:self.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
-			continue;
-		}
-		
-		TrackDescriptor *track = (TrackDescriptor *)managedObject;
-		
+	for(TrackDescriptor *track in self.orderedTracks) {
 		// Don't waste time re-reading a pre-existing ISRC
 		if(!track.metadata.ISRC)
 			[tracksWithoutISRCs addObject:track];
@@ -453,17 +444,7 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.CopyTrack
 	NSMutableArray *tracksWithoutPregaps = [NSMutableArray array];
 	
 	// Ensure pregaps have been read for the selected tracks
-	for(NSManagedObjectID *objectID in self.trackIDs) {
-		
-		// Fetch the TrackDescriptor object from the context and ensure it is the correct class
-		NSManagedObject *managedObject = [self.managedObjectContext objectWithID:objectID];
-		if(![managedObject isKindOfClass:[TrackDescriptor class]]) {
-//			[self presentError:error modalForWindow:self.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
-			continue;
-		}
-		
-		TrackDescriptor *track = (TrackDescriptor *)managedObject;
-		
+	for(TrackDescriptor *track in self.orderedTracks) {
 		// Grab pre-gaps
 		if(!track.pregap)
 			[tracksWithoutPregaps addObject:track];
@@ -479,22 +460,6 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.CopyTrack
 											modalDelegate:self 
 										   didEndSelector:@selector(showDetectPregapsSheetDidEnd:returnCode:contextInfo:) 
 											  contextInfo:sheetController];
-	}
-	else
-		[self beginCalculateAccurateRipOffsetsSheet];
-}
-
-- (void) beginCalculateAccurateRipOffsetsSheet
-{
-	if(self.compactDisc.accurateRipDiscs) {
-		CalculateAccurateRipOffsetsSheetController *sheetController = [[CalculateAccurateRipOffsetsSheetController alloc] init];
-	
-		sheetController.disk = self.disk;
-	
-		[sheetController beginCalculateAccurateRipOffsetsSheetForWindow:_sheetOwner
-														  modalDelegate:self 
-														 didEndSelector:@selector(showCalculateAccurateRipOffsetsSheetDidEnd:returnCode:contextInfo:) 
-															contextInfo:sheetController];
 	}
 	else
 		[self performShowCopyTracksSheet];
@@ -523,23 +488,14 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.CopyTrack
 
 - (void) startExtractingNextTrack
 {
-	if(![_tracksToBeExtracted count])
-		return;
+	NSArray *tracks = self.orderedTracksRemainingToBeExtracted;
 
-	// Remove the last object
-	NSManagedObjectID *objectID = [_tracksToBeExtracted lastObject];
-	[_tracksToBeExtracted removeLastObject];
-	
-	// Fetch the TrackDescriptor object from the context and ensure it is the correct class
-	NSManagedObject *managedObject = [self.managedObjectContext objectWithID:objectID];
-	if(![managedObject isKindOfClass:[TrackDescriptor class]]) {
-//		[self presentError:error modalForWindow:self.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
+	if(![tracks count])
 		return;
-	}
 	
+	TrackDescriptor *track = [tracks objectAtIndex:0];
+	[_tracksToBeExtracted removeObject:[track objectID]];
 	
-	TrackDescriptor *track = (TrackDescriptor *)managedObject;
-
 	[self extractWholeTrack:track];
 }
 
@@ -689,33 +645,53 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.CopyTrack
 	
 	TrackDescriptor *track = (TrackDescriptor *)managedObject;			
 	
-	// Calculate the actual AccurateRip checksums of the extracted audio
+	// Calculate the actual AccurateRip checksum of the extracted audio
 	NSNumber *trackActualAccurateRipChecksum = [self calculateAccurateRipChecksumForExtractionOperation:operation];
+
+	// Deter
+	NSArray *possibleAccurateRipOffsets = [self determinePossibleAccurateRipOffsetForTrack:track URL:operation.URL];
+
+	// Determine which pressings (if any) are the primary ones (offset checksum matches with a zero read offset)
+	NSPredicate *zeroOffsetPredicate = [NSPredicate predicateWithFormat:@"%K == 0", kReadOffsetKey];
+	NSArray *matchingPressingsWithZeroOffset = [possibleAccurateRipOffsets filteredArrayUsingPredicate:zeroOffsetPredicate];
 	
-	// If this disc was found in Accurate Rip, verify the track's checksum
-	if(self.accurateRipPressingToMatch) {
-		AccurateRipTrackRecord *accurateRipTrack = [self.accurateRipPressingToMatch trackNumber:track.number.unsignedIntegerValue];
+	// Iterate through each pressing and compare the track's AccurateRip checksums
+	if([matchingPressingsWithZeroOffset count]) {
+
+		for(NSDictionary *matchingPressingInfo in matchingPressingsWithZeroOffset) {
+			NSManagedObjectID *accurateRipTrackID = [matchingPressingInfo objectForKey:kAccurateRipTrackIDKey];
+
+			// Fetch the AccurateRipTrackRecord object from the context and ensure it is the correct class
+			managedObject = [self.managedObjectContext objectWithID:accurateRipTrackID];
+			if(![managedObject isKindOfClass:[AccurateRipTrackRecord class]])
+				continue;
 			
-		// If the track was accurately ripped, ship it off to the encoder
-		if(accurateRipTrack && accurateRipTrack.checksum.unsignedIntegerValue == trackActualAccurateRipChecksum.unsignedIntegerValue) {
-			// Create the extraction record
-			TrackExtractionRecord *extractionRecord = [self createTrackExtractionRecordForOperation:operation accurateRipChecksum:trackActualAccurateRipChecksum];
-			extractionRecord.accurateRipConfidenceLevel = accurateRipTrack.confidenceLevel;
-			
-			NSError *error = nil;
-			if(![[EncoderManager sharedEncoderManager] encodeURL:operation.URL forTrackExtractionRecord:extractionRecord error:&error]) {
-				[self.managedObjectContext deleteObject:extractionRecord];
-				[self presentError:error modalForWindow:self.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
+			AccurateRipTrackRecord *accurateRipTrack = (AccurateRipTrackRecord *)managedObject;
+
+			// If the track was accurately ripped, ship it off to the encoder
+			if([accurateRipTrack.checksum isEqualToNumber:trackActualAccurateRipChecksum]) {
+				// Create the extraction record
+				TrackExtractionRecord *extractionRecord = [self createTrackExtractionRecordForOperation:operation accurateRipChecksum:trackActualAccurateRipChecksum];
+				extractionRecord.accurateRipConfidenceLevel = accurateRipTrack.confidenceLevel;
+				
+				NSError *error = nil;
+				if(![[EncoderManager sharedEncoderManager] encodeURL:operation.URL forTrackExtractionRecord:extractionRecord error:&error]) {
+					[self.managedObjectContext deleteObject:extractionRecord];
+					[self presentError:error modalForWindow:self.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
+					return;
+				}
+				
+				[_trackExtractionRecords addObject:extractionRecord];
+				[self startExtractingNextTrack];
+				
 				return;
 			}
 			
-			[_trackExtractionRecords addObject:extractionRecord];
-			[self startExtractingNextTrack];
-			
-			return;
+			// If the checksum was not verified, fall through to handling below
 		}
-		
-		// If the checksum was not verified, fall through to handling below
+	}
+	else {
+		NSLog(@"FIXME: USE ALTERNATE ACCURATERIP PRESSING");
 	}
 	
 	// Re-rip portions of the track if any C2 error flags were returned
@@ -833,11 +809,40 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.CopyTrack
 			
 	TrackDescriptor *track = (TrackDescriptor *)managedObject;
 	NSUInteger accurateRipChecksum = calculateAccurateRipChecksumForFile(operation.URL, 
-																		 self.compactDisc.firstSession.firstTrack.number.unsignedIntegerValue == track.number.unsignedIntegerValue,
-																		 self.compactDisc.firstSession.lastTrack.number.unsignedIntegerValue == track.number.unsignedIntegerValue);
+																		 [self.compactDisc.firstSession.firstTrack.number isEqualToNumber:track.number],
+																		 [self.compactDisc.firstSession.lastTrack.number isEqualToNumber:track.number]);
 	
 	// Since Core Data only stores signed integers, cast the unsigned checksum to signed for storage
 	return [NSNumber numberWithInt:(int32_t)accurateRipChecksum];
+}
+
+- (NSArray *) determinePossibleAccurateRipOffsetForTrack:(TrackDescriptor *)track URL:(NSURL *)URL
+{
+	NSParameterAssert(nil != track);
+	NSParameterAssert(nil != URL);
+	
+	// Scan the extracted file and determine possible AccurateRip offsets
+	ReadOffsetCalculationOperation *operation = [[ReadOffsetCalculationOperation alloc ] init];
+	
+	operation.URL = URL;
+	operation.trackID = [track objectID];
+	operation.sixSecondPointSector = 6 * CDDA_SECTORS_PER_SECOND;
+	operation.maximumOffsetToCheck = MAXIMUM_OFFSET_TO_CHECK_IN_SECTORS;
+	
+	// Wait for the operation to be ready
+	while(![operation isReady])
+		[NSThread sleepForTimeInterval:0.25];
+	
+	// Run the operation in standalone mode
+	[_detailedStatusTextField setStringValue:NSLocalizedString(@"Calculating AccurateRip offsets", @"")];
+	[operation start];
+	
+	if(operation.error) {
+//		[self presentError:operation.error modalForWindow:self.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
+		return nil;
+	}
+	
+	return operation.possibleReadOffsets;
 }
 
 #if 0
@@ -871,8 +876,8 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.CopyTrack
 			NSUInteger accurateRipChecksum = calculateAccurateRipChecksumForFileRegion(operation.URL, 
 																					   adjustedSectorRange.firstSector,
 																					   adjustedSectorRange.lastSector,
-																					   self.compactDisc.firstSession.firstTrack.number.unsignedIntegerValue == track.number.unsignedIntegerValue,
-																					   self.compactDisc.firstSession.lastTrack.number.unsignedIntegerValue == track.number.unsignedIntegerValue);
+																					   [self.compactDisc.firstSession.firstTrack.number isEqualToNumber:track.number],
+																					   [self.compactDisc.firstSession.lastTrack.number isEqualToNumber:track.number]);
 			
 			// Since Core Data only stores signed integers, cast the unsigned checksum to signed for storage
 			[actualAccurateRipChecksums setObject:[NSNumber numberWithInt:(int32_t)accurateRipChecksum]

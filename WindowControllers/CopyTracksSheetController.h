@@ -24,7 +24,7 @@
 	
 @private
 	__strong DADiskRef _disk;
-	NSArray *_trackIDs;
+	NSSet *_trackIDs;
 
 	NSWindow *_sheetOwner;
 	id _sheetModalDelegate;
@@ -38,23 +38,18 @@
 	NSMutableArray *_activeTimers;
 	NSOperationQueue *_operationQueue;
 
-	NSMutableArray *_tracksToBeExtracted;
+	NSMutableSet *_tracksToBeExtracted;
 	NSMutableDictionary *_tracksExtractedButNotVerified;
 	NSMutableDictionary *_sectorIndexesNeedingVerification;
 	NSMutableArray *_trackPartialExtractions;
 
 	NSMutableArray *_trackExtractionRecords;
-	
-	AccurateRipDiscRecord *_accurateRipPressingToMatch;
-	NSInteger _accurateRipPressingOffset;
 }
 
 // ========================================
 // Properties
 @property (assign) DADiskRef disk;
-@property (copy) NSArray * trackIDs;
-
-@property (readonly, assign) AccurateRipDiscRecord * accurateRipPressingToMatch;
+@property (copy) NSSet * trackIDs;
 
 @property (readonly) NSArray * trackExtractionRecords;
 
