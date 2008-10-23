@@ -10,6 +10,11 @@
 // ========================================
 NSString * const	kFLACCompressionLevelKey				= @"compressionLevel";
 
+// ========================================
+// The amount of time to sleep while waiting for the NSTask to finish
+// ========================================
+#define SLEEP_TIME_INTERVAL ((NSTimeInterval)0.25)
+
 static void
 setArgumentForTag(NSMutableArray *arguments, NSDictionary *metadata, NSString *keyName, NSString *tagName)
 {
@@ -97,7 +102,7 @@ setArgumentForTag(NSMutableArray *arguments, NSDictionary *metadata, NSString *k
 			[task terminate];
 		
 		// Sleep to avoid spinning
-		[NSThread sleepUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.25]];
+		[NSThread sleepForTimeInterval:SLEEP_TIME_INTERVAL];
 	}
 	
 	// Get the result
