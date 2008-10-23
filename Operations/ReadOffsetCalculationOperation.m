@@ -33,7 +33,7 @@ NSString * const	kAccurateRipTrackIDKey					= @"accurateRipTrackID";
 @implementation ReadOffsetCalculationOperation
 
 @synthesize URL = _URL;
-@synthesize trackDescriptorID = _trackDescriptorID;
+@synthesize trackID = _trackID;
 @synthesize sixSecondPointSector = _sixSecondPointSector;
 @synthesize maximumOffsetToCheck = _maximumOffsetToCheck;
 @synthesize error = _error;
@@ -43,14 +43,14 @@ NSString * const	kAccurateRipTrackIDKey					= @"accurateRipTrackID";
 - (void) main
 {
 	NSParameterAssert(nil != self.URL);
-	NSParameterAssert(nil != self.trackDescriptorID);
+	NSParameterAssert(nil != self.trackID);
 	
 	// Create our own context for accessing the store
 	NSManagedObjectContext *managedObjectContext = [[NSManagedObjectContext alloc] init];
 	[managedObjectContext setPersistentStoreCoordinator:[[[NSApplication sharedApplication] delegate] persistentStoreCoordinator]];
 	
 	// Fetch the TrackDescriptor object from the context and ensure it is the correct class
-	NSManagedObject *managedObject = [managedObjectContext objectWithID:self.trackDescriptorID];
+	NSManagedObject *managedObject = [managedObjectContext objectWithID:self.trackID];
 	if(![managedObject isKindOfClass:[TrackDescriptor class]]) {
 		self.error = [NSError errorWithDomain:NSOSStatusErrorDomain code:paramErr userInfo:nil];
 		return;
