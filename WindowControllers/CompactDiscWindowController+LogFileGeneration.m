@@ -66,9 +66,9 @@
 		[result appendFormat:@"    Audio SHA1 hash:        %@\n", extractionRecord.SHA1];
 		[result appendFormat:@"    AccurateRip checksum:   %08lx\n", extractionRecord.accurateRipChecksum.unsignedIntegerValue];
 
-		if([extractionRecord.errorFlags countOfOnes]) {
+		if([extractionRecord.blockErrorFlags count]) {
 			[result appendString:@"\n"];
-			[result appendFormat:@"    C2 error count:         %@\n", [numberFormatter stringForObjectValue:[NSNumber numberWithUnsignedInteger:[extractionRecord.errorFlags countOfOnes]]]];
+			[result appendFormat:@"    C2 block error count:   %@\n", [numberFormatter stringForObjectValue:[NSNumber numberWithUnsignedInteger:[extractionRecord.blockErrorFlags count]]]];
 			
 //			NSIndexSet *onesIndexSet = [extractionRecord.errorFlags indexSetForOnes];
 		}
@@ -186,8 +186,8 @@
 	else
 		[result appendString:NSLocalizedString(@"Unknown Album", @"")];
 	[result appendString:@"\n"];
-	[result appendFormat:@"FreeDB ID:          %08lx\n", self.compactDisc.freeDBDiscID.integerValue];
 	[result appendFormat:@"MusicBrainz ID:     %@\n", self.compactDisc.musicBrainzDiscID];
+	[result appendFormat:@"FreeDB ID:          %08lx\n", self.compactDisc.freeDBDiscID];
 	[result appendString:@"TOC:\n"];
 
 	[result appendString:@"\n"];

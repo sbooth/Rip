@@ -470,13 +470,6 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 
 #pragma unused(sender)
 	
-	for(AccurateRipDiscRecord *arDisc in self.compactDisc.accurateRipDiscs) {
-		NSLog(@"%@",arDisc);
-		for(AccurateRipTrackRecord *arTrack in arDisc.tracks) {
-			NSLog(@"Track %@ [%@]",arTrack.number, arTrack.confidenceLevel);
-		}
-		NSLog(@"\n");			
-	}
 }
 
 - (IBAction) detectPregaps:(id)sender
@@ -681,7 +674,10 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 	
 	CopyTracksSheetController *sheetController = (CopyTracksSheetController *)contextInfo;
 	
-	// Save an extraction log file
+	// Save an extraction log file if any tracks were successfully extracted
+	if(![sheetController.trackExtractionRecords count])
+		return;
+	
 	NSString *title = self.compactDisc.metadata.title;
 	if(nil == title)
 		title = NSLocalizedString(@"Unknown Album", @"");
@@ -788,7 +784,7 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 	
 	[cueSheetString appendString:@"\n"];
 
-	[cueSheetString appendFormat:@"REM FreeDB Disc ID %08x\n", self.compactDisc.freeDBDiscID.integerValue];
+	[cueSheetString appendFormat:@"REM FreeDB Disc ID %08x\n", self.compactDisc.freeDBDiscID];
 	[cueSheetString appendFormat:@"REM MusicBrainz Disc ID %@\n", self.compactDisc.musicBrainzDiscID];
 
 	if(self.compactDisc.metadata.date)

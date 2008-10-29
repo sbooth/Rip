@@ -26,6 +26,8 @@ static NSString * const kEncoderOperationQueueKVOContext		= @"org.sbooth.Rip.Enc
 {
 	NSPathCell *pathCell = [[NSPathCell alloc] init];
 	[pathCell setPathStyle:NSPathStylePopUp];
+	[pathCell setControlSize:NSSmallControlSize];
+	[pathCell setEditable:NO];
 	[[[_tableView tableColumns] objectAtIndex:0] setDataCell:pathCell];
 }
 

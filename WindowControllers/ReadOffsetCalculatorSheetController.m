@@ -238,7 +238,7 @@ static NSString * const kCalculateOffsetsKVOContext		= @"org.sbooth.Rip.ReadOffs
 		trackToExtract = potentialTrack;
 		break;
 	}
-	
+
 	if(!trackToExtract) {
 		NSBeep();
 		// TODO: Descriptive error message
