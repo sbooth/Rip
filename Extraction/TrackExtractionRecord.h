@@ -5,7 +5,7 @@
 
 #import <Cocoa/Cocoa.h>
 
-@class BitArray, TrackDescriptor, DriveInformation;
+@class TrackDescriptor, DriveInformation;
 
 // ========================================
 // This class represents a single track extracted from a CDDA disc
@@ -20,8 +20,8 @@
 @property (assign) NSNumber * accurateRipAlternatePressingChecksum;
 @property (assign) NSNumber * accurateRipAlternatePressingOffset;
 @property (assign) NSNumber * accurateRipConfidenceLevel;
+@property (assign) NSIndexSet * blockErrorFlags;
 @property (assign) NSDate * date;
-@property (assign) BitArray * errorFlags;
 @property (assign) NSString * MD5;
 @property (assign) NSString * SHA1;
 @property (assign) NSURL * URL;

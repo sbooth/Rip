@@ -13,8 +13,8 @@
 @dynamic accurateRipAlternatePressingChecksum;
 @dynamic accurateRipAlternatePressingOffset;
 @dynamic accurateRipConfidenceLevel;
+@dynamic blockErrorFlags;
 @dynamic date;
-@dynamic errorFlags;
 @dynamic MD5;
 @dynamic SHA1;
 @dynamic URL;

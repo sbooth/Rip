@@ -17,10 +17,75 @@
 // Keep reads to approximately 2 MB in size (2352 + 294 + 16 bytes are necessary for each sector)
 #define BUFFER_SIZE_IN_SECTORS 775u
 
+// ========================================
+// Delete the specified number of bits from the beginning of buffer
+// ========================================
+static void
+zeroLeadingBitsOfBufferInPlace(void *buffer, 
+							   NSUInteger numberOfBitsToZero)
+{
+	NSCParameterAssert(NULL != buffer);
+	
+	NSUInteger bytesToZero = numberOfBitsToZero / 8;
+	NSUInteger bitsToZero = numberOfBitsToZero % 8;
+	
+	uint8_t *alias = (uint8_t *)buffer;
+
+	// Zero the whole undesired bytes
+	memset(buffer, 0, bytesToZero);
+
+	alias += bytesToZero;
+	
+	// Zero the remaining undesired bits
+	switch(bitsToZero) {
+		case 0:		*alias++ &= 0xFF;		break;
+		case 1:		*alias++ &= 0x7F;		break;
+		case 2:		*alias++ &= 0x3F;		break;
+		case 3:		*alias++ &= 0x1F;		break;
+		case 4:		*alias++ &= 0x0F;		break;
+		case 5:		*alias++ &= 0x07;		break;
+		case 6:		*alias++ &= 0x03;		break;
+		case 7:		*alias++ &= 0x01;		break;
+	}
+}
+
+// ========================================
+// Delete the specified number of bits from the beginning of buffer
+// ========================================
+static void
+zeroTrailingBitsOfBufferInPlace(void *buffer, 
+								NSUInteger length,
+								NSUInteger numberOfBitsToZero)
+{
+	NSCParameterAssert(NULL != buffer);
+	
+	NSUInteger bytesToZero = numberOfBitsToZero / 8;
+	NSUInteger bitsToZero = numberOfBitsToZero % 8;
+
+	uint8_t *alias = (uint8_t *)buffer;
+	alias += (length - bytesToZero - 1);
+
+	// Mask out the undesired bits
+	switch(bitsToZero) {
+		case 0:		*alias++ &= 0xFF;		break;
+		case 1:		*alias++ &= 0xFE;		break;
+		case 2:		*alias++ &= 0xFC;		break;
+		case 3:		*alias++ &= 0xF8;		break;
+		case 4:		*alias++ &= 0xF0;		break;
+		case 5:		*alias++ &= 0xE0;		break;
+		case 6:		*alias++ &= 0xC0;		break;
+		case 7:		*alias++ &= 0x80;		break;
+	}
+
+	// Zero the remaining whole undesired bytes
+	memset(alias, 0, bytesToZero);
+}
+
 @interface ExtractionOperation ()
 @property (copy) SectorRange * sectorsRead;
 @property (copy) NSError * error;
-@property (copy) BitArray * errorFlags;
+@property (copy) NSIndexSet * blockErrorFlags;
+@property (copy) NSDictionary * errorFlags;
 @property (copy) NSString * MD5;
 @property (copy) NSString * SHA1;
 @property (assign) float fractionComplete;
@@ -28,7 +93,7 @@
 @end
 
 @interface ExtractionOperation (Private)
-- (void) setErrorFlags:(const int8_t *)errorFlags forSectorRange:(SectorRange *)range;
+- (void) setErrorFlags:(const uint8_t *)errorFlags forSectorRange:(SectorRange *)range;
 @end
 
 @implementation ExtractionOperation
@@ -39,6 +104,7 @@
 @synthesize sectorsRead = _sectorsRead;
 @synthesize trackIDs = _trackIDs;
 @synthesize error = _error;
+@synthesize blockErrorFlags = _blockErrorFlags;
 @synthesize errorFlags = _errorFlags;
 @synthesize URL = _URL;
 @synthesize readOffset = _readOffset;
@@ -89,7 +155,7 @@
 	// Allocate the extraction buffers
 	__strong int8_t *buffer = NSAllocateCollectable(BUFFER_SIZE_IN_SECTORS * (kCDSectorSizeCDDA + kCDSectorSizeErrorFlags/* + kCDSectorSizeQSubchannel*/), 0);
 	__strong int8_t *audioBuffer = NSAllocateCollectable(BUFFER_SIZE_IN_SECTORS * kCDSectorSizeCDDA, 0);
-	__strong int8_t *c2Buffer = NSAllocateCollectable(BUFFER_SIZE_IN_SECTORS * kCDSectorSizeErrorFlags, 0);
+	__strong uint8_t *c2Buffer = NSAllocateCollectable(BUFFER_SIZE_IN_SECTORS * kCDSectorSizeErrorFlags, 0);
 //	__strong int8_t *qBuffer = NSAllocateCollectable(BUFFER_SIZE_IN_SECTORS * kCDSectorSizeQSubchannel, 0);
 	int8_t *alias = NULL;
 	
@@ -172,8 +238,9 @@
 	// Store the sectors that will actually be read
 	self.sectorsRead = [[SectorRange alloc] initWithFirstSector:firstSectorToRead lastSector:lastSectorToRead];
 	
-	// Setup C2 error flag tracking
-	self.errorFlags = [[BitArray alloc] initWithBitCount:self.sectorsRead.length];
+	// Setup C2 block error tracking
+	_blockErrorFlags = [NSMutableIndexSet indexSet];
+	_errorFlags = [NSMutableDictionary dictionary];
 	
 	self.fractionComplete = 0;
 	
@@ -241,26 +308,35 @@
 			//memcpy(qBuffer + (i * kCDSectorSizeQSubchannel), alias + kCDSectorSizeCDDA + kCDSectorSizeErrorFlags, kCDSectorSizeQSubchannel);
 		}
 
-		// Store the error flags
-		[self setErrorFlags:c2Buffer forSectorRange:readRange];
-
 		NSData *audioData = nil;
 		
-		// Adjust the data read for the read offset
+		// Audio data is offset by the number of bytes corresponding to the read offset in sample frames
 		// If sectors of silence were prepended or will be appended, the read offset is taken into account there
-		if(!sectorsOfSilenceToPrepend && readRange.firstSector == self.sectorsRead.firstSector)
+		if(!sectorsOfSilenceToPrepend && readRange.firstSector == self.sectorsRead.firstSector) {
 			audioData = [NSData dataWithBytesNoCopy:(audioBuffer + readOffsetInBytes)
 											 length:((kCDSectorSizeCDDA * sectorsRead) - readOffsetInBytes)
 									   freeWhenDone:NO];
-		else if(!sectorsOfSilenceToAppend && readRange.lastSector == self.sectorsRead.lastSector)
+
+			// Discard any C2 error bits corresponding to discarded samples in the read offset
+			zeroLeadingBitsOfBufferInPlace(c2Buffer, readOffsetInFrames);
+		}
+		// If this is the last read, remove the last readOffset sample frames of data
+		else if(!sectorsOfSilenceToAppend && readRange.lastSector == self.sectorsRead.lastSector) {
 			audioData = [NSData dataWithBytesNoCopy:audioBuffer
 											 length:((kCDSectorSizeCDDA * (sectorsRead - readOffsetInSectors)) + readOffsetInBytes)
 									   freeWhenDone:NO];
+
+			// Discard any C2 error bits corresponding to discarded samples in the read offset
+			zeroTrailingBitsOfBufferInPlace(c2Buffer, (kCDSectorSizeErrorFlags * sectorsRead), readOffsetInFrames);
+		}
 		else
 			audioData = [NSData dataWithBytesNoCopy:audioBuffer 
 											 length:(kCDSectorSizeCDDA * sectorsRead) 
 									   freeWhenDone:NO];
 
+		// Store the error flags
+		[self setErrorFlags:c2Buffer forSectorRange:readRange];
+		
 		// Stuff the data in an AudioBufferList
 		AudioBufferList bufferList;
 		bufferList.mNumberBuffers = 1;
@@ -362,19 +438,30 @@ cleanup:
 
 @implementation ExtractionOperation (Private)
 
-// range will always be a subset of self.sectorsRead
-- (void) setErrorFlags:(const int8_t *)errorFlags forSectorRange:(SectorRange *)range
+// Convert C2 errors (1 bit for each data byte in the sector, 294 bytes of error data per sector) to
+// C2 block errors- a simple YES/NO value for each sector (the logical OR of all the C2 error bits)
+- (void) setErrorFlags:(const uint8_t *)errorFlags forSectorRange:(SectorRange *)range;
 {
 	NSParameterAssert(NULL != errorFlags);
 	NSParameterAssert(nil != range);
+
+	// For easy comparison
+	uint8_t zeroErrorFlags [kCDSectorSizeErrorFlags];
+	memset(zeroErrorFlags, 0, kCDSectorSizeErrorFlags);
 	
-	NSUInteger i, j;
-	for(i = 0; i < kCDSectorSizeErrorFlags * range.length; ++i) {
-		if(errorFlags[i]) {
-			for(j = 0; j < 8; ++j) {
-				if((1 << j) & errorFlags[i])
-					[_errorFlags setValue:YES forIndex:(range.firstSector - self.sectorsRead.firstSector + ((8 * i) + j))];
-			}					
+	NSUInteger sectorIndex;
+	for(sectorIndex = 0; sectorIndex < range.length; ++sectorIndex) {
+		const uint8_t *sectorErrorFlags = errorFlags + (kCDSectorSizeErrorFlags * sectorIndex);
+
+		if(memcmp(sectorErrorFlags, zeroErrorFlags, kCDSectorSizeErrorFlags)) {
+			NSUInteger sectorNumber = range.firstSector + sectorIndex;
+
+			// Add this sector to the block error flags
+			[_blockErrorFlags addIndex:sectorNumber];
+			
+			// Copy the error bits as well
+			NSData *sectorErrorFlagsData = [NSData dataWithBytes:sectorErrorFlags length:kCDSectorSizeErrorFlags];
+			[_errorFlags setObject:sectorErrorFlagsData forKey:[NSNumber numberWithUnsignedInteger:sectorNumber]];
 		}
 	}
 }

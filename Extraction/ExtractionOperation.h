@@ -28,9 +28,11 @@
 	
 	SectorRange *_sectorsRead;		// The sectors that were actually read (sectors adjusted for read offset)
 	NSError *_error;				// Holds the first error (if any) occurring during extraction
-	BitArray *_errorFlags;			// C2 error flags corresponding to readSectors
 	NSString *_MD5;					// The MD5 sum of the extracted audio
 	NSString *_SHA1;				// The SHA1 sum of the extracted audio
+
+	NSMutableIndexSet *_blockErrorFlags;	// C2 block error flags (indexes correspond to disc sectors)
+	NSMutableDictionary *_errorFlags;		// NSNumber * keys correspond to disc sectors, NSData * values
 }
 
 // ========================================
@@ -51,7 +53,8 @@
 // Properties set after extraction is complete (or cancelled)
 @property (readonly, copy) SectorRange * sectorsRead;
 @property (readonly, copy) NSError * error;
-@property (readonly, copy) BitArray * errorFlags;
+@property (readonly, copy) NSIndexSet * blockErrorFlags;
+@property (readonly, copy) NSDictionary * errorFlags;
 @property (readonly, copy) NSString * MD5;
 @property (readonly, copy) NSString * SHA1;
 
