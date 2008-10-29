@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2005 - 2007 Stephen F. Booth <me@sbooth.org>
+ *  Copyright (C) 2005 - 2008 Stephen F. Booth <me@sbooth.org>
  *  All Rights Reserved
  */
 
@@ -25,7 +25,7 @@
 // ========================================
 // Core Data properties
 @property (assign) NSData * discTOC;
-@property (assign) NSNumber * freeDBDiscID;
+@property (assign) NSString * musicBrainzDiscID;
 
 // ========================================
 // Core Data relationships
@@ -42,7 +42,7 @@
 
 // ========================================
 // Computed properties
-@property (readonly) NSString * musicBrainzDiscID;
+@property (readonly) NSUInteger freeDBDiscID;
 @property (readonly) NSUInteger accurateRipID1;
 @property (readonly) NSUInteger accurateRipID2;
 

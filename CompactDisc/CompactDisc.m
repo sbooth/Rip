@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2005 - 2007 Stephen F. Booth <me@sbooth.org>
+ *  Copyright (C) 2005 - 2008 Stephen F. Booth <me@sbooth.org>
  *  All Rights Reserved
  */
 
@@ -18,9 +18,9 @@ static NSInteger sum_digits(NSInteger number)
 { 
 	NSInteger sum = 0; 
 	
-	while(0 < number) { 
-		sum += (number % 10); 
-		number /= 10; 
+	while(0 < number) {
+		sum += (number % 10);
+		number /= 10;
 	}
 	
 	return sum;
@@ -28,7 +28,7 @@ static NSInteger sum_digits(NSInteger number)
 
 // ========================================
 // Calculate the FreeDB ID for the given CDTOC
-static NSInteger calculateFreeDBDiscIDForCDTOC(CDTOC *toc)
+static NSUInteger calculateFreeDBDiscIDForCDTOC(CDTOC *toc)
 {
 	NSCParameterAssert(NULL != toc);
 
@@ -43,21 +43,19 @@ static NSInteger calculateFreeDBDiscIDForCDTOC(CDTOC *toc)
 	for(i = 0; i < numDescriptors; ++i) {
 		CDTOCDescriptor *desc = &toc->descriptors[i];
 		
+		// For multi-session discs only the first session is used to generate the FreeDB ID
+		if(1 != desc->session)
+			continue;
+
 		// First track
-		if(0xA0 == desc->point && 1 == desc->adr) {
-			if(1 == desc->session)
-				firstTrackNumber = desc->p.minute;
-		}
+		if(0xA0 == desc->point && 1 == desc->adr)
+			firstTrackNumber = desc->p.minute;
 		// Last track
-		else if(0xA1 == desc->point && 1 == desc->adr) {
-			if(1 == desc->session)
-				lastTrackNumber = desc->p.minute;
-		}
+		else if(0xA1 == desc->point && 1 == desc->adr)
+			lastTrackNumber = desc->p.minute;
 		// Lead-out
-		else if(0xA2 == desc->point && 1 == desc->adr) {
-			if(1 == desc->session)
-				leadOutMSF = desc->p;
-		}
+		else if(0xA2 == desc->point && 1 == desc->adr)
+			leadOutMSF = desc->p;
 	}
 	
 	NSUInteger trackNumber;
@@ -70,6 +68,57 @@ static NSInteger calculateFreeDBDiscIDForCDTOC(CDTOC *toc)
 	NSInteger discLengthInSeconds = ((leadOutMSF.minute * 60) + leadOutMSF.second) - ((firstTrackMSF.minute * 60) + firstTrackMSF.second);
 	
 	return ((sumOfTrackLengthDigits % 0xFF) << 24 | discLengthInSeconds << 8 | (lastTrackNumber - firstTrackNumber + 1));
+}
+
+// ========================================
+// Calculate the MusicBrainz ID for the given CDTOC
+static NSString * calculateMusicBrainzDiscIDForCDTOC(CDTOC *toc)
+{
+	NSCParameterAssert(NULL != toc);
+
+	NSString *musicBrainzDiscID = nil;
+	
+	DiscId *discID = discid_new();
+	if(NULL == discID)
+		return nil;
+	
+	int offsets[100];
+	int firstTrackNumber = 0, lastTrackNumber = 0;
+	
+	// Non-existent tracks are treated as zeroes
+	memset(offsets, 0, 100 * sizeof(int));
+
+	// Iterate through each descriptor and extract the information we need
+	NSUInteger numDescriptors = CDTOCGetDescriptorCount(toc);
+	NSUInteger i;
+	for(i = 0; i < numDescriptors; ++i) {
+		CDTOCDescriptor *desc = &toc->descriptors[i];
+
+		// For multi-session discs only the first session is used to generate the MusicBrainz ID
+		if(1 != desc->session)
+			continue;
+
+		// This is a normal audio or data track
+		if(0x01 <= desc->point && 0x63 >= desc->point && 1 == desc->adr)
+				offsets[desc->point] = CDConvertMSFToLBA(desc->p) + 150;
+		// First track
+		else if(0xA0 == desc->point && 1 == desc->adr)
+				firstTrackNumber = desc->p.minute;
+		// Last track
+		else if(0xA1 == desc->point && 1 == desc->adr)
+				lastTrackNumber = desc->p.minute;
+		// Lead-out
+		else if(0xA2 == desc->point && 1 == desc->adr)
+				offsets[0] = CDConvertMSFToLBA(desc->p) + 150;
+	}
+
+	int result = discid_put(discID, firstTrackNumber, lastTrackNumber, offsets);
+	if(result)
+		musicBrainzDiscID = [NSString stringWithCString:discid_get_id(discID) encoding:NSASCIIStringEncoding];
+	
+	discid_free(discID);
+
+	return musicBrainzDiscID;
 }
 
 // ========================================
@@ -132,18 +181,18 @@ static NSInteger calculateFreeDBDiscIDForCDTOC(CDTOC *toc)
 	NSParameterAssert(nil != managedObjectContext);
 	
 	CDTOC *toc = (CDTOC *)[tocData bytes];
-	
-	// If this disc has been seen before, fetch it
-	NSInteger discID = calculateFreeDBDiscIDForCDTOC(toc);
 
-	// Build and execute a fetch request matching on the disc's FreeDB ID
+	// If this disc has been seen before, fetch it
+	NSString *discID = calculateMusicBrainzDiscIDForCDTOC(toc);
+
+	// Build and execute a fetch request matching on the disc's MusicBrainz ID
 	NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"CompactDisc" 
 														 inManagedObjectContext:managedObjectContext];
 	NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
 	[fetchRequest setEntity:entityDescription];
 	[fetchRequest setFetchLimit:1];
 
-	NSPredicate *fetchPredicate = [NSPredicate predicateWithFormat:@"freeDBDiscID == %i", discID];
+	NSPredicate *fetchPredicate = [NSPredicate predicateWithFormat:@"musicBrainzDiscID == %@", discID];
 	[fetchRequest setPredicate:fetchPredicate];
 	
 	NSError *error = nil;
@@ -161,7 +210,7 @@ static NSInteger calculateFreeDBDiscIDForCDTOC(CDTOC *toc)
 													inManagedObjectContext:managedObjectContext];
 		
 		compactDisc.discTOC = tocData;
-		compactDisc.freeDBDiscID = [NSNumber numberWithInteger:discID];
+		compactDisc.musicBrainzDiscID = discID;
 		[compactDisc parseTOC:toc];
 	}
 	else
@@ -190,7 +239,7 @@ static NSInteger calculateFreeDBDiscIDForCDTOC(CDTOC *toc)
 // ========================================
 // Core Data properties
 @dynamic discTOC;
-@dynamic freeDBDiscID;
+@dynamic musicBrainzDiscID;
 
 // ========================================
 // Core Data relationships
@@ -228,33 +277,10 @@ static NSInteger calculateFreeDBDiscIDForCDTOC(CDTOC *toc)
 
 // ========================================
 // Computed properties
-- (NSString *) musicBrainzDiscID
+- (NSUInteger) freeDBDiscID
 {
-	NSString *musicBrainzDiscID = nil;
-	
-	DiscId *discID = discid_new();
-	if(NULL == discID)
-		return nil;
-	
-	// For multi-session discs only the first session is used to calculate the MusicBrainz disc ID
-	SessionDescriptor *firstSession = self.firstSession;
-	if(!firstSession)
-		return nil;
-	
-	// zero is lead out
-	int offsets[100];
-	offsets[0] = firstSession.leadOut.unsignedIntValue + 150;
-	
-	for(TrackDescriptor *trackDescriptor in firstSession.tracks)
-		offsets[trackDescriptor.number.unsignedIntegerValue] = trackDescriptor.firstSector.unsignedIntValue + 150;
-	
-	int result = discid_put(discID, firstSession.firstTrack.number.unsignedIntValue, firstSession.lastTrack.number.unsignedIntValue, offsets);
-	if(result)
-		musicBrainzDiscID = [NSString stringWithCString:discid_get_id(discID) encoding:NSASCIIStringEncoding];
-	
-	discid_free(discID);
-	
-	return musicBrainzDiscID;
+	CDTOC *toc = (CDTOC *)[self.discTOC bytes];
+	return calculateFreeDBDiscIDForCDTOC(toc);
 }
 
 - (NSUInteger) accurateRipID1
@@ -433,47 +459,15 @@ static NSInteger calculateFreeDBDiscIDForCDTOC(CDTOC *toc)
 					break;
 			}			
 		}
-		else if(0xA0 == desc->point && 1 == desc->adr) {
+		// First track in session
+		else if(0xA0 == desc->point && 1 == desc->adr)
 			;//[[self sessionNumber:desc->session] setFirstTrack:desc->p.minute];
-/*			NSLog(@"Disc type:                 %d (%s)\n", (int)desc->p.second,
-				  (0x00 == desc->p.second) ? "CD-DA, or CD-ROM with first track in Mode 1":
-				  (0x10 == desc->p.second) ? "CD-I disc":
-				  (0x20 == desc->p.second) ? "CD-ROM XA disc with first track in Mode 2" : "Unknown");*/
-		}
-		// Last track
+		// Last track in session
 		else if(0xA1 == desc->point && 1 == desc->adr)
 			;//[[self sessionNumber:desc->session] setLastTrack:desc->p.minute];
 		// Lead-out
 		else if(0xA2 == desc->point && 1 == desc->adr)
 			[self sessionNumber:desc->session].leadOut = [NSNumber numberWithUnsignedInt:CDConvertMSFToLBA(desc->p)];
-/*		else if(0xB0 == desc->point && 5 == desc->adr) {
-			NSLog(@"Next possible track start: %02d:%02d.%02d\n",
-				  (int)desc->address.minute, (int)desc->address.second, (int)desc->address.frame);
-			NSLog(@"Number of ptrs in Mode 5:  %d\n",
-				  (int)desc->zero);
-			NSLog(@"Last possible lead-out:    %02d:%02d.%02d\n",
-				  (int)desc->p.minute, (int)desc->p.second, (int)desc->p.frame);
-		}
-		else if(0xB1 == desc->point && 5 == desc->adr) {
-			NSLog(@"Skip interval pointers:    %d\n", (int)desc->p.minute);
-			NSLog(@"Skip track pointers:       %d\n", (int)desc->p.second);
-		}
-		else if(0xB2 <= desc->point && 0xB2 >= desc->point && 5 == desc->adr) {
-			NSLog(@"Skip numbers:              %d, %d, %d, %d, %d, %d, %d\n",
-				  (int)desc->address.minute, (int)desc->address.second, (int)desc->address.frame,
-				  (int)desc->zero, (int)desc->p.minute, (int)desc->p.second, (int)desc->p.frame);
-		}
-		else if(1 == desc->point && 40 >= desc->point && 5 == desc->adr) {
-			NSLog(@"Skip from %02d:%02d.%02d to %02d:%02d.%02d\n",
-				  (int)desc->p.minute, (int)desc->p.second, (int)desc->p.frame,
-				  (int)desc->address.minute, (int)desc->address.second, (int)desc->address.frame);
-		}
-		else if(0xC0 == desc->point && 5 == desc->adr) {
-			NSLog(@"Optimum recording power:   %d\n", (int)desc->address.minute);
-			NSLog(@"Application code:          %d\n", (int)desc->address.second);
-			NSLog(@"Start of first lead-in:    %02d:%02d.%02d\n",
-				  (int)desc->p.minute, (int)desc->p.second, (int)desc->p.frame);
-		}*/
 	}
 	
 	// Make one pass over the parsed tracks and fill in the last sector for each

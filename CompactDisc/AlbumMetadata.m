@@ -9,7 +9,6 @@
 
 // ========================================
 // Core Data properties
-@dynamic accurateRipURL;
 @dynamic artist;
 @dynamic date;
 @dynamic discNumber;

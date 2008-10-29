@@ -16,7 +16,6 @@
 
 // ========================================
 // Core Data properties
-@property (assign) NSURL * accurateRipURL;
 @property (assign) NSString * artist;
 @property (assign) NSString * date;
 @property (assign) NSNumber * discNumber;
