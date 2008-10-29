@@ -13,8 +13,6 @@
 {
 	NSMutableDictionary *defaultSettings = [[NSMutableDictionary alloc] init];
 	
-//	[defaultSettings setObject:[NSNumber numberWithInteger:5] forKey:kFLACCompressionLevelKey];
-	
 	return defaultSettings;
 }
 

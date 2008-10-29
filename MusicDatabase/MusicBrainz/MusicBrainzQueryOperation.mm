@@ -15,7 +15,7 @@
 
 @interface MusicDatabaseQueryOperation ()
 @property (assign) NSArray * queryResults;
-@property (assign) NSError * error;
+@property (copy) NSError * error;
 @end
 
 @implementation MusicBrainzQueryOperation

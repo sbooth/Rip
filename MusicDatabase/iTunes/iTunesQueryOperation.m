@@ -9,7 +9,7 @@
 
 @interface MusicDatabaseQueryOperation ()
 @property (assign) NSArray * queryResults;
-@property (assign) NSError * error;
+@property (copy) NSError * error;
 @end
 
 @implementation iTunesQueryOperation
@@ -21,7 +21,6 @@
 	// Process the CDTOC into a more friendly format
 	CDTOC *toc = (CDTOC *)[self.discTOC bytes];
 	NSUInteger firstTrackNumber = 0, lastTrackNumber = 0;
-	CDMSF leadOutMSF = { 0, 0, 0 };
 	
 	// Iterate through each descriptor in the first session and extract the information we need
 	NSUInteger numDescriptors = CDTOCGetDescriptorCount(toc);
@@ -29,21 +28,16 @@
 	for(i = 0; i < numDescriptors; ++i) {
 		CDTOCDescriptor *desc = &toc->descriptors[i];
 		
+		// Audio tracks are always in the first session
+		if(1 != desc->session)
+			continue;
+		
 		// First track
-		if(0xA0 == desc->point && 1 == desc->adr) {
-			if(1 == desc->session)
-				firstTrackNumber = desc->p.minute;
-		}
+		if(0xA0 == desc->point && 1 == desc->adr)
+			firstTrackNumber = desc->p.minute;
 		// Last track
-		else if(0xA1 == desc->point && 1 == desc->adr) {
-			if(1 == desc->session)
-				lastTrackNumber = desc->p.minute;
-		}
-		// Lead-out
-		else if(0xA2 == desc->point && 1 == desc->adr) {
-			if(1 == desc->session)
-				leadOutMSF = desc->p;
-		}
+		else if(0xA1 == desc->point && 1 == desc->adr)
+			lastTrackNumber = desc->p.minute;
 	}
 	
 	// Create the scripting bridge application object for iTunes
@@ -169,12 +163,14 @@
 	self.queryResults = matchingDiscs;
 }
 
-- (void) eventDidFail:(const AppleEvent *)event withError:(NSError *)error
+- (id) eventDidFail:(const AppleEvent *)event withError:(NSError *)error
 {
 	
 #pragma unused(event)
 
 	self.error = error;
+	
+	return nil;
 }
 
 @end

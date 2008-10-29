@@ -10,7 +10,7 @@
 
 @interface MusicDatabaseQueryOperation ()
 @property (assign) NSArray * queryResults;
-@property (assign) NSError * error;
+@property (copy) NSError * error;
 @end
 
 @interface FreeDBQueryOperation (Private)
@@ -161,22 +161,20 @@ cleanup:
 	NSUInteger i;
 	for(i = 0; i < numDescriptors; ++i) {
 		CDTOCDescriptor *desc = &toc->descriptors[i];
-		
+
+		// Only the first session is used to create the FreeDB ID
+		if(1 != desc->session)
+			continue;
+
 		// First track
-		if(0xA0 == desc->point && 1 == desc->adr) {
-			if(1 == desc->session)
-				firstTrackNumber = desc->p.minute;
-		}
+		if(0xA0 == desc->point && 1 == desc->adr)
+			firstTrackNumber = desc->p.minute;
 		// Last track
-		else if(0xA1 == desc->point && 1 == desc->adr) {
-			if(1 == desc->session)
-				lastTrackNumber = desc->p.minute;
-		}
+		else if(0xA1 == desc->point && 1 == desc->adr)
+			lastTrackNumber = desc->p.minute;
 		// Lead-out
-		else if(0xA2 == desc->point && 1 == desc->adr) {
-			if(1 == desc->session)
-				leadOutMSF = desc->p;
-		}
+		else if(0xA2 == desc->point && 1 == desc->adr)
+			leadOutMSF = desc->p;
 	}
 	
 	NSUInteger trackNumber;

@@ -43,7 +43,7 @@ extern NSString * const		kMusicDatabaseTracksKey;		// NSArray * of NSDictionary 
 {
 @protected
 	NSData *_discTOC;					// Contains a CDTOC * as defined in <IOKit/storage/IOCDTypes.h>
-	NSNumber * _freeDBDiscID;			// This disc's FreeDB disc ID
+	NSUInteger _freeDBDiscID;			// This disc's FreeDB disc ID
 	NSString * _musicBrainzDiscID;		// This disc's MusicBrainz disc ID
 	NSDictionary *_settings;			// A dictionary containing any settings configured by the user
 	NSArray *_queryResults;
@@ -52,11 +52,11 @@ extern NSString * const		kMusicDatabaseTracksKey;		// NSArray * of NSDictionary 
 
 // ========================================
 // Properties
-@property (assign) NSData * discTOC;
-@property (assign) NSNumber * freeDBDiscID;
-@property (assign) NSString * musicBrainzDiscID;
+@property (copy) NSData * discTOC;
+@property (assign) NSUInteger freeDBDiscID;
+@property (copy) NSString * musicBrainzDiscID;
 @property (copy) NSDictionary * settings;
 @property (readonly, assign) NSArray * queryResults;
-@property (readonly, assign) NSError * error;
+@property (readonly, copy) NSError * error;
 
 @end
