@@ -40,7 +40,7 @@
 
 	NSMutableSet *_tracksToBeExtracted;
 	NSMutableDictionary *_tracksExtractedButNotVerified;
-	NSMutableDictionary *_sectorIndexesNeedingVerification;
+	NSMutableDictionary *_sectorsNeedingVerification;
 	NSMutableArray *_trackPartialExtractions;
 
 	NSMutableArray *_trackExtractionRecords;
