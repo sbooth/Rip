@@ -411,6 +411,9 @@ diskDisappearedCallback(DADiskRef disk, void *context)
 		
 		if([[NSUserDefaults standardUserDefaults] boolForKey:@"automaticallyQueryMusicDatabase"])
 			[compactDiscWindow queryDefaultMusicDatabase:self];
+		
+		// Automatically select all the tracks
+		[compactDiscWindow selectAllTracks:self];
 	}
 	else
 		[compactDiscWindow showWindow:self];
