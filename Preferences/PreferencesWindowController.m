@@ -156,14 +156,14 @@ static PreferencesWindowController *sSharedPreferencesWindowController = nil;
     else if([itemIdentifier isEqualToString:EncoderPreferencesToolbarItemIdentifier]) {
 		[toolbarItem setLabel:NSLocalizedString(@"Encoders", @"Encoders preference pane name")];
 		[toolbarItem setPaletteLabel:NSLocalizedString(@"Encoders", @"")];
-		[toolbarItem setToolTip:NSLocalizedString(@"Specify the audio encoder and settings used for extraction", @"")];
-		[toolbarItem setImage:[NSImage imageNamed:@"HotKeyPreferencesToolbarImage"]];
+		[toolbarItem setToolTip:NSLocalizedString(@"Select and configure the encoder used for audio extraction", @"")];
+		[toolbarItem setImage:[NSImage imageNamed:@"EncoderPreferencesToolbarIcon"]];
 	}
     else if([itemIdentifier isEqualToString:MusicDatabasePreferencesToolbarItemIdentifier]) {
 		[toolbarItem setLabel:NSLocalizedString(@"Metadata", @"Metadata preference pane name")];
 		[toolbarItem setPaletteLabel:NSLocalizedString(@"Metadata", @"")];
-		[toolbarItem setToolTip:NSLocalizedString(@"Set the output device and replay gain used by Play", @"")];
-		[toolbarItem setImage:[NSImage imageNamed:@"OutputPreferencesToolbarImage"]];
+		[toolbarItem setToolTip:NSLocalizedString(@"Select and configure the metadata provider", @"")];
+		[toolbarItem setImage:[NSImage imageNamed:@"MetadataPreferencesToolbarIcon"]];
 	}
     else if([itemIdentifier isEqualToString:AdvancedPreferencesToolbarItemIdentifier]) {
 		[toolbarItem setLabel:NSLocalizedString(@"Advanced", @"Advanced preference pane name")];
