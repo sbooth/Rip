@@ -1,12 +1,12 @@
 /*
- *  Copyright (C) 2007 Stephen F. Booth <me@sbooth.org>
+ *  Copyright (C) 2007 - 2008 Stephen F. Booth <me@sbooth.org>
  *  All Rights Reserved
  */
 
 #import "AccurateRipUtilities.h"
 #import "CDDAUtilities.h"
 
-#include <AudioToolbox/ExtendedAudioFile.h>
+#include <AudioToolbox/AudioFile.h>
 #include <IOKit/storage/IOCDTypes.h>
 
 // ========================================
@@ -20,56 +20,52 @@ calculateAccurateRipChecksumForFile(NSURL *fileURL, BOOL firstTrack, BOOL lastTr
 	uint32_t checksum = 0;
 
 	// Open the file for reading
-	ExtAudioFileRef file = NULL;
-	OSStatus status = ExtAudioFileOpenURL((CFURLRef)fileURL, &file);
+	AudioFileID file = NULL;
+	OSStatus status = AudioFileOpenURL((CFURLRef)fileURL, fsRdPerm, kAudioFileWAVEType, &file);
 	if(noErr != status)
 		return 0;
 	
 	// Verify the file contains CDDA audio
 	AudioStreamBasicDescription fileFormat;
 	UInt32 dataSize = sizeof(fileFormat);
-	status = ExtAudioFileGetProperty(file, kExtAudioFileProperty_FileDataFormat, &dataSize, &fileFormat);
+	status = AudioFileGetProperty(file, kAudioFilePropertyDataFormat, &dataSize, &fileFormat);
 	if(noErr != status)
 		goto cleanup;
 	
 	if(!streamDescriptionIsCDDA(&fileFormat))
 		goto cleanup;
 	
-	// Determine the total number of audio frames in the file
-	SInt64 totalFrames = -1;
-	dataSize = sizeof(totalFrames);
-	status = ExtAudioFileGetProperty(file, kExtAudioFileProperty_FileLengthFrames, &dataSize, &totalFrames);
+	// Determine the total number of audio packets (frames) in the file
+	UInt64 totalPackets;
+	dataSize = sizeof(totalPackets);
+	status = AudioFileGetProperty(file, kAudioFilePropertyAudioDataPacketCount, &dataSize, &totalPackets);
 	if(noErr != status)
 		goto cleanup;
 	
 	// Convert the number of frames to the number of blocks (CDDA sectors)
-	NSUInteger totalBlocks = (NSUInteger)(totalFrames / AUDIO_FRAMES_PER_CDDA_SECTOR);
+	NSUInteger totalBlocks = (NSUInteger)(totalPackets / AUDIO_FRAMES_PER_CDDA_SECTOR);
 	NSUInteger blockNumber = 0;
 
 	// Set up extraction buffers
 	int8_t buffer [kCDSectorSizeCDDA];
-	AudioBufferList bufferList;
-	bufferList.mNumberBuffers = 1;
-	bufferList.mBuffers[0].mNumberChannels = fileFormat.mChannelsPerFrame;
-	bufferList.mBuffers[0].mData = (void *)buffer;	
 	
 	// Iteratively process each CDDA sector in the file
 	for(;;) {
-		bufferList.mBuffers[0].mDataByteSize = kCDSectorSizeCDDA;
 		
-		UInt32 frameCount = AUDIO_FRAMES_PER_CDDA_SECTOR;
-		status = ExtAudioFileRead(file, &frameCount, &bufferList);
+		UInt32 byteCount = kCDSectorSizeCDDA;
+		UInt32 packetCount = AUDIO_FRAMES_PER_CDDA_SECTOR;
+		SInt64 startingPacket = blockNumber * AUDIO_FRAMES_PER_CDDA_SECTOR;
 		
-		if(noErr != status)
-			break;
-		else if(AUDIO_FRAMES_PER_CDDA_SECTOR != frameCount)
+		status = AudioFileReadPackets(file, false, &byteCount, NULL, startingPacket, &packetCount, buffer);
+		
+		if(noErr != status || kCDSectorSizeCDDA != byteCount || AUDIO_FRAMES_PER_CDDA_SECTOR != packetCount)
 			break;
 		
 		checksum += calculateAccurateRipChecksumForBlock(buffer, blockNumber++, totalBlocks, firstTrack, lastTrack);
 	}
 	
 cleanup:
-	status = ExtAudioFileDispose(file);
+	status = AudioFileClose(file);
 /*	if(noErr != status)
 		return 0;*/
 	
@@ -94,35 +90,29 @@ calculateAccurateRipChecksumForFileRegionUsingOffset(NSURL *fileURL, NSUInteger 
 	uint32_t checksum = 0;
 	
 	// Open the file for reading
-	ExtAudioFileRef file = NULL;
-	OSStatus status = ExtAudioFileOpenURL((CFURLRef)fileURL, &file);
+	AudioFileID file = NULL;
+	OSStatus status = AudioFileOpenURL((CFURLRef)fileURL, fsRdPerm, kAudioFileWAVEType, &file);
 	if(noErr != status)
 		return 0;
 	
 	// Verify the file contains CDDA audio
 	AudioStreamBasicDescription fileFormat;
 	UInt32 dataSize = sizeof(fileFormat);
-	status = ExtAudioFileGetProperty(file, kExtAudioFileProperty_FileDataFormat, &dataSize, &fileFormat);
+	status = AudioFileGetProperty(file, kAudioFilePropertyDataFormat, &dataSize, &fileFormat);
 	if(noErr != status)
 		goto cleanup;
 	
 	if(!streamDescriptionIsCDDA(&fileFormat))
 		goto cleanup;
 	
-	// For some reason seeking fails if the client data format is not set
-	AudioStreamBasicDescription cddaDescription = getStreamDescriptionForCDDA();
-	status = ExtAudioFileSetProperty(file, kExtAudioFileProperty_ClientDataFormat, sizeof(cddaDescription), &cddaDescription);
+	// Determine the total number of audio packets (frames) in the file
+	UInt64 totalPacketsInFile;
+	dataSize = sizeof(totalPacketsInFile);
+	status = AudioFileGetProperty(file, kAudioFilePropertyAudioDataPacketCount, &dataSize, &totalPacketsInFile);
 	if(noErr != status)
 		goto cleanup;
 	
-	// Determine how many frames are contained in the file
-	SInt64 totalFramesInFile;
-	dataSize = sizeof(totalFramesInFile);
-	status = ExtAudioFileGetProperty(file, kExtAudioFileProperty_FileLengthFrames, &dataSize, &totalFramesInFile);
-	if(noErr != status)
-		goto cleanup;
-	
-	NSInteger totalSectorsInFile = (NSInteger)(totalFramesInFile / AUDIO_FRAMES_PER_CDDA_SECTOR);
+	NSInteger totalSectorsInFile = (NSInteger)(totalPacketsInFile / AUDIO_FRAMES_PER_CDDA_SECTOR);
 	
 	// With no read offset, the range of sectors that will be read won't change
 	NSInteger firstSectorToRead = firstSector;
@@ -170,43 +160,35 @@ calculateAccurateRipChecksumForFileRegionUsingOffset(NSURL *fileURL, NSUInteger 
 		lastSectorToRead = totalSectorsInFile;
 	}
 	
-	// Seek to the desired starting sector, adjusting for the read offset
-	// Since the AccurateRip algorithm requires whole CDDA sectors to be passed, it is easier to 
-	// adjust for the read offset here and read whole sectors than to try to adjust for the read offset later
-	status = ExtAudioFileSeek(file, (AUDIO_FRAMES_PER_CDDA_SECTOR * firstSectorToRead) + readOffsetInFrames);
-	if(noErr != status)
-		goto cleanup;
-	
 	// The block range is inclusive, but should indicate the number of complete blocks to be read
 	NSUInteger totalBlocks = lastSectorToRead - firstSectorToRead - readOffsetInSectors + 1;
 	NSUInteger blockNumber = 0;
 	
-	// Set up extraction buffers
 	int8_t buffer [kCDSectorSizeCDDA];
-	AudioBufferList bufferList;
-	bufferList.mNumberBuffers = 1;
-	bufferList.mBuffers[0].mNumberChannels = fileFormat.mChannelsPerFrame;
-	bufferList.mBuffers[0].mData = (void *)buffer;	
 
 	// Prepend silence, if required
 	// Since the AccurateRip checksum for silence is zero, all that must be accounted for is the block counter
 	if(sectorsOfSilenceToPrepend)
 		blockNumber += sectorsOfSilenceToPrepend;
 
-	// Iteratively process each CDDA sector in the file
+	// Adjust the starting packet for the read offset
+	SInt64 startingPacket = (firstSectorToRead * AUDIO_FRAMES_PER_CDDA_SECTOR) + readOffsetInFrames;
+	
+	// Iteratively process each CDDA sector in the file, adjusting each read for the specified read offset
 	NSUInteger sectorCount = totalBlocks - (sectorsOfSilenceToPrepend + sectorsOfSilenceToAppend);
 	while(sectorCount--) {
-		bufferList.mBuffers[0].mDataByteSize = kCDSectorSizeCDDA;
 		
-		UInt32 frameCount = AUDIO_FRAMES_PER_CDDA_SECTOR;
-		status = ExtAudioFileRead(file, &frameCount, &bufferList);
+		UInt32 byteCount = kCDSectorSizeCDDA;
+		UInt32 packetCount = AUDIO_FRAMES_PER_CDDA_SECTOR;
 		
-		if(noErr != status)
-			break;
-		else if(AUDIO_FRAMES_PER_CDDA_SECTOR != frameCount)
+		status = AudioFileReadPackets(file, false, &byteCount, NULL, startingPacket, &packetCount, buffer);
+		
+		if(noErr != status || kCDSectorSizeCDDA != byteCount || AUDIO_FRAMES_PER_CDDA_SECTOR != packetCount)
 			break;
 		
 		checksum += calculateAccurateRipChecksumForBlock(buffer, blockNumber++, totalBlocks, firstTrack, lastTrack);
+		
+		startingPacket += packetCount;
 	}
 	
 	// Append silence, if required
@@ -215,8 +197,8 @@ calculateAccurateRipChecksumForFileRegionUsingOffset(NSURL *fileURL, NSUInteger 
 		;
 
 cleanup:
-	status = ExtAudioFileDispose(file);
-	/*	if(noErr != status)
+	status = AudioFileClose(file);
+/*	if(noErr != status)
 	 return 0;*/
 	
 return checksum;

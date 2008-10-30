@@ -11,7 +11,7 @@
 #import "CDDAUtilities.h"
 
 #include <IOKit/storage/IOCDTypes.h>
-#include <AudioToolbox/ExtendedAudioFile.h>
+#include <AudioToolbox/AudioFile.h>
 #include <CommonCrypto/CommonDigest.h>
 
 // Keep reads to approximately 2 MB in size (2352 + 294 + 16 bytes are necessary for each sector)
@@ -145,8 +145,8 @@ zeroTrailingBitsOfBufferInPlace(void *buffer,
 	const AudioStreamBasicDescription cddaASBD = getStreamDescriptionForCDDA();
 	
 	// Create and open the output file, overwriting if it exists
-	ExtAudioFileRef file = NULL;
-	OSStatus status = ExtAudioFileCreateWithURL((CFURLRef)self.URL, kAudioFileWAVEType, &cddaASBD, NULL, kAudioFileFlags_EraseFile, &file);
+	AudioFileID file = NULL;
+	OSStatus status = AudioFileCreateWithURL((CFURLRef)self.URL, kAudioFileWAVEType, &cddaASBD, kAudioFileFlags_EraseFile, &file);
 	if(noErr != status) {
 		self.error = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
 		goto cleanup;
@@ -242,7 +242,9 @@ zeroTrailingBitsOfBufferInPlace(void *buffer,
 	_blockErrorFlags = [NSMutableIndexSet indexSet];
 	_errorFlags = [NSMutableDictionary dictionary];
 	
+	// Housekeeping setup
 	self.fractionComplete = 0;
+	SInt64 packetNumber = 0;
 	
 	// ========================================
 	// EXTRACTION PHASE 1: PREPEND SILENCE AS NECESSARY
@@ -255,15 +257,9 @@ zeroTrailingBitsOfBufferInPlace(void *buffer,
 												 length:((kCDSectorSizeCDDA * sectorsOfSilenceToPrepend) - readOffsetInBytes)
 										   freeWhenDone:NO];
 
-		// Stuff the silence in an AudioBufferList
-		AudioBufferList bufferList;
-		bufferList.mNumberBuffers = 1;
-		bufferList.mBuffers[0].mNumberChannels = cddaASBD.mChannelsPerFrame;
-		bufferList.mBuffers[0].mData = (void *)audioData.bytes;
-		bufferList.mBuffers[0].mDataByteSize = audioData.length;
-		
 		// Write the silence to the output file
-		status = ExtAudioFileWrite(file, (audioData.length / cddaASBD.mBytesPerFrame), &bufferList);
+		UInt32 packetCount = audioData.length / cddaASBD.mBytesPerPacket;
+		status = AudioFileWritePackets(file, false, audioData.length, NULL, packetNumber, &packetCount, audioData.bytes);
 		if(noErr != status) {
 			self.error = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
 			goto cleanup;
@@ -272,6 +268,9 @@ zeroTrailingBitsOfBufferInPlace(void *buffer,
 		// Update the MD5 and SHA1 digests
 		CC_MD5_Update(&md5, audioData.bytes, audioData.length);
 		CC_SHA1_Update(&sha1, audioData.bytes, audioData.length);
+		
+		// Housekeeping
+		packetNumber += packetCount;
 	}
 	
 	// ========================================
@@ -337,15 +336,9 @@ zeroTrailingBitsOfBufferInPlace(void *buffer,
 		// Store the error flags
 		[self setErrorFlags:c2Buffer forSectorRange:readRange];
 		
-		// Stuff the data in an AudioBufferList
-		AudioBufferList bufferList;
-		bufferList.mNumberBuffers = 1;
-		bufferList.mBuffers[0].mNumberChannels = cddaASBD.mChannelsPerFrame;
-		bufferList.mBuffers[0].mData = (void *)audioData.bytes;
-		bufferList.mBuffers[0].mDataByteSize = audioData.length;
-		
 		// Write the data to the output file
-		status = ExtAudioFileWrite(file, (audioData.length / cddaASBD.mBytesPerFrame), &bufferList);
+		UInt32 packetCount = audioData.length / cddaASBD.mBytesPerPacket;
+		status = AudioFileWritePackets(file, false, audioData.length, NULL, packetNumber, &packetCount, audioData.bytes);
 		if(noErr != status) {
 			self.error = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
 			goto cleanup;
@@ -357,6 +350,7 @@ zeroTrailingBitsOfBufferInPlace(void *buffer,
 		
 		// Housekeeping
 		sectorsRemaining -= sectorsRead;
+		packetNumber += packetCount;
 		self.fractionComplete = (1.f - (sectorsRemaining / (float)self.sectorsRead.length));
 		
 		// Stop if requested
@@ -375,15 +369,9 @@ zeroTrailingBitsOfBufferInPlace(void *buffer,
 												 length:((kCDSectorSizeCDDA * sectorsOfSilenceToAppend) - readOffsetInBytes)
 										   freeWhenDone:NO];
 		
-		// Stuff the silence in an AudioBufferList
-		AudioBufferList bufferList;
-		bufferList.mNumberBuffers = 1;
-		bufferList.mBuffers[0].mNumberChannels = cddaASBD.mChannelsPerFrame;
-		bufferList.mBuffers[0].mData = (void *)audioData.bytes;
-		bufferList.mBuffers[0].mDataByteSize = audioData.length;
-		
 		// Write the silence to the output file
-		status = ExtAudioFileWrite(file, (audioData.length / cddaASBD.mBytesPerFrame), &bufferList);
+		UInt32 packetCount = audioData.length / cddaASBD.mBytesPerPacket;
+		status = AudioFileWritePackets(file, false, audioData.length, NULL, packetNumber, &packetCount, audioData.bytes);
 		if(noErr != status) {
 			self.error = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
 			goto cleanup;
@@ -392,6 +380,9 @@ zeroTrailingBitsOfBufferInPlace(void *buffer,
 		// Update the MD5 and SHA1 digests
 		CC_MD5_Update(&md5, audioData.bytes, audioData.length);
 		CC_SHA1_Update(&sha1, audioData.bytes, audioData.length);
+
+		// Housekeeping
+		packetNumber += packetCount;
 	}
 
 	// ========================================
@@ -428,7 +419,7 @@ cleanup:
 	
 	// Close the output file
 	if(file) {
-		status = ExtAudioFileDispose(file);
+		status = AudioFileClose(file);
 		if(noErr != status)
 			self.error = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
 	}

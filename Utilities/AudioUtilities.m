@@ -5,103 +5,67 @@
 
 #import "AudioUtilities.h"
 
-#include <AudioToolbox/ExtendedAudioFile.h>
+#include <AudioToolbox/AudioFile.h>
 #include <CommonCrypto/CommonDigest.h>
 
 #import "CDDAUtilities.h"
 
 NSIndexSet *
-compareFilesForNonMatchingSectors(NSURL *leftFileURL, NSURL *rightFileURL, NSError **error)
+compareFilesForNonMatchingSectors(NSURL *leftFileURL, NSURL *rightFileURL)
 {
 	NSCParameterAssert(nil != leftFileURL);
 	NSCParameterAssert(nil != rightFileURL);
 	
 	NSMutableIndexSet *mismatchedSectors = nil;
 
-	ExtAudioFileRef leftFile = NULL;
-	ExtAudioFileRef rightFile = NULL;
+	AudioFileID leftFile = NULL;
+	AudioFileID rightFile = NULL;
 	
 	// Open the files for reading
-	OSStatus status = ExtAudioFileOpenURL((CFURLRef)leftFileURL, &leftFile);
-	if(noErr != status) {
-		if(error)
-			*error = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
+	OSStatus status = AudioFileOpenURL((CFURLRef)leftFileURL, fsRdPerm, kAudioFileWAVEType, &leftFile);
+	if(noErr != status)
 		return nil;
-	}
 
-	status = ExtAudioFileOpenURL((CFURLRef)rightFileURL, &rightFile);
-	if(noErr != status) {
-		if(error)
-			*error = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
+	status = AudioFileOpenURL((CFURLRef)rightFileURL, fsRdPerm, kAudioFileWAVEType, &rightFile);
+	if(noErr != status)
 		goto cleanup;
-	}
 	
 	// Determine the files' type
 	AudioStreamBasicDescription leftStreamDescription;
 	UInt32 dataSize = (UInt32)sizeof(leftStreamDescription);
-	status = ExtAudioFileGetProperty(leftFile, kExtAudioFileProperty_FileDataFormat, &dataSize, &leftStreamDescription);
-	if(noErr != status) {
-		if(error)
-			*error = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
+	status = AudioFileGetProperty(leftFile, kAudioFilePropertyDataFormat, &dataSize, &leftStreamDescription);
+	if(noErr != status)
 		goto cleanup;
-	}
 
 	AudioStreamBasicDescription rightStreamDescription;
 	dataSize = (UInt32)sizeof(rightStreamDescription);
-	status = ExtAudioFileGetProperty(rightFile, kExtAudioFileProperty_FileDataFormat, &dataSize, &rightStreamDescription);
-	if(noErr != status) {
-		if(error)
-			*error = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
+	status = AudioFileGetProperty(rightFile, kAudioFilePropertyDataFormat, &dataSize, &rightStreamDescription);
+	if(noErr != status)
 		goto cleanup;
-	}
 
 	// Make sure the files are the expected type (CDDA)
-	if(!streamDescriptionIsCDDA(&leftStreamDescription) || !streamDescriptionIsCDDA(&rightStreamDescription)) {
-		if(error)
-			*error = [NSError errorWithDomain:NSPOSIXErrorDomain code:EINVAL userInfo:nil];
+	if(!streamDescriptionIsCDDA(&leftStreamDescription) || !streamDescriptionIsCDDA(&rightStreamDescription))
 		goto cleanup;
-	}
 	
 	// Ensure both files contain the same number of frames
-	SInt64 totalFramesInLeftFile;
-	dataSize = sizeof(totalFramesInLeftFile);
-	status = ExtAudioFileGetProperty(leftFile, kExtAudioFileProperty_FileLengthFrames, &dataSize, &totalFramesInLeftFile);
-	if(noErr != status) {
-		if(error)
-			*error = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
+	UInt64 totalPacketsInLeftFile;
+	dataSize = sizeof(totalPacketsInLeftFile);
+	status = AudioFileGetProperty(leftFile, kAudioFilePropertyAudioDataPacketCount, &dataSize, &totalPacketsInLeftFile);
+	if(noErr != status)
 		goto cleanup;
-	}
 
-	SInt64 totalFramesInRightFile;
-	dataSize = sizeof(totalFramesInRightFile);
-	status = ExtAudioFileGetProperty(rightFile, kExtAudioFileProperty_FileLengthFrames, &dataSize, &totalFramesInRightFile);
-	if(noErr != status) {
-		if(error)
-			*error = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
+	UInt64 totalPacketsInRightFile;
+	dataSize = sizeof(totalPacketsInRightFile);
+	status = AudioFileGetProperty(rightFile, kAudioFilePropertyAudioDataPacketCount, &dataSize, &totalPacketsInRightFile);
+	if(noErr != status)
 		goto cleanup;
-	}
 
-	if(totalFramesInLeftFile != totalFramesInRightFile) {
-		if(error)
-			*error = [NSError errorWithDomain:NSOSStatusErrorDomain code:paramErr userInfo:nil];
+	if(totalPacketsInLeftFile != totalPacketsInRightFile)
 		goto cleanup;
-	}
 	
 	// Set up the extraction buffers
 	int8_t leftBuffer [kCDSectorSizeCDDA];
 	int8_t rightBuffer [kCDSectorSizeCDDA];
-	
-	AudioBufferList leftAudioBuffer;
-	leftAudioBuffer.mNumberBuffers = 1;
-	leftAudioBuffer.mBuffers[0].mNumberChannels = leftStreamDescription.mChannelsPerFrame;
-	leftAudioBuffer.mBuffers[0].mData = (void *)leftBuffer;
-	leftAudioBuffer.mBuffers[0].mDataByteSize = kCDSectorSizeCDDA;
-
-	AudioBufferList rightAudioBuffer;
-	rightAudioBuffer.mNumberBuffers = 1;
-	rightAudioBuffer.mBuffers[0].mNumberChannels = rightStreamDescription.mChannelsPerFrame;
-	rightAudioBuffer.mBuffers[0].mData = (void *)rightBuffer;
-	rightAudioBuffer.mBuffers[0].mDataByteSize = kCDSectorSizeCDDA;
 	
 	NSUInteger sectorCounter = 0;
 
@@ -109,34 +73,30 @@ compareFilesForNonMatchingSectors(NSURL *leftFileURL, NSURL *rightFileURL, NSErr
 	
 	// Iteratively read data from each file and compare it
 	for(;;) {
-		leftAudioBuffer.mBuffers[0].mDataByteSize = kCDSectorSizeCDDA;
-		rightAudioBuffer.mBuffers[0].mDataByteSize = kCDSectorSizeCDDA;
+		UInt32 leftByteCount = kCDSectorSizeCDDA;
+		UInt32 rightByteCount = kCDSectorSizeCDDA;
 		
-		UInt32 leftFrameCount = AUDIO_FRAMES_PER_CDDA_SECTOR;
-		UInt32 rightFrameCount = AUDIO_FRAMES_PER_CDDA_SECTOR;
+		UInt32 leftPacketCount = AUDIO_FRAMES_PER_CDDA_SECTOR;
+		UInt32 rightPacketCount = AUDIO_FRAMES_PER_CDDA_SECTOR;
+		
+		SInt64 startingPacket = sectorCounter * AUDIO_FRAMES_PER_CDDA_SECTOR;
 		
 		// Read a sector of input from each file
-		status = ExtAudioFileRead(leftFile, &leftFrameCount, &leftAudioBuffer);
-		if(noErr != status) {
-			if(error)
-				*error = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
+		status = AudioFileReadPackets(leftFile, false, &leftByteCount, NULL, startingPacket, &leftPacketCount, leftBuffer);
+		if(noErr != status)
 			goto cleanup;
-		}
 
-		status = ExtAudioFileRead(rightFile, &rightFrameCount, &rightAudioBuffer);
-		if(noErr != status) {
-			if(error)
-				*error = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
+		status = AudioFileReadPackets(rightFile, false, &rightByteCount, NULL, startingPacket, &rightPacketCount, rightBuffer);
+		if(noErr != status)
 			goto cleanup;
-		}
 		
 		// If no frames were returned, comparison is finished
 		// If the same number of frames were not returned from each file, comparison is finished
-		if(0 == leftFrameCount || 0 == rightFrameCount || leftFrameCount != rightFrameCount)
+		if(0 == leftPacketCount || 0 == rightPacketCount || leftPacketCount != rightPacketCount)
 			break;
 		
 		// Compare the two sectors for differences
-		if(!memcmp(leftAudioBuffer.mBuffers[0].mData, rightAudioBuffer.mBuffers[0].mData, kCDSectorSizeCDDA))
+		if(!memcmp(leftBuffer, rightBuffer, kCDSectorSizeCDDA))
 			[mismatchedSectors addIndex:sectorCounter];
 		
 		++sectorCounter;
@@ -145,19 +105,15 @@ compareFilesForNonMatchingSectors(NSURL *leftFileURL, NSURL *rightFileURL, NSErr
 	// Cleanup
 cleanup:
 	if(leftFile) {
-		status = ExtAudioFileDispose(leftFile);
-		if(noErr != status) {
-			if(error)
-				*error = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
-		}
+		status = AudioFileClose(leftFile);
+		if(noErr != status)
+			;
 	}
 	
 	if(rightFile) {
-		status = ExtAudioFileDispose(rightFile);
-		if(noErr != status) {
-			if(error)
-				*error = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
-		}
+		status = AudioFileClose(rightFile);
+		if(noErr != status)
+			;
 	}
 
 	return [mismatchedSectors copy];
@@ -168,203 +124,134 @@ compareFileRegionsForNonMatchingSectors(NSURL *leftFileURL,
 										NSUInteger leftFileStartingSectorOffset,
 										NSURL *rightFileURL, 
 										NSUInteger rightFileStartingSectorOffset, 
-										NSUInteger sectorCount, 
-										NSError **error)
+										NSUInteger sectorCount)
 {
 	NSCParameterAssert(nil != leftFileURL);
 	NSCParameterAssert(nil != rightFileURL);
 	
 	NSMutableIndexSet *mismatchedSectors = nil;
 	
-	ExtAudioFileRef leftFile = NULL;
-	ExtAudioFileRef rightFile = NULL;
+	AudioFileID leftFile = NULL;
+	AudioFileID rightFile = NULL;
 	
 	// Open the files for reading
-	OSStatus status = ExtAudioFileOpenURL((CFURLRef)leftFileURL, &leftFile);
-	if(noErr != status) {
-		if(error)
-			*error = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
+	OSStatus status = AudioFileOpenURL((CFURLRef)leftFileURL, fsRdPerm, kAudioFileWAVEType, &leftFile);
+	if(noErr != status)
 		return nil;
-	}
 	
-	status = ExtAudioFileOpenURL((CFURLRef)rightFileURL, &rightFile);
-	if(noErr != status) {
-		if(error)
-			*error = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
+	status = AudioFileOpenURL((CFURLRef)rightFileURL, fsRdPerm, kAudioFileWAVEType, &rightFile);
+	if(noErr != status)
 		goto cleanup;
-	}
 	
 	// Determine the files' type
 	AudioStreamBasicDescription leftStreamDescription;
 	UInt32 dataSize = (UInt32)sizeof(leftStreamDescription);
-	status = ExtAudioFileGetProperty(leftFile, kExtAudioFileProperty_FileDataFormat, &dataSize, &leftStreamDescription);
-	if(noErr != status) {
-		if(error)
-			*error = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
+	status = AudioFileGetProperty(leftFile, kAudioFilePropertyDataFormat, &dataSize, &leftStreamDescription);
+	if(noErr != status)
 		goto cleanup;
-	}
 	
 	AudioStreamBasicDescription rightStreamDescription;
 	dataSize = (UInt32)sizeof(rightStreamDescription);
-	status = ExtAudioFileGetProperty(rightFile, kExtAudioFileProperty_FileDataFormat, &dataSize, &rightStreamDescription);
-	if(noErr != status) {
-		if(error)
-			*error = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
+	status = AudioFileGetProperty(rightFile, kAudioFilePropertyDataFormat, &dataSize, &rightStreamDescription);
+	if(noErr != status)
 		goto cleanup;
-	}
 	
 	// Make sure the files are the expected type (CDDA)
-	if(!streamDescriptionIsCDDA(&leftStreamDescription) || !streamDescriptionIsCDDA(&rightStreamDescription)) {
-		if(error)
-			*error = [NSError errorWithDomain:NSPOSIXErrorDomain code:EINVAL userInfo:nil];
+	if(!streamDescriptionIsCDDA(&leftStreamDescription) || !streamDescriptionIsCDDA(&rightStreamDescription))
 		goto cleanup;
-	}
 	
 	// Ensure both files contain an adequate number of frames
-	SInt64 totalFramesInLeftFile;
-	dataSize = sizeof(totalFramesInLeftFile);
-	status = ExtAudioFileGetProperty(leftFile, kExtAudioFileProperty_FileLengthFrames, &dataSize, &totalFramesInLeftFile);
-	if(noErr != status) {
-		if(error)
-			*error = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
+	UInt64 totalPacketsInLeftFile;
+	dataSize = sizeof(totalPacketsInLeftFile);
+	status = AudioFileGetProperty(leftFile, kAudioFilePropertyAudioDataPacketCount, &dataSize, &totalPacketsInLeftFile);
+	if(noErr != status)
 		goto cleanup;
-	}
 	
-	SInt64 totalFramesInRightFile;
-	dataSize = sizeof(totalFramesInRightFile);
-	status = ExtAudioFileGetProperty(rightFile, kExtAudioFileProperty_FileLengthFrames, &dataSize, &totalFramesInRightFile);
-	if(noErr != status) {
-		if(error)
-			*error = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
+	UInt64 totalPacketsInRightFile;
+	dataSize = sizeof(totalPacketsInRightFile);
+	status = AudioFileGetProperty(rightFile, kAudioFilePropertyAudioDataPacketCount, &dataSize, &totalPacketsInRightFile);
+	if(noErr != status)
 		goto cleanup;
-	}
 	
-	if(((SInt64)leftFileStartingSectorOffset + sectorCount) > totalFramesInLeftFile || ((SInt64)rightFileStartingSectorOffset + sectorCount) > totalFramesInRightFile) {
-		if(error)
-			*error = [NSError errorWithDomain:NSOSStatusErrorDomain code:paramErr userInfo:nil];
-		goto cleanup;
-	}
+	UInt64 packetsRequiredInLeftFile = ((UInt64)leftFileStartingSectorOffset + sectorCount) * AUDIO_FRAMES_PER_CDDA_SECTOR;
+	UInt64 packetsRequiredInRightFile = ((UInt64)rightFileStartingSectorOffset + sectorCount) * AUDIO_FRAMES_PER_CDDA_SECTOR;
 	
-	// For some reason seeking fails if the client data format is not set
-	AudioStreamBasicDescription cddaDescription = getStreamDescriptionForCDDA();
-	status = ExtAudioFileSetProperty(leftFile, kExtAudioFileProperty_ClientDataFormat, sizeof(cddaDescription), &cddaDescription);
-	if(noErr != status) {
-		if(error)
-			*error = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
+	if(packetsRequiredInLeftFile > totalPacketsInLeftFile || packetsRequiredInRightFile > totalPacketsInRightFile)
 		goto cleanup;
-	}
-
-	status = ExtAudioFileSetProperty(rightFile, kExtAudioFileProperty_ClientDataFormat, sizeof(cddaDescription), &cddaDescription);
-	if(noErr != status) {
-		if(error)
-			*error = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
-		goto cleanup;
-	}
-	
-	// Seek to the desired starting sectors
-	status = ExtAudioFileSeek(leftFile, AUDIO_FRAMES_PER_CDDA_SECTOR * (SInt64)leftFileStartingSectorOffset);
-	if(noErr != status) {
-		if(error)
-			*error = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
-		goto cleanup;
-	}
-
-	status = ExtAudioFileSeek(rightFile, AUDIO_FRAMES_PER_CDDA_SECTOR * (SInt64)rightFileStartingSectorOffset);
-	if(noErr != status) {
-		if(error)
-			*error = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
-		goto cleanup;
-	}
-	
+		
 	// Set up the extraction buffers
 	int8_t leftBuffer [kCDSectorSizeCDDA];
 	int8_t rightBuffer [kCDSectorSizeCDDA];
+		
+	NSUInteger sectorCounter = leftFileStartingSectorOffset;
 	
-	AudioBufferList leftAudioBuffer;
-	leftAudioBuffer.mNumberBuffers = 1;
-	leftAudioBuffer.mBuffers[0].mNumberChannels = leftStreamDescription.mChannelsPerFrame;
-	leftAudioBuffer.mBuffers[0].mData = (void *)leftBuffer;
-	leftAudioBuffer.mBuffers[0].mDataByteSize = kCDSectorSizeCDDA;
-	
-	AudioBufferList rightAudioBuffer;
-	rightAudioBuffer.mNumberBuffers = 1;
-	rightAudioBuffer.mBuffers[0].mNumberChannels = rightStreamDescription.mChannelsPerFrame;
-	rightAudioBuffer.mBuffers[0].mData = (void *)rightBuffer;
-	rightAudioBuffer.mBuffers[0].mDataByteSize = kCDSectorSizeCDDA;
-	
-	NSUInteger sectorCounter = 0;
-	
+	SInt64 leftStartingPacket = leftFileStartingSectorOffset * AUDIO_FRAMES_PER_CDDA_SECTOR;
+	SInt64 rightStartingPacket = rightFileStartingSectorOffset * AUDIO_FRAMES_PER_CDDA_SECTOR;
+
 	mismatchedSectors = [NSMutableIndexSet indexSet];
 	
 	// Iteratively read data from each file and compare it
 	while(sectorCount--) {
-		leftAudioBuffer.mBuffers[0].mDataByteSize = kCDSectorSizeCDDA;
-		rightAudioBuffer.mBuffers[0].mDataByteSize = kCDSectorSizeCDDA;
+		UInt32 leftByteCount = kCDSectorSizeCDDA;
+		UInt32 rightByteCount = kCDSectorSizeCDDA;
 		
-		UInt32 leftFrameCount = AUDIO_FRAMES_PER_CDDA_SECTOR;
-		UInt32 rightFrameCount = AUDIO_FRAMES_PER_CDDA_SECTOR;
+		UInt32 leftPacketCount = AUDIO_FRAMES_PER_CDDA_SECTOR;
+		UInt32 rightPacketCount = AUDIO_FRAMES_PER_CDDA_SECTOR;
 		
 		// Read a sector of input from each file
-		status = ExtAudioFileRead(leftFile, &leftFrameCount, &leftAudioBuffer);
-		if(noErr != status) {
-			if(error)
-				*error = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
+		status = AudioFileReadPackets(leftFile, false, &leftByteCount, NULL, leftStartingPacket, &leftPacketCount, leftBuffer);
+		if(noErr != status)
 			goto cleanup;
-		}
 		
-		status = ExtAudioFileRead(rightFile, &rightFrameCount, &rightAudioBuffer);
-		if(noErr != status) {
-			if(error)
-				*error = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
+		status = AudioFileReadPackets(rightFile, false, &rightByteCount, NULL, rightStartingPacket, &rightPacketCount, rightBuffer);
+		if(noErr != status)
 			goto cleanup;
-		}
 		
 		// If no frames were returned, comparison is finished
 		// If the same number of frames were not returned from each file, comparison is finished
-		if(0 == leftFrameCount || 0 == rightFrameCount || leftFrameCount != rightFrameCount)
+		if(0 == leftPacketCount || 0 == rightPacketCount || leftPacketCount != rightPacketCount)
 			break;
 		
 		// Compare the two sectors for differences
-		if(!memcmp(leftAudioBuffer.mBuffers[0].mData, rightAudioBuffer.mBuffers[0].mData, kCDSectorSizeCDDA))
+		if(!memcmp(leftBuffer, rightBuffer, kCDSectorSizeCDDA))
 			[mismatchedSectors addIndex:sectorCounter];
 		
 		++sectorCounter;
+		
+		leftStartingPacket += leftPacketCount;
+		rightStartingPacket += rightPacketCount;
 	}
 	
 	// Cleanup
 cleanup:
 	if(leftFile) {
-		status = ExtAudioFileDispose(leftFile);
-		if(noErr != status) {
-			if(error)
-				*error = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
-		}
+		status = AudioFileClose(leftFile);
+		if(noErr != status)
+			;
 	}
 	
 	if(rightFile) {
-		status = ExtAudioFileDispose(rightFile);
-		if(noErr != status) {
-			if(error)
-				*error = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
-		}
+		status = AudioFileClose(rightFile);
+		if(noErr != status)
+			;
 	}
 	
 	return [mismatchedSectors copy];
 }
 
-NSString * calculateMD5DigestForURL(NSURL *fileURL, NSError **error)
+NSString * calculateMD5DigestForURL(NSURL *fileURL)
 {
-	NSArray *array = calculateMD5AndSHA1DigestsForURL(fileURL, error);
+	NSArray *array = calculateMD5AndSHA1DigestsForURL(fileURL);
 	return ((1 <= [array count]) ? [array objectAtIndex:0] : nil);
 }
 
-NSString * calculateSHA1DigestForURL(NSURL *fileURL, NSError **error)
+NSString * calculateSHA1DigestForURL(NSURL *fileURL)
 {
-	NSArray *array = calculateMD5AndSHA1DigestsForURL(fileURL, error);
+	NSArray *array = calculateMD5AndSHA1DigestsForURL(fileURL);
 	return ((2 <= [array count]) ? [array objectAtIndex:1] : nil);
 }
 
-NSArray * calculateMD5AndSHA1DigestsForURL(NSURL *fileURL, NSError **error)
+NSArray * calculateMD5AndSHA1DigestsForURL(NSURL *fileURL)
 {
 	NSCParameterAssert(nil != fileURL);
 	
@@ -378,52 +265,45 @@ NSArray * calculateMD5AndSHA1DigestsForURL(NSURL *fileURL, NSError **error)
 	CC_SHA1_Init(&sha1);
 	
 	// Open the file for reading
-	ExtAudioFileRef file = NULL;
-	OSStatus status = ExtAudioFileOpenURL((CFURLRef)fileURL, &file);
-	if(noErr != status) {
-		if(error)
-			*error = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
+	AudioFileID file = NULL;
+	OSStatus status = AudioFileOpenURL((CFURLRef)fileURL, fsRdPerm, kAudioFileWAVEType, &file);
+	if(noErr != status)
 		return nil;
-	}
 	
 	// Verify the file contains CDDA audio
 	AudioStreamBasicDescription fileFormat;
 	UInt32 dataSize = sizeof(fileFormat);
-	status = ExtAudioFileGetProperty(file, kExtAudioFileProperty_FileDataFormat, &dataSize, &fileFormat);
-	if(noErr != status) {
-		if(error)
-			*error = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
+	status = AudioFileGetProperty(file, kAudioFilePropertyDataFormat, &dataSize, &fileFormat);
+	if(noErr != status)
 		goto cleanup;
-	}
 	
-	if(!streamDescriptionIsCDDA(&fileFormat)) {
-		if(error)
-			*error = [NSError errorWithDomain:NSOSStatusErrorDomain code:paramErr userInfo:nil];
+	if(!streamDescriptionIsCDDA(&fileFormat))
 		goto cleanup;
-	}
 		
-	// Set up extraction buffers
+	// Set up extraction buffer
 	int8_t buffer [kCDSectorSizeCDDA];
-	AudioBufferList bufferList;
-	bufferList.mNumberBuffers = 1;
-	bufferList.mBuffers[0].mNumberChannels = fileFormat.mChannelsPerFrame;
-	bufferList.mBuffers[0].mData = (void *)buffer;	
+	
+	SInt64 startingPacket = 0;
 	
 	// Iteratively process each CDDA sector in the file
 	for(;;) {
-		bufferList.mBuffers[0].mDataByteSize = kCDSectorSizeCDDA;
 		
-		UInt32 frameCount = AUDIO_FRAMES_PER_CDDA_SECTOR;
-		status = ExtAudioFileRead(file, &frameCount, &bufferList);
+		UInt32 byteCount = kCDSectorSizeCDDA;
+		UInt32 packetCount = AUDIO_FRAMES_PER_CDDA_SECTOR;
 		
+		status = AudioFileReadPackets(file, false, &byteCount, NULL, startingPacket, &packetCount, buffer);
 		if(noErr != status)
-			break;
-		else if(AUDIO_FRAMES_PER_CDDA_SECTOR != frameCount)
+			goto cleanup;
+		
+		if(AUDIO_FRAMES_PER_CDDA_SECTOR != packetCount)
 			break;
 		
 		// Update the MD5 and SHA1 digests
-		CC_MD5_Update(&md5, bufferList.mBuffers[0].mData, bufferList.mBuffers[0].mDataByteSize);
-		CC_SHA1_Update(&sha1, bufferList.mBuffers[0].mData, bufferList.mBuffers[0].mDataByteSize);
+		CC_MD5_Update(&md5, buffer, byteCount);
+		CC_SHA1_Update(&sha1, buffer, byteCount);
+		
+		// Housekeeping
+		startingPacket += packetCount;
 	}
 	
 	// Complete the MD5 and SHA1 calculations and store the result
@@ -448,11 +328,9 @@ NSArray * calculateMD5AndSHA1DigestsForURL(NSURL *fileURL, NSError **error)
 	[result addObject:[tempString copy]];
 
 cleanup:
-	status = ExtAudioFileDispose(file);
-	if(noErr != status) {
-		if(error)
-			*error = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
-	}
+	status = AudioFileClose(file);
+	if(noErr != status)
+		;
 	
 	return [result copy];
 }
