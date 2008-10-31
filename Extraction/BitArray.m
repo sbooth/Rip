@@ -25,6 +25,17 @@
 	return self;
 }
 
+- (id) initWithBits:(const void *)buffer bitCount:(NSUInteger)bitCount
+{
+	NSParameterAssert(NULL != buffer);
+	
+	if((self = [super init])) {
+		self.bitCount = bitCount;
+		memcpy(_bits, buffer, self.arrayLength * sizeof(NSUInteger));
+	}
+	return self;
+}
+
 #pragma mark NSCoding
 
 - (id) initWithCoder:(NSCoder *)decoder

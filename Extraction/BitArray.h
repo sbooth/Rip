@@ -29,6 +29,7 @@
 // Creation
 + (id) bitArrayWithBitCount:(NSUInteger)bitCount;
 - (id) initWithBitCount:(NSUInteger)bitCount;
+- (id) initWithBits:(const void *)buffer bitCount:(NSUInteger)bitCount;
 
 // ========================================
 // Access to the individual bits
