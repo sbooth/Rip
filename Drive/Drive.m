@@ -334,7 +334,7 @@
 	bzero(&cd_read, sizeof(cd_read));
 	bzero(buffer, blockSize * sectorCount);
 
-	cd_read.offset			= blockSize * startSector;
+	cd_read.offset			= (uint64_t)blockSize * startSector;
 	cd_read.sectorArea		= sectorAreas;
 	cd_read.sectorType		= kCDSectorTypeCDDA;
 	cd_read.buffer			= buffer;
@@ -344,9 +344,13 @@
 		self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:nil];
 		return 0;
 	}
-
+	
+#if DEBUG
+	if(cd_read.bufferLength != (blockSize * sectorCount))
+		NSLog(@"DKIOCCDREAD: Requested %ld bytes at sector %ld (offset %ld), got %ld", blockSize * sectorCount, startSector, blockSize * startSector, cd_read.bufferLength);
+#endif
+	
 	return cd_read.bufferLength / blockSize;
 }
 
 @end
-
