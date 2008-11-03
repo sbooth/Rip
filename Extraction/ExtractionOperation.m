@@ -104,6 +104,7 @@ zeroTrailingBitsOfBufferInPlace(void *buffer,
 @synthesize sectorsRead = _sectorsRead;
 @synthesize trackIDs = _trackIDs;
 @synthesize error = _error;
+@synthesize useC2 = _useC2;
 @synthesize blockErrorFlags = _blockErrorFlags;
 @synthesize errorFlags = _errorFlags;
 @synthesize URL = _URL;
@@ -239,8 +240,10 @@ zeroTrailingBitsOfBufferInPlace(void *buffer,
 	self.sectorsRead = [[SectorRange alloc] initWithFirstSector:firstSectorToRead lastSector:lastSectorToRead];
 	
 	// Setup C2 block error tracking
-	_blockErrorFlags = [NSMutableIndexSet indexSet];
-	_errorFlags = [NSMutableDictionary dictionary];
+	if(self.useC2) {
+		_blockErrorFlags = [NSMutableIndexSet indexSet];
+		_errorFlags = [NSMutableDictionary dictionary];
+	}
 	
 	// Housekeeping setup
 	self.fractionComplete = 0;
@@ -285,7 +288,11 @@ zeroTrailingBitsOfBufferInPlace(void *buffer,
 		SectorRange *readRange = [SectorRange sectorRangeWithFirstSector:startSector sectorCount:sectorCount];
 
 		// Read from the CD media
-		NSUInteger sectorsRead = [drive readAudioAndErrorFlags:buffer sectorRange:readRange];
+		NSUInteger sectorsRead = 0;
+		if(self.useC2)
+			sectorsRead = [drive readAudioAndErrorFlags:buffer sectorRange:readRange];
+		else
+			sectorsRead = [drive readAudio:buffer sectorRange:readRange];
 		
 		// Verify the requested sectors were read
 		if(0 == sectorsRead) {
@@ -293,19 +300,26 @@ zeroTrailingBitsOfBufferInPlace(void *buffer,
 			goto cleanup;
 		}
 		else if(sectorsRead != sectorCount) {
+#if DEBUG
+			NSLog(@"ExtractionOperation: Requested %ld sectors, got %ld", sectorCount, sectorsRead);
+#endif
 			self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:EIO userInfo:nil];
 			goto cleanup;
 		}
-		
-		// Copy the audio and C2 data to their respective buffers
-		NSUInteger i;
-		for(i = 0; i < sectorsRead; ++i) {
-			alias = buffer + (i * (kCDSectorSizeCDDA + kCDSectorSizeErrorFlags));
-			
-			memcpy(audioBuffer + (i * kCDSectorSizeCDDA), alias, kCDSectorSizeCDDA);
-			memcpy(c2Buffer + (i * kCDSectorSizeErrorFlags), alias + kCDSectorSizeCDDA, kCDSectorSizeErrorFlags);				
-			//memcpy(qBuffer + (i * kCDSectorSizeQSubchannel), alias + kCDSectorSizeCDDA + kCDSectorSizeErrorFlags, kCDSectorSizeQSubchannel);
+
+		// Split the audio and C2 data to their respective buffers
+		if(self.useC2) {
+			NSUInteger i;
+			for(i = 0; i < sectorsRead; ++i) {
+				alias = buffer + (i * (kCDSectorSizeCDDA + kCDSectorSizeErrorFlags));
+				
+				memcpy(audioBuffer + (i * kCDSectorSizeCDDA), alias, kCDSectorSizeCDDA);
+				memcpy(c2Buffer + (i * kCDSectorSizeErrorFlags), alias + kCDSectorSizeCDDA, kCDSectorSizeErrorFlags);				
+				//memcpy(qBuffer + (i * kCDSectorSizeQSubchannel), alias + kCDSectorSizeCDDA + kCDSectorSizeErrorFlags, kCDSectorSizeQSubchannel);
+			}
 		}
+		else
+			memcpy(audioBuffer, buffer, kCDSectorSizeCDDA * sectorsRead);
 
 		NSData *audioData = nil;
 		
@@ -317,7 +331,8 @@ zeroTrailingBitsOfBufferInPlace(void *buffer,
 									   freeWhenDone:NO];
 
 			// Discard any C2 error bits corresponding to discarded samples in the read offset
-			zeroLeadingBitsOfBufferInPlace(c2Buffer, readOffsetInFrames);
+			if(self.useC2)
+				zeroLeadingBitsOfBufferInPlace(c2Buffer, readOffsetInFrames);
 		}
 		// If this is the last read, remove the last readOffset sample frames of data
 		else if(!sectorsOfSilenceToAppend && readRange.lastSector == self.sectorsRead.lastSector) {
@@ -326,7 +341,8 @@ zeroTrailingBitsOfBufferInPlace(void *buffer,
 									   freeWhenDone:NO];
 
 			// Discard any C2 error bits corresponding to discarded samples in the read offset
-			zeroTrailingBitsOfBufferInPlace(c2Buffer, (kCDSectorSizeErrorFlags * sectorsRead), readOffsetInFrames);
+			if(self.useC2)
+				zeroTrailingBitsOfBufferInPlace(c2Buffer, (kCDSectorSizeErrorFlags * sectorsRead), readOffsetInFrames);
 		}
 		else
 			audioData = [NSData dataWithBytesNoCopy:audioBuffer 
@@ -334,8 +350,9 @@ zeroTrailingBitsOfBufferInPlace(void *buffer,
 									   freeWhenDone:NO];
 
 		// Store the error flags
-		[self setErrorFlags:c2Buffer forSectorRange:readRange];
-		
+		if(self.useC2)
+			[self setErrorFlags:c2Buffer forSectorRange:readRange];
+
 		// Write the data to the output file
 		UInt32 packetCount = audioData.length / cddaASBD.mBytesPerPacket;
 		status = AudioFileWritePackets(file, false, audioData.length, NULL, packetNumber, &packetCount, audioData.bytes);

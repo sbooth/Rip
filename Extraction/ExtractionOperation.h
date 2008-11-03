@@ -31,6 +31,7 @@
 	NSString *_MD5;					// The MD5 sum of the extracted audio
 	NSString *_SHA1;				// The SHA1 sum of the extracted audio
 
+	BOOL _useC2;							// Whether to request C2 error information
 	NSMutableIndexSet *_blockErrorFlags;	// C2 block error flags (indexes correspond to disc sectors)
 	NSMutableDictionary *_errorFlags;		// NSNumber * keys correspond to disc sectors, NSData * values
 }
@@ -43,6 +44,7 @@
 @property (copy) NSURL * URL;
 @property (copy) NSNumber * readOffset;
 @property (copy) NSArray * trackIDs;
+@property (assign) BOOL useC2;
 
 // ========================================
 // Properties set during extraction
