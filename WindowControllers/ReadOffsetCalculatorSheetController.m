@@ -259,6 +259,7 @@ static NSString * const kCalculateOffsetsKVOContext		= @"org.sbooth.Rip.ReadOffs
 	extractionOperation.sectors = sectorsToExtract;
 	extractionOperation.allowedSectors = self.compactDisc.firstSession.sectorRange;
 	extractionOperation.URL = temporaryURLWithExtension(@"wav");
+	extractionOperation.useC2 = NO;
 
 	// Offset calculation
 	ReadOffsetCalculationOperation *offsetCalculationOperation = [[ReadOffsetCalculationOperation alloc] init];
