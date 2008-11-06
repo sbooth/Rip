@@ -26,6 +26,7 @@
 // Core Data properties
 @property (assign) NSString * deviceIdentifier;
 @property (assign) NSNumber * readOffset;
+@property (assign) NSNumber * useC2;
 
 // ========================================
 // Core Data relationships

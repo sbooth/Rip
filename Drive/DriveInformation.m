@@ -164,6 +164,7 @@ static NSDictionary * getDevicePropertiesForDADiskRef(DADiskRef disk)
 // Core Data properties
 @dynamic deviceIdentifier;
 @dynamic readOffset;
+@dynamic useC2;
 
 // ========================================
 // Core Data relationships
