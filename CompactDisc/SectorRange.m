@@ -112,6 +112,16 @@
 - (BOOL)			containsSectorRange:(SectorRange *)range		{ return ([self containsSector:range.firstSector] && [self containsSector:range.lastSector]); }
 - (BOOL)			intersectsSectorRange:(SectorRange *)range		{ return ([self containsSector:range.firstSector] || [self containsSector:range.lastSector]); }
 
+- (SectorRange *) intersectedSectorRange:(SectorRange *)range
+{
+	NSParameterAssert(nil != range);
+	
+	NSUInteger firstSector = MAX(self.firstSector, range.firstSector);
+	NSUInteger lastSector = MIN(self.lastSector, range.lastSector);
+	
+	return [[SectorRange alloc] initWithFirstSector:firstSector lastSector:lastSector];
+}
+
 - (NSString *) description
 {
 	return [NSString stringWithFormat:@"SectorRange {\n\tfirstSector = %i,\n\tlastSector = %i,\n\tlength = %i\n}", self.firstSector, self.lastSector, self.length];
