@@ -17,7 +17,7 @@
 // ========================================
 // Create an AudioStreamBasicDescription that describes CDDA audio
 // ========================================
-AudioStreamBasicDescription getStreamDescriptionForCDDA();
+AudioStreamBasicDescription getStreamDescriptionForCDDA(void);
 
 // ========================================
 // Verify an AudioStreamBasicDescription describes CDDA audio
@@ -25,6 +25,9 @@ AudioStreamBasicDescription getStreamDescriptionForCDDA();
 BOOL streamDescriptionIsCDDA(const AudioStreamBasicDescription *asbd);
 
 // ========================================
-// Utility function for adding CDMSF structures
+// Utility function for adding/subtracting CDMSF structures
+// addCDMSF returns a + b
+// subtractCDMSF returns a - b
 // ========================================
 CDMSF addCDMSF(CDMSF a, CDMSF b);
+CDMSF subtractCDMSF(CDMSF a, CDMSF b);

@@ -53,7 +53,7 @@ BOOL streamDescriptionIsCDDA(const AudioStreamBasicDescription *asbd)
 }
 
 // ========================================
-// Utility function for adding CDMSF structures
+// Utility function for adding/subtracting CDMSF structures
 // ========================================
 CDMSF addCDMSF(CDMSF a, CDMSF b)
 {
@@ -77,3 +77,32 @@ CDMSF addCDMSF(CDMSF a, CDMSF b)
 	return result;
 }
 
+CDMSF subtractCDMSF(CDMSF a, CDMSF b)
+{
+	CDMSF result;
+	memset(&result, 0, sizeof(CDMSF));
+	
+	NSInteger minuteDiff = a.minute - b.minute;
+	NSInteger secondDiff = a.second - b.second;
+	NSInteger frameDiff = a.frame - b.frame;
+	
+	if(0 > frameDiff) {
+		frameDiff += 75;
+		--secondDiff;
+	}
+	
+	if(0 > secondDiff) {
+		secondDiff -= 60;
+		--minuteDiff;
+	}
+	
+	// a is larger than b, return 0 (no such thing as a negative CDMSF)
+	if(0 > minuteDiff)
+		return result;
+	
+	result.minute = minuteDiff;
+	result.second = secondDiff;
+	result.frame = frameDiff;
+	
+	return result;
+}
