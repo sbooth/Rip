@@ -6,7 +6,7 @@
 #import <Cocoa/Cocoa.h>
 #include <DiskArbitration/DiskArbitration.h>
 
-@class SectorRange, BitArray;
+@class SectorRange;
 
 // ========================================
 // An NSOperation subclass that extracts audio from a specified range of sectors

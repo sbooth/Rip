@@ -6,7 +6,6 @@
 #import "ExtractionOperation.h"
 #import "SectorRange.h"
 #import "SessionDescriptor.h"
-#import "BitArray.h"
 #import "Drive.h"
 #import "CDDAUtilities.h"
 
@@ -38,14 +37,14 @@ zeroLeadingBitsOfBufferInPlace(void *buffer,
 	
 	// Zero the remaining undesired bits
 	switch(bitsToZero) {
-		case 0:		*alias++ &= 0xFF;		break;
-		case 1:		*alias++ &= 0x7F;		break;
-		case 2:		*alias++ &= 0x3F;		break;
-		case 3:		*alias++ &= 0x1F;		break;
-		case 4:		*alias++ &= 0x0F;		break;
-		case 5:		*alias++ &= 0x07;		break;
-		case 6:		*alias++ &= 0x03;		break;
-		case 7:		*alias++ &= 0x01;		break;
+		case 0:		*alias &= 0xFF;		break;
+		case 1:		*alias &= 0x7F;		break;
+		case 2:		*alias &= 0x3F;		break;
+		case 3:		*alias &= 0x1F;		break;
+		case 4:		*alias &= 0x0F;		break;
+		case 5:		*alias &= 0x07;		break;
+		case 6:		*alias &= 0x03;		break;
+		case 7:		*alias &= 0x01;		break;
 	}
 }
 
