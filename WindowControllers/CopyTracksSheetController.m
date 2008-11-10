@@ -32,7 +32,7 @@
 
 #import "EncoderManager.h"
 
-#import "SecondsFormatter.h"
+#import "ExtractedAudioFile.h"
 
 #import "CDDAUtilities.h"
 #import "FileUtilities.h"
@@ -67,6 +67,8 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.CopyTrack
 @property (readonly) NSArray * orderedTracks;
 @property (readonly) NSArray * orderedTracksRemainingToBeExtracted;
 
+@property (assign) NSUInteger retryCountUsingC2;
+
 @end
 
 @interface CopyTracksSheetController (Callbacks)
@@ -95,21 +97,25 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.CopyTrack
 - (void) extractSectors:(NSIndexSet *)sectorIndexes forTrack:(TrackDescriptor *)track coalesceRanges:(BOOL)coalesceRanges;
 
 - (void) processExtractionOperation:(ExtractionOperation *)operation;
-- (void) processExtractionOperationForWholeTrack:(ExtractionOperation *)operation;
-- (void) processExtractionOperationForPartialTrack:(ExtractionOperation *)operation;
+- (void) processExtractionOperation:(ExtractionOperation *)operation forWholeTrack:(TrackDescriptor *)track;
+- (void) processExtractionOperation:(ExtractionOperation *)operation forPartialTrack:(TrackDescriptor *)track;
 
-- (NSNumber *) calculateAccurateRipChecksumForExtractionOperation:(ExtractionOperation *)operation;
+- (NSUInteger) calculateAccurateRipChecksumForExtractionOperation:(ExtractionOperation *)operation;
 - (NSArray *) determinePossibleAccurateRipOffsetForTrack:(TrackDescriptor *)track URL:(NSURL *)URL;
 
 - (TrackExtractionRecord *) createTrackExtractionRecordForOperation:(ExtractionOperation *)operation accurateRipChecksum:(NSNumber *)checksum;
 
 - (BOOL) synthesizeTrack:(TrackDescriptor *)track toURL:(NSURL *)fileURL error:(NSError **)error;
+
+- (BOOL) saveSectors:(NSIndexSet *)sectors fromOperation:(ExtractionOperation *)operation forTrack:(TrackDescriptor *)track;
 @end
 
 @implementation CopyTracksSheetController
 
 @synthesize disk = _disk;
 @synthesize trackIDs = _trackIDs;
+
+@synthesize maxRetriesUsingC2 = _maxRetriesUsingC2;
 
 @synthesize trackExtractionRecords = _trackExtractionRecords;
 
@@ -118,6 +124,8 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.CopyTrack
 @synthesize managedObjectContext = _managedObjectContext;
 
 @synthesize operationQueue = _operationQueue;
+
+@synthesize retryCountUsingC2 = _retryCountUsingC2;
 
 - (id) init
 {
@@ -505,6 +513,10 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.CopyTrack
 	
 	TrackDescriptor *track = [tracks objectAtIndex:0];
 	[_tracksToBeExtracted removeObject:[track objectID]];
+
+	self.retryCountUsingC2 = 0;
+	
+	_synthesizedFile = nil;
 	
 	[self extractWholeTrack:track];
 }
@@ -551,7 +563,8 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.CopyTrack
 	extractionOperation.trackIDs = [NSArray arrayWithObject:[track objectID]];
 	extractionOperation.readOffset = self.driveInformation.readOffset;
 	extractionOperation.URL = temporaryURLWithExtension(@"wav");
-	
+	extractionOperation.useC2 = [self.driveInformation.useC2 boolValue];
+
 	// Observe the operation's progress
 	[extractionOperation addObserver:self forKeyPath:@"isExecuting" options:NSKeyValueObservingOptionNew context:kAudioExtractionKVOContext];
 	[extractionOperation addObserver:self forKeyPath:@"isCancelled" options:NSKeyValueObservingOptionNew context:kAudioExtractionKVOContext];
@@ -624,16 +637,20 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.CopyTrack
 			[self presentError:operation.error modalForWindow:self.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
 		
 		NSError *error = nil;
-		if(![[NSFileManager defaultManager] removeItemAtPath:operation.URL.path error:&error])
+		if([[NSFileManager defaultManager] fileExistsAtPath:operation.URL.path] && ![[NSFileManager defaultManager] removeItemAtPath:operation.URL.path error:&error])
 			[self presentError:error modalForWindow:self.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
 
 		return;
 	}
 	
 #if DEBUG
-	NSLog(@"Extracted sectors %u - %u to %@, %u C2 block errors.  MD5 = %@", operation.sectorsRead.firstSector, operation.sectorsRead.lastSector, [operation.URL.path lastPathComponent], operation.blockErrorFlags.count, operation.MD5);
-	if([operation.blockErrorFlags count])
-		NSLog(@"C2 block errors for sectors %@", operation.blockErrorFlags);
+	if(operation.useC2) {
+		NSLog(@"Extracted sectors %u - %u to %@, %u C2 block errors.  MD5 = %@", operation.sectorsRead.firstSector, operation.sectorsRead.lastSector, [operation.URL.path lastPathComponent], operation.blockErrorFlags.count, operation.MD5);
+		if([operation.blockErrorFlags count])
+			NSLog(@"C2 block errors for sectors %@", operation.blockErrorFlags);
+	}
+	else
+		NSLog(@"Extracted sectors %u - %u to %@.  MD5 = %@", operation.sectorsRead.firstSector, operation.sectorsRead.lastSector, [operation.URL.path lastPathComponent], operation.MD5);
 #endif
 	
 	// Fetch the track this operation represents
@@ -646,25 +663,18 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.CopyTrack
 
 	// Determine if this operation represents a whole track extraction or a partial track extraction
 	if([operation.sectors containsSectorRange:track.sectorRange])
-		[self processExtractionOperationForWholeTrack:operation];
+		[self processExtractionOperation:operation forWholeTrack:track];
 	else
-		[self processExtractionOperationForPartialTrack:operation];
+		[self processExtractionOperation:operation forPartialTrack:track];
 }
 
-- (void) processExtractionOperationForWholeTrack:(ExtractionOperation *)operation
+- (void) processExtractionOperation:(ExtractionOperation *)operation forWholeTrack:(TrackDescriptor *)track
 {
 	NSParameterAssert(nil != operation);
-	
-	// Fetch the track this operation represents
-	NSManagedObjectID *trackID = [operation.trackIDs lastObject];
-	NSManagedObject *managedObject = [self.managedObjectContext objectWithID:trackID];
-	if(![managedObject isKindOfClass:[TrackDescriptor class]])
-		return;
-	
-	TrackDescriptor *track = (TrackDescriptor *)managedObject;			
+	NSParameterAssert(nil != track);
 	
 	// Calculate the actual AccurateRip checksum of the extracted audio
-	NSNumber *trackActualAccurateRipChecksum = [self calculateAccurateRipChecksumForExtractionOperation:operation];
+	NSUInteger trackActualAccurateRipChecksum = [self calculateAccurateRipChecksumForExtractionOperation:operation];
 
 	// Determine the possible AccurateRip offsets for the extracted audio, if any
 	NSArray *possibleAccurateRipOffsets = [self determinePossibleAccurateRipOffsetForTrack:track URL:operation.URL];
@@ -680,16 +690,16 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.CopyTrack
 			NSManagedObjectID *accurateRipTrackID = [matchingPressingInfo objectForKey:kAccurateRipTrackIDKey];
 
 			// Fetch the AccurateRipTrackRecord object from the context and ensure it is the correct class
-			managedObject = [self.managedObjectContext objectWithID:accurateRipTrackID];
+			NSManagedObject *managedObject = [self.managedObjectContext objectWithID:accurateRipTrackID];
 			if(![managedObject isKindOfClass:[AccurateRipTrackRecord class]])
 				continue;
 			
 			AccurateRipTrackRecord *accurateRipTrack = (AccurateRipTrackRecord *)managedObject;
 
 			// If the track was accurately ripped, ship it off to the encoder
-			if([accurateRipTrack.checksum isEqualToNumber:trackActualAccurateRipChecksum]) {
+			if([accurateRipTrack.checksum unsignedIntegerValue] == trackActualAccurateRipChecksum) {
 				// Create the extraction record
-				TrackExtractionRecord *extractionRecord = [self createTrackExtractionRecordForOperation:operation accurateRipChecksum:trackActualAccurateRipChecksum];
+				TrackExtractionRecord *extractionRecord = [self createTrackExtractionRecordForOperation:operation accurateRipChecksum:[NSNumber numberWithUnsignedInteger:trackActualAccurateRipChecksum]];
 				extractionRecord.accurateRipConfidenceLevel = accurateRipTrack.confidenceLevel;
 				
 				NSError *error = nil;
@@ -712,10 +722,18 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.CopyTrack
 		NSLog(@"FIXME: USE ALTERNATE ACCURATERIP PRESSING");
 	}
 	
-	// Re-rip portions of the track if any C2 error flags were returned
-	if(operation.blockErrorFlags.count) {
-		NSIndexSet *positionOfErrors = [operation.blockErrorFlags copy];
+	// Re-rip only portions of the track if any C2 block error flags were returned and C2 retries are enabled
+	if(operation.useC2 && operation.blockErrorFlags.count && self.maxRetriesUsingC2) {
+		NSIndexSet *positionOfErrors = operation.blockErrorFlags;
 
+		// Determine which sectors have no C2 errors
+		SectorRange *trackSectorRange = track.sectorRange;
+		NSMutableIndexSet *sectorsWithNoErrors = [NSMutableIndexSet indexSetWithIndexesInRange:NSMakeRange(trackSectorRange.firstSector, trackSectorRange.length)];
+		[sectorsWithNoErrors removeIndexes:positionOfErrors];
+		
+		// Save the sectors from this operation with no C2 errors
+		[self saveSectors:sectorsWithNoErrors fromOperation:operation forTrack:track];
+		
 		NSIndexSet *currentSectorsNeedingVerification = [_sectorsNeedingVerification objectForKey:[track objectID]];
 		if(currentSectorsNeedingVerification) {
 			NSMutableIndexSet *newSectorsNeedingVerification = [currentSectorsNeedingVerification mutableCopy];
@@ -725,11 +743,13 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.CopyTrack
 		else
 			[_sectorsNeedingVerification setObject:positionOfErrors forKey:[track objectID]];
 
-		[_trackPartialExtractions addObject:operation];
+		[_tracksExtractedButNotVerified setObject:operation forKey:[track objectID]];
+		
+//		_retryCountUsingC2++;
 		
 		[self extractSectors:positionOfErrors forTrack:track coalesceRanges:YES];
 	}
-	// No C2 errors were encountered
+	// No C2 errors were encountered or C2 is disabled
 	else {
 		[_detailedStatusTextField setStringValue:NSLocalizedString(@"Verifying copy integrity", @"")];
 
@@ -747,7 +767,7 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.CopyTrack
 				NSLog(@"Error removing temporary file: %@", error);
 			
 			// Ship the track off to the encoder
-			TrackExtractionRecord *extractionRecord = [self createTrackExtractionRecordForOperation:operation accurateRipChecksum:trackActualAccurateRipChecksum];
+			TrackExtractionRecord *extractionRecord = [self createTrackExtractionRecordForOperation:operation accurateRipChecksum:[NSNumber numberWithUnsignedInteger:trackActualAccurateRipChecksum]];
 			if(![[EncoderManager sharedEncoderManager] encodeURL:operation.URL forTrackExtractionRecord:extractionRecord error:&error]) {
 				[self.managedObjectContext deleteObject:extractionRecord];
 				[self presentError:error modalForWindow:self.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
@@ -761,30 +781,39 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.CopyTrack
 		// Determine where the differences are and re-extract those sections
 		else if(copyOperation) {
 #if DEBUG
-			NSLog(@"Track extracted before but SHA1 hashes don't match.  No C2 errors.");
+			NSLog(@"Track extracted before but SHA1 hashes don't match.");
 #endif
 			
-			NSError *error = nil;
-			NSIndexSet *nonMatchingSectorIndexes = compareFilesForNonMatchingSectors(copyOperation.URL, operation.URL, &error);
+			NSIndexSet *nonMatchingSectorIndexes = compareFilesForNonMatchingSectors(copyOperation.URL, operation.URL);
 			
 			// Sanity check
 			if(!nonMatchingSectorIndexes.count) {
 				NSLog(@"Internal inconsistency: SHA1 hashes don't match but no sector-level differences found");
 				return;
 			}
+
+			// Convert from sector indexes to sector numbers
+			NSMutableIndexSet *nonMatchingSectors = [nonMatchingSectorIndexes mutableCopy];
+			[nonMatchingSectors shiftIndexesStartingAtIndex:[nonMatchingSectorIndexes firstIndex] by:copyOperation.sectors.firstSector];
 			
+			// Determine which sectors did match
+			SectorRange *trackSectorRange = track.sectorRange;
+			NSMutableIndexSet *matchingSectors = [NSMutableIndexSet indexSetWithIndexesInRange:NSMakeRange(trackSectorRange.firstSector, trackSectorRange.length)];
+			[matchingSectors removeIndexes:nonMatchingSectors];
+			
+			// A track containing sectors from multiple extraction operations will be synthesized
+			// Start with the sectors from this operation that matched the previous extraction
+			if([matchingSectors count])
+				[self saveSectors:matchingSectors fromOperation:operation forTrack:track];
+
+#if DEBUG
+			NSLog(@"Sectors with differences: %@", nonMatchingSectors);
+#endif
+
 			[_trackPartialExtractions addObject:operation];
+			[_sectorsNeedingVerification setObject:nonMatchingSectors forKey:[track objectID]];
 			
-			NSIndexSet *currentSectorsNeedingVerification = [_sectorsNeedingVerification objectForKey:[track objectID]];
-			if(currentSectorsNeedingVerification) {
-				NSMutableIndexSet *newSectorsNeedingVerification = [currentSectorsNeedingVerification mutableCopy];
-				[newSectorsNeedingVerification addIndexes:nonMatchingSectorIndexes];
-				[_sectorsNeedingVerification setObject:newSectorsNeedingVerification forKey:[track objectID]];
-			}
-			else
-				[_sectorsNeedingVerification setObject:nonMatchingSectorIndexes forKey:[track objectID]];
-			
-			[self extractSectors:nonMatchingSectorIndexes forTrack:track coalesceRanges:YES];
+			[self extractSectors:nonMatchingSectors forTrack:track coalesceRanges:YES];
 		}
 		// This track has not been extracted before, so re-rip the entire track (verification)
 		else {
@@ -794,43 +823,118 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.CopyTrack
 	}
 }
 
-- (void) processExtractionOperationForPartialTrack:(ExtractionOperation *)operation
+- (void) processExtractionOperation:(ExtractionOperation *)operation forPartialTrack:(TrackDescriptor *)track;
 {
 	NSParameterAssert(nil != operation);
+	NSParameterAssert(nil != track);
 	
-	// Fetch the track this operation represents a portion of
-	NSManagedObjectID *trackID = [operation.trackIDs lastObject];
-	NSManagedObject *managedObject = [self.managedObjectContext objectWithID:trackID];
-	if(![managedObject isKindOfClass:[TrackDescriptor class]])
-		return;
-	
-	TrackDescriptor *track = (TrackDescriptor *)managedObject;			
+	// Get the whole track copy operation corresponding to this operation
+	ExtractionOperation *copyOperation = [_tracksExtractedButNotVerified objectForKey:[track objectID]];
+
+	// Which sectors need to be verified?
 	NSIndexSet *sectorsNeedingVerification = [_sectorsNeedingVerification objectForKey:[track objectID]];
-	
 	if(!sectorsNeedingVerification)
 		return;
 	
-	// Check for resolved C2 errors
+	// Keep track of which sectors have been verified, either through C2 or direct comparison
 	NSMutableIndexSet *verifiedSectors = [NSMutableIndexSet indexSet];
-	NSUInteger sectorIndex = [sectorsNeedingVerification firstIndex];
-	while(NSNotFound != sectorIndex) {
-		
-		if([operation.sectorsRead containsSector:sectorIndex] && ![operation.blockErrorFlags containsIndex:sectorIndex])
-			[verifiedSectors addIndex:sectorIndex];
-		
-		sectorIndex = [sectorsNeedingVerification indexGreaterThanIndex:sectorIndex];
-	}
+	
+	// Check for sectors with existing errors that were resolved by this operation
 
+	// If C2 is enabled, trust the C2 block error flags
+	if(operation.useC2 && self.maxRetriesUsingC2 >= self.retryCountUsingC2) {
+		NSUInteger sectorIndex = [sectorsNeedingVerification firstIndex];
+		while(NSNotFound != sectorIndex) {
+			if([operation.sectors containsSector:sectorIndex] && ![operation.blockErrorFlags containsIndex:sectorIndex])
+				[verifiedSectors addIndex:sectorIndex];
+			
+			sectorIndex = [sectorsNeedingVerification indexGreaterThanIndex:sectorIndex];
+		}
+		
+		// If this operation resolved any C2 errors, save those sectors
+		if([verifiedSectors count]) {
 #if DEBUG
-	if([verifiedSectors count])
-		NSLog(@"Resolved C2 block errors for sectors %@", verifiedSectors);
+			NSLog(@"Resolved C2 block errors for sectors %@", verifiedSectors);
 #endif
 
-	// If this operation resolved any C2 errors, save it
-	if([verifiedSectors count])
-		[_trackPartialExtractions addObject:operation];
+			[self saveSectors:verifiedSectors fromOperation:operation forTrack:track];
+//			[_trackPartialExtractions addObject:operation];	
+		}
+	}
+	// If C2 is not enabled, compare sectors directly
+	else {
+		// Determine which sectors from this partial extraction overlap the whole track copy operation
+		SectorRange *intersection = [copyOperation.sectors intersectedSectorRange:operation.sectors];
+		
+		// Compare this operation to the whole track copy operation
+		NSIndexSet *nonMatchingSectorIndexes = compareFileRegionsForNonMatchingSectors(operation.URL,
+																					   [operation.sectors indexForSector:intersection.firstSector],
+																					   copyOperation.URL,
+																					   [copyOperation.sectors indexForSector:intersection.firstSector],
+																					   intersection.length);
+		
+		// Convert from sector indexes to sector numbers
+		NSMutableIndexSet *nonMatchingSectors = [nonMatchingSectorIndexes mutableCopy];
+		[nonMatchingSectors shiftIndexesStartingAtIndex:[nonMatchingSectorIndexes firstIndex] by:operation.sectors.firstSector];
+		
+		// Determine which sectors did match
+		SectorRange *operationSectorRange = operation.sectors;
+		NSMutableIndexSet *matchingSectors = [NSMutableIndexSet indexSetWithIndexesInRange:NSMakeRange(operationSectorRange.firstSector, operationSectorRange.length)];
+		[matchingSectors removeIndexes:nonMatchingSectorIndexes];
 
-	// Update the list of sectors needing verification
+		NSIndexSet *sectorsVerified = [sectorsNeedingVerification intersectedIndexSet:matchingSectors];
+		[verifiedSectors addIndexes:sectorsVerified];
+
+		// Save the sectors from this operation that matched the previous extraction
+		if([sectorsVerified count]) {
+#if DEBUG
+			NSLog(@"Got matches for sectors %@", sectorsVerified);
+#endif
+			[self saveSectors:sectorsVerified fromOperation:operation forTrack:track];
+			[_trackPartialExtractions addObject:operation];
+		}
+		
+		// Determine any partial track extractions that overlap this sector range
+		NSMutableArray *previousExtractions = [NSMutableArray array];
+		for(ExtractionOperation *previousOperation in _trackPartialExtractions) {
+			if([previousOperation.sectors intersectsSectorRange:operation.sectors])
+				[previousExtractions addObject:previousOperation];
+		}
+		
+		// Iterate through all the matching operations and check each sector for matches
+		for(ExtractionOperation *previousOperation in previousExtractions) {
+			intersection = [previousOperation.sectors intersectedSectorRange:operation.sectors];
+			
+			nonMatchingSectorIndexes = compareFileRegionsForNonMatchingSectors(operation.URL,
+																			   [operation.sectors indexForSector:intersection.firstSector],
+																			   previousOperation.URL,
+																			   [previousOperation.sectors indexForSector:intersection.firstSector],
+																			   intersection.length);
+			
+			// Convert from sector indexes to sector numbers
+			nonMatchingSectors = [nonMatchingSectorIndexes mutableCopy];
+			[nonMatchingSectors shiftIndexesStartingAtIndex:[nonMatchingSectorIndexes firstIndex] by:operation.sectors.firstSector];
+			
+			// Determine which sectors did match
+			operationSectorRange = operation.sectors;
+			matchingSectors = [NSMutableIndexSet indexSetWithIndexesInRange:NSMakeRange(operationSectorRange.firstSector, operationSectorRange.length)];
+			[matchingSectors removeIndexes:nonMatchingSectorIndexes];
+			
+			sectorsVerified = [sectorsNeedingVerification intersectedIndexSet:matchingSectors];
+			[verifiedSectors addIndexes:sectorsVerified];
+			
+			// Save the sectors from this operation that matched the previous extraction
+			if([sectorsVerified count]) {
+#if DEBUG
+				NSLog(@"Got matches for sectors %@", sectorsVerified);
+#endif
+				[self saveSectors:sectorsVerified fromOperation:operation forTrack:track];
+				[_trackPartialExtractions addObject:operation];
+			}
+		}	
+	}
+
+	// Update the list of sectors needing verification with the sectors resolved by this operation
 	NSMutableIndexSet *updatedSectorsNeedingVerification = [sectorsNeedingVerification mutableCopy];
 	[updatedSectorsNeedingVerification removeIndexes:verifiedSectors];
 
@@ -839,24 +943,25 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.CopyTrack
 	else
 		[_sectorsNeedingVerification removeObjectForKey:[track objectID]];
 	
-	// All sectors verified, synthesize the track and encode
+	// If all sectors are verified, encode the track if it is verified
 	if(![updatedSectorsNeedingVerification count]) {
 
 #if DEBUG
-		NSLog(@"Track has no C2 errors");
+		NSLog(@"Track has no errors");
 #endif
 		
 		// Any operations in progress are no longer needed
 		[self.operationQueue cancelAllOperations];
-
-		NSURL *fileURL = temporaryURLWithExtension(@"wav");
-
-		NSError *error = nil;
-		if(![self synthesizeTrack:track toURL:fileURL error:&error])
-			[self presentError:error modalForWindow:self.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
 		
-		// Calculate the digests and AccurateRip checksum
-		NSArray *digests = calculateMD5AndSHA1DigestsForURL(fileURL, &error);
+		// Finish the file synthesis
+		NSURL *fileURL = _synthesizedFile.URL;
+		NSString *MD5 = _synthesizedFile.MD5;
+		NSString *SHA1 = _synthesizedFile.SHA1;
+		
+		[_synthesizedFile closeFile];
+		_synthesizedFile = nil;
+		
+		// Calculate the AccurateRip checksum
 		NSUInteger accurateRipChecksum = calculateAccurateRipChecksumForFile(fileURL,
 																			 [self.compactDisc.firstSession.firstTrack.number isEqualToNumber:track.number],
 																			 [self.compactDisc.firstSession.lastTrack.number isEqualToNumber:track.number]);
@@ -864,10 +969,6 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.CopyTrack
 		// Determine the possible AccurateRip offsets for the extracted audio, if any
 		NSArray *possibleAccurateRipOffsets = [self determinePossibleAccurateRipOffsetForTrack:track URL:fileURL];
 
-#if DEBUG
-		NSLog(@"possibleAccurateRipOffsets: %@", possibleAccurateRipOffsets);
-#endif
-		
 		// Determine which pressings (if any) are the primary ones (offset checksum matches with a zero read offset)
 		NSPredicate *zeroOffsetPredicate = [NSPredicate predicateWithFormat:@"%K == 0", kReadOffsetKey];
 		NSArray *matchingPressingsWithZeroOffset = [possibleAccurateRipOffsets filteredArrayUsingPredicate:zeroOffsetPredicate];
@@ -879,14 +980,20 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.CopyTrack
 				NSManagedObjectID *accurateRipTrackID = [matchingPressingInfo objectForKey:kAccurateRipTrackIDKey];
 				
 				// Fetch the AccurateRipTrackRecord object from the context and ensure it is the correct class
-				managedObject = [self.managedObjectContext objectWithID:accurateRipTrackID];
+				NSManagedObject *managedObject = [self.managedObjectContext objectWithID:accurateRipTrackID];
 				if(![managedObject isKindOfClass:[AccurateRipTrackRecord class]])
 					continue;
 				
 				AccurateRipTrackRecord *accurateRipTrack = (AccurateRipTrackRecord *)managedObject;
-				
+		
+#if DEBUG
+				NSLog(@"Track AR checksum = %.8lx, checking against %.8lx", accurateRipChecksum, accurateRipTrack.checksum.unsignedIntegerValue);
+#endif
 				// If the track was accurately ripped, ship it off to the encoder
-				if([accurateRipTrack.checksum isEqualToNumber:[NSNumber numberWithUnsignedInteger:accurateRipChecksum]]) {
+				if([accurateRipTrack.checksum unsignedIntegerValue] == accurateRipChecksum) {
+					
+					NSLog(@"MATCH!");
+					
 					// Create the extraction record
 					TrackExtractionRecord *extractionRecord = [NSEntityDescription insertNewObjectForEntityForName:@"TrackExtractionRecord" 
 																							inManagedObjectContext:self.managedObjectContext];
@@ -894,12 +1001,13 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.CopyTrack
 					extractionRecord.date = [NSDate date];
 					extractionRecord.drive = self.driveInformation;
 //					extractionRecord.blockErrorFlags = operation.blockErrorFlags;
-					extractionRecord.MD5 = [digests objectAtIndex:0];
-					extractionRecord.SHA1 = [digests objectAtIndex:1];
+					extractionRecord.MD5 = MD5;
+					extractionRecord.SHA1 = SHA1;
 					extractionRecord.track = track;
 					extractionRecord.accurateRipChecksum = [NSNumber numberWithUnsignedInteger:accurateRipChecksum];
 					extractionRecord.accurateRipConfidenceLevel = accurateRipTrack.confidenceLevel;
-					
+
+					NSError *error = nil;
 					if(![[EncoderManager sharedEncoderManager] encodeURL:fileURL forTrackExtractionRecord:extractionRecord error:&error]) {
 						[self.managedObjectContext deleteObject:extractionRecord];
 						[self presentError:error modalForWindow:self.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
@@ -917,89 +1025,19 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.CopyTrack
 		}
 		else if([possibleAccurateRipOffsets count]) {
 			NSLog(@"FIXME: USE ALTERNATE ACCURATERIP PRESSING");
-		}		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		return;
-	}
-	
-	return;
-
-	// Determine the whole track copy operation corresponding to this operation
-	ExtractionOperation *copyOperation = [_tracksExtractedButNotVerified objectForKey:[track objectID]];
-	if(copyOperation) {
-#if 0
-		// Check for resolved C2 errors from the original copy
-		NSUInteger sectorIndex = [copyOperation.blockErrorFlags firstIndex];
-		while(NSNotFound != sectorIndex) {
-			
-			if(![operation.blockErrorFlags containsIndex:sectorIndex]) {
-				NSLog(@"C2 block error for sector %u resolved", sectorIndex);
-				[currentSectorsNeedingVerification removeIndex:sectorIndex];
-			}
-			
-			sectorIndex = [copyOperation.blockErrorFlags indexGreaterThanIndex:sectorIndex];
 		}
-#endif
+		
+		NSLog(@"Track still has errors after synthesis");
+
+		// Retry the track
+		[_tracksExtractedButNotVerified removeObjectForKey:[track objectID]];
+		[self extractWholeTrack:track];
 	}
-	
-	
-	// Determine any partial track extractions that overlap this sector range
-	NSMutableArray *previousExtractions = [NSMutableArray array];
-	for(ExtractionOperation *previousOperation in _trackPartialExtractions) {
-		if([previousOperation.sectors intersectsSectorRange:operation.sectors])
-			[previousExtractions addObject:previousOperation];
-	}
-	
-
-	// If sectors with (multiple) C2 errors still remain, attempt to match 2 extractions
-	if([updatedSectorsNeedingVerification count]) {
-#if 0
-		NSUInteger firstSector = (copyOperation.sectors.firstSector > operation.sectors.firstSector ? copyOperation.sectors.firstSector : operation.sectors.firstSector);
-		NSUInteger lastSector = (copyOperation.sectors.lastSector < operation.sectors.lastSector ? copyOperation.sectors.lastSector : operation.sectors.lastSector);
-		
-		NSError *error = nil;
-		NSIndexSet *mismatchedSectors = compareFileRegionsForNonMatchingSectors(operation.URL,
-																				[operation.sectors indexForSector:firstSector],
-																				copyOperation.URL,
-																				[copyOperation.sectors indexForSector:firstSector],
-																				lastSector - firstSector,
-																				&error);
-		
-		NSLog(@"rerip mismatched sectors: %@", mismatchedSectors);
-
-		
-		// Iterate through all the matching operations and check each sector for two matches
-		for(ExtractionOperation *previousOperation in previousExtractions) {
-			firstSector = (previousOperation.sectors.firstSector > operation.sectors.firstSector ? previousOperation.sectors.firstSector : operation.sectors.firstSector);
-			lastSector = (previousOperation.sectors.lastSector < operation.sectors.lastSector ? previousOperation.sectors.lastSector : operation.sectors.lastSector);
-			
-			error = nil;
-			mismatchedSectors = compareFileRegionsForNonMatchingSectors(operation.URL,
-																					[operation.sectors indexForSector:firstSector],
-																					previousOperation.URL,
-																					[previousOperation.sectors indexForSector:firstSector],
-																					lastSector - firstSector + 1,
-																					&error);
-			
-			NSLog(@"rerip mismatched sectors: %@", mismatchedSectors);
-		}
-#endif
-
-		[_sectorsNeedingVerification setObject:updatedSectorsNeedingVerification forKey:[track objectID]];
-	}	
+	else
+		[self extractSectors:updatedSectorsNeedingVerification forTrack:track coalesceRanges:YES];
 }
 
-- (NSNumber *) calculateAccurateRipChecksumForExtractionOperation:(ExtractionOperation *)operation
+- (NSUInteger) calculateAccurateRipChecksumForExtractionOperation:(ExtractionOperation *)operation
 {
 	NSParameterAssert(nil != operation);
 	NSParameterAssert(1 == [[operation trackIDs] count]);
@@ -1009,15 +1047,12 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.CopyTrack
 	NSManagedObjectID *trackID = operation.trackIDs.lastObject;
 	NSManagedObject *managedObject = [self.managedObjectContext objectWithID:trackID];
 	if(![managedObject isKindOfClass:[TrackDescriptor class]])
-		return nil;
+		return 0;
 			
 	TrackDescriptor *track = (TrackDescriptor *)managedObject;
-	NSUInteger accurateRipChecksum = calculateAccurateRipChecksumForFile(operation.URL, 
-																		 [self.compactDisc.firstSession.firstTrack.number isEqualToNumber:track.number],
-																		 [self.compactDisc.firstSession.lastTrack.number isEqualToNumber:track.number]);
-	
-	// Since Core Data only stores signed integers, cast the unsigned checksum to signed for storage
-	return [NSNumber numberWithInt:(int32_t)accurateRipChecksum];
+	return calculateAccurateRipChecksumForFile(operation.URL, 
+											   [self.compactDisc.firstSession.firstTrack.number isEqualToNumber:track.number],
+											   [self.compactDisc.firstSession.lastTrack.number isEqualToNumber:track.number]);
 }
 
 - (NSArray *) determinePossibleAccurateRipOffsetForTrack:(TrackDescriptor *)track URL:(NSURL *)URL
@@ -1130,19 +1165,22 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.CopyTrack
 
 	BOOL result = NO;
 	
-	// Determine the extraction operations for this track
-	NSPredicate *trackIDPredicate = [NSPredicate predicateWithFormat:@"%@ IN trackIDs", [track objectID]];
-	NSArray *matchingOperations = [_trackPartialExtractions filteredArrayUsingPredicate:trackIDPredicate];
+	// The copy operation
+	ExtractionOperation *copyOperation = [_tracksExtractedButNotVerified objectForKey:[track objectID]];
 
-#if DEBUG
-	NSLog(@"matchingOperations: %@",matchingOperations);
-#endif
-	
-	if(![matchingOperations count]) {
+	// Determine the partial extraction operations for this track
+	NSPredicate *trackIDPredicate = [NSPredicate predicateWithFormat:@"%@ IN trackIDs", [track objectID]];
+	NSArray *matchingPartialExtractionOperations = [_trackPartialExtractions filteredArrayUsingPredicate:trackIDPredicate];
+
+	if(!copyOperation || ![matchingPartialExtractionOperations count]) {
 		if(error)
 			*error = [NSError errorWithDomain:NSOSStatusErrorDomain code:paramErr userInfo:nil];
 		return NO;
 	}
+	
+	// Store the copy operation as the primary operation
+	NSMutableArray *matchingOperations = [matchingPartialExtractionOperations mutableCopy];
+	[matchingOperations insertObject:copyOperation atIndex:0];
 	
 	[_detailedStatusTextField setStringValue:NSLocalizedString(@"Creating temporary output file", @"")];
 
@@ -1271,6 +1309,220 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.CopyTrack
 	}
 	
 	return result;
+}
+
+- (BOOL) interpolateC2ErrorsForTrack:(TrackDescriptor *)track withOperation:(ExtractionOperation *)operation error:(NSError **)error
+{
+	NSParameterAssert(nil != operation);
+	
+	BOOL result = NO;
+	
+	NSURL *fileURL = temporaryURLWithExtension(@"wav");
+	
+	// Copy the file sector by sector, interpolating single sector C2 errors
+
+	// Set up the ASBD for CDDA audio
+	const AudioStreamBasicDescription cddaASBD = getStreamDescriptionForCDDA();
+	
+	// Create and open the output file, overwriting if it exists
+	AudioFileID outputFile = NULL;
+	OSStatus status = AudioFileCreateWithURL((CFURLRef)fileURL, kAudioFileWAVEType, &cddaASBD, kAudioFileFlags_EraseFile, &outputFile);
+	if(noErr != status) {
+		if(error)
+			*error = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
+		return NO;
+	}
+	
+	// Track the sectors needed
+	SectorRange *trackSectorRange = track.sectorRange;
+	NSUInteger trackFirstSector = trackSectorRange.firstSector;
+
+	// Open the operation's output file to use as input
+	AudioFileID inputFile = NULL;
+	status = AudioFileOpenURL((CFURLRef)operation.URL, fsRdPerm, kAudioFileWAVEType, &inputFile);
+	if(noErr != status) {
+		if(error)
+			*error = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
+		goto cleanup;
+	}
+	
+	// Verify the file contains CDDA audio
+	AudioStreamBasicDescription fileFormat;
+	UInt32 dataSize = sizeof(fileFormat);
+	status = AudioFileGetProperty(inputFile, kAudioFilePropertyDataFormat, &dataSize, &fileFormat);
+	if(noErr != status) {
+		if(error)
+			*error = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
+		goto cleanup;
+	}
+	
+	if(!streamDescriptionIsCDDA(&fileFormat)) {
+		if(error)
+			*error = [NSError errorWithDomain:NSOSStatusErrorDomain code:paramErr userInfo:nil];
+		goto cleanup;
+	}
+	
+	// The extraction buffer for one sector
+	int8_t buffer [kCDSectorSizeCDDA];
+	UInt32 packetCount, bytesRead;
+	SInt64 startingPacketNumber;
+	
+	// Iteratively process each desired CDDA sector in the file
+	NSUInteger sectorNumber = trackFirstSector;
+	for(;;) {
+		
+		// Since this is lpcm audio, packets === frames and no packet descriptions are required
+		
+		startingPacketNumber = (sectorNumber - trackFirstSector) * AUDIO_FRAMES_PER_CDDA_SECTOR;
+		
+		packetCount = AUDIO_FRAMES_PER_CDDA_SECTOR;
+		bytesRead = 0;
+		
+		status = AudioFileReadPackets(inputFile, false, &bytesRead, NULL, startingPacketNumber, &packetCount, buffer);
+		
+		if(noErr != status)
+			break;
+		else if(kCDSectorSizeCDDA != bytesRead || AUDIO_FRAMES_PER_CDDA_SECTOR != packetCount)
+			break;
+		
+		// Attempt to fixup any C2 errors
+		if([operation.blockErrorFlags containsIndex:sectorNumber]) {
+			NSData *errorFlags = [operation.errorFlags objectForKey:[NSNumber numberWithUnsignedInteger:sectorNumber]];
+			
+			const uint8_t *rawErrorFlags = [errorFlags bytes];
+			
+			// errorFlags contains 294 bytes, 1 bit for each byte in the sector
+			// attempt a linear interpolation on any missing samples
+			BitArray *ba = [[BitArray alloc] initWithBits:rawErrorFlags bitCount:kCDSectorSizeCDDA];
+			NSIndexSet *bytesWithErrors = [ba indexSetForOnes];
+
+			NSUInteger byteIndex = [bytesWithErrors firstIndex];
+			while(NSNotFound != byteIndex) {
+				
+				// Is this a single byte error?
+				if(byteIndex && ((kCDSectorSizeCDDA - 2) > byteIndex) && ![ba valueAtIndex:(byteIndex - 1)] && ![ba valueAtIndex:(byteIndex + 1)]) {
+					NSLog(@"interpolating single byte error at index: %ld", byteIndex);
+					
+					int16_t avgValue = ((int16_t)buffer[byteIndex - 1] + (int16_t)buffer[byteIndex + 1]) / 2;
+					buffer[byteIndex] = avgValue;
+				}
+
+				byteIndex = [bytesWithErrors indexGreaterThanIndex:byteIndex];
+			}			
+		}
+		
+		// Write the data to the output file at the appropriate location
+		status = AudioFileWritePackets(outputFile, false, bytesRead, NULL, startingPacketNumber, &packetCount, buffer);
+		if(noErr != status)
+			break;
+		else if(AUDIO_FRAMES_PER_CDDA_SECTOR != packetCount)
+			break;
+		
+		++sectorNumber;
+	}
+	
+	// Close the input file
+	status = AudioFileClose(inputFile);
+	if(noErr != status) {
+		if(error)
+			*error = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
+		goto cleanup;
+	}
+	
+	result = YES;
+	
+cleanup:
+	
+	// Close the output file
+	if(outputFile) {
+		status = AudioFileClose(outputFile);
+		if(noErr != status) {
+			if(error)
+				*error = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
+		}
+	}
+	
+	return result;
+}
+
+- (BOOL) saveSectors:(NSIndexSet *)sectors fromOperation:(ExtractionOperation *)operation forTrack:(TrackDescriptor *)track
+{
+	NSParameterAssert(nil != sectors);
+	NSParameterAssert(nil != operation);
+	NSParameterAssert(nil != track);
+	
+	// Open the source file for reading
+	NSError *error = nil;
+	ExtractedAudioFile *inputFile = [ExtractedAudioFile openFileForReadingAtURL:operation.URL error:&error];
+	if(!inputFile) {
+		[self presentError:error modalForWindow:self.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
+		return NO;
+	}
+	
+	// Create the output file if it doesn't exist
+	if(!_synthesizedFile) {
+		_synthesizedFile = [ExtractedAudioFile createFileAtURL:temporaryURLWithExtension(@"wav") error:&error];
+		if(!_synthesizedFile) {
+			[inputFile closeFile];
+			[self presentError:error modalForWindow:self.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
+			return NO;
+		}
+	}
+	
+	// Convert the absolute sector numbers to indexes within the extracted audio
+	NSUInteger trackFirstSector = track.sectorRange.firstSector;
+	NSUInteger firstSectorInInputFile = operation.sectors.firstSector;
+	
+	// Copy and save the specified sectors, combining ranges to minimize reads
+	NSUInteger firstIndex = NSNotFound;
+	NSUInteger latestIndex = NSNotFound;
+	NSUInteger sectorIndex = [sectors firstIndex];
+	
+	for(;;) {
+		// Last sector
+		if(NSNotFound == sectorIndex) {
+			if(NSNotFound != firstIndex) {
+				if(firstIndex == latestIndex) {
+					NSData *sectorData = [inputFile audioDataForSector:(firstIndex - firstSectorInInputFile) error:&error];
+					[_synthesizedFile setAudioData:sectorData forSector:(firstIndex - trackFirstSector) error:&error];
+				}
+				else {
+					NSUInteger sectorCount = latestIndex - firstIndex + 1;
+					NSData *sectorsData = [inputFile audioDataForSectors:NSMakeRange(firstIndex - firstSectorInInputFile, sectorCount) error:&error];
+					[_synthesizedFile setAudioData:sectorsData forSectors:NSMakeRange(firstIndex - trackFirstSector, sectorCount) error:&error];
+				}
+			}
+			
+			break;
+		}
+		
+		// Consolidate this sector into the current range
+		if(latestIndex == (sectorIndex - 1))
+			latestIndex = sectorIndex;
+		// Store the previous range and start a new one
+		else {
+			if(NSNotFound != firstIndex) {
+				if(firstIndex == latestIndex) {
+					NSData *sectorData = [inputFile audioDataForSector:(firstIndex - firstSectorInInputFile) error:&error];
+					[_synthesizedFile setAudioData:sectorData forSector:(firstIndex - trackFirstSector) error:&error];
+				}
+				else {
+					NSUInteger sectorCount = latestIndex - firstIndex + 1;
+					NSData *sectorsData = [inputFile audioDataForSectors:NSMakeRange(firstIndex - firstSectorInInputFile, sectorCount) error:&error];
+					[_synthesizedFile setAudioData:sectorsData forSectors:NSMakeRange(firstIndex - trackFirstSector, sectorCount) error:&error];
+				}
+			}
+			
+			firstIndex = sectorIndex;
+			latestIndex = sectorIndex;
+		}
+		
+		sectorIndex = [sectors indexGreaterThanIndex:sectorIndex];
+	}
+	
+	[inputFile closeFile];
+	
+	return YES;
 }
 
 @end

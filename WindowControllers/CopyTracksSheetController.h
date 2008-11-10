@@ -7,6 +7,7 @@
 #include <DiskArbitration/DiskArbitration.h>
 
 @class CompactDisc, DriveInformation, AccurateRipDiscRecord;
+@class ExtractedAudioFile;
 
 // ========================================
 // An NSWindowController subclass for customizing the extraction
@@ -43,6 +44,11 @@
 	NSMutableDictionary *_sectorsNeedingVerification;
 	NSMutableArray *_trackPartialExtractions;
 
+	NSUInteger _retryCountUsingC2;
+	NSUInteger _maxRetriesUsingC2;
+	
+	ExtractedAudioFile *_synthesizedFile;
+
 	NSMutableArray *_trackExtractionRecords;
 }
 
@@ -50,6 +56,8 @@
 // Properties
 @property (assign) DADiskRef disk;
 @property (copy) NSSet * trackIDs;
+
+@property (assign) NSUInteger maxRetriesUsingC2;
 
 @property (readonly) NSArray * trackExtractionRecords;
 
