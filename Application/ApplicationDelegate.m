@@ -417,7 +417,7 @@ diskDisappearedCallback(DADiskRef disk, void *context)
 	}
 	else
 		[compactDiscWindow showWindow:self];
-	
+
 	// If the read offset for the drive isn't configured, give the user the opportunity to configure it now
 	if(!compactDiscWindow.driveInformation.readOffset) {		
 		NSBeginAlertSheet([NSString stringWithFormat:NSLocalizedString(@"The read offset for \u201c%@ %@\u201d is unknown.  Would you like to determine the drive's read offset now?", @""), compactDiscWindow.driveInformation.vendorName, compactDiscWindow.driveInformation.productName],
