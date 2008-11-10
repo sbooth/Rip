@@ -5,6 +5,7 @@
 
 #import "CompactDiscWindowController.h"
 #import "CompactDiscWindowController+LogFileGeneration.h"
+#import "CompactDiscWindowController+CueSheetGeneration.h"
 
 #import "CompactDisc.h"
 #import "SessionDescriptor.h"
@@ -60,7 +61,6 @@ static NSString * const kMusicDatabaseQueryKVOContext	= @"org.sbooth.Rip.Compact
 @end
 
 @interface CompactDiscWindowController (Private)
-- (BOOL) writeCueSheetToURL:(NSURL *)cueSheetURL error:(NSError **)error;
 
 - (void) diskWasEjected;
 
@@ -211,14 +211,14 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 		
 		return YES;
 	}
-	else if([anItem action] == @selector(determineDriveReadOffset:)) {
-		if(self.driveInformation.productName)
-			[anItem setTitle:[NSString stringWithFormat:NSLocalizedString(@"Determine Read Offset for \u201c%@ %@\u201d", @""), self.driveInformation.vendorName, self.driveInformation.productName]];
-		else
-			[anItem setTitle:NSLocalizedString(@"Determine Read Offset", @"")];
-			
-		return YES;
-	}
+//	else if([anItem action] == @selector(determineDriveReadOffset:)) {
+//		if(self.driveInformation.productName)
+//			[anItem setTitle:[NSString stringWithFormat:NSLocalizedString(@"Determine Read Offset for \u201c%@ %@\u201d", @""), self.driveInformation.vendorName, self.driveInformation.productName]];
+//		else
+//			[anItem setTitle:NSLocalizedString(@"Determine Read Offset", @"")];
+//			
+//		return YES;
+//	}
 	else if([self respondsToSelector:[anItem action]])
 		return YES;
 	else
@@ -458,6 +458,8 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 	
 	sheetController.disk = self.disk;
 	sheetController.trackIDs = [selectedTracks valueForKey:@"objectID"];
+	
+	sheetController.maxRetriesUsingC2 = 5;
 	
 	[sheetController beginCopyTracksSheetForWindow:self.window
 									 modalDelegate:self 
@@ -769,89 +771,6 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 	
 	[column setHidden:!column.isHidden];
 	[menuItem setState:!column.isHidden];
-}
-
-- (BOOL) writeCueSheetToURL:(NSURL *)cueSheetURL error:(NSError **)error
-{
-	NSParameterAssert(nil != cueSheetURL);
-	
-	NSMutableString *cueSheetString = [NSMutableString string];
-	
-	NSString *appName = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleName"];
-	NSString *shortVersionNumber = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
-	NSString *versionNumber = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"];	
-	[cueSheetString appendFormat:@"REM Created by %@ %@ (%@)\n", appName, shortVersionNumber, versionNumber];
-	
-	[cueSheetString appendString:@"\n"];
-
-	[cueSheetString appendFormat:@"REM FreeDB Disc ID %08x\n", self.compactDisc.freeDBDiscID];
-	[cueSheetString appendFormat:@"REM MusicBrainz Disc ID %@\n", self.compactDisc.musicBrainzDiscID];
-
-	if(self.compactDisc.metadata.date)
-		[cueSheetString appendFormat:@"REM DATE %@\n", self.compactDisc.metadata.date];
-	
-	[cueSheetString appendString:@"\n"];
-	
-	if(self.compactDisc.metadata.MCN)
-		[cueSheetString appendFormat:@"CATALOG %@\n", self.compactDisc.metadata.MCN];
-
-	// Title, artist
-	if(self.compactDisc.metadata.title)
-		[cueSheetString appendFormat:@"TITLE \"%@\"\n", self.compactDisc.metadata.title];
-
-	if(self.compactDisc.metadata.artist)
-		[cueSheetString appendFormat:@"PERFORMER \"%@\"\n", self.compactDisc.metadata.artist];
-
-	[cueSheetString appendString:@"\n"];
-	
-	for(TrackDescriptor *trackDescriptor in self.compactDisc.firstSession.orderedTracks) {
-		// Track number
-		[cueSheetString appendFormat:@"TRACK %02i AUDIO\n", trackDescriptor.number.integerValue];
-
-		// Pregap
-		// PREGAP uses digital silence, while INDEX 00 uses audio from the file
-		// Depending on  options this should change!
-		if(trackDescriptor.pregap) {
-			CDMSF trackPregapMSF = CDConvertLBAToMSF(trackDescriptor.pregap.integerValue - 150);
-			[cueSheetString appendFormat:@"  PREGAP %02i:%02i:%02i\n", trackPregapMSF.minute, trackPregapMSF.second, trackPregapMSF.frame];
-		}
-		
-		// Index
-		CDMSF trackMSF = CDConvertLBAToMSF(trackDescriptor.firstSector.integerValue - 150);
-		[cueSheetString appendFormat:@"  INDEX 01 %02i:%02i:%02i\n", trackMSF.minute, trackMSF.second, trackMSF.frame];
-		
-		// Flags
-		NSMutableArray *flagsArray = [NSMutableArray array];
-		if(trackDescriptor.digitalCopyPermitted.boolValue)
-			[flagsArray addObject:@"DCP"];
-		if(trackDescriptor.hasPreEmphasis.boolValue)
-			[flagsArray addObject:@"PRE"];
-		if(4 == trackDescriptor.channelsPerFrame.integerValue)
-			[flagsArray addObject:@"4CH"];
-		if(trackDescriptor.isDataTrack.boolValue)
-			[flagsArray addObject:@"DATA"];
-
-		if(flagsArray.count)
-			[cueSheetString appendFormat:@"  FLAGS %@\n", [flagsArray componentsJoinedByString:@" "]];
-
-		// ISRC
-		if(trackDescriptor.metadata.ISRC)
-			[cueSheetString appendFormat:@"  ISRC %@\n", trackDescriptor.metadata.ISRC];
-		
-		// Track title, artist and composer
-		if(trackDescriptor.metadata.title)
-			[cueSheetString appendFormat:@"  TITLE \"%@\"\n", trackDescriptor.metadata.title];
-		
-		if(trackDescriptor.metadata.artist)
-			[cueSheetString appendFormat:@"  PERFORMER \"%@\"\n", trackDescriptor.metadata.artist];
-
-		if(trackDescriptor.metadata.composer)
-			[cueSheetString appendFormat:@"  SONGWRITER \"%@\"\n", trackDescriptor.metadata.composer];
-
-		[cueSheetString appendString:@"\n"];
-	}
-
-	return [cueSheetString writeToURL:cueSheetURL atomically:YES encoding:NSUTF8StringEncoding error:error];
 }
 
 @end

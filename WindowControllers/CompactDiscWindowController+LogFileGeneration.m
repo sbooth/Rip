@@ -19,8 +19,6 @@
 #import "DurationFormatter.h"
 #import "YesNoFormatter.h"
 
-#import "BitArray.h"
-
 @interface CompactDiscWindowController (LogFileGenerationPrivate)
 - (NSString *) headerSection;
 - (NSString *) driveSection;
