@@ -78,8 +78,8 @@
 			[result appendFormat:@"    Confidence level:       %@\n", [numberFormatter stringFromNumber:extractionRecord.accurateRipConfidenceLevel]];
 			
 			if(extractionRecord.accurateRipAlternatePressingChecksum) {
-				[result appendFormat:@"    Alt pressing offset:    %@\n", [numberFormatter stringFromNumber:extractionRecord.accurateRipAlternatePressingOffset]];
-				[result appendFormat:@"    Alt pressing checksum:  %@\n", [numberFormatter stringFromNumber:extractionRecord.accurateRipAlternatePressingChecksum]];
+				[result appendFormat:@"    Alt. pressing offset:   %@\n", [numberFormatter stringFromNumber:extractionRecord.accurateRipAlternatePressingOffset]];
+				[result appendFormat:@"    Alt. pressing checksum: %08lx\n", extractionRecord.accurateRipAlternatePressingChecksum.unsignedIntegerValue];
 			}
 		}
 		
