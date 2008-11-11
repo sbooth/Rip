@@ -245,13 +245,30 @@ NSString * calculateMD5DigestForURL(NSURL *fileURL)
 	return ((1 <= [array count]) ? [array objectAtIndex:0] : nil);
 }
 
+NSString * calculateMD5DigestForURLRegion(NSURL *fileURL, NSUInteger startingSector, NSUInteger sectorCount)
+{
+	NSArray *array = calculateMD5AndSHA1DigestsForURLRegion(fileURL, startingSector, sectorCount);
+	return ((1 <= [array count]) ? [array objectAtIndex:0] : nil);
+}
+
 NSString * calculateSHA1DigestForURL(NSURL *fileURL)
 {
 	NSArray *array = calculateMD5AndSHA1DigestsForURL(fileURL);
 	return ((2 <= [array count]) ? [array objectAtIndex:1] : nil);
 }
 
+NSString * calculateSHA1DigestForURLRegion(NSURL *fileURL, NSUInteger startingSector, NSUInteger sectorCount)
+{
+	NSArray *array = calculateMD5AndSHA1DigestsForURLRegion(fileURL, startingSector, sectorCount);
+	return ((2 <= [array count]) ? [array objectAtIndex:1] : nil);
+}
+
 NSArray * calculateMD5AndSHA1DigestsForURL(NSURL *fileURL)
+{
+	return calculateMD5AndSHA1DigestsForURLRegion(fileURL, 0, NSUIntegerMax);
+}
+
+NSArray * calculateMD5AndSHA1DigestsForURLRegion(NSURL *fileURL, NSUInteger startingSector, NSUInteger sectorCount)
 {
 	NSCParameterAssert(nil != fileURL);
 	
@@ -283,10 +300,11 @@ NSArray * calculateMD5AndSHA1DigestsForURL(NSURL *fileURL)
 	// Set up extraction buffer
 	int8_t buffer [kCDSectorSizeCDDA];
 	
-	SInt64 startingPacket = 0;
+	SInt64 startingPacket = AUDIO_FRAMES_PER_CDDA_SECTOR * startingSector;
+	NSUInteger sectorCounter = 0;
 	
-	// Iteratively process each CDDA sector in the file
-	for(;;) {
+	// Iteratively process the specified CDDA sectors
+	while(sectorCounter < sectorCount) {
 		
 		UInt32 byteCount = kCDSectorSizeCDDA;
 		UInt32 packetCount = AUDIO_FRAMES_PER_CDDA_SECTOR;
@@ -304,6 +322,7 @@ NSArray * calculateMD5AndSHA1DigestsForURL(NSURL *fileURL)
 		
 		// Housekeeping
 		startingPacket += packetCount;
+		++sectorCounter;
 	}
 	
 	// Complete the MD5 and SHA1 calculations and store the result
@@ -334,4 +353,3 @@ cleanup:
 	
 	return [result copy];
 }
-
