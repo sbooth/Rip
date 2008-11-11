@@ -92,7 +92,7 @@ CDMSF subtractCDMSF(CDMSF a, CDMSF b)
 	}
 	
 	if(0 > secondDiff) {
-		secondDiff -= 60;
+		secondDiff += 60;
 		--minuteDiff;
 	}
 	
