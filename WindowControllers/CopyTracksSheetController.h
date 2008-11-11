@@ -44,8 +44,8 @@
 	NSMutableDictionary *_sectorsNeedingVerification;
 	NSMutableArray *_trackPartialExtractions;
 
-	NSUInteger _retryCountUsingC2;
-	NSUInteger _maxRetriesUsingC2;
+	NSUInteger _retryCount;
+	NSUInteger _maxRetries;
 	
 	ExtractedAudioFile *_synthesizedFile;
 
@@ -57,7 +57,7 @@
 @property (assign) DADiskRef disk;
 @property (copy) NSSet * trackIDs;
 
-@property (assign) NSUInteger maxRetriesUsingC2;
+@property (assign) NSUInteger maxRetries;
 
 @property (readonly) NSArray * trackExtractionRecords;
 
