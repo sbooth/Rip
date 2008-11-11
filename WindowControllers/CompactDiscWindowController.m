@@ -459,7 +459,7 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 	sheetController.disk = self.disk;
 	sheetController.trackIDs = [selectedTracks valueForKey:@"objectID"];
 	
-	sheetController.maxRetriesUsingC2 = 5;
+	sheetController.maxRetries = 5;
 	
 	[sheetController beginCopyTracksSheetForWindow:self.window
 									 modalDelegate:self 
