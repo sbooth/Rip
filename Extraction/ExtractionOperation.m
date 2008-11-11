@@ -86,7 +86,9 @@ zeroTrailingBitsOfBufferInPlace(void *buffer,
 @property (copy) NSIndexSet * blockErrorFlags;
 @property (copy) NSDictionary * errorFlags;
 @property (copy) NSString * MD5;
+@property (copy) NSString * fullMD5;
 @property (copy) NSString * SHA1;
+@property (copy) NSString * fullSHA1;
 @property (assign) float fractionComplete;
 @property (assign) NSDate * startTime;
 @end
@@ -101,7 +103,8 @@ zeroTrailingBitsOfBufferInPlace(void *buffer,
 @synthesize sectors = _sectors;
 @synthesize allowedSectors = _allowedSectors;
 @synthesize sectorsRead = _sectorsRead;
-@synthesize trackIDs = _trackIDs;
+@synthesize cushionSectors = _cushionSectors;
+@synthesize trackID = _trackID;
 @synthesize error = _error;
 @synthesize useC2 = _useC2;
 @synthesize blockErrorFlags = _blockErrorFlags;
@@ -109,7 +112,9 @@ zeroTrailingBitsOfBufferInPlace(void *buffer,
 @synthesize URL = _URL;
 @synthesize readOffset = _readOffset;
 @synthesize MD5 = _MD5;
+@synthesize fullMD5 = _fullMD5;
 @synthesize SHA1 = _SHA1;
+@synthesize fullSHA1 = _fullSHA1;
 @synthesize fractionComplete = _fractionComplete;
 @synthesize startTime = _startTime;
 
@@ -175,8 +180,8 @@ zeroTrailingBitsOfBufferInPlace(void *buffer,
 	// SETUP FOR READ OFFSET HANDLING
 	
 	// With no read offset, the range of sectors that will be extracted won't change
-	NSInteger firstSectorToRead = self.sectors.firstSector;
-	NSInteger lastSectorToRead = self.sectors.lastSector;
+	NSInteger firstSectorToRead = self.sectors.firstSector - self.cushionSectors;
+	NSInteger lastSectorToRead = self.sectors.lastSector + self.cushionSectors;
 
 	// Handle the read offset, if specified
 	NSInteger readOffsetInFrames = 0;
@@ -406,7 +411,7 @@ zeroTrailingBitsOfBufferInPlace(void *buffer,
 	
 	self.fractionComplete = 1;
 
-	// Complete the MD5 and SHA1 calculations and store the result
+	// Complete the full MD5 and SHA1 calculations (over all audio extracted, including cushion sectors)
 	unsigned char md5Digest [CC_MD5_DIGEST_LENGTH];
 	CC_MD5_Final(md5Digest, &md5);
 
@@ -418,12 +423,65 @@ zeroTrailingBitsOfBufferInPlace(void *buffer,
 	NSUInteger i;
 	for(i = 0; i < CC_MD5_DIGEST_LENGTH; ++i)
 		[tempString appendFormat:@"%02x", md5Digest[i]];
-	self.MD5 = tempString;
+	self.fullMD5 = tempString;
 
 	tempString = [NSMutableString string];
 	for(i = 0; i < CC_SHA1_DIGEST_LENGTH; ++i)
 		[tempString appendFormat:@"%02x", sha1Digest[i]];
-	self.SHA1 = tempString;
+	self.fullSHA1 = tempString;
+	
+	// Compute the MD5 and SHA1 digests for the desired audio only (excluding cushion sectors)
+	if(self.cushionSectors) {
+		// Reset the state
+		CC_MD5_Init(&md5);
+		CC_SHA1_Init(&sha1);
+
+		SInt64 startingPacket = AUDIO_FRAMES_PER_CDDA_SECTOR * self.cushionSectors;
+		NSUInteger sectorCount = self.sectors.length;
+		NSUInteger sectorCounter = 0;
+		
+		// Iteratively process the specified CDDA sectors
+		while(sectorCounter < sectorCount) {
+			
+			UInt32 byteCount = kCDSectorSizeCDDA;
+			UInt32 packetCount = AUDIO_FRAMES_PER_CDDA_SECTOR;
+			
+			status = AudioFileReadPackets(file, false, &byteCount, NULL, startingPacket, &packetCount, buffer);
+			if(noErr != status) {
+				self.error = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
+				goto cleanup;
+			}
+			
+			if(AUDIO_FRAMES_PER_CDDA_SECTOR != packetCount)
+				break;
+			
+			// Update the MD5 and SHA1 digests
+			CC_MD5_Update(&md5, buffer, byteCount);
+			CC_SHA1_Update(&sha1, buffer, byteCount);
+			
+			// Housekeeping
+			startingPacket += packetCount;
+			++sectorCounter;
+		}
+		
+		// Complete the MD5 and SHA1 calculations and store the result
+		CC_MD5_Final(md5Digest, &md5);		
+		CC_SHA1_Final(sha1Digest, &sha1);
+		
+		tempString = [NSMutableString string];
+		for(i = 0; i < CC_MD5_DIGEST_LENGTH; ++i)
+			[tempString appendFormat:@"%02x", md5Digest[i]];
+		self.MD5 = tempString;
+		
+		tempString = [NSMutableString string];
+		for(i = 0; i < CC_SHA1_DIGEST_LENGTH; ++i)
+			[tempString appendFormat:@"%02x", sha1Digest[i]];
+		self.SHA1 = tempString;
+	}
+	else {
+		self.MD5 = self.fullMD5;
+		self.SHA1 = self.fullSHA1;
+	}
 	
 	// ========================================
 	// CLEAN UP
