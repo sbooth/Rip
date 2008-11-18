@@ -28,21 +28,20 @@ extern NSString * const		kMetadataMusicBrainzIDKey;
 
 // ========================================
 // An NSOperation subclass that defines the interface to be implemented by encoders
+// desiring to post-process their output
 // ========================================
-@interface EncodingOperation : NSOperation
+@interface EncodingPostProcessingOperation : NSOperation
 {
 @protected
-	NSURL *_inputURL;
-	NSURL *_outputURL;
+	NSArray *_URLs;
+	NSArray *_metadata;
 	NSDictionary *_settings;
-	NSDictionary *_metadata;
 	NSError *_error;
 }
 
-@property (copy) NSURL * inputURL;
-@property (copy) NSURL * outputURL;
+@property (copy) NSArray * URLs;
+@property (copy) NSArray * metadata;
 @property (copy) NSDictionary * settings;
-@property (copy) NSDictionary * metadata;
 @property (copy) NSError * error;
 
 // Optional properties

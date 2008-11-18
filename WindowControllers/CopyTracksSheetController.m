@@ -211,6 +211,11 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.CopyTrack
 			// If no tracks are being processed and none remain to be extracted, we are finished			
 			if(![[self.operationQueue operations] count] && ![_tracksToBeExtracted count]) {
 				
+				// Post-process the encoded tracks
+				NSError *error = nil;
+				if(![[EncoderManager sharedEncoderManager] postProcessEncodingOperations:_encodingOperations error:&error])
+					[self presentError:error modalForWindow:self.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
+				
 				// Remove any active timers
 				[_activeTimers makeObjectsPerformSelector:@selector(invalidate)];
 				[_activeTimers removeAllObjects];
@@ -501,6 +506,7 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.CopyTrack
 	
 	// Set up the extraction records
 	_trackExtractionRecords = [NSMutableArray array];
+	_encodingOperations =  [NSMutableArray array];
 	
 	// Get started on the first one
 	[self startExtractingNextTrack];
@@ -519,6 +525,15 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.CopyTrack
 	self.retryCount = 0;
 	
 	_synthesizedFile = nil;
+	
+	// Remove temporary files
+	NSArray *temporaryURLS = [_trackPartialExtractions valueForKey:@"URL"];
+	for(NSURL *URL in temporaryURLS) {
+		NSError *error = nil;
+		if(![[NSFileManager defaultManager] removeItemAtPath:[URL path] error:&error]) {
+			NSLog(@"Error removing temporary file: %@", error);
+		}
+	}
 	
 	[self extractWholeTrack:track];
 }
@@ -1021,13 +1036,16 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.CopyTrack
 					extractionRecord.accurateRipConfidenceLevel = accurateRipTrack.confidenceLevel;
 
 					NSError *error = nil;
-					if(![[EncoderManager sharedEncoderManager] encodeURL:fileURL forTrackExtractionRecord:extractionRecord error:&error]) {
+					EncodingOperation *encodingOperation = nil;
+					if(![[EncoderManager sharedEncoderManager] encodeURL:fileURL forTrackExtractionRecord:extractionRecord encodingOperation:&encodingOperation delayPostProcessing:YES error:&error]) {
 						[self.managedObjectContext deleteObject:extractionRecord];
 						[self presentError:error modalForWindow:self.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
 						return;
 					}
 					
 					[_trackExtractionRecords addObject:extractionRecord];
+					[_encodingOperations addObject:encodingOperation];
+
 					[self startExtractingNextTrack];
 					
 					return;
@@ -1078,13 +1096,16 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.CopyTrack
 					extractionRecord.accurateRipAlternatePressingOffset = alternatePressingOffset;
 					
 					NSError *error = nil;
-					if(![[EncoderManager sharedEncoderManager] encodeURL:fileURL forTrackExtractionRecord:extractionRecord error:&error]) {
+					EncodingOperation *encodingOperation = nil;
+					if(![[EncoderManager sharedEncoderManager] encodeURL:fileURL forTrackExtractionRecord:extractionRecord encodingOperation:&encodingOperation delayPostProcessing:YES error:&error]) {
 						[self.managedObjectContext deleteObject:extractionRecord];
 						[self presentError:error modalForWindow:self.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
 						return;
 					}
 					
 					[_trackExtractionRecords addObject:extractionRecord];
+					[_encodingOperations addObject:encodingOperation];
+
 					[self startExtractingNextTrack];
 					
 					return;
@@ -1170,49 +1191,6 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.CopyTrack
 }
 
 #if 0
-- (NSDictionary *) calculateAccurateRipChecksumsForExtractionOperation:(ExtractionOperation *)operation
-{
-	NSParameterAssert(nil != operation);
-	
-	// If trackIDs is set, the ExtractionOperation represents one or more whole tracks (and not an arbitrary range of sectors)
-	// If this is the case, calculate the AccurateRip checksum(s) for the extracted tracks
-	// This will allow tracks to be verified later if for some reason AccurateRip isn't available during ripping
-	if(operation.trackIDs) {
-		[_detailedStatusTextField setStringValue:NSLocalizedString(@"Calculating AccurateRip checksums", @"")];
-		
-		NSMutableDictionary *actualAccurateRipChecksums = [NSMutableDictionary dictionary];
-		NSUInteger sectorOffset = 0;
-		
-		for(NSManagedObjectID *trackID in operation.trackIDs) {
-			NSManagedObject *managedObject = [self.managedObjectContext objectWithID:trackID];
-			if(![managedObject isKindOfClass:[TrackDescriptor class]])
-				continue;
-			
-			TrackDescriptor *track = (TrackDescriptor *)managedObject;			
-			SectorRange *trackSectorRange = track.sectorRange;
-			
-			// Since a file may contain multiple non-sequential tracks, there is not a 1:1 correspondence between
-			// LBAs on the disc and sample frame offsets in the file.  Adjust for that here
-			SectorRange *adjustedSectorRange = [SectorRange sectorRangeWithFirstSector:sectorOffset sectorCount:trackSectorRange.length];
-			sectorOffset += trackSectorRange.length;
-			
-			NSUInteger accurateRipChecksum = calculateAccurateRipChecksumForFileRegion(operation.URL, 
-																					   adjustedSectorRange.firstSector,
-																					   adjustedSectorRange.lastSector,
-																					   [self.compactDisc.firstSession.firstTrack.number isEqualToNumber:track.number],
-																					   [self.compactDisc.firstSession.lastTrack.number isEqualToNumber:track.number]);
-			
-			// Since Core Data only stores signed integers, cast the unsigned checksum to signed for storage
-			[actualAccurateRipChecksums setObject:[NSNumber numberWithInt:(int32_t)accurateRipChecksum]
-										   forKey:[track objectID]];			
-		}
-		
-		return [actualAccurateRipChecksums copy];
-	}
-	else
-		return nil;
-}
-
 - (BOOL) interpolateC2ErrorsForTrack:(TrackDescriptor *)track withOperation:(ExtractionOperation *)operation error:(NSError **)error
 {
 	NSParameterAssert(nil != operation);
@@ -1516,12 +1494,14 @@ cleanup:
 	if(accurateRipAlternatePressingOffset)
 		extractionRecord.accurateRipAlternatePressingOffset = accurateRipAlternatePressingOffset;
 	
-	if(![[EncoderManager sharedEncoderManager] encodeURL:URLToEncode forTrackExtractionRecord:extractionRecord error:error]) {
+	EncodingOperation *encodingOperation = nil;
+	if(![[EncoderManager sharedEncoderManager] encodeURL:URLToEncode forTrackExtractionRecord:extractionRecord encodingOperation:&encodingOperation delayPostProcessing:YES error:error]) {
 		[self.managedObjectContext deleteObject:extractionRecord];
 		return NO;
 	}
 	
 	[_trackExtractionRecords addObject:extractionRecord];
+	[_encodingOperations addObject:encodingOperation];
 	
 	return YES;
 }

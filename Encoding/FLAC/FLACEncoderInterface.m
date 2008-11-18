@@ -6,6 +6,7 @@
 #import "FLACEncoderInterface.h"
 #import "FLACEncodeOperation.h"
 #import "FLACSettingsViewController.h"
+#import "FLACPostProcessingOperation.h"
 
 @implementation FLACEncoderInterface
 
@@ -27,6 +28,11 @@
 - (EncodingOperation *) encodingOperation
 {
 	return [[FLACEncodeOperation alloc] init];
+}
+
+- (EncodingPostProcessingOperation *) encodingPostProcessingOperation
+{
+	return [[FLACPostProcessingOperation alloc] init];
 }
 
 - (NSString *) pathExtensionForSettings:(NSDictionary *)settings

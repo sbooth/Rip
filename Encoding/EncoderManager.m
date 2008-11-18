@@ -7,6 +7,7 @@
 #import "PlugInManager.h"
 #import "EncoderInterface/EncoderInterface.h"
 #import "EncoderInterface/EncodingOperation.h"
+#import "EncoderInterface/EncodingPostProcessingOperation.h"
 
 #import "TrackMetadata.h"
 #import "AlbumMetadata.h"
@@ -166,13 +167,14 @@ encoderBundleSortFunction(id bundleA, id bundleB, void *context)
 	NSString *bundleAName = [bundleA objectForInfoDictionaryKey:@"EncoderName"];
 	NSString *bundleBName = [bundleB objectForInfoDictionaryKey:@"EncoderName"];
 
-	return [bundleAName compare:bundleBName];;
+	return [bundleAName compare:bundleBName];
 }
 
 // ========================================
 // Context objects for observeValueForKeyPath:ofObject:change:context:
 // ========================================
 static NSString * const kEncodingOperationKVOContext		= @"org.sbooth.Rip.EncoderManager.EncodingOperationKVOContext";
+static NSString * const kEncodingPostProcessingOperationKVOContext		= @"org.sbooth.Rip.EncoderManager.EncodingPostProcessingOperationKVOContext";
 
 // ========================================
 // KVC key names for the encoder dictionaries
@@ -221,6 +223,15 @@ static EncoderManager *sSharedEncoderManager				= nil;
 			NSError *error = nil;
 			if(![[NSFileManager defaultManager] removeItemAtPath:[operation.inputURL path] error:&error])
 				[[NSApplication sharedApplication] presentError:error];
+		}
+	}
+	else if(kEncodingPostProcessingOperationKVOContext == context) {
+		EncodingPostProcessingOperation *operation = (EncodingPostProcessingOperation *)object;
+
+		if([keyPath isEqualToString:@"isCancelled"] || [keyPath isEqualToString:@"isFinished"]) {
+			[operation removeObserver:self forKeyPath:@"isCancelled"];
+			[operation removeObserver:self forKeyPath:@"isFinished"];
+			
 		}
 	}
 	else
@@ -382,7 +393,12 @@ static EncoderManager *sSharedEncoderManager				= nil;
 	return [NSURL fileURLWithPath:outputPath];
 }
 
-- (BOOL) encodeURL:(NSURL *)inputURL forTrackExtractionRecord:(TrackExtractionRecord *)trackExtractionRecord error:(NSError **)error;
+- (BOOL) encodeURL:(NSURL *)inputURL forTrackExtractionRecord:(TrackExtractionRecord *)trackExtractionRecord error:(NSError **)error
+{
+	return [self encodeURL:inputURL forTrackExtractionRecord:trackExtractionRecord encodingOperation:NULL delayPostProcessing:NO error:error];
+}
+
+- (BOOL) encodeURL:(NSURL *)inputURL forTrackExtractionRecord:(TrackExtractionRecord *)trackExtractionRecord encodingOperation:(EncodingOperation **)encodingOperation delayPostProcessing:(BOOL)delayPostProcessing error:(NSError **)error
 {
 	NSParameterAssert(nil != inputURL);
 	NSParameterAssert(nil != trackExtractionRecord);
@@ -470,25 +486,31 @@ static EncoderManager *sSharedEncoderManager				= nil;
 		}
 	}
 	
-	EncodingOperation *encodingOperation = [encoderInterface encodingOperation];
+	EncodingOperation *operation = [encoderInterface encodingOperation];
 	
-	encodingOperation.inputURL = inputURL;
-	encodingOperation.outputURL = [NSURL fileURLWithPath:outputPath];
-	encodingOperation.settings = encoderSettings;
-	encodingOperation.metadata = metadataForTrackExtractionRecord(trackExtractionRecord);
+	operation.inputURL = inputURL;
+	operation.outputURL = [NSURL fileURLWithPath:outputPath];
+	operation.settings = encoderSettings;
+	operation.metadata = metadataForTrackExtractionRecord(trackExtractionRecord);
 	
 	// Observe the operation's progress so the input file can be deleted when it completes
-	[encodingOperation addObserver:self forKeyPath:@"isCancelled" options:NSKeyValueObservingOptionNew context:kEncodingOperationKVOContext];
-	[encodingOperation addObserver:self forKeyPath:@"isFinished" options:NSKeyValueObservingOptionNew context:kEncodingOperationKVOContext];
+	[operation addObserver:self forKeyPath:@"isCancelled" options:NSKeyValueObservingOptionNew context:kEncodingOperationKVOContext];
+	[operation addObserver:self forKeyPath:@"isFinished" options:NSKeyValueObservingOptionNew context:kEncodingOperationKVOContext];
 
 #if DEBUG
-	NSLog(@"Encoding %@ to %@ using %@", [encodingOperation.inputURL path], [encodingOperation.outputURL path], [encoderBundle objectForInfoDictionaryKey:@"EncoderName"]);
+	NSLog(@"Encoding %@ to %@ using %@", [operation.inputURL path], [operation.outputURL path], [encoderBundle objectForInfoDictionaryKey:@"EncoderName"]);
 #endif
 
-	[self.queue addOperation:encodingOperation];
+	if(!delayPostProcessing)
+		[self postProcessEncodingOperation:operation error:error];
+	
+	[self.queue addOperation:operation];
 	
 	// Communicate the output URL back to the caller
-	trackExtractionRecord.URL = encodingOperation.outputURL;
+	trackExtractionRecord.URL = operation.outputURL;
+	
+	if(encodingOperation)
+		*encodingOperation = operation;
 	
 	return YES;
 }
@@ -496,6 +518,46 @@ static EncoderManager *sSharedEncoderManager				= nil;
 - (BOOL) encodeURL:(NSURL *)inputURL forExtractedImageRecord:(ExtractedImageRecord *)extractedImageRecord error:(NSError **)error
 {
 	NSBeep();
+}
+
+// ========================================
+// Post-encoding processing
+- (BOOL) postProcessEncodingOperation:(EncodingOperation *)encodingOperation error:(NSError **)error
+{
+	return [self postProcessEncodingOperations:[NSArray arrayWithObject:encodingOperation] error:error];
+}
+
+- (BOOL) postProcessEncodingOperations:(NSArray *)encodingOperations error:(NSError **)error
+{
+	NSParameterAssert(nil != encodingOperations);
+	
+	EncodingOperation *baseOperation = [encodingOperations lastObject];
+	
+	NSBundle *encoderBundle = [NSBundle bundleForClass:[baseOperation class]];
+	
+	if(![encoderBundle loadAndReturnError:error])
+		return NO;
+	
+	Class encoderClass = [encoderBundle principalClass];
+	NSObject <EncoderInterface> *encoderInterface = [[encoderClass alloc] init];
+
+	EncodingPostProcessingOperation *operation = [encoderInterface encodingPostProcessingOperation];
+	
+	operation.URLs = [encodingOperations valueForKey:@"outputURL"];
+	operation.settings = [baseOperation settings];
+	operation.metadata = [baseOperation valueForKey:@"metadata"];
+	
+	// Observe the operation's progress
+	[operation addObserver:self forKeyPath:@"isCancelled" options:NSKeyValueObservingOptionNew context:kEncodingPostProcessingOperationKVOContext];
+	[operation addObserver:self forKeyPath:@"isFinished" options:NSKeyValueObservingOptionNew context:kEncodingPostProcessingOperationKVOContext];
+	
+	// Add the encoding operations as dependencies for the post-processing
+	for(NSOperation *encodingOperation in encodingOperations)
+		[operation addDependency:encodingOperation];
+	
+	[self.queue addOperation:operation];
+
+	return YES;
 }
 
 @end

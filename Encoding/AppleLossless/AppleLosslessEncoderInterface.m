@@ -7,6 +7,8 @@
 #import "AppleLosslessEncodeOperation.h"
 #import "AppleLosslessSettingsViewController.h"
 
+#import "EncoderInterface/EncodingPostProcessingOperation.h"
+
 @implementation AppleLosslessEncoderInterface
 
 - (NSDictionary *) defaultSettings
@@ -41,6 +43,11 @@
 - (EncodingOperation *) encodingOperation
 {
 	return [[AppleLosslessEncodeOperation alloc] init];
+}
+
+- (EncodingPostProcessingOperation *) encodingPostProcessingOperation
+{
+	return nil;
 }
 
 - (NSString *) pathExtensionForSettings:(NSDictionary *)settings

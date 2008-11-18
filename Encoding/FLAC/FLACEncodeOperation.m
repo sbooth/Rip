@@ -62,7 +62,10 @@ setArgumentForTag(NSMutableArray *arguments, NSDictionary *metadata, NSString *k
 	NSNumber *compressionLevel = [self.settings objectForKey:kFLACCompressionLevelKey];
 	if(compressionLevel)
 		[arguments addObject:[NSString stringWithFormat:@"-%i", [compressionLevel integerValue]]];
-	
+
+	// Verify encoding
+	[arguments addObject:@"-V"];
+
 	// Metadata
 	setArgumentForTag(arguments, self.metadata, kMetadataTitleKey, @"TITLE");
 	setArgumentForTag(arguments, self.metadata, kMetadataAlbumTitleKey, @"ALBUM");

@@ -50,6 +50,7 @@
 	ExtractedAudioFile *_synthesizedFile;
 
 	NSMutableArray *_trackExtractionRecords;
+	NSMutableArray *_encodingOperations;
 }
 
 // ========================================

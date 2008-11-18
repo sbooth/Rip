@@ -7,6 +7,8 @@
 #import "CoreAudioEncodeOperation.h"
 #import "WAVESettingsViewController.h"
 
+#import "EncoderInterface/EncodingPostProcessingOperation.h"
+
 @implementation WAVEEncoderInterface
 
 - (NSDictionary *) defaultSettings
@@ -46,6 +48,11 @@
 - (EncodingOperation *) encodingOperation
 {
 	return [[CoreAudioEncodeOperation alloc] init];
+}
+
+- (EncodingPostProcessingOperation *) encodingPostProcessingOperation
+{
+	return nil;
 }
 
 - (NSString *) pathExtensionForSettings:(NSDictionary *)settings
