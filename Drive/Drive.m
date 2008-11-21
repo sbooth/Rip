@@ -1,10 +1,11 @@
 /*
- *  Copyright (C) 2005 - 2007 Stephen F. Booth <me@sbooth.org>
+ *  Copyright (C) 2005 - 2008 Stephen F. Booth <me@sbooth.org>
  *  All Rights Reserved
  */
 
 #import "Drive.h"
 #import "SectorRange.h"
+#import "Logger.h"
 
 #include <IOKit/storage/IOCDTypes.h>
 #include <IOKit/storage/IOCDMediaBSDClient.h>
@@ -61,11 +62,9 @@
 	// Claim the disk for exclusive use
 //	DADiskClaim(self.disk);
 	
-	self.fd = opendev((char *)DADiskGetBSDName(self.disk), O_RDONLY | O_NONBLOCK, 0, NULL);
+	self.fd = opendev((char *)DADiskGetBSDName(self.disk), O_RDONLY, 0, NULL);
 	if(-1 == self.fd) {
-#if DEBUG
-		NSLog(@"Unable to open the drive for reading.");
-#endif
+		[[Logger sharedLogger] logMessage:@"Unable to open the drive for reading"];
 		self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:nil];
 		return NO;
 	}
@@ -81,9 +80,7 @@
 	int result = close(self.fd);
 	self.fd = -1;
 	if(-1 == result) {
-#if DEBUG
-		NSLog(@"Unable to close the drive.");
-#endif
+		[[Logger sharedLogger] logMessage:@"Unable to close the drive"];
 		self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:nil];
 		return NO;
 	}
@@ -100,9 +97,7 @@
 {
 	uint16_t speed = 0;
 	if(-1 == ioctl(self.fd, DKIOCCDGETSPEED, &speed)) {
-#if DEBUG
-		NSLog(@"Unable to get the drive's speed");
-#endif
+		[[Logger sharedLogger] logMessage:@"Unable to get the drive's speed"];
 		self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:nil];
 	}
 
@@ -112,9 +107,7 @@
 - (BOOL) setSpeed:(uint16_t)speed
 {
 	if(-1 == ioctl(self.fd, DKIOCCDSETSPEED, &speed)) {
-#if DEBUG
-		NSLog(@"Unable to set the drive's speed");
-#endif
+		[[Logger sharedLogger] logMessage:@"Unable to set the drive's speed"];
 		self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:nil];
 		return NO;
 	}
@@ -286,9 +279,8 @@
 	bzero(&cd_read_mcn, sizeof(cd_read_mcn));
 
 	if(-1 == ioctl(self.fd, DKIOCCDREADMCN, &cd_read_mcn)) {
-#if DEBUG
-		NSLog(@"Unable to read the disc's media catalog number (MCN)");
-#endif
+		[[Logger sharedLogger] logMessage:@"Unable to read the disc's media catalog number (MCN)"];
+		
 		// This is not an error condition
 		return nil;
 	}
@@ -304,9 +296,8 @@
 	cd_read_isrc.track = track;
 
 	if(-1 == ioctl(self.fd, DKIOCCDREADISRC, &cd_read_isrc)) {
-#if DEBUG
-		NSLog(@"Unable to read the international standard recording code (ISRC) for track %i", track);
-#endif
+		[[Logger sharedLogger] logMessage:@"Unable to read the international standard recording code (ISRC) for track %i", track];
+
 		// This is not an error condition
 		return nil;
 	}
@@ -345,10 +336,8 @@
 		return 0;
 	}
 	
-#if DEBUG
 	if(cd_read.bufferLength != (blockSize * sectorCount))
-		NSLog(@"DKIOCCDREAD: Requested %ld bytes at sector %ld (offset %ld), got %ld", blockSize * sectorCount, startSector, blockSize * startSector, cd_read.bufferLength);
-#endif
+		[[Logger sharedLogger] logMessage:@"DKIOCCDREAD: Requested %ld bytes at sector %ld (offset %ld), got %ld", blockSize * sectorCount, startSector, blockSize * startSector, cd_read.bufferLength];
 	
 	return cd_read.bufferLength / blockSize;
 }

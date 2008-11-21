@@ -12,6 +12,7 @@
 #import "EncoderManager.h"
 #import "MusicDatabaseManager.h"
 #import "ReadOffsetCalculatorSheetController.h"
+#import "Logger.h"
 
 #include <CoreFoundation/CoreFoundation.h>
 #include <DiskArbitration/DiskArbitration.h>
@@ -76,16 +77,28 @@ diskDisappearedCallback(DADiskRef disk, void *context)
 
 + (void) initialize
 {
-	// Register application defaults
-	NSDictionary *ripDefaults = [NSDictionary dictionaryWithObjectsAndKeys:
-								 [NSNumber numberWithInteger:1], @"preferencesVersion",
-								 [NSArchiver archivedDataWithRootObject:[NSURL fileURLWithPath:[@"~/Music" stringByExpandingTildeInPath]]], @"outputDirectory",
-								 [NSNumber numberWithInteger:eExistingOutputFileHandlingRename], @"existingOutputFileHandling",
-								 [NSNumber numberWithBool:YES], @"automaticallyQueryAccurateRip",
-								 [NSNumber numberWithBool:YES], @"automaticallyQueryMusicDatabase",
-								 [NSNumber numberWithInteger:0], @"defaultMusicDatabase",
-								 nil];
-	[[NSUserDefaults standardUserDefaults] registerDefaults:ripDefaults];
+	// Register reasonable defaults for most preferences
+	NSMutableDictionary *defaultsDictionary = [NSMutableDictionary dictionary];
+
+	[defaultsDictionary setObject:[NSNumber numberWithInteger:1] forKey:@"preferencesVersion"];
+	[defaultsDictionary setObject:[NSNumber numberWithInteger:5] forKey:@"maxRetries"];
+
+	NSURL *musicFolderURL = [NSURL URLWithString:[@"~/Music" stringByExpandingTildeInPath]];
+	[defaultsDictionary setObject:[NSArchiver archivedDataWithRootObject:musicFolderURL] forKey:@"outputDirectory"];
+	
+	[defaultsDictionary setObject:[NSNumber numberWithInteger:eExistingOutputFileHandlingRename] forKey:@"existingOutputFileHandling"];
+	[defaultsDictionary setObject:[NSNumber numberWithInteger:eLogMessageLevelNormal] forKey:@"logMessageLevel"];
+	
+	[defaultsDictionary setObject:[NSNumber numberWithBool:YES] forKey:@"automaticallyQueryAccurateRip"];
+	[defaultsDictionary setObject:[NSNumber numberWithBool:YES] forKey:@"automaticallyQueryMusicDatabase"];
+	
+	[defaultsDictionary setObject:@"org.sbooth.Rip.MusicDatabase.MusicBrainz" forKey:@"defaultMusicDatabase"];
+	[defaultsDictionary setObject:@"org.sbooth.Rip.Encoder.FLAC" forKey:@"defaultEncoder"];
+	
+	// Enable Sparkle system profiling
+	[defaultsDictionary setObject:[NSNumber numberWithBool:YES] forKey:@"SUEnableSystemProfiling"];
+	
+	[[NSUserDefaults standardUserDefaults] registerDefaults:defaultsDictionary];
 	
 	// Register custom value transformer classes
 	NSValueTransformer *transformer = nil;
@@ -117,21 +130,6 @@ diskDisappearedCallback(DADiskRef disk, void *context)
 	
 #pragma unused(aNotification)
 	
-	// Register reasonable defaults for most preferences
-	NSMutableDictionary *defaultsDictionary = [NSMutableDictionary dictionary];
-
-	NSURL *musicFolderURL = [NSURL URLWithString:[@"~/Music" stringByExpandingTildeInPath]];
-	[defaultsDictionary setObject:[NSArchiver archivedDataWithRootObject:musicFolderURL] forKey:@"outputDirectory"];
-
-	[defaultsDictionary setObject:[NSNumber numberWithInteger:eExistingOutputFileHandlingRename] forKey:@"existingOutputFileHandling"];
-
-	[defaultsDictionary setObject:@"org.sbooth.Rip.MusicDatabase.MusicBrainz" forKey:@"defaultMusicDatabase"];
-	[defaultsDictionary setObject:@"org.sbooth.Rip.Encoder.FLAC" forKey:@"defaultEncoder"];
-	
-	// Enable Sparkle system profiling
-	[defaultsDictionary setObject:[NSNumber numberWithBool:YES] forKey:@"SUEnableSystemProfiling"];
-	
-	[[NSUserDefaults standardUserDefaults] registerDefaults:defaultsDictionary];
 }
 
 - (void) applicationDidFinishLaunching:(NSNotification *)aNotification
@@ -141,6 +139,9 @@ diskDisappearedCallback(DADiskRef disk, void *context)
 	
 	// Seed the random number generator
 	srandom(time(NULL));
+	
+	// Set up logging
+	[[Logger sharedLogger] logMessage:NSLocalizedString(@"Log opened", @"")];
 	
 	// Register our URL handlers
 	[[NSAppleEventManager sharedAppleEventManager] setEventHandler:self 
@@ -264,6 +265,11 @@ diskDisappearedCallback(DADiskRef disk, void *context)
 		DASessionUnscheduleFromRunLoop(_diskArbitrationSession, CFRunLoopGetCurrent(), kCFRunLoopDefaultMode);
 		CFRelease(_diskArbitrationSession), _diskArbitrationSession = NULL;
 	}
+	
+	// Close the log file
+	[[Logger sharedLogger] logMessage:NSLocalizedString(@"Log closed", @"")];
+	if(_logFile)
+		[_logFile closeFile], _logFile = nil;
 }
 
 - (BOOL) application:(NSApplication *)theApplication openFile:(NSString *)filename
@@ -393,6 +399,8 @@ diskDisappearedCallback(DADiskRef disk, void *context)
 {
 	NSParameterAssert(NULL != disk);
 
+	[[Logger sharedLogger] logMessageWithLevel:eLogMessageLevelDebug format:NSLocalizedString(@"Found compact disc on %s", @""), DADiskGetBSDName(disk)];
+	
 	// Create a new window for this disk
 	CompactDiscWindowController *compactDiscWindow = [[CompactDiscWindowController alloc] init];
 	compactDiscWindow.disk = disk;

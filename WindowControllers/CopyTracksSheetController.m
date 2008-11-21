@@ -40,6 +40,8 @@
 
 #import "NSIndexSet+SetMethods.h"
 
+#import "Logger.h"
+
 #include <AudioToolbox/AudioFile.h>
 
 // ========================================
@@ -120,8 +122,10 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.CopyTrack
 @synthesize trackIDs = _trackIDs;
 
 @synthesize maxRetries = _maxRetries;
+@synthesize requiredMatches = _requiredMatches;
 
 @synthesize trackExtractionRecords = _trackExtractionRecords;
+@synthesize failedTrackIDs = _failedTrackIDs;
 
 @synthesize compactDisc = _compactDisc;
 @synthesize driveInformation = _driveInformation;
@@ -506,6 +510,7 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.CopyTrack
 	
 	// Set up the extraction records
 	_trackExtractionRecords = [NSMutableArray array];
+	_failedTrackIDs = [NSMutableArray array];
 	_encodingOperations =  [NSMutableArray array];
 	
 	// Get started on the first one
@@ -530,11 +535,12 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.CopyTrack
 	NSArray *temporaryURLS = [_trackPartialExtractions valueForKey:@"URL"];
 	for(NSURL *URL in temporaryURLS) {
 		NSError *error = nil;
-		if(![[NSFileManager defaultManager] removeItemAtPath:[URL path] error:&error]) {
-			NSLog(@"Error removing temporary file: %@", error);
-		}
+		if(![[NSFileManager defaultManager] removeItemAtPath:[URL path] error:&error])
+			[[Logger sharedLogger] logMessage:@"Error removing temporary file: %@", error];
 	}
 	
+	[[Logger sharedLogger] logMessageWithLevel:eLogMessageLevelDebug format:@"Beginning extraction for track %@", track.number];
+
 	[self extractWholeTrack:track];
 }
 
@@ -661,15 +667,13 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.CopyTrack
 		return;
 	}
 	
-#if DEBUG
 	if(operation.useC2) {
-		NSLog(@"Extracted sectors %u - %u to %@, %u C2 block errors.  MD5 = %@", operation.sectorsRead.firstSector, operation.sectorsRead.lastSector, [operation.URL.path lastPathComponent], operation.blockErrorFlags.count, operation.MD5);
+		[[Logger sharedLogger] logMessageWithLevel:eLogMessageLevelDebug format:@"Extracted sectors %u - %u to %@, %u C2 block errors.  MD5 = %@", operation.sectorsRead.firstSector, operation.sectorsRead.lastSector, [operation.URL.path lastPathComponent], operation.blockErrorFlags.count, operation.MD5];
 		if([operation.blockErrorFlags count])
-			NSLog(@"C2 block errors for sectors %@", operation.blockErrorFlags);
+			[[Logger sharedLogger] logMessageWithLevel:eLogMessageLevelDebug format:@"C2 block errors for sectors %@", operation.blockErrorFlags];
 	}
 	else
-		NSLog(@"Extracted sectors %u - %u to %@.  MD5 = %@", operation.sectorsRead.firstSector, operation.sectorsRead.lastSector, [operation.URL.path lastPathComponent], operation.MD5);
-#endif
+		[[Logger sharedLogger] logMessageWithLevel:eLogMessageLevelDebug format:@"Extracted sectors %u - %u to %@.  MD5 = %@", operation.sectorsRead.firstSector, operation.sectorsRead.lastSector, [operation.URL.path lastPathComponent], operation.MD5];
 	
 	// Fetch the track this operation represents
 	NSManagedObject *managedObject = [self.managedObjectContext objectWithID:operation.trackID];
@@ -728,9 +732,7 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.CopyTrack
 		}
 	}
 	else if([possibleAccurateRipOffsets count]) {
-#if DEBUG
-		NSLog(@"Using alternate AccurateRip pressing");
-#endif
+		[[Logger sharedLogger] logMessageWithLevel:eLogMessageLevelDebug format:@"Using alternate AccurateRip pressing"];
 		
 		for(NSDictionary *alternatePressingInfo in possibleAccurateRipOffsets) {
 			NSManagedObjectID *accurateRipTrackID = [alternatePressingInfo objectForKey:kAccurateRipTrackIDKey];
@@ -799,7 +801,7 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.CopyTrack
 			// Remove the old temporary files
 			NSError *error = nil;
 			if(![[NSFileManager defaultManager] removeItemAtPath:copyOperation.URL.path error:&error])
-				NSLog(@"Error removing temporary file: %@", error);
+				[[Logger sharedLogger] logMessage:@"Error removing temporary file: %@", error];
 			
 			if([self sendTrackToEncoder:track extractionOperation:operation accurateRipChecksum:trackActualAccurateRipChecksum accurateRipConfidenceLevel:nil error:&error])
 				[self startExtractingNextTrack];
@@ -809,15 +811,13 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.CopyTrack
 		// This track has been extracted before but the SHA1 hashes don't match
 		// Determine where the differences are and re-extract those sections
 		else if(copyOperation) {
-#if DEBUG
-			NSLog(@"Track extracted before but SHA1 hashes don't match.");
-#endif
+			[[Logger sharedLogger] logMessageWithLevel:eLogMessageLevelDebug format:@"Track extracted before but SHA1 hashes don't match."];
 			
 			NSIndexSet *nonMatchingSectorIndexes = compareFilesForNonMatchingSectors(copyOperation.URL, operation.URL);
 			
 			// Sanity check
 			if(!nonMatchingSectorIndexes.count) {
-				NSLog(@"Internal inconsistency: SHA1 hashes don't match but no sector-level differences found");
+				[[Logger sharedLogger] logMessage:@"Internal inconsistency: SHA1 hashes don't match but no sector-level differences found"];
 				return;
 			}
 
@@ -835,9 +835,7 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.CopyTrack
 			if([matchingSectors count])
 				[self saveSectors:matchingSectors fromOperation:operation forTrack:track];
 
-#if DEBUG
-			NSLog(@"Sectors with differences: %@", nonMatchingSectors);
-#endif
+			[[Logger sharedLogger] logMessageWithLevel:eLogMessageLevelDebug format:@"Sectors with differences: %@", nonMatchingSectors];
 
 			[_trackPartialExtractions addObject:operation];
 			[_sectorsNeedingVerification setObject:nonMatchingSectors forKey:[track objectID]];
@@ -882,9 +880,7 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.CopyTrack
 		
 		// If this operation resolved any C2 errors, save those sectors
 		if([verifiedSectors count]) {
-#if DEBUG
-			NSLog(@"Resolved C2 block errors for sectors %@", verifiedSectors);
-#endif
+			[[Logger sharedLogger] logMessageWithLevel:eLogMessageLevelDebug format:@"Resolved C2 block errors for sectors %@", verifiedSectors];
 
 			[sectorsNeedingVerification removeIndexes:verifiedSectors];
 			
@@ -917,9 +913,8 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.CopyTrack
 
 		// Save the sectors from this operation that matched the previous extraction
 		if([sectorsVerified count]) {
-#if DEBUG
-			NSLog(@"Got matches for sectors %@", sectorsVerified);
-#endif
+			[[Logger sharedLogger] logMessageWithLevel:eLogMessageLevelDebug format:@"Got matches for sectors %@", sectorsVerified];
+
 			[sectorsNeedingVerification removeIndexes:verifiedSectors];
 
 			[self saveSectors:sectorsVerified fromOperation:operation forTrack:track];
@@ -957,9 +952,8 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.CopyTrack
 			
 			// Save the sectors from this operation that matched the previous extraction
 			if([sectorsVerified count]) {
-#if DEBUG
-				NSLog(@"Got matches for sectors %@", sectorsVerified);
-#endif
+				[[Logger sharedLogger] logMessageWithLevel:eLogMessageLevelDebug format:@"Got matches for sectors %@", sectorsVerified];
+
 				[sectorsNeedingVerification removeIndexes:verifiedSectors];
 
 				[self saveSectors:sectorsVerified fromOperation:operation forTrack:track];
@@ -976,10 +970,7 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.CopyTrack
 	
 	// If all sectors are verified, encode the track if it is verified
 	if(![sectorsNeedingVerification count]) {
-
-#if DEBUG
-		NSLog(@"Track has no errors");
-#endif
+		[[Logger sharedLogger] logMessage:@"Track has no errors"];
 		
 		// Any operations in progress are no longer needed
 		[self.operationQueue cancelAllOperations];
@@ -1017,9 +1008,8 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.CopyTrack
 				
 				AccurateRipTrackRecord *accurateRipTrack = (AccurateRipTrackRecord *)managedObject;
 		
-#if DEBUG
-				NSLog(@"Track AR checksum = %.8lx, checking against %.8lx", accurateRipChecksum, accurateRipTrack.checksum.unsignedIntegerValue);
-#endif
+				[[Logger sharedLogger] logMessageWithLevel:eLogMessageLevelDebug format:@"Track AR checksum = %.8lx, checking against %.8lx", accurateRipChecksum, accurateRipTrack.checksum.unsignedIntegerValue];
+				
 				// If the track was accurately ripped, ship it off to the encoder
 				if([accurateRipTrack.checksum unsignedIntegerValue] == accurateRipChecksum) {					
 					// Create the extraction record
@@ -1055,9 +1045,7 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.CopyTrack
 			}
 		}
 		else if([possibleAccurateRipOffsets count]) {
-#if DEBUG
-			NSLog(@"Using alternate AccurateRip pressing");
-#endif
+			[[Logger sharedLogger] logMessage:@"Using alternate AccurateRip pressing"];
 			
 			for(NSDictionary *alternatePressingInfo in possibleAccurateRipOffsets) {
 				NSManagedObjectID *accurateRipTrackID = [alternatePressingInfo objectForKey:kAccurateRipTrackIDKey];
@@ -1073,9 +1061,7 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.CopyTrack
 				NSNumber *alternatePressingOffset = [alternatePressingInfo objectForKey:kReadOffsetKey];
 				NSUInteger trackAlternateAccurateRipChecksum = [self calculateAccurateRipChecksumForTrack:track extractionOperation:operation readOffsetAdjustment:[alternatePressingOffset unsignedIntegerValue]];
 				
-#if DEBUG
-				NSLog(@"Track alternate pressing AR checksum = %.8lx, checking against %.8lx", trackAlternateAccurateRipChecksum, accurateRipTrack.checksum.unsignedIntegerValue);
-#endif
+				[[Logger sharedLogger] logMessageWithLevel:eLogMessageLevelDebug format:@"Track alternate pressing AR checksum = %.8lx, checking against %.8lx", trackAlternateAccurateRipChecksum, accurateRipTrack.checksum.unsignedIntegerValue];
 
 				// If the track was accurately ripped, ship it off to the encoder
 				if([accurateRipTrack.checksum unsignedIntegerValue] == trackAlternateAccurateRipChecksum) {
@@ -1113,9 +1099,7 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.CopyTrack
 			}
 		}
 
-#if DEBUG		
-		NSLog(@"Track still has errors after synthesis");
-#endif
+		[[Logger sharedLogger] logMessageWithLevel:eLogMessageLevelDebug format:@"Track still has errors after synthesis"];
 
 		[_tracksExtractedButNotVerified removeObjectForKey:[track objectID]];
 
@@ -1125,9 +1109,10 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.CopyTrack
 			[self extractWholeTrack:track];
 		}
 		else {
-#if DEBUG
-			NSLog(@"Maximum retry count exceeded");
-#endif
+			[[Logger sharedLogger] logMessage:@"Extraction failed for track %@: maximum retry count exceeded", track.number];
+			
+			[_failedTrackIDs addObject:[track objectID]];
+			
 			[self startExtractingNextTrack];
 		}
 	}
@@ -1457,7 +1442,7 @@ cleanup:
 		
 		// Sanity check to ensure the correct sectors were removed and all sectors were copied
 		if(![operation.MD5 isEqualToString:outputFile.MD5] || ![operation.SHA1 isEqualToString:outputFile.SHA1]) {
-			NSLog(@"Internal inconsistency: MD5 or SHA1 for extracted and synthesized audio don't match");
+			[[Logger sharedLogger] logMessage:@"Internal inconsistency: MD5 or SHA1 for extracted and synthesized audio don't match"];
 
 			[inputFile closeFile];
 			[outputFile closeFile];

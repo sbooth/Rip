@@ -18,6 +18,9 @@
 #import "ImageExtractionRecord.h"
 
 #import "FileUtilities.h"
+#import "Logger.h"
+
+#import <Growl/GrowlApplicationBridge.h>
 
 // ========================================
 // Flatten the metadata objects into a single NSDictionary
@@ -231,7 +234,7 @@ static EncoderManager *sSharedEncoderManager				= nil;
 		if([keyPath isEqualToString:@"isCancelled"] || [keyPath isEqualToString:@"isFinished"]) {
 			[operation removeObserver:self forKeyPath:@"isCancelled"];
 			[operation removeObserver:self forKeyPath:@"isFinished"];
-			
+			// Nothing to do currently
 		}
 	}
 	else
@@ -497,14 +500,15 @@ static EncoderManager *sSharedEncoderManager				= nil;
 	[operation addObserver:self forKeyPath:@"isCancelled" options:NSKeyValueObservingOptionNew context:kEncodingOperationKVOContext];
 	[operation addObserver:self forKeyPath:@"isFinished" options:NSKeyValueObservingOptionNew context:kEncodingOperationKVOContext];
 
-#if DEBUG
-	NSLog(@"Encoding %@ to %@ using %@", [operation.inputURL path], [operation.outputURL path], [encoderBundle objectForInfoDictionaryKey:@"EncoderName"]);
-#endif
+	[[Logger sharedLogger] logMessageWithLevel:eLogMessageLevelDebug format:@"Encoding %@ to %@ using %@", [operation.inputURL path], [operation.outputURL path], [encoderBundle objectForInfoDictionaryKey:@"EncoderName"]];
 
 	if(!delayPostProcessing)
 		[self postProcessEncodingOperation:operation error:error];
 	
 	[self.queue addOperation:operation];
+	
+	NSString *notificationDescription = [NSString stringWithFormat:NSLocalizedString(@"Encoding %@ to %@ using %@", @""), [operation.metadata objectForKey:kMetadataTitleKey], [[operation.outputURL path] lastPathComponent], [encoderBundle objectForInfoDictionaryKey:@"EncoderName"]];
+	[GrowlApplicationBridge notifyWithTitle:NSLocalizedString(@"Encoding started", @"") description:notificationDescription notificationName:@"Encoding Started" iconData:nil priority:0 isSticky:NO clickContext:nil];
 	
 	// Communicate the output URL back to the caller
 	trackExtractionRecord.URL = operation.outputURL;

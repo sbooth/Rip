@@ -9,6 +9,7 @@
 // Enum for user defaults output file handling
 // ========================================
 enum _eLogMessageLevel {
+	eLogMessageLevelSilent = 0,
 	eLogMessageLevelNormal = 1,
 	eLogMessageLevelDebug = 2,
 	eLogMessageLevelFull = 3
@@ -33,8 +34,9 @@ typedef enum _eLogMessageLevel eLogMessageLevel;
 // Properties
 @property (assign) eLogMessageLevel logMessageLevel;
 
-// Log the specified string to the application's log file
-- (void) logMessage:(NSString *)message;
-- (void) logMessage:(NSString *)message level:(eLogMessageLevel)level;
+// ========================================
+// Logging
+- (void) logMessage:(NSString *)format, ...;
+- (void) logMessageWithLevel:(eLogMessageLevel)level format:(NSString *)format, ...;
 
 @end

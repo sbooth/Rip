@@ -12,6 +12,7 @@
 @interface Logger (Private)
 - (BOOL) openLogFile;
 - (void) closeLogFile;
+- (void) logMessage:(NSString *)message level:(eLogMessageLevel)level;
 @end
 
 // ========================================
@@ -40,33 +41,32 @@ static Logger *sSharedLogger				= nil;
 	return self;
 }
 
-- (void) logMessage:(NSString *)message
+- (void) logMessage:(NSString *)format, ...
 {
+	NSParameterAssert(nil != format);
+	
+	va_list ap;
+	
+	va_start(ap, format);
+	
+	NSString *message = [[NSString alloc] initWithFormat:format arguments:ap];
 	[self logMessage:message level:eLogMessageLevelNormal];
+	
+	va_end(ap);
 }
 
-- (void) logMessage:(NSString *)message level:(eLogMessageLevel)level
+- (void) logMessageWithLevel:(eLogMessageLevel)level format:(NSString *)format, ...
 {
-	NSParameterAssert(nil != message);
+	NSParameterAssert(nil != format);
 	
-	// Only log messages with the specified log level or less
-	if(self.logMessageLevel < level)
-		return;
+	va_list ap;
 	
-	// Add a timestamp
-	NSMutableString *logMessage = [NSMutableString string];
-	[logMessage appendFormat:@"[%@] %@\n", [NSDate date], message];
+	va_start(ap, format);
 	
-	// Use UTF-8 for the file's data
-	NSData *data = [logMessage dataUsingEncoding:NSUTF8StringEncoding];
+	NSString *message = [[NSString alloc] initWithFormat:format arguments:ap];
+	[self logMessage:message level:level];
 	
-	// Don't let an exception here ruin our day
-	@try {
-		[_logFile writeData:data];
-	}
-	@catch(NSException *exception) {
-		NSLog(@"Unable to write to log file: %@", exception);
-	}
+	va_end(ap);
 }
 
 @end
@@ -100,6 +100,34 @@ static Logger *sSharedLogger				= nil;
 {
 	if(_logFile)
 		[_logFile closeFile], _logFile = nil;
+}
+
+- (void) logMessage:(NSString *)message level:(eLogMessageLevel)level
+{
+	NSParameterAssert(nil != message);
+	
+#if DEBUG
+	NSLog(message);
+#endif
+	
+	// Only log messages with the specified log level or less
+	if(self.logMessageLevel < level)
+		return;
+	
+	// Add a timestamp
+	NSMutableString *logMessage = [NSMutableString string];
+	[logMessage appendFormat:@"[%@] %@\n", [NSDate date], message];
+	
+	// Use UTF-8 for the file's data
+	NSData *data = [logMessage dataUsingEncoding:NSUTF8StringEncoding];
+	
+	// Don't let an exception here ruin our day
+	@try {
+		[_logFile writeData:data];
+	}
+	@catch(NSException *exception) {
+		NSLog(@"Unable to write to log file: %@", exception);
+	}
 }
 
 @end

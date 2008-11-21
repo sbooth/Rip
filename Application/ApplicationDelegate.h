@@ -15,6 +15,7 @@
 	NSManagedObjectContext *_managedObjectContext;
 	NSPersistentStore *_primaryStore;
 	NSPersistentStore *_inMemoryStore;
+	NSFileHandle *_logFile;
 }
 
 // File and folder locations

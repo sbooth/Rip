@@ -43,14 +43,16 @@
 	NSMutableDictionary *_tracksExtractedButNotVerified;
 	NSMutableDictionary *_sectorsNeedingVerification;
 	NSMutableArray *_trackPartialExtractions;
+	NSMutableArray *_encodingOperations;
 
+	NSUInteger _requiredMatches;
 	NSUInteger _retryCount;
 	NSUInteger _maxRetries;
 	
 	ExtractedAudioFile *_synthesizedFile;
 
 	NSMutableArray *_trackExtractionRecords;
-	NSMutableArray *_encodingOperations;
+	NSMutableArray *_failedTrackIDs;
 }
 
 // ========================================
@@ -59,8 +61,10 @@
 @property (copy) NSSet * trackIDs;
 
 @property (assign) NSUInteger maxRetries;
+@property (assign) NSUInteger requiredMatches;
 
 @property (readonly) NSArray * trackExtractionRecords;
+@property (readonly) NSArray * failedTrackIDs;
 
 // ========================================
 // The meat & potatoes
