@@ -7,7 +7,7 @@
 #include <DiskArbitration/DiskArbitration.h>
 
 @class CompactDisc, DriveInformation, AccurateRipDiscRecord;
-@class ExtractedAudioFile;
+@class ExtractionOperation, ExtractedAudioFile;
 
 // ========================================
 // An NSWindowController subclass for customizing the extraction
@@ -39,10 +39,14 @@
 	NSMutableArray *_activeTimers;
 	NSOperationQueue *_operationQueue;
 
-	NSMutableSet *_tracksToBeExtracted;
-	NSMutableDictionary *_tracksExtractedButNotVerified;
-	NSMutableDictionary *_sectorsNeedingVerification;
-	NSMutableArray *_trackPartialExtractions;
+	NSMutableSet *_tracksRemaining;
+	
+	ExtractionOperation *_copyOperation;
+	ExtractionOperation *_verificationOperation;
+	
+	NSMutableArray *_partialExtractions;
+	NSMutableIndexSet *_sectorsNeedingVerification;
+
 	NSMutableArray *_encodingOperations;
 
 	NSUInteger _requiredMatches;
@@ -51,8 +55,8 @@
 	
 	ExtractedAudioFile *_synthesizedFile;
 
-	NSMutableArray *_trackExtractionRecords;
-	NSMutableArray *_failedTrackIDs;
+	NSMutableSet *_trackExtractionRecords;
+	NSMutableSet *_failedTrackIDs;
 }
 
 // ========================================
@@ -63,8 +67,8 @@
 @property (assign) NSUInteger maxRetries;
 @property (assign) NSUInteger requiredMatches;
 
-@property (readonly) NSArray * trackExtractionRecords;
-@property (readonly) NSArray * failedTrackIDs;
+@property (readonly) NSSet * trackExtractionRecords;
+@property (readonly) NSSet * failedTrackIDs;
 
 // ========================================
 // The meat & potatoes
