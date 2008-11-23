@@ -76,16 +76,15 @@ cleanup:
 // Calculate the AccurateRip checksum for the specified range of CDDA sectors file at path
 // ========================================
 uint32_t 
-calculateAccurateRipChecksumForFileRegion(NSURL *fileURL, NSUInteger firstSector, NSUInteger lastSector, BOOL firstTrack, BOOL lastTrack)
+calculateAccurateRipChecksumForFileRegion(NSURL *fileURL, NSRange sectorsToProcess, BOOL firstTrack, BOOL lastTrack)
 {
-	return calculateAccurateRipChecksumForFileRegionUsingOffset(fileURL, firstSector, lastSector, firstTrack, lastTrack, 0);
+	return calculateAccurateRipChecksumForFileRegionUsingOffset(fileURL, sectorsToProcess, firstTrack, lastTrack, 0);
 }
 
 uint32_t 
-calculateAccurateRipChecksumForFileRegionUsingOffset(NSURL *fileURL, NSUInteger firstSector, NSUInteger lastSector, BOOL firstTrack, BOOL lastTrack, NSInteger readOffsetInFrames)
+calculateAccurateRipChecksumForFileRegionUsingOffset(NSURL *fileURL, NSRange sectorsToProcess, BOOL firstTrack, BOOL lastTrack, NSInteger readOffsetInFrames)
 {
 	NSCParameterAssert(nil != fileURL);
-	NSCParameterAssert(lastSector >= firstSector);
 	
 	uint32_t checksum = 0;
 	
@@ -115,8 +114,8 @@ calculateAccurateRipChecksumForFileRegionUsingOffset(NSURL *fileURL, NSUInteger 
 	NSInteger totalSectorsInFile = (NSInteger)(totalPacketsInFile / AUDIO_FRAMES_PER_CDDA_SECTOR);
 	
 	// With no read offset, the range of sectors that will be read won't change
-	NSInteger firstSectorToRead = firstSector;
-	NSInteger lastSectorToRead = lastSector;
+	NSInteger firstSectorToRead = sectorsToProcess.location;
+	NSInteger lastSectorToRead = sectorsToProcess.location + sectorsToProcess.length - 1;
 
 	// Negative read offsets can easily be transformed into positive read offsets
 	// For example, suppose the desired range is sectors 10 through 20 and the read offset is -600 frames.

@@ -11,6 +11,7 @@
 #import "TrackDescriptor.h"
 #import "AccurateRipDiscRecord.h"
 #import "AccurateRipTrackRecord.h"
+#import "Logger.h"
 
 #include <SystemConfiguration/SCNetwork.h>
 
@@ -133,10 +134,7 @@
 		arFreeDBID = OSSwapLittleToHostInt32(arFreeDBID);
 		
 		if(arTrackCount != orderedTracks.count || arDiscID1 != accurateRipID1 || arDiscID2 != accurateRipID2 || (NSUInteger)arFreeDBID != compactDisc.freeDBDiscID) {
-			
-#if DEBUG
-			NSLog(@"AccurateRip track count or disc IDs don't match.");
-#endif
+			[[Logger sharedLogger] logMessageWithLevel:eLogMessageLevelDebug format:@"AccurateRip track count or disc IDs don't match."];
 			
 			self.error = [NSError errorWithDomain:NSCocoaErrorDomain code:3 userInfo:nil];
 			continue;

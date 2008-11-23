@@ -270,10 +270,19 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.CopyTrack
 	[self beginReadMCNSheet];
 }
 
+// A non-traditional cancel; post-processing is still performed for
+// tracks that were successfully extracted
 - (IBAction) cancel:(id)sender
 {
 	[self.operationQueue cancelAllOperations];
 
+	// Post-process the encoded tracks, if required
+	if([_encodingOperations count]) {
+		NSError *error = nil;
+		if(![[EncoderManager sharedEncoderManager] postProcessEncodingOperations:_encodingOperations error:&error])
+			[self presentError:error modalForWindow:self.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
+	}
+	
 	// Remove any active timers
 	[_activeTimers makeObjectsPerformSelector:@selector(invalidate)];
 	[_activeTimers removeAllObjects];
@@ -1084,8 +1093,7 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.CopyTrack
 	[_detailedStatusTextField setStringValue:NSLocalizedString(@"Calculating AccurateRip checksum", @"")];
 	
 	return calculateAccurateRipChecksumForFileRegionUsingOffset(operation.URL, 
-																operation.cushionSectors,
-																operation.cushionSectors + operation.sectors.length - 1,
+																NSMakeRange(operation.cushionSectors, operation.sectors.length),
 																[self.compactDisc.firstSession.firstTrack.number isEqualToNumber:track.number],
 																[self.compactDisc.firstSession.lastTrack.number isEqualToNumber:track.number],
 																readOffsetAdjustment);

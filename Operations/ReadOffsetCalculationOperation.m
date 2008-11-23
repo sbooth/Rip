@@ -72,7 +72,7 @@ NSString * const	kAccurateRipTrackIDKey					= @"accurateRipTrackID";
 	NSMutableArray *possibleReadOffsets = [NSMutableArray array];
 	
 	// Adjust the starting sector in the file
-	SectorRange *singleSectorRange = [SectorRange sectorRangeWithFirstSector:self.sixSecondPointSector sectorCount:1];
+	NSRange singleSectorRange = NSMakeRange(self.sixSecondPointSector, 1);
 	
 	NSInteger firstOffsetToTry = -1 * self.maximumOffsetToCheck;
 	NSInteger lastOffsetToTry = self.maximumOffsetToCheck;
@@ -85,8 +85,7 @@ NSString * const	kAccurateRipTrackIDKey					= @"accurateRipTrackID";
 		
 		// Calculate the AccurateRip checksum for this track with the specified offset
 		uint32_t trackActualOffsetChecksum = calculateAccurateRipChecksumForFileRegionUsingOffset(self.URL, 
-																								  singleSectorRange.firstSector,
-																								  singleSectorRange.lastSector,
+																								  singleSectorRange,
 																								  NO,
 																								  NO,
 																								  currentOffset);
