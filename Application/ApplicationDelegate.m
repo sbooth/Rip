@@ -82,6 +82,7 @@ diskDisappearedCallback(DADiskRef disk, void *context)
 
 	[defaultsDictionary setObject:[NSNumber numberWithInteger:1] forKey:@"preferencesVersion"];
 	[defaultsDictionary setObject:[NSNumber numberWithInteger:5] forKey:@"maxRetries"];
+	[defaultsDictionary setObject:[NSNumber numberWithInteger:3] forKey:@"requiredMatches"];
 
 	NSURL *musicFolderURL = [NSURL URLWithString:[@"~/Music" stringByExpandingTildeInPath]];
 	[defaultsDictionary setObject:[NSArchiver archivedDataWithRootObject:musicFolderURL] forKey:@"outputDirectory"];
@@ -141,7 +142,11 @@ diskDisappearedCallback(DADiskRef disk, void *context)
 	srandom(time(NULL));
 	
 	// Set up logging
-	[[Logger sharedLogger] logMessage:NSLocalizedString(@"Log opened", @"")];
+	NSString *appName = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleName"];
+	NSString *shortVersionNumber = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
+	NSString *versionNumber = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"];	
+
+	[[Logger sharedLogger] logMessage:@"%@ %@ (%@) log opened", appName, shortVersionNumber, versionNumber];
 	
 	// Register our URL handlers
 	[[NSAppleEventManager sharedAppleEventManager] setEventHandler:self 
