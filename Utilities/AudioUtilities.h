@@ -16,6 +16,9 @@ NSIndexSet * compareFileRegionsForNonMatchingSectors(NSURL *leftFileURL, NSUInte
 													 NSURL *rightFileURL, NSUInteger rightFileStartingSectorOffset, 
 													 NSUInteger sectorCount);
 
+BOOL sectorInFilesMatches(NSURL *leftFileURL, NSUInteger leftFileSectorOffset,
+						  NSURL *rightFileURL, NSUInteger rightFileSectorOffset);
+
 // ========================================
 // Calculate the MD5 digest for the audio portion of the specified file
 // ========================================

@@ -239,6 +239,19 @@ cleanup:
 	return [mismatchedSectors copy];
 }
 
+BOOL 
+sectorInFilesMatches(NSURL *leftFileURL, 
+					 NSUInteger leftFileSectorOffset,
+					 NSURL *rightFileURL, 
+					 NSUInteger rightFileSectorOffset)
+{
+	NSIndexSet *mismatchedSectors = compareFileRegionsForNonMatchingSectors(leftFileURL, leftFileSectorOffset, 
+																			rightFileURL, rightFileSectorOffset,
+																			1);
+	
+	return (0 == [mismatchedSectors count]);
+}
+
 NSString * calculateMD5DigestForURL(NSURL *fileURL)
 {
 	NSArray *array = calculateMD5AndSHA1DigestsForURL(fileURL);
