@@ -201,6 +201,7 @@
 	[result appendString:@"\n"];
 	[result appendFormat:@"MusicBrainz ID:     %@\n", self.compactDisc.musicBrainzDiscID];
 	[result appendFormat:@"FreeDB ID:          %08lx\n", self.compactDisc.freeDBDiscID];
+	[result appendFormat:@"AccurateRip ID:     %.3d-%.8x-%.8x-%.8x\n", self.compactDisc.firstSession.tracks.count, self.compactDisc.accurateRipID1, self.compactDisc.accurateRipID2, self.compactDisc.freeDBDiscID];
 	[result appendString:@"TOC:\n"];
 
 	[result appendString:@"\n"];
