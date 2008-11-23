@@ -122,6 +122,11 @@
 	return [[SectorRange alloc] initWithFirstSector:firstSector lastSector:lastSector];
 }
 
+- (NSRange) rangeValue
+{
+	return NSMakeRange(self.firstSector, self.length);
+}
+
 - (NSString *) description
 {
 	return [NSString stringWithFormat:@"SectorRange {\n\tfirstSector = %i,\n\tlastSector = %i,\n\tlength = %i\n}", self.firstSector, self.lastSector, self.length];

@@ -44,4 +44,6 @@
 - (BOOL) intersectsSectorRange:(SectorRange *)range;
 - (SectorRange *) intersectedSectorRange:(SectorRange *)range;
 
+- (NSRange) rangeValue;
+
 @end
