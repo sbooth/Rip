@@ -57,10 +57,17 @@ static NSString * const kMusicDatabaseQueryKVOContext	= @"org.sbooth.Rip.Compact
 @interface CompactDiscWindowController (SheetCallbacks)
 - (void) showMusicDatabaseMatchesSheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode contextInfo:(void *)contextInfo;
 - (void) createCueSheetSavePanelDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode  contextInfo:(void *)contextInfo;
+- (void) showReadMCNSheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode contextInfo:(void *)contextInfo;
+- (void) showReadISRCsSheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode contextInfo:(void *)contextInfo;
+- (void) showDetectPregapsSheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode contextInfo:(void *)contextInfo;
 - (void) showCopyTracksSheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode contextInfo:(void *)contextInfo;
 @end
 
 @interface CompactDiscWindowController (Private)
+- (void) beginReadMCNSheet;
+- (void) beginReadISRCsSheet;
+- (void) beginDetectPregapsSheet;
+- (void) performShowCopyTracksSheet;
 
 - (void) diskWasEjected;
 
@@ -447,32 +454,28 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 {
 	
 #pragma unused(sender)
-	
+
 	NSSet *selectedTracks = self.compactDisc.firstSession.selectedTracks;
 	if(0 == selectedTracks.count) {
 		NSBeep();
 		return;
 	}
 	
-	CopyTracksSheetController *sheetController = [[CopyTracksSheetController alloc] init];
+//	self.extractionMode = eExtractionModeIndividualTracks;
 	
-	sheetController.disk = self.disk;
-	sheetController.trackIDs = [selectedTracks valueForKey:@"objectID"];
-	
-	sheetController.maxRetries = [[NSUserDefaults standardUserDefaults] integerForKey:@"maxRetries"];
-	sheetController.requiredMatches = [[NSUserDefaults standardUserDefaults] integerForKey:@"requiredMatches"];
-	
-	[sheetController beginCopyTracksSheetForWindow:self.window
-									 modalDelegate:self 
-									didEndSelector:@selector(showCopyTracksSheetDidEnd:returnCode:contextInfo:) 
-									   contextInfo:sheetController];
+	// Start the sheet cascade
+	[self beginReadMCNSheet];	
 }
 
 - (IBAction) copyImage:(id)sender
 {
 
 #pragma unused(sender)
+
+	//	self.extractionMode = eExtractionModeImage;
 	
+	// Start the sheet cascade
+//	[self beginReadMCNSheet];		
 }
 
 - (IBAction) detectPregaps:(id)sender
@@ -666,6 +669,54 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 		[self presentError:error modalForWindow:self.window delegate:nil didPresentSelector:NULL contextInfo:NULL];
 }
 
+- (void) showReadMCNSheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode contextInfo:(void *)contextInfo
+{
+	NSParameterAssert(nil != sheet);
+	
+	[sheet orderOut:self];
+	
+	ReadMCNSheetController *sheetController = (ReadMCNSheetController *)contextInfo;
+	sheetController = nil;
+	
+	if(NSCancelButton == returnCode)
+		return;
+	
+	[self beginReadISRCsSheet];
+}
+
+- (void) showReadISRCsSheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode contextInfo:(void *)contextInfo
+{
+	NSParameterAssert(nil != sheet);
+	
+	[sheet orderOut:self];
+	
+	ReadISRCsSheetController *sheetController = (ReadISRCsSheetController *)contextInfo;
+	sheetController = nil;
+	
+	if(NSCancelButton == returnCode)
+		return;
+	
+	[self beginDetectPregapsSheet];
+}
+
+- (void) showDetectPregapsSheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode contextInfo:(void *)contextInfo
+{
+	NSParameterAssert(nil != sheet);
+	
+	[sheet orderOut:self];
+	
+	DetectPregapsSheetController *sheetController = (DetectPregapsSheetController *)contextInfo;
+	sheetController = nil;
+	
+	if(NSCancelButton == returnCode)
+		return;
+	
+//	if(eExtractionModeImage == self.extractionMode)
+//		[self performShowCopyImageSheet];
+//	else if(eExtractionModeIndividualTracks == self.extractionMode)
+	[self performShowCopyTracksSheet];
+}
+
 - (void) showCopyTracksSheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode contextInfo:(void *)contextInfo
 {
 	NSParameterAssert(nil != sheet);
@@ -772,6 +823,93 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 	
 	[column setHidden:!column.isHidden];
 	[menuItem setState:!column.isHidden];
+}
+
+- (void) beginReadMCNSheet
+{
+	// Read the MCN for the disc, if not present
+	if(!self.compactDisc.metadata.MCN) {
+		ReadMCNSheetController *sheetController = [[ReadMCNSheetController alloc] init];
+		
+		sheetController.disk = self.disk;
+		
+		[sheetController beginReadMCNSheetForWindow:self.window
+									  modalDelegate:self 
+									 didEndSelector:@selector(showReadMCNSheetDidEnd:returnCode:contextInfo:) 
+										contextInfo:sheetController];
+	}
+	else
+		[self beginReadISRCsSheet];
+}
+
+- (void) beginReadISRCsSheet
+{
+	NSMutableArray *tracksWithoutISRCs = [NSMutableArray array];
+	
+	// Ensure ISRCs have been read for the selected tracks
+	for(TrackDescriptor *track in self.compactDisc.firstSession.orderedSelectedTracks) {
+		// Don't waste time re-reading a pre-existing ISRC
+		if(!track.metadata.ISRC)
+			[tracksWithoutISRCs addObject:track];
+	}
+	
+	if([tracksWithoutISRCs count]) {
+		ReadISRCsSheetController *sheetController = [[ReadISRCsSheetController alloc] init];
+		
+		sheetController.disk = self.disk;
+		sheetController.trackIDs = [tracksWithoutISRCs valueForKey:@"objectID"];
+		
+		[sheetController beginReadISRCsSheetForWindow:self.window
+										modalDelegate:self 
+									   didEndSelector:@selector(showReadISRCsSheetDidEnd:returnCode:contextInfo:) 
+										  contextInfo:sheetController];
+	}
+	else
+		[self beginDetectPregapsSheet];
+}
+
+- (void) beginDetectPregapsSheet
+{
+	NSMutableArray *tracksWithoutPregaps = [NSMutableArray array];
+	
+	// Ensure pregaps have been read for the selected tracks
+	for(TrackDescriptor *track in self.compactDisc.firstSession.orderedSelectedTracks) {
+		// Grab pre-gaps
+		if(!track.pregap)
+			[tracksWithoutPregaps addObject:track];
+	}
+	
+	if([tracksWithoutPregaps count]) {
+		DetectPregapsSheetController *sheetController = [[DetectPregapsSheetController alloc] init];
+		
+		sheetController.disk = self.disk;
+		sheetController.trackIDs = [tracksWithoutPregaps valueForKey:@"objectID"];
+		
+		[sheetController beginDetectPregapsSheetForWindow:self.window
+											modalDelegate:self 
+										   didEndSelector:@selector(showDetectPregapsSheetDidEnd:returnCode:contextInfo:) 
+											  contextInfo:sheetController];
+	}
+	else
+		[self performShowCopyTracksSheet];
+}
+
+- (void) performShowCopyTracksSheet
+{
+	NSSet *selectedTracks = self.compactDisc.firstSession.selectedTracks;
+
+	CopyTracksSheetController *sheetController = [[CopyTracksSheetController alloc] init];
+	
+	sheetController.disk = self.disk;
+	sheetController.trackIDs = [selectedTracks valueForKey:@"objectID"];
+	
+	sheetController.maxRetries = [[NSUserDefaults standardUserDefaults] integerForKey:@"maxRetries"];
+	sheetController.requiredMatches = [[NSUserDefaults standardUserDefaults] integerForKey:@"requiredMatches"];
+	
+	[sheetController beginCopyTracksSheetForWindow:self.window
+									 modalDelegate:self 
+									didEndSelector:@selector(showCopyTracksSheetDidEnd:returnCode:contextInfo:) 
+									   contextInfo:sheetController];
 }
 
 @end

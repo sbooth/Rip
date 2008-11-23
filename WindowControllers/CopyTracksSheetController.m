@@ -67,7 +67,7 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.CopyTrack
 @property (assign) NSOperationQueue * operationQueue;
 
 @property (readonly) NSArray * orderedTracks;
-@property (readonly) NSArray * orderedTracksRemainingToBeExtracted;
+@property (readonly) NSArray * orderedTracksRemaining;
 
 @property (assign) NSUInteger retryCount;
 
@@ -78,18 +78,7 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.CopyTrack
 - (void) audioExtractionTimerFired:(NSTimer *)timer;
 @end
 
-@interface CopyTracksSheetController (SheetCallbacks)
-- (void) showReadMCNSheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode contextInfo:(void *)contextInfo;
-- (void) showReadISRCsSheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode contextInfo:(void *)contextInfo;
-- (void) showDetectPregapsSheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode contextInfo:(void *)contextInfo;
-@end
-
 @interface CopyTracksSheetController (Private)
-- (void) beginReadMCNSheet;
-- (void) beginReadISRCsSheet;
-- (void) beginDetectPregapsSheet;
-- (void) performShowCopyTracksSheet;
-
 - (void) removeTemporaryFiles;
 
 - (void) startExtractingNextTrack;
@@ -260,14 +249,23 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.CopyTrack
 {
 	NSParameterAssert(nil != window);
 	
-	// Save the owning window's information
-	_sheetOwner = window;
-	_sheetModalDelegate = modalDelegate;
-	_sheetDidEndSelector = didEndSelector;
-	_sheetContextInfo = contextInfo;
+	// Show ourselves
+	[[NSApplication sharedApplication] beginSheet:self.window
+								   modalForWindow:window
+									modalDelegate:modalDelegate
+								   didEndSelector:didEndSelector
+									  contextInfo:contextInfo];
 	
-	// Start the sheet cascade
-	[self beginReadMCNSheet];
+	// Copy the array containing the tracks to be extracted
+	_tracksRemaining = [self.trackIDs mutableCopy];
+	
+	// Set up the extraction records
+	_trackExtractionRecords = [NSMutableSet set];
+	_failedTrackIDs = [NSMutableSet set];
+	_encodingOperations =  [NSMutableArray array];
+	
+	// Get started on the first one
+	[self startExtractingNextTrack];
 }
 
 // A non-traditional cancel; post-processing is still performed for
@@ -319,7 +317,7 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.CopyTrack
 	return tracks;
 }
 
-- (NSArray *) orderedTracksRemainingToBeExtracted
+- (NSArray *) orderedTracksRemaining
 {
 	// Fetch the tracks to be extracted and sort them by track number
 	NSPredicate *trackPredicate  = [NSPredicate predicateWithFormat:@"self IN %@", [_tracksRemaining allObjects]];
@@ -381,153 +379,7 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.CopyTrack
 
 @end
 
-@implementation CopyTracksSheetController (SheetCallbacks)
-
-- (void) showReadMCNSheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode contextInfo:(void *)contextInfo
-{
-	NSParameterAssert(nil != sheet);
-	
-	[sheet orderOut:self];
-	
-	ReadMCNSheetController *sheetController = (ReadMCNSheetController *)contextInfo;
-	sheetController = nil;
-	
-	if(NSCancelButton == returnCode) {
-		[self cancel:self];
-		return;
-	}
-	
-	[self beginReadISRCsSheet];
-}
-
-- (void) showReadISRCsSheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode contextInfo:(void *)contextInfo
-{
-	NSParameterAssert(nil != sheet);
-	
-	[sheet orderOut:self];
-	
-	ReadISRCsSheetController *sheetController = (ReadISRCsSheetController *)contextInfo;
-	sheetController = nil;
-	
-	if(NSCancelButton == returnCode) {
-		[self cancel:self];
-		return;
-	}
-	
-	[self beginDetectPregapsSheet];
-}
-
-- (void) showDetectPregapsSheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode contextInfo:(void *)contextInfo
-{
-	NSParameterAssert(nil != sheet);
-	
-	[sheet orderOut:self];
-	
-	DetectPregapsSheetController *sheetController = (DetectPregapsSheetController *)contextInfo;
-	sheetController = nil;
-
-	if(NSCancelButton == returnCode) {
-		[self cancel:self];
-		return;
-	}
-	
-	[self performShowCopyTracksSheet];
-}
-
-@end
-
-
 @implementation CopyTracksSheetController (Private)
-
-- (void) beginReadMCNSheet
-{
-	// Read the MCN for the disc, if not present
-	if(!self.compactDisc.metadata.MCN) {
-		ReadMCNSheetController *sheetController = [[ReadMCNSheetController alloc] init];
-		
-		sheetController.disk = self.disk;
-		
-		[sheetController beginReadMCNSheetForWindow:_sheetOwner
-										modalDelegate:self 
-									   didEndSelector:@selector(showReadMCNSheetDidEnd:returnCode:contextInfo:) 
-										  contextInfo:sheetController];
-	}
-	else
-		[self beginReadISRCsSheet];
-}
-
-- (void) beginReadISRCsSheet
-{
-	NSMutableArray *tracksWithoutISRCs = [NSMutableArray array];
-	
-	// Ensure ISRCs have been read for the selected tracks
-	for(TrackDescriptor *track in self.orderedTracks) {
-		// Don't waste time re-reading a pre-existing ISRC
-		if(!track.metadata.ISRC)
-			[tracksWithoutISRCs addObject:track];
-	}
-	
-	if([tracksWithoutISRCs count]) {
-		ReadISRCsSheetController *sheetController = [[ReadISRCsSheetController alloc] init];
-		
-		sheetController.disk = self.disk;
-		sheetController.trackIDs = [tracksWithoutISRCs valueForKey:@"objectID"];
-		
-		[sheetController beginReadISRCsSheetForWindow:_sheetOwner
-										modalDelegate:self 
-									   didEndSelector:@selector(showReadISRCsSheetDidEnd:returnCode:contextInfo:) 
-										  contextInfo:sheetController];
-	}
-	else
-		[self beginDetectPregapsSheet];
-}
-
-- (void) beginDetectPregapsSheet
-{
-	NSMutableArray *tracksWithoutPregaps = [NSMutableArray array];
-	
-	// Ensure pregaps have been read for the selected tracks
-	for(TrackDescriptor *track in self.orderedTracks) {
-		// Grab pre-gaps
-		if(!track.pregap)
-			[tracksWithoutPregaps addObject:track];
-	}
-	
-	if([tracksWithoutPregaps count]) {
-		DetectPregapsSheetController *sheetController = [[DetectPregapsSheetController alloc] init];
-		
-		sheetController.disk = self.disk;
-		sheetController.trackIDs = [tracksWithoutPregaps valueForKey:@"objectID"];
-		
-		[sheetController beginDetectPregapsSheetForWindow:_sheetOwner
-											modalDelegate:self 
-										   didEndSelector:@selector(showDetectPregapsSheetDidEnd:returnCode:contextInfo:) 
-											  contextInfo:sheetController];
-	}
-	else
-		[self performShowCopyTracksSheet];
-}
-
-- (void) performShowCopyTracksSheet
-{
-	// Show ourselves
-	[[NSApplication sharedApplication] beginSheet:self.window
-								   modalForWindow:_sheetOwner
-									modalDelegate:_sheetModalDelegate
-								   didEndSelector:_sheetDidEndSelector
-									  contextInfo:_sheetContextInfo];
-
-	// Copy the array containing the tracks to be extracted
-	_tracksRemaining = [self.trackIDs mutableCopy];
-	
-	// Set up the extraction records
-	_trackExtractionRecords = [NSMutableSet set];
-	_failedTrackIDs = [NSMutableSet set];
-	_encodingOperations =  [NSMutableArray array];
-	
-	// Get started on the first one
-	[self startExtractingNextTrack];
-}
 
 - (void) removeTemporaryFiles
 {
@@ -549,7 +401,7 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.CopyTrack
 
 - (void) startExtractingNextTrack
 {
-	NSArray *tracks = self.orderedTracksRemainingToBeExtracted;
+	NSArray *tracks = self.orderedTracksRemaining;
 
 	if(![tracks count])
 		return;

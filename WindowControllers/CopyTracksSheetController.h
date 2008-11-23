@@ -27,11 +27,6 @@
 	__strong DADiskRef _disk;
 	NSSet *_trackIDs;
 
-	NSWindow *_sheetOwner;
-	id _sheetModalDelegate;
-	SEL _sheetDidEndSelector;
-	void *_sheetContextInfo;
-	
 	CompactDisc *_compactDisc;
 	DriveInformation *_driveInformation;
 	NSManagedObjectContext *_managedObjectContext;
