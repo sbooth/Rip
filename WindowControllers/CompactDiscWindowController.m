@@ -460,6 +460,7 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 	sheetController.trackIDs = [selectedTracks valueForKey:@"objectID"];
 	
 	sheetController.maxRetries = [[NSUserDefaults standardUserDefaults] integerForKey:@"maxRetries"];
+	sheetController.requiredMatches = [[NSUserDefaults standardUserDefaults] integerForKey:@"requiredMatches"];
 	
 	[sheetController beginCopyTracksSheetForWindow:self.window
 									 modalDelegate:self 
