@@ -1085,7 +1085,7 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.CopyTrack
 	
 	return calculateAccurateRipChecksumForFileRegionUsingOffset(operation.URL, 
 																operation.cushionSectors,
-																operation.sectors.length,
+																operation.cushionSectors + operation.sectors.length - 1,
 																[self.compactDisc.firstSession.firstTrack.number isEqualToNumber:track.number],
 																[self.compactDisc.firstSession.lastTrack.number isEqualToNumber:track.number],
 																readOffsetAdjustment);
