@@ -27,7 +27,7 @@
 
 @implementation CompactDiscWindowController (LogFileGeneration)
 
-- (BOOL) writeLogFileToURL:(NSURL *)logFileURL forTrackExtractionRecords:(NSArray *)trackExtractionRecords error:(NSError **)error
+- (BOOL) writeLogFileToURL:(NSURL *)logFileURL forTrackExtractionRecords:(NSSet *)trackExtractionRecords error:(NSError **)error
 {
 	NSParameterAssert(nil != logFileURL);
 	NSParameterAssert(nil != trackExtractionRecords);
@@ -50,7 +50,7 @@
 	[result appendString:@"\n"];
 	
 	NSSortDescriptor *trackNumberSortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"track.number" ascending:YES];
-	NSArray *sortedExtractionRecords = [trackExtractionRecords sortedArrayUsingDescriptors:[NSArray arrayWithObject:trackNumberSortDescriptor]];
+	NSArray *sortedExtractionRecords = [[trackExtractionRecords allObjects] sortedArrayUsingDescriptors:[NSArray arrayWithObject:trackNumberSortDescriptor]];
 	
 	[result appendString:@"Extracted Audio\n"];
 	[result appendString:@"========================================\n"];
@@ -64,13 +64,6 @@
 		[result appendFormat:@"    Audio SHA1 hash:        %@\n", extractionRecord.SHA1];
 		[result appendFormat:@"    AccurateRip checksum:   %08lx\n", extractionRecord.accurateRipChecksum.unsignedIntegerValue];
 
-		if([extractionRecord.blockErrorFlags count]) {
-			[result appendString:@"\n"];
-			[result appendFormat:@"    C2 block error count:   %@\n", [numberFormatter stringForObjectValue:[NSNumber numberWithUnsignedInteger:[extractionRecord.blockErrorFlags count]]]];
-			
-//			NSIndexSet *onesIndexSet = [extractionRecord.errorFlags indexSetForOnes];
-		}
-		
 		if(extractionRecord.accurateRipConfidenceLevel) {
 			[result appendString:@"\n"];
 			
@@ -81,6 +74,16 @@
 				[result appendFormat:@"    Alt. pressing offset:   %@\n", [numberFormatter stringFromNumber:extractionRecord.accurateRipAlternatePressingOffset]];
 				[result appendFormat:@"    Alt. pressing checksum: %08lx\n", extractionRecord.accurateRipAlternatePressingChecksum.unsignedIntegerValue];
 			}
+		}		
+		else if([extractionRecord.blockErrorFlags count]) {
+			[result appendString:@"\n"];
+			[result appendFormat:@"    C2 block error count:   %@\n", [numberFormatter stringForObjectValue:[NSNumber numberWithUnsignedInteger:[extractionRecord.blockErrorFlags count]]]];
+			
+//			NSIndexSet *onesIndexSet = [extractionRecord.errorFlags indexSetForOnes];
+		}
+		else {
+			[result appendString:@"\n"];
+			[result appendString:@"    Copy verified\n"];
 		}
 		
 		[result appendString:@"\n"];

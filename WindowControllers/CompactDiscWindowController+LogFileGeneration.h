@@ -9,6 +9,6 @@
 @class ImageExtractionRecord;
 
 @interface CompactDiscWindowController (LogFileGeneration)
-- (BOOL) writeLogFileToURL:(NSURL *)logFileURL forTrackExtractionRecords:(NSArray *)trackExtractionRecords error:(NSError **)error;
+- (BOOL) writeLogFileToURL:(NSURL *)logFileURL forTrackExtractionRecords:(NSSet *)trackExtractionRecords error:(NSError **)error;
 - (BOOL) writeLogFileToURL:(NSURL *)logFileURL forImageExtractionRecord:(ImageExtractionRecord *)imageExtractionRecord error:(NSError **)error;
 @end
