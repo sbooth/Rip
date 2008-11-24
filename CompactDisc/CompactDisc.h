@@ -8,7 +8,7 @@
 #include <DiskArbitration/DiskArbitration.h>
 #include <IOKit/storage/IOCDTypes.h>
 
-@class SessionDescriptor, TrackDescriptor, SectorRange, AccurateRipDiscRecord, AlbumMetadata, ImageExtractionRecord;
+@class SessionDescriptor, TrackDescriptor, AccurateRipDiscRecord, AlbumMetadata, ImageExtractionRecord;
 
 // ========================================
 // This class simplifies access to a CDDA disc
