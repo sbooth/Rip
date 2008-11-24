@@ -5,7 +5,7 @@
 
 #import <Cocoa/Cocoa.h>
 
-@class TrackDescriptor, DriveInformation;
+@class TrackDescriptor, DriveInformation, ImageExtractionRecord;
 
 // ========================================
 // This class represents a single track extracted from a CDDA disc
@@ -30,5 +30,6 @@
 // Core Data relationships
 @property (assign) DriveInformation * drive;
 @property (assign) TrackDescriptor * track;
+@property (assign) ImageExtractionRecord * image;
 
 @end

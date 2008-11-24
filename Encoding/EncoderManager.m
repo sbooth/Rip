@@ -76,12 +76,12 @@ metadataForTrackExtractionRecord(TrackExtractionRecord *trackExtractionRecord)
 }
 
 static NSDictionary *
-metadataForExtractedImageRecord(ExtractedImageRecord *imageExtractionRecord)
+metadataForExtractedImageRecord(ImageExtractionRecord *imageExtractionRecord)
 {
 	NSCParameterAssert(nil != imageExtractionRecord);
 	
 	NSMutableDictionary *metadata = [NSMutableDictionary dictionary];
-#if 0
+
 	// Multiple tracks were extracted, so fill in album details only
 	TrackMetadata *trackMetadata = imageExtractionRecord.firstTrack.track.metadata;
 	AlbumMetadata *albumMetadata = trackMetadata.track.session.disc.metadata;
@@ -105,7 +105,7 @@ metadataForExtractedImageRecord(ExtractedImageRecord *imageExtractionRecord)
 		[metadata setObject:albumMetadata.MCN forKey:kMetadataMCNKey];
 	if(albumMetadata.title)
 		[metadata setObject:albumMetadata.title forKey:kMetadataAlbumTitleKey];
-#endif
+
 	return [metadata copy];
 }
 
@@ -135,7 +135,6 @@ filenameForExtractedImageRecord(ImageExtractionRecord *imageExtractionRecord)
 	
 	NSString *filename = nil;
 	CompactDisc *disc = imageExtractionRecord.disc;
-#if 0
 	NSString *title = disc.metadata.title;
 	if(nil == title)
 		title = NSLocalizedString(@"Unknown Album", @"");
@@ -143,13 +142,13 @@ filenameForExtractedImageRecord(ImageExtractionRecord *imageExtractionRecord)
 	// Build up the sanitized file name
 	if(imageExtractionRecord.tracks.count != disc.firstSession.tracks.count) {
 		TrackExtractionRecord *firstTrack = imageExtractionRecord.firstTrack;
-		TrackExtractionRecord *lastTrack = extractionRecord.lastTrack;
+		TrackExtractionRecord *lastTrack = imageExtractionRecord.lastTrack;
 		
 		filename = [NSString stringWithFormat:@"%@ (%@ - %@)", makeStringSafeForFilename(title), firstTrack.track.number, lastTrack.track.number];
 	}
 	else
 		filename = makeStringSafeForFilename(title);
-#endif
+
 	return filename;
 }
 
@@ -519,9 +518,11 @@ static EncoderManager *sSharedEncoderManager				= nil;
 	return YES;
 }
 
-- (BOOL) encodeURL:(NSURL *)inputURL forExtractedImageRecord:(ExtractedImageRecord *)extractedImageRecord error:(NSError **)error
+- (BOOL) encodeURL:(NSURL *)inputURL forImageExtractionRecord:(ImageExtractionRecord *)imageExtractionRecord error:(NSError **)error
 {
 	NSBeep();
+	
+	return NO;
 }
 
 // ========================================

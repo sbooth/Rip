@@ -23,5 +23,6 @@
 // Core Data relationships
 @dynamic drive;
 @dynamic track;
+@dynamic image;
 
 @end

@@ -5,13 +5,13 @@
 
 #import "ImageExtractionRecord.h"
 #import "TrackDescriptor.h"
+#import "TrackExtractionRecord.h"
 
 @implementation ImageExtractionRecord
 
 // ========================================
 // Core Data properties
 @dynamic date;
-@dynamic errorFlags;
 @dynamic MD5;
 @dynamic SHA1;
 @dynamic URL;
@@ -20,8 +20,8 @@
 // Core Data relationships
 @dynamic disc;
 @dynamic drive;
+@dynamic tracks;
 
-#if 0
 // ========================================
 // Other properties
 - (NSArray *) orderedTracks
@@ -58,5 +58,5 @@
 	
 	return nil;
 }
-#endif
+
 @end

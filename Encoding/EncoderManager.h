@@ -21,7 +21,7 @@ enum _eExistingOutputFileHandling {
 };
 typedef enum _eExistingOutputFileHandling eExistingOutputFileHandling;
 
-@class CompactDisc, TrackExtractionRecord, ExtractedImageRecord;
+@class CompactDisc, TrackExtractionRecord, ImageExtractionRecord;
 @class EncodingOperation;
 
 @interface EncoderManager : NSObject
@@ -65,7 +65,7 @@ typedef enum _eExistingOutputFileHandling eExistingOutputFileHandling;
 - (BOOL) encodeURL:(NSURL *)inputURL forTrackExtractionRecord:(TrackExtractionRecord *)trackExtractionRecord error:(NSError **)error;
 - (BOOL) encodeURL:(NSURL *)inputURL forTrackExtractionRecord:(TrackExtractionRecord *)trackExtractionRecord encodingOperation:(EncodingOperation **)encodingOperation delayPostProcessing:(BOOL)delayPostProcessing error:(NSError **)error;
 
-- (BOOL) encodeURL:(NSURL *)inputURL forExtractedImageRecord:(ExtractedImageRecord *)extractedImageRecord error:(NSError **)error;
+- (BOOL) encodeURL:(NSURL *)inputURL forImageExtractionRecord:(ImageExtractionRecord *)imageExtractionRecord error:(NSError **)error;
 
 // ========================================
 // Post-encoding processing
