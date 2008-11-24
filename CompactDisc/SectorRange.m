@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2005 - 2007 Stephen F. Booth <me@sbooth.org>
+ *  Copyright (C) 2005 - 2008 Stephen F. Booth <me@sbooth.org>
  *  All Rights Reserved
  */
 
@@ -22,6 +22,11 @@
 	return [[SectorRange alloc] initWithSector:sector];
 }
 
++ (id) sectorRangeWithRange:(NSRange)range
+{
+	return [[SectorRange alloc] initWithRange:range];
+}
+
 + (id) sectorRangeWithFirstSector:(NSUInteger)firstSector lastSector:(NSUInteger)lastSector
 {
 	return [[SectorRange alloc] initWithFirstSector:firstSector lastSector:lastSector];
@@ -40,6 +45,11 @@
 - (id) initWithSector:(NSUInteger)sector
 {
 	return [self initWithFirstSector:sector lastSector:sector];
+}
+
+- (id) initWithRange:(NSRange)range
+{
+	return [self initWithFirstSector:range.location sectorCount:range.length];
 }
 
 - (id) initWithFirstSector:(NSUInteger)firstSector lastSector:(NSUInteger)lastSector
