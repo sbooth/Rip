@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2005 - 2007 Stephen F. Booth <me@sbooth.org>
+ *  Copyright (C) 2005 - 2008 Stephen F. Booth <me@sbooth.org>
  *  All Rights Reserved
  */
 
@@ -51,7 +51,7 @@ enum {
 
 // ========================================
 // Clear the drive's cache by filling with sectors outside of range
-- (BOOL) clearCache:(SectorRange *)range;
+- (BOOL) clearCacheAvoidingRange:(SectorRange *)range legalSectors:(SectorRange *)legalSectors;
 
 // ========================================
 // Read a chunk of CD-DA data (buffer should be kCDSectorSizeCDDA * sectorCount bytes)

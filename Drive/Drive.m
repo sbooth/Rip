@@ -115,15 +115,13 @@
 	return YES;
 }
 
-- (BOOL) clearCache:(SectorRange *)range
+- (BOOL) clearCacheAvoidingRange:(SectorRange *)range legalSectors:(SectorRange *)legalSectors
 {
-/*	
 	NSUInteger sectorsRemaining, sectorsRead, boundary;
 
 	NSUInteger requiredReadSize			= self.cacheSizeInSectors;
-	NSUInteger session					= [self.compactDisc sessionContainingSectorRange:range];
-	NSUInteger sessionFirstSector		= [self.compactDisc firstSectorForSession:session];
-	NSUInteger sessionLastSector		= [self.compactDisc lastSectorForSession:session];
+	NSUInteger sessionFirstSector		= legalSectors.firstSector;
+	NSUInteger sessionLastSector		= legalSectors.lastSector;
 	NSUInteger preSectorsAvailable		= range.firstSector - sessionFirstSector;
 	NSUInteger postSectorsAvailable		= sessionLastSector - range.lastSector;
 
@@ -138,9 +136,8 @@
 
 	// Make sure there are enough sectors outside the range to fill the cache
 	if(preSectorsAvailable + postSectorsAvailable < requiredReadSize) {
-#if DEBUG
-		NSLog(@"Unable to flush the drive's cache");
-#endif
+		[[Logger sharedLogger] logMessageWithLevel:eLogMessageLevelDebug format:@"Unable to flush the drive's cache"];
+
 		self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:EINVAL userInfo:nil];
 		return NO;
 	}
@@ -209,7 +206,7 @@
 			sectorsRemaining -= sectorsRead;
 		}
 	}
-*/
+
 	return YES;
 }
 
