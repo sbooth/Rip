@@ -90,7 +90,7 @@
 	}
 	
 	// If the file exists, append to it if desired
-	if(1 && [[NSFileManager defaultManager] fileExistsAtPath:[logFileURL path]]) {
+	if(0 && [[NSFileManager defaultManager] fileExistsAtPath:[logFileURL path]]) {
 		// Read in the existing log file
 		NSString *existingLogFile = [NSString stringWithContentsOfURL:logFileURL encoding:NSUTF8StringEncoding error:error];
 		if(!existingLogFile)
@@ -98,6 +98,7 @@
 		NSMutableString *appendedLogFile = [existingLogFile mutableCopy];
 		[appendedLogFile appendString:@"\n\n"];
 		[appendedLogFile appendString:result];
+		
 		return [appendedLogFile writeToURL:logFileURL atomically:YES encoding:NSUTF8StringEncoding error:error];
 	}
 	else
@@ -173,7 +174,7 @@
 	}
 	
 	// If the file exists, append to it if desired
-	if(1 && [[NSFileManager defaultManager] fileExistsAtPath:[logFileURL path]]) {
+	if(0 && [[NSFileManager defaultManager] fileExistsAtPath:[logFileURL path]]) {
 		// Read in the existing log file
 		NSString *existingLogFile = [NSString stringWithContentsOfURL:logFileURL encoding:NSUTF8StringEncoding error:error];
 		if(!existingLogFile)
@@ -181,6 +182,7 @@
 		NSMutableString *appendedLogFile = [existingLogFile mutableCopy];
 		[appendedLogFile appendString:@"\n\n"];
 		[appendedLogFile appendString:result];
+		
 		return [appendedLogFile writeToURL:logFileURL atomically:YES encoding:NSUTF8StringEncoding error:error];
 	}
 	else

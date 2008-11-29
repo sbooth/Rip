@@ -26,7 +26,7 @@
 #import "ReadISRCsSheetController.h"
 #import "DetectPregapsSheetController.h"
 
-#import "CopyTracksSheetController.h"
+#import "AudioExtractionSheetController.h"
 
 #import "EncoderManager.h"
 #import "MusicDatabaseManager.h"
@@ -732,7 +732,7 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 	if(NSCancelButton == returnCode)
 		return;
 	
-	CopyTracksSheetController *sheetController = (CopyTracksSheetController *)contextInfo;
+	AudioExtractionSheetController *sheetController = (AudioExtractionSheetController *)contextInfo;
 	
 	// Save an extraction log file if any tracks were successfully extracted
 	if(![sheetController.trackExtractionRecords count])
@@ -780,7 +780,7 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 	if(NSCancelButton == returnCode)
 		return;
 	
-	CopyTracksSheetController *sheetController = (CopyTracksSheetController *)contextInfo;
+	AudioExtractionSheetController *sheetController = (AudioExtractionSheetController *)contextInfo;
 	
 	// Save an extraction log file if any tracks were successfully extracted
 	if(!sheetController.imageExtractionRecord)
@@ -964,7 +964,7 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 {
 	NSSet *selectedTracks = self.compactDisc.firstSession.selectedTracks;
 
-	CopyTracksSheetController *sheetController = [[CopyTracksSheetController alloc] init];
+	AudioExtractionSheetController *sheetController = [[AudioExtractionSheetController alloc] init];
 	
 	sheetController.disk = self.disk;
 	sheetController.extractionMode = eExtractionModeIndividualTracks;
@@ -981,7 +981,7 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 
 - (void) performShowCopyImageSheet
 {
-	CopyTracksSheetController *sheetController = [[CopyTracksSheetController alloc] init];
+	AudioExtractionSheetController *sheetController = [[AudioExtractionSheetController alloc] init];
 	
 	sheetController.disk = self.disk;
 	sheetController.extractionMode = eExtractionModeImage;

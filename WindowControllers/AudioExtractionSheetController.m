@@ -3,7 +3,7 @@
  *  All Rights Reserved
  */
 
-#import "CopyTracksSheetController.h"
+#import "AudioExtractionSheetController.h"
 
 #import "CompactDisc.h"
 #import "DriveInformation.h"
@@ -48,7 +48,7 @@
 // ========================================
 // Context objects for observeValueForKeyPath:ofObject:change:context:
 // ========================================
-static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.CopyTracksSheetController.ExtractAudioKVOContext";
+static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.AudioExtractionSheetController.ExtractAudioKVOContext";
 
 // ========================================
 // The number of sectors which will be scanned during offset verification
@@ -60,7 +60,7 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.CopyTrack
 // ========================================
 #define MINIMUM_DISC_READ_SIZE (2048 * 1024)
 
-@interface CopyTracksSheetController ()
+@interface AudioExtractionSheetController ()
 @property (assign) CompactDisc * compactDisc;
 @property (assign) DriveInformation * driveInformation;
 @property (assign) NSManagedObjectContext * managedObjectContext;
@@ -74,12 +74,12 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.CopyTrack
 
 @end
 
-@interface CopyTracksSheetController (Callbacks)
+@interface AudioExtractionSheetController (Callbacks)
 - (void) didPresentErrorWithRecovery:(BOOL)didRecover contextInfo:(void *)contextInfo;
 - (void) audioExtractionTimerFired:(NSTimer *)timer;
 @end
 
-@interface CopyTracksSheetController (Private)
+@interface AudioExtractionSheetController (Private)
 - (void) removeTemporaryFiles;
 - (void) resetExtractionState;
 
@@ -115,7 +115,7 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.CopyTrack
 - (ImageExtractionRecord *) createImageExtractionRecord;
 @end
 
-@implementation CopyTracksSheetController
+@implementation AudioExtractionSheetController
 
 @synthesize disk = _disk;
 @synthesize trackIDs = _trackIDs;
@@ -138,7 +138,7 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.CopyTrack
 
 - (id) init
 {
-	if((self = [super initWithWindowNibName:@"CopyTracksSheet"])) {
+	if((self = [super initWithWindowNibName:@"AudioExtractionSheet"])) {
 		// Create our own context for accessing the store
 		self.managedObjectContext = [[NSManagedObjectContext alloc] init];
 		[self.managedObjectContext setPersistentStoreCoordinator:[[[NSApplication sharedApplication] delegate] persistentStoreCoordinator]];
@@ -376,7 +376,7 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.CopyTrack
 
 @end
 
-@implementation CopyTracksSheetController (Callbacks)
+@implementation AudioExtractionSheetController (Callbacks)
 
 - (void) didPresentErrorWithRecovery:(BOOL)didRecover contextInfo:(void *)contextInfo
 {
@@ -413,7 +413,7 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.CopyTrack
 
 @end
 
-@implementation CopyTracksSheetController (Private)
+@implementation AudioExtractionSheetController (Private)
 
 - (void) removeTemporaryFiles
 {
@@ -729,15 +729,13 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.CopyTrack
 		// The track is verified if a copy operation has already been performed
 		// and the SHA1 hashes for the copy and this verification operation match
 		if(_copyOperation && [_copyOperation.SHA1 isEqualToString:operation.SHA1]) {
-			// Remove the old temporary files
 			NSError *error = nil;
-			if(![[NSFileManager defaultManager] removeItemAtPath:_copyOperation.URL.path error:&error])
-				[[Logger sharedLogger] logMessage:@"Error removing temporary file: %@", error];
-			
 			if([self sendTrackToEncoder:track extractionOperation:operation accurateRipChecksum:trackActualAccurateRipChecksum accurateRipConfidenceLevel:nil error:&error])
 				[self startExtractingNextTrack];
 			else
 				[self presentError:error modalForWindow:self.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
+
+			return;
 		}
 		// This track has been extracted before but the SHA1 hashes don't match
 		// Determine where the differences are and re-extract those sectors

@@ -27,7 +27,7 @@ typedef enum _eExtractionMode eExtractionMode;
 //  - Extract the entire track (copy)
 //  - Compare
 // ========================================
-@interface CopyTracksSheetController : NSWindowController
+@interface AudioExtractionSheetController : NSWindowController
 {
 	IBOutlet NSProgressIndicator *_progressIndicator;
 	IBOutlet NSTextField *_statusTextField;
