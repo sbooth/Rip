@@ -262,8 +262,23 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 			[operation removeObserver:self forKeyPath:@"isCancelled"];
 			[operation removeObserver:self forKeyPath:@"isFinished"];
 
-			if(operation.error)
+			if(operation.error) {
 				[self presentError:operation.error modalForWindow:self.window delegate:nil didPresentSelector:NULL contextInfo:NULL];
+				return;
+			}
+			
+			if(![self.compactDisc.accurateRipDiscs count]) {
+				NSBeginAlertSheet(NSLocalizedString(@"The disc was not found.", @"Music database search failed"), 
+								  NSLocalizedString(@"OK", @"Button"),
+								  nil, /* alternateButton */
+								  nil, /* otherButton */
+								  self.window, 
+								  nil, /* modalDelegate */
+								  NULL, /* didEndSelector */
+								  NULL, /* didDismissSelector */
+								  NULL, /* contextInfo */
+								  NSLocalizedString(@"No matching discs were found in the AccurateRip database.", @""));
+			}
 		}
 	}
 	else if(kMusicDatabaseQueryKVOContext == context) {

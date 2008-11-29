@@ -71,18 +71,26 @@
 												  accurateRipID2,
 												  compactDisc.freeDBDiscID]];
 	
+	[[Logger sharedLogger] logMessageWithLevel:eLogMessageLevelDebug format:@"Querying %@", accurateRipURL];
+
 	// Create a request for the URL with a 2 minute timeout
 	NSURLRequest *request = [NSURLRequest requestWithURL:accurateRipURL
 											 cachePolicy:NSURLRequestUseProtocolCachePolicy
 										 timeoutInterval:120.0];
 	
-	NSURLResponse *accurateRipResponse = nil;
+	NSHTTPURLResponse *accurateRipResponse = nil;
 	NSError *error = nil;
 	NSData *accurateRipResponseData = [NSURLConnection sendSynchronousRequest:request 
 															returningResponse:&accurateRipResponse 
 																		error:&error];
 	if(!accurateRipResponseData) {
 		self.error = error;
+		return;
+	}
+	
+	// If the disc wasn't found in AccurateRip it isn't an error condition
+	if(404 == [accurateRipResponse statusCode]) {
+		[[Logger sharedLogger] logMessageWithLevel:eLogMessageLevelDebug format:@"Disc not found in AccurateRip"];
 		return;
 	}
 	
