@@ -52,11 +52,11 @@ setArgumentForTag(NSMutableArray *arguments, NSDictionary *metadata, NSString *k
 	NSMutableArray *arguments = [NSMutableArray array];
 
 	// Input file
-	[arguments addObject:self.inputURL.path];
+	[arguments addObject:[self.inputURL path]];
 
 	// Output file
 	[arguments addObject:@"-o"];
-	[arguments addObject:self.outputURL.path];
+	[arguments addObject:[self.outputURL path]];
 
 	// Compression level
 	NSNumber *compressionLevel = [self.settings objectForKey:kFLACCompressionLevelKey];
@@ -85,7 +85,7 @@ setArgumentForTag(NSMutableArray *arguments, NSDictionary *metadata, NSString *k
 	setArgumentForTag(arguments, self.metadata, kMetadataMusicBrainzIDKey, @"MUSICBRAINZ_ID");
 	
 	// Task setup
-	[task setCurrentDirectoryPath:[self.inputURL.path stringByDeletingLastPathComponent]];
+	[task setCurrentDirectoryPath:[[self.inputURL path] stringByDeletingLastPathComponent]];
 	[task setLaunchPath:flacPath];
 	[task setArguments:arguments];
 

@@ -14,7 +14,7 @@
 
 - (void) main
 {
-	NSAssert(nil != self.URLs, @"self.URLs may not be nil");
+	NSAssert((nil != self.trackURLs || nil != self.imageURL), @"self.trackURLs and self.imageURL may not be nil");
 	
 	// Locate the metaflac executable
 	NSString *metaflacPath = [[NSBundle bundleWithIdentifier:@"org.sbooth.Rip.Encoder.FLAC"] pathForResource:@"metaflac" ofType:nil];
@@ -23,9 +23,6 @@
 		return;
 	}
 	
-	// ========================================
-	// REPLAYGAIN PROCESSING
-	
 	// Create the task
 	NSTask *task = [[NSTask alloc] init];
 	NSMutableArray *arguments = [NSMutableArray array];
@@ -33,10 +30,18 @@
 	// ReplayGain scanning
 	[arguments addObject:@"--add-replay-gain"];
 
-	// Input files
-	for(NSURL *fileURL in self.URLs)
-		[arguments addObject:fileURL.path];
+	// Cue sheet processing
+	if(self.isImage)
+		[arguments addObject:[NSString stringWithFormat:@"--import-cuesheet-from=%@", [self.cueSheetURL path]]];
 		
+	// Input files
+	if(self.isImage)	
+		[arguments addObject:[self.imageURL path]];
+	else {
+		for(NSURL *trackURL in self.trackURLs)
+			[arguments addObject:[trackURL path]];
+	}
+			
 	// Task setup
 	[task setLaunchPath:metaflacPath];
 	[task setArguments:arguments];

@@ -36,7 +36,7 @@
 	NSMutableArray *arguments = [NSMutableArray array];
 	
 	// The file to tag
-	[arguments addObject:self.outputURL.path];
+	[arguments addObject:[self.outputURL path]];
 
 	// Overwrite the original file
 	[arguments addObject:@"--overWrite"];
@@ -100,7 +100,7 @@
 	}
 	
 	// Task setup
-	[task setCurrentDirectoryPath:[self.outputURL.path stringByDeletingLastPathComponent]];
+	[task setCurrentDirectoryPath:[[self.outputURL path] stringByDeletingLastPathComponent]];
 	[task setLaunchPath:apPath];
 	[task setArguments:arguments];
 	

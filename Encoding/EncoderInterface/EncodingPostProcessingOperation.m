@@ -7,10 +7,13 @@
 
 @implementation EncodingPostProcessingOperation
 
-@synthesize URLs = _URLs;
+@synthesize isImage = _isImage;
+@synthesize imageURL = _imageURL;
+@synthesize imageMetadata = _imageMetadata;
 @synthesize cueSheetURL = _cueSheetURL;
+@synthesize trackURLs = _trackURLs;
+@synthesize trackMetadata = _trackMetadata;
 @synthesize settings = _settings;
-@synthesize metadata = _metadata;
 @synthesize error = _error;
 
 @dynamic progress;

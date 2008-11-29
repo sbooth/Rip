@@ -9,11 +9,14 @@
 #import "EncoderInterface/EncodingOperation.h"
 #import "EncoderInterface/EncodingPostProcessingOperation.h"
 
-#import "TrackMetadata.h"
-#import "AlbumMetadata.h"
-#import "TrackDescriptor.h"
-#import "SessionDescriptor.h"
 #import "CompactDisc.h"
+#import "CompactDisc+CueSheetGeneration.h"
+#import "SessionDescriptor.h"
+#import "TrackDescriptor.h"
+
+#import "AlbumMetadata.h"
+#import "TrackMetadata.h"
+
 #import "TrackExtractionRecord.h"
 #import "ImageExtractionRecord.h"
 
@@ -243,7 +246,13 @@ static EncoderManager *sSharedEncoderManager				= nil;
 		if([keyPath isEqualToString:@"isCancelled"] || [keyPath isEqualToString:@"isFinished"]) {
 			[operation removeObserver:self forKeyPath:@"isCancelled"];
 			[operation removeObserver:self forKeyPath:@"isFinished"];
-			// Nothing to do currently
+
+			if(operation.isImage) {
+				// Remove the temporary cue sheet
+				NSError *error = nil;
+				if(![[NSFileManager defaultManager] removeItemAtPath:[operation.cueSheetURL path] error:&error])
+					[[NSApplication sharedApplication] presentError:error];
+			}
 		}
 	}
 	else
@@ -452,7 +461,7 @@ static EncoderManager *sSharedEncoderManager				= nil;
 	[[Logger sharedLogger] logMessageWithLevel:eLogMessageLevelDebug format:@"Encoding %@ to %@ using %@", [operation.inputURL path], [operation.outputURL path], [encoderBundle objectForInfoDictionaryKey:@"EncoderName"]];
 
 	if(!delayPostProcessing)
-		[self postProcessEncodingOperation:operation error:error];
+		[self postProcessEncodingOperation:operation forTrackExtractionRecord:trackExtractionRecord error:error];
 	
 	[self.queue addOperation:operation];
 	
@@ -515,7 +524,7 @@ static EncoderManager *sSharedEncoderManager				= nil;
 	[[Logger sharedLogger] logMessageWithLevel:eLogMessageLevelDebug format:@"Encoding %@ to %@ using %@", [operation.inputURL path], [operation.outputURL path], [encoderBundle objectForInfoDictionaryKey:@"EncoderName"]];
 	
 	if(!delayPostProcessing)
-		[self postProcessEncodingOperation:operation error:error];
+		[self postProcessEncodingOperation:operation forImageExtractionRecord:imageExtractionRecord error:error];
 	
 	[self.queue addOperation:operation];
 	
@@ -533,14 +542,16 @@ static EncoderManager *sSharedEncoderManager				= nil;
 
 // ========================================
 // Post-encoding processing
-- (BOOL) postProcessEncodingOperation:(EncodingOperation *)encodingOperation error:(NSError **)error
+- (BOOL) postProcessEncodingOperation:(EncodingOperation *)encodingOperation forTrackExtractionRecord:(TrackExtractionRecord *)trackExtractionRecord error:(NSError **)error
 {
-	return [self postProcessEncodingOperations:[NSArray arrayWithObject:encodingOperation] error:error];
+	return [self postProcessEncodingOperations:[NSArray arrayWithObject:encodingOperation] forTrackExtractionRecords:[NSArray arrayWithObject:trackExtractionRecord] error:error];
 }
 
-- (BOOL) postProcessEncodingOperations:(NSArray *)encodingOperations error:(NSError **)error
+- (BOOL) postProcessEncodingOperations:(NSArray *)encodingOperations forTrackExtractionRecords:(NSArray *)trackExtractionRecords error:(NSError **)error
 {
 	NSParameterAssert(nil != encodingOperations);
+	NSParameterAssert(nil != trackExtractionRecords);
+	NSParameterAssert([encodingOperations count] == [trackExtractionRecords count]);
 	
 	EncodingOperation *baseOperation = [encodingOperations lastObject];
 	
@@ -553,10 +564,11 @@ static EncoderManager *sSharedEncoderManager				= nil;
 	NSObject <EncoderInterface> *encoderInterface = [[encoderClass alloc] init];
 
 	EncodingPostProcessingOperation *operation = [encoderInterface encodingPostProcessingOperation];
-	
-	operation.URLs = [encodingOperations valueForKey:@"outputURL"];
+
+	operation.isImage = NO;
+	operation.trackURLs = [encodingOperations valueForKey:@"outputURL"];
+	operation.trackMetadata = [baseOperation valueForKey:@"metadata"];
 	operation.settings = [baseOperation settings];
-	operation.metadata = [baseOperation valueForKey:@"metadata"];
 	
 	// Observe the operation's progress
 	[operation addObserver:self forKeyPath:@"isCancelled" options:NSKeyValueObservingOptionNew context:kEncodingPostProcessingOperationKVOContext];
@@ -568,6 +580,44 @@ static EncoderManager *sSharedEncoderManager				= nil;
 	
 	[self.queue addOperation:operation];
 
+	return YES;
+}
+
+- (BOOL) postProcessEncodingOperation:(EncodingOperation *)encodingOperation forImageExtractionRecord:(ImageExtractionRecord *)imageExtractionRecord error:(NSError **)error
+{
+	NSParameterAssert(nil != encodingOperation);
+	NSParameterAssert(nil != imageExtractionRecord);
+
+	NSBundle *encoderBundle = [NSBundle bundleForClass:[encodingOperation class]];
+	
+	if(![encoderBundle loadAndReturnError:error])
+		return NO;
+	
+	Class encoderClass = [encoderBundle principalClass];
+	NSObject <EncoderInterface> *encoderInterface = [[encoderClass alloc] init];
+	
+	// Create a temporary cue sheet
+	NSURL *cueSheetURL = temporaryURLWithExtension(@"cue");
+	if(![imageExtractionRecord.disc writeCueSheetToURL:cueSheetURL error:error])
+		return NO;
+	
+	EncodingPostProcessingOperation *operation = [encoderInterface encodingPostProcessingOperation];
+	
+	operation.isImage = YES;
+	operation.imageURL = encodingOperation.outputURL;
+	operation.imageMetadata = encodingOperation.metadata;
+	operation.cueSheetURL = cueSheetURL;
+	operation.settings = encodingOperation.settings;
+	
+	// Observe the operation's progress
+	[operation addObserver:self forKeyPath:@"isCancelled" options:NSKeyValueObservingOptionNew context:kEncodingPostProcessingOperationKVOContext];
+	[operation addObserver:self forKeyPath:@"isFinished" options:NSKeyValueObservingOptionNew context:kEncodingPostProcessingOperationKVOContext];
+	
+	// Add the encoding operations as dependencies for the post-processing
+	[operation addDependency:encodingOperation];
+	
+	[self.queue addOperation:operation];
+	
 	return YES;
 }
 

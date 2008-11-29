@@ -70,7 +70,9 @@ typedef enum _eExistingOutputFileHandling eExistingOutputFileHandling;
 
 // ========================================
 // Post-encoding processing
-- (BOOL) postProcessEncodingOperation:(EncodingOperation *)encodingOperation error:(NSError **)error;
-- (BOOL) postProcessEncodingOperations:(NSArray *)encodingOperations error:(NSError **)error;
+- (BOOL) postProcessEncodingOperation:(EncodingOperation *)encodingOperation forTrackExtractionRecord:(TrackExtractionRecord *)trackExtractionRecord error:(NSError **)error;
+- (BOOL) postProcessEncodingOperations:(NSArray *)encodingOperations forTrackExtractionRecords:(NSArray *)trackExtractionRecords error:(NSError **)error;
+
+- (BOOL) postProcessEncodingOperation:(EncodingOperation *)encodingOperation forImageExtractionRecord:(ImageExtractionRecord *)imageExtractionRecord error:(NSError **)error;
 
 @end

@@ -27,7 +27,7 @@ extern NSString * const		kMetadataMCNKey;					// NSString *
 extern NSString * const		kMetadataMusicBrainzIDKey;			// NSString *
 
 // ========================================
-// This value will only be present if inputURL represents a disc image
+// This value will only be present in imageMetadata
 // ========================================
 extern NSString * const		kTrackMetadataArrayKey;				// NSArray * of NSDictionary *
 
@@ -38,16 +38,29 @@ extern NSString * const		kTrackMetadataArrayKey;				// NSArray * of NSDictionary
 @interface EncodingPostProcessingOperation : NSOperation
 {
 @protected
-	NSArray *_URLs;
+	BOOL _isImage;
+	NSURL *_imageURL;
+	NSDictionary *_imageMetadata;
 	NSURL *_cueSheetURL;
-	NSArray *_metadata;
+	NSArray *_trackURLs;
+	NSArray *_trackMetadata;
 	NSDictionary *_settings;
 	NSError *_error;
 }
 
-@property (copy) NSArray * URLs;
+// YES if post-processing a disc image, NO otherwise
+@property (assign) BOOL isImage;
+
+// Properties set if processing a disc image
+@property (copy) NSURL * imageURL;
+@property (copy) NSDictionary * imageMetadata;
 @property (copy) NSURL * cueSheetURL;
-@property (copy) NSArray * metadata;
+
+// Properties set if processing individual tracks
+@property (copy) NSArray * trackURLs;
+@property (copy) NSArray * trackMetadata;
+
+// General properties
 @property (copy) NSDictionary * settings;
 @property (copy) NSError * error;
 
