@@ -4,8 +4,8 @@
  */
 
 #import <Cocoa/Cocoa.h>
-#import "CompactDiscWindowController.h"
+#import "CompactDisc.h"
 
-@interface CompactDiscWindowController (CueSheetGeneration)
+@interface CompactDisc (CueSheetGeneration)
 - (BOOL) writeCueSheetToURL:(NSURL *)cueSheetURL error:(NSError **)error;
 @end

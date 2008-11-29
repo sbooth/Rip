@@ -13,7 +13,6 @@
 #import "AlbumMetadata.h"
 #import "TrackMetadata.h"
 
-#import "BitArray.h"
 #import "SectorRange.h"
 #import "ExtractionOperation.h"
 
@@ -219,7 +218,8 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.AudioExtr
 				NSError *error = nil;
 				if(eExtractionModeIndividualTracks == self.extractionMode) {
 					if([_encodingOperations count]) {
-						if(![[EncoderManager sharedEncoderManager] postProcessEncodingOperations:_encodingOperations error:&error])
+						// FIXME: If trackExtractionRecords are ever used, the order will be wrong
+						if(![[EncoderManager sharedEncoderManager] postProcessEncodingOperations:_encodingOperations forTrackExtractionRecords:[_trackExtractionRecords allObjects] error:&error])
 							[self presentError:error modalForWindow:self.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
 					}
 				}
@@ -311,7 +311,7 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.AudioExtr
 	// Post-process the encoded tracks, if required
 	if([_encodingOperations count]) {
 		NSError *error = nil;
-		if(![[EncoderManager sharedEncoderManager] postProcessEncodingOperations:_encodingOperations error:&error])
+		if(![[EncoderManager sharedEncoderManager] postProcessEncodingOperations:_encodingOperations forTrackExtractionRecords:[_trackExtractionRecords allObjects] error:&error])
 			[self presentError:error modalForWindow:self.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
 	}
 	
@@ -1283,6 +1283,7 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.AudioExtr
 - (ImageExtractionRecord *) createImageExtractionRecord
 {
 	[[Logger sharedLogger] logMessageWithLevel:eLogMessageLevelDebug format:@"Generating image"];
+	[_detailedStatusTextField setStringValue:NSLocalizedString(@"Creating image file", @"")];	
 	
 	// Create the output file
 	NSError *error = nil;

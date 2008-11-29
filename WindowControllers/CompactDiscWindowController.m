@@ -5,9 +5,9 @@
 
 #import "CompactDiscWindowController.h"
 #import "CompactDiscWindowController+LogFileGeneration.h"
-#import "CompactDiscWindowController+CueSheetGeneration.h"
 
 #import "CompactDisc.h"
+#import "CompactDisc+CueSheetGeneration.h"
 #import "SessionDescriptor.h"
 #import "TrackDescriptor.h"
 #import "AlbumMetadata.h"
@@ -686,7 +686,7 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 	NSURL *cueSheetURL = [sheet URL];
 	
 	NSError *error = nil;
-	if(![self writeCueSheetToURL:cueSheetURL error:&error])
+	if(![self.compactDisc writeCueSheetToURL:cueSheetURL error:&error])
 		[self presentError:error modalForWindow:self.window delegate:nil didPresentSelector:NULL contextInfo:NULL];
 }
 

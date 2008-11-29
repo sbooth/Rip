@@ -3,9 +3,8 @@
  *  All Rights Reserved
  */
 
-#import "CompactDiscWindowController+CueSheetGeneration.h"
+#import "CompactDisc+CueSheetGeneration.h"
 
-#import "CompactDisc.h"
 #import "SessionDescriptor.h"
 #import "TrackDescriptor.h"
 #import "AlbumMetadata.h"
@@ -13,7 +12,7 @@
 
 #import "CDDAUtilities.h"
 
-@implementation CompactDiscWindowController (CueSheetGeneration)
+@implementation CompactDisc (CueSheetGeneration)
 
 - (BOOL) writeCueSheetToURL:(NSURL *)cueSheetURL error:(NSError **)error
 {
@@ -28,29 +27,33 @@
 	
 	[cueSheetString appendString:@"\n"];
 	
-	[cueSheetString appendFormat:@"REM FreeDB Disc ID %08x\n", self.compactDisc.freeDBDiscID];
-	[cueSheetString appendFormat:@"REM MusicBrainz Disc ID %@\n", self.compactDisc.musicBrainzDiscID];
+	[cueSheetString appendFormat:@"REM FreeDB Disc ID %08x\n", self.freeDBDiscID];
+	[cueSheetString appendFormat:@"REM MusicBrainz Disc ID %@\n", self.musicBrainzDiscID];
 	
-	if(self.compactDisc.metadata.date)
-		[cueSheetString appendFormat:@"REM DATE %@\n", self.compactDisc.metadata.date];
+	if(self.metadata.date)
+		[cueSheetString appendFormat:@"REM DATE %@\n", self.metadata.date];
 	
 	[cueSheetString appendString:@"\n"];
 	
-	if(self.compactDisc.metadata.MCN)
-		[cueSheetString appendFormat:@"CATALOG %@\n", self.compactDisc.metadata.MCN];
+	if(self.metadata.MCN)
+		[cueSheetString appendFormat:@"CATALOG %@\n", self.metadata.MCN];
 	
 	// Title, artist
-	if(self.compactDisc.metadata.title)
-		[cueSheetString appendFormat:@"TITLE \"%@\"\n", self.compactDisc.metadata.title];
+	if(self.metadata.title)
+		[cueSheetString appendFormat:@"TITLE \"%@\"\n", self.metadata.title];
 	
-	if(self.compactDisc.metadata.artist)
-		[cueSheetString appendFormat:@"PERFORMER \"%@\"\n", self.compactDisc.metadata.artist];
+	if(self.metadata.artist)
+		[cueSheetString appendFormat:@"PERFORMER \"%@\"\n", self.metadata.artist];
 	
 	[cueSheetString appendString:@"\n"];
 	
-	for(TrackDescriptor *trackDescriptor in self.compactDisc.firstSession.orderedTracks) {
+	for(TrackDescriptor *trackDescriptor in self.firstSession.orderedTracks) {
 		// Track number
 		[cueSheetString appendFormat:@"TRACK %02i AUDIO\n", trackDescriptor.number.integerValue];
+		
+		// ISRC
+		if(trackDescriptor.metadata.ISRC)
+			[cueSheetString appendFormat:@"  ISRC %@\n", trackDescriptor.metadata.ISRC];
 		
 		CDMSF trackMSF = CDConvertLBAToMSF(trackDescriptor.firstSector.integerValue - 150);
 		
@@ -85,10 +88,6 @@
 		
 		if(flagsArray.count)
 			[cueSheetString appendFormat:@"  FLAGS %@\n", [flagsArray componentsJoinedByString:@" "]];
-		
-		// ISRC
-		if(trackDescriptor.metadata.ISRC)
-			[cueSheetString appendFormat:@"  ISRC %@\n", trackDescriptor.metadata.ISRC];
 		
 		// Track title, artist and composer
 		if(trackDescriptor.metadata.title)

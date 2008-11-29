@@ -49,6 +49,7 @@
 		328375F60EABB7D30011EB44 /* AudioUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 328375F50EABB7D30011EB44 /* AudioUtilities.m */; };
 		3284CF190EE0D99C00FEC9A1 /* AudioExtractionSheetController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3284CF180EE0D99C00FEC9A1 /* AudioExtractionSheetController.m */; };
 		3284CF240EE0D9F500FEC9A1 /* AudioExtractionSheet.xib in Resources */ = {isa = PBXBuildFile; fileRef = 3284CF220EE0D9F500FEC9A1 /* AudioExtractionSheet.xib */; };
+		3284CFA50EE1CF5600FEC9A1 /* CompactDisc+CueSheetGeneration.m in Sources */ = {isa = PBXBuildFile; fileRef = 3284CFA40EE1CF5600FEC9A1 /* CompactDisc+CueSheetGeneration.m */; };
 		328DE21C0E5E628700F5BD13 /* PregapFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = 328DE21B0E5E628700F5BD13 /* PregapFormatter.m */; };
 		328DE4C20E5FBFE500F5BD13 /* MusicBrainz.bundle in Copy PlugIns */ = {isa = PBXBuildFile; fileRef = 328DE4C00E5FBFBF00F5BD13 /* MusicBrainz.bundle */; };
 		328DE4CE0E5FC08500F5BD13 /* MusicDatabaseManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 328DE4CD0E5FC08500F5BD13 /* MusicDatabaseManager.m */; };
@@ -71,7 +72,6 @@
 		32B1A37D0E8F10B1005A9AD9 /* DiscInspectorPanel.xib in Resources */ = {isa = PBXBuildFile; fileRef = 32B1A37B0E8F10B1005A9AD9 /* DiscInspectorPanel.xib */; };
 		32BBEFD10EC63B4200EC2FBE /* CDDAUtilitiesTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 32BBEFD00EC63B4200EC2FBE /* CDDAUtilitiesTest.m */; };
 		32BBEFE70EC63C1C00EC2FBE /* CDDAUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 325B2D480E78D83000696A1A /* CDDAUtilities.m */; };
-		32BBF0480EC6AF4700EC2FBE /* CompactDiscWindowController+CueSheetGeneration.m in Sources */ = {isa = PBXBuildFile; fileRef = 32BBF0470EC6AF4700EC2FBE /* CompactDiscWindowController+CueSheetGeneration.m */; };
 		32BBF08B0EC6B34A00EC2FBE /* ExtractedAudioFile.m in Sources */ = {isa = PBXBuildFile; fileRef = 32BBF08A0EC6B34A00EC2FBE /* ExtractedAudioFile.m */; };
 		32BBF1510EC8875100EC2FBE /* CopyImageToolbarIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 32BBF1480EC8875100EC2FBE /* CopyImageToolbarIcon.png */; };
 		32BBF1520EC8875100EC2FBE /* CopyTracksToolbarIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 32BBF1490EC8875100EC2FBE /* CopyTracksToolbarIcon.png */; };
@@ -357,6 +357,8 @@
 		3284CF170EE0D99C00FEC9A1 /* AudioExtractionSheetController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AudioExtractionSheetController.h; sourceTree = "<group>"; };
 		3284CF180EE0D99C00FEC9A1 /* AudioExtractionSheetController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AudioExtractionSheetController.m; sourceTree = "<group>"; };
 		3284CF230EE0D9F500FEC9A1 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/AudioExtractionSheet.xib; sourceTree = "<group>"; };
+		3284CFA30EE1CF5600FEC9A1 /* CompactDisc+CueSheetGeneration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "CompactDisc+CueSheetGeneration.h"; sourceTree = "<group>"; };
+		3284CFA40EE1CF5600FEC9A1 /* CompactDisc+CueSheetGeneration.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "CompactDisc+CueSheetGeneration.m"; sourceTree = "<group>"; };
 		328DE21A0E5E628700F5BD13 /* PregapFormatter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PregapFormatter.h; sourceTree = "<group>"; };
 		328DE21B0E5E628700F5BD13 /* PregapFormatter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PregapFormatter.m; sourceTree = "<group>"; };
 		328DE2860E5F831600F5BD13 /* MusicDatabaseInterface.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = MusicDatabaseInterface.xcodeproj; path = MusicDatabaseInterface/MusicDatabaseInterface.xcodeproj; sourceTree = "<group>"; };
@@ -387,8 +389,6 @@
 		32B1A37C0E8F10B1005A9AD9 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/DiscInspectorPanel.xib; sourceTree = "<group>"; };
 		32BBEFCF0EC63B4200EC2FBE /* CDDAUtilitiesTest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CDDAUtilitiesTest.h; path = Tests/CDDAUtilitiesTest.h; sourceTree = "<group>"; };
 		32BBEFD00EC63B4200EC2FBE /* CDDAUtilitiesTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CDDAUtilitiesTest.m; path = Tests/CDDAUtilitiesTest.m; sourceTree = "<group>"; };
-		32BBF0460EC6AF4700EC2FBE /* CompactDiscWindowController+CueSheetGeneration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "CompactDiscWindowController+CueSheetGeneration.h"; sourceTree = "<group>"; };
-		32BBF0470EC6AF4700EC2FBE /* CompactDiscWindowController+CueSheetGeneration.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "CompactDiscWindowController+CueSheetGeneration.m"; sourceTree = "<group>"; };
 		32BBF0890EC6B34A00EC2FBE /* ExtractedAudioFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExtractedAudioFile.h; sourceTree = "<group>"; };
 		32BBF08A0EC6B34A00EC2FBE /* ExtractedAudioFile.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ExtractedAudioFile.m; sourceTree = "<group>"; };
 		32BBF1480EC8875100EC2FBE /* CopyImageToolbarIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = CopyImageToolbarIcon.png; sourceTree = "<group>"; };
@@ -607,8 +607,6 @@
 				328371600EA7DCFB0011EB44 /* EncoderWindowController.m */,
 				328374F90EAB07340011EB44 /* CompactDiscWindowController+LogFileGeneration.h */,
 				328374FA0EAB07340011EB44 /* CompactDiscWindowController+LogFileGeneration.m */,
-				32BBF0460EC6AF4700EC2FBE /* CompactDiscWindowController+CueSheetGeneration.h */,
-				32BBF0470EC6AF4700EC2FBE /* CompactDiscWindowController+CueSheetGeneration.m */,
 			);
 			path = WindowControllers;
 			sourceTree = "<group>";
@@ -911,6 +909,8 @@
 		8C67A7AD0CF73B9C00A3B129 /* CompactDisc */ = {
 			isa = PBXGroup;
 			children = (
+				3284CFA30EE1CF5600FEC9A1 /* CompactDisc+CueSheetGeneration.h */,
+				3284CFA40EE1CF5600FEC9A1 /* CompactDisc+CueSheetGeneration.m */,
 				8C4C8B760D5C1DE600DC0279 /* AlbumMetadata.h */,
 				8C4C8B770D5C1DE600DC0279 /* AlbumMetadata.m */,
 				8C4C8B780D5C1DE600DC0279 /* CompactDisc.h */,
@@ -1325,10 +1325,10 @@
 				328375F60EABB7D30011EB44 /* AudioUtilities.m in Sources */,
 				32544B8A0EB56C5400E14BE8 /* NSIndexSet+SetMethods.m in Sources */,
 				32C7B61E0EBD61AC00D1A722 /* AdvancedPreferencesViewController.m in Sources */,
-				32BBF0480EC6AF4700EC2FBE /* CompactDiscWindowController+CueSheetGeneration.m in Sources */,
 				32BBF08B0EC6B34A00EC2FBE /* ExtractedAudioFile.m in Sources */,
 				3207D4990ED66DDD00F35BD5 /* Logger.m in Sources */,
 				3284CF190EE0D99C00FEC9A1 /* AudioExtractionSheetController.m in Sources */,
+				3284CFA50EE1CF5600FEC9A1 /* CompactDisc+CueSheetGeneration.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
