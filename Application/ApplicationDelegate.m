@@ -7,6 +7,7 @@
 #import "ByteSizeValueTransformer.h"
 #import "DurationValueTransformer.h"
 #import "CompactDiscWindowController.h"
+#import "CompactDisc.h"
 #import "DriveInformation.h"
 #import "AquaticPrime.h"
 #import "EncoderManager.h"
@@ -432,7 +433,7 @@ diskDisappearedCallback(DADiskRef disk, void *context)
 		[compactDiscWindow showWindow:self];
 
 	// If the read offset for the drive isn't configured, give the user the opportunity to configure it now
-	if(!compactDiscWindow.driveInformation.readOffset) {		
+	if(!compactDiscWindow.driveInformation.readOffset && [compactDiscWindow.compactDisc.accurateRipDiscs count]) {
 		NSBeginAlertSheet([NSString stringWithFormat:NSLocalizedString(@"The read offset for \u201c%@ %@\u201d is unknown.  Would you like to determine the drive's read offset now?", @""), compactDiscWindow.driveInformation.vendorName, compactDiscWindow.driveInformation.productName],
 						  NSLocalizedString(@"Yes", @""), 
 						  NSLocalizedString(@"No", @""),
