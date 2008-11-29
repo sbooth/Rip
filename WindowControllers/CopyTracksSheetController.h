@@ -8,6 +8,16 @@
 
 @class CompactDisc, DriveInformation, AccurateRipDiscRecord;
 @class ExtractionOperation, ExtractedAudioFile;
+@class ImageExtractionRecord;
+
+// ========================================
+// Enum for extraction modes
+// ========================================
+enum _eExtractionMode {
+	eExtractionModeIndividualTracks = 1,
+	eExtractionModeImage = 2
+};
+typedef enum _eExtractionMode eExtractionMode;
 
 // ========================================
 // An NSWindowController subclass for customizing the extraction
@@ -47,9 +57,12 @@
 	NSUInteger _requiredMatches;
 	NSUInteger _retryCount;
 	NSUInteger _maxRetries;
+
+	eExtractionMode _extractionMode;
 	
 	ExtractedAudioFile *_synthesizedFile;
 
+	ImageExtractionRecord *_imageExtractionRecord;
 	NSMutableSet *_trackExtractionRecords;
 	NSMutableSet *_failedTrackIDs;
 }
@@ -62,12 +75,15 @@
 @property (assign) NSUInteger maxRetries;
 @property (assign) NSUInteger requiredMatches;
 
+@property (assign) eExtractionMode extractionMode;
+
+@property (readonly) ImageExtractionRecord * imageExtractionRecord;
 @property (readonly) NSSet * trackExtractionRecords;
 @property (readonly) NSSet * failedTrackIDs;
 
 // ========================================
 // The meat & potatoes
-- (void) beginCopyTracksSheetForWindow:(NSWindow *)window modalDelegate:(id)modalDelegate didEndSelector:(SEL)didEndSelector contextInfo:(void *)contextInfo;
+- (void) beginAudioExtractionSheetForWindow:(NSWindow *)window modalDelegate:(id)modalDelegate didEndSelector:(SEL)didEndSelector contextInfo:(void *)contextInfo;
 
 // ========================================
 // Action methods

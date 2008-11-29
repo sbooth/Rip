@@ -22,6 +22,7 @@
 	DriveInformation *_driveInformation;
 	
 	NSOperationQueue *_operationQueue;
+	int _extractionMode; // eExtractionMode
 }
 
 // ========================================

@@ -49,6 +49,7 @@ static NSString * const kMusicDatabaseQueryKVOContext	= @"org.sbooth.Rip.Compact
 @property (assign) DriveInformation * driveInformation;
 
 @property (readonly) NSOperationQueue * operationQueue;
+@property (assign) int extractionMode;
 
 @property (readonly) NSManagedObjectContext * managedObjectContext;
 @property (readonly) id managedObjectModel;
@@ -61,6 +62,7 @@ static NSString * const kMusicDatabaseQueryKVOContext	= @"org.sbooth.Rip.Compact
 - (void) showReadISRCsSheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode contextInfo:(void *)contextInfo;
 - (void) showDetectPregapsSheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode contextInfo:(void *)contextInfo;
 - (void) showCopyTracksSheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode contextInfo:(void *)contextInfo;
+- (void) showCopyImageSheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode contextInfo:(void *)contextInfo;
 @end
 
 @interface CompactDiscWindowController (Private)
@@ -68,6 +70,7 @@ static NSString * const kMusicDatabaseQueryKVOContext	= @"org.sbooth.Rip.Compact
 - (void) beginReadISRCsSheet;
 - (void) beginDetectPregapsSheet;
 - (void) performShowCopyTracksSheet;
+- (void) performShowCopyImageSheet;
 
 - (void) diskWasEjected;
 
@@ -126,6 +129,7 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 @synthesize trackController = _trackController;
 @synthesize driveInformationController = _driveInformationController;
 @synthesize operationQueue = _operationQueue;
+@synthesize extractionMode = _extractionMode;
 
 @synthesize disk = _disk;
 @synthesize compactDisc = _compactDisc;
@@ -461,10 +465,10 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 		return;
 	}
 	
-//	self.extractionMode = eExtractionModeIndividualTracks;
+	self.extractionMode = eExtractionModeIndividualTracks;
 	
 	// Start the sheet cascade
-	[self beginReadMCNSheet];	
+	[self beginReadMCNSheet];
 }
 
 - (IBAction) copyImage:(id)sender
@@ -472,10 +476,10 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 
 #pragma unused(sender)
 
-	//	self.extractionMode = eExtractionModeImage;
+	self.extractionMode = eExtractionModeImage;
 	
 	// Start the sheet cascade
-//	[self beginReadMCNSheet];		
+	[self beginReadMCNSheet];
 }
 
 - (IBAction) detectPregaps:(id)sender
@@ -648,6 +652,8 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 	NSParameterAssert(nil != sheet);
 	NSParameterAssert(NULL != contextInfo);
 
+	[sheet orderOut:self];
+	
 	MusicDatabaseMatchesSheetController *sheetController = (MusicDatabaseMatchesSheetController *)contextInfo;
 	
 	if(NSOKButton == returnCode)
@@ -711,10 +717,10 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 	if(NSCancelButton == returnCode)
 		return;
 	
-//	if(eExtractionModeImage == self.extractionMode)
-//		[self performShowCopyImageSheet];
-//	else if(eExtractionModeIndividualTracks == self.extractionMode)
-	[self performShowCopyTracksSheet];
+	if(eExtractionModeImage == self.extractionMode)
+		[self performShowCopyImageSheet];
+	else if(eExtractionModeIndividualTracks == self.extractionMode)
+		[self performShowCopyTracksSheet];
 }
 
 - (void) showCopyTracksSheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode contextInfo:(void *)contextInfo
@@ -760,6 +766,54 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 	
 	NSError *error = nil;
 	if(![self writeLogFileToURL:logFileURL forTrackExtractionRecords:sheetController.trackExtractionRecords error:&error])
+		[self presentError:error modalForWindow:self.window delegate:nil didPresentSelector:NULL contextInfo:NULL];
+	
+	// Save a cue sheet
+}
+
+- (void) showCopyImageSheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode contextInfo:(void *)contextInfo
+{
+	NSParameterAssert(nil != sheet);
+	
+	[sheet orderOut:self];
+	
+	if(NSCancelButton == returnCode)
+		return;
+	
+	CopyTracksSheetController *sheetController = (CopyTracksSheetController *)contextInfo;
+	
+	// Save an extraction log file if any tracks were successfully extracted
+	if(!sheetController.imageExtractionRecord)
+		return;
+	
+	NSString *title = self.compactDisc.metadata.title;
+	if(nil == title)
+		title = NSLocalizedString(@"Unknown Album", @"");
+	
+	NSURL *baseURL = [[EncoderManager sharedEncoderManager] outputURLForCompactDisc:self.compactDisc];
+	NSString *filename = makeStringSafeForFilename(title);
+	NSString *pathname = [filename stringByAppendingPathExtension:@"log"];
+	NSString *outputPath = [[baseURL path] stringByAppendingPathComponent:pathname];
+	NSURL *logFileURL = [NSURL fileURLWithPath:outputPath];
+	
+	// Don't overwrite existing log files
+	if([[NSFileManager defaultManager] fileExistsAtPath:[logFileURL path]]) {
+		
+		NSString *backupFilename = [filename copy];
+		NSString *backupPathname = nil;
+		NSString *backupPath = nil;
+		
+		do {
+			backupFilename = [backupFilename stringByAppendingPathExtension:@"old"];
+			backupPathname = [backupFilename stringByAppendingPathExtension:@"log"];
+			backupPath = [[baseURL path] stringByAppendingPathComponent:backupPathname];
+		} while([[NSFileManager defaultManager] fileExistsAtPath:backupPath]);
+		
+		[[NSFileManager defaultManager] movePath:[logFileURL path] toPath:backupPath handler:nil];
+	}
+	
+	NSError *error = nil;
+	if(![self writeLogFileToURL:logFileURL forImageExtractionRecord:sheetController.imageExtractionRecord error:&error])
 		[self presentError:error modalForWindow:self.window delegate:nil didPresentSelector:NULL contextInfo:NULL];
 	
 	// Save a cue sheet
@@ -844,10 +898,16 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 
 - (void) beginReadISRCsSheet
 {
+	NSArray *tracksToIterate = nil;
+	if(eExtractionModeIndividualTracks == self.extractionMode)
+		tracksToIterate = self.compactDisc.firstSession.orderedSelectedTracks;
+	else if(eExtractionModeImage == self.extractionMode)
+		tracksToIterate = self.compactDisc.firstSession.orderedTracks;
+
 	NSMutableArray *tracksWithoutISRCs = [NSMutableArray array];
 	
-	// Ensure ISRCs have been read for the selected tracks
-	for(TrackDescriptor *track in self.compactDisc.firstSession.orderedSelectedTracks) {
+	// Ensure ISRCs have been read for the desired tracks
+	for(TrackDescriptor *track in tracksToIterate) {
 		// Don't waste time re-reading a pre-existing ISRC
 		if(!track.metadata.ISRC)
 			[tracksWithoutISRCs addObject:track];
@@ -870,10 +930,16 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 
 - (void) beginDetectPregapsSheet
 {
+	NSArray *tracksToIterate = nil;
+	if(eExtractionModeIndividualTracks == self.extractionMode)
+		tracksToIterate = self.compactDisc.firstSession.orderedSelectedTracks;
+	else if(eExtractionModeImage == self.extractionMode)
+		tracksToIterate = self.compactDisc.firstSession.orderedTracks;
+
 	NSMutableArray *tracksWithoutPregaps = [NSMutableArray array];
 	
-	// Ensure pregaps have been read for the selected tracks
-	for(TrackDescriptor *track in self.compactDisc.firstSession.orderedSelectedTracks) {
+	// Ensure pregaps have been read for the desired tracks
+	for(TrackDescriptor *track in tracksToIterate) {
 		// Grab pre-gaps
 		if(!track.pregap)
 			[tracksWithoutPregaps addObject:track];
@@ -901,15 +967,33 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 	CopyTracksSheetController *sheetController = [[CopyTracksSheetController alloc] init];
 	
 	sheetController.disk = self.disk;
+	sheetController.extractionMode = eExtractionModeIndividualTracks;
 	sheetController.trackIDs = [selectedTracks valueForKey:@"objectID"];
 	
 	sheetController.maxRetries = [[NSUserDefaults standardUserDefaults] integerForKey:@"maxRetries"];
 	sheetController.requiredMatches = [[NSUserDefaults standardUserDefaults] integerForKey:@"requiredMatches"];
 	
-	[sheetController beginCopyTracksSheetForWindow:self.window
-									 modalDelegate:self 
-									didEndSelector:@selector(showCopyTracksSheetDidEnd:returnCode:contextInfo:) 
-									   contextInfo:sheetController];
+	[sheetController beginAudioExtractionSheetForWindow:self.window
+										  modalDelegate:self 
+										 didEndSelector:@selector(showCopyTracksSheetDidEnd:returnCode:contextInfo:) 
+											contextInfo:sheetController];
+}
+
+- (void) performShowCopyImageSheet
+{
+	CopyTracksSheetController *sheetController = [[CopyTracksSheetController alloc] init];
+	
+	sheetController.disk = self.disk;
+	sheetController.extractionMode = eExtractionModeImage;
+	sheetController.trackIDs = [self.compactDisc.firstSession.tracks valueForKey:@"objectID"];
+	
+	sheetController.maxRetries = [[NSUserDefaults standardUserDefaults] integerForKey:@"maxRetries"];
+	sheetController.requiredMatches = [[NSUserDefaults standardUserDefaults] integerForKey:@"requiredMatches"];
+	
+	[sheetController beginAudioExtractionSheetForWindow:self.window
+										  modalDelegate:self 
+										 didEndSelector:@selector(showCopyImageSheetDidEnd:returnCode:contextInfo:) 
+											contextInfo:sheetController];
 }
 
 @end

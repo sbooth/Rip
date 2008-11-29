@@ -8,23 +8,28 @@
 // ========================================
 // KVC key names for the metadata dictionary
 // ========================================
-extern NSString * const		kMetadataTitleKey;
-extern NSString * const		kMetadataAlbumTitleKey;
-extern NSString * const		kMetadataArtistKey;
-extern NSString * const		kMetadataAlbumArtistKey;
-extern NSString * const		kMetadataGenreKey;
-extern NSString * const		kMetadataComposerKey;
-extern NSString * const		kMetadataReleaseDateKey;
-extern NSString * const		kMetadataCompilationKey;
-extern NSString * const		kMetadataTrackNumberKey;
-extern NSString * const		kMetadataTrackTotalKey;
-extern NSString * const		kMetadataDiscNumberKey;
-extern NSString * const		kMetadataDiscTotalKey;
-extern NSString * const		kMetadataLyricsKey;
-extern NSString * const		kMetadataCommentKey;
-extern NSString * const		kMetadataISRCKey;
-extern NSString * const		kMetadataMCNKey;
-extern NSString * const		kMetadataMusicBrainzIDKey;
+extern NSString * const		kMetadataTitleKey;					// NSString *
+extern NSString * const		kMetadataAlbumTitleKey;				// NSString *
+extern NSString * const		kMetadataArtistKey;					// NSString *
+extern NSString * const		kMetadataAlbumArtistKey;			// NSString *
+extern NSString * const		kMetadataGenreKey;					// NSString *
+extern NSString * const		kMetadataComposerKey;				// NSString *
+extern NSString * const		kMetadataReleaseDateKey;			// NSString *
+extern NSString * const		kMetadataCompilationKey;			// NSNumber *
+extern NSString * const		kMetadataTrackNumberKey;			// NSNumber *
+extern NSString * const		kMetadataTrackTotalKey;				// NSNumber *
+extern NSString * const		kMetadataDiscNumberKey;				// NSNumber *
+extern NSString * const		kMetadataDiscTotalKey;				// NSNumber *
+extern NSString * const		kMetadataLyricsKey;					// NSString *
+extern NSString * const		kMetadataCommentKey;				// NSString *
+extern NSString * const		kMetadataISRCKey;					// NSString *
+extern NSString * const		kMetadataMCNKey;					// NSString *
+extern NSString * const		kMetadataMusicBrainzIDKey;			// NSString *
+
+// ========================================
+// This value will only be present if inputURL represents a disc image
+// ========================================
+extern NSString * const		kTrackMetadataArrayKey;				// NSArray * of NSDictionary *
 
 // ========================================
 // An NSOperation subclass that defines the interface to be implemented by encoders

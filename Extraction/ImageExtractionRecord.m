@@ -12,9 +12,10 @@
 // ========================================
 // Core Data properties
 @dynamic date;
+@dynamic inputURL;
 @dynamic MD5;
+@dynamic outputURL;
 @dynamic SHA1;
-@dynamic URL;
 
 // ========================================
 // Core Data relationships

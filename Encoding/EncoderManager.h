@@ -62,10 +62,11 @@ typedef enum _eExistingOutputFileHandling eExistingOutputFileHandling;
 
 // ========================================
 // Queue an encoding request
-- (BOOL) encodeURL:(NSURL *)inputURL forTrackExtractionRecord:(TrackExtractionRecord *)trackExtractionRecord error:(NSError **)error;
-- (BOOL) encodeURL:(NSURL *)inputURL forTrackExtractionRecord:(TrackExtractionRecord *)trackExtractionRecord encodingOperation:(EncodingOperation **)encodingOperation delayPostProcessing:(BOOL)delayPostProcessing error:(NSError **)error;
+- (BOOL) encodeTrackExtractionRecord:(TrackExtractionRecord *)trackExtractionRecord error:(NSError **)error;
+- (BOOL) encodeTrackExtractionRecord:(TrackExtractionRecord *)trackExtractionRecord encodingOperation:(EncodingOperation **)encodingOperation delayPostProcessing:(BOOL)delayPostProcessing error:(NSError **)error;
 
-- (BOOL) encodeURL:(NSURL *)inputURL forImageExtractionRecord:(ImageExtractionRecord *)imageExtractionRecord error:(NSError **)error;
+- (BOOL) encodeImageExtractionRecord:(ImageExtractionRecord *)imageExtractionRecord error:(NSError **)error;
+- (BOOL) encodeImageExtractionRecord:(ImageExtractionRecord *)imageExtractionRecord encodingOperation:(EncodingOperation **)encodingOperation delayPostProcessing:(BOOL)delayPostProcessing error:(NSError **)error;
 
 // ========================================
 // Post-encoding processing

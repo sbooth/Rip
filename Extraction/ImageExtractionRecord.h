@@ -17,9 +17,10 @@
 // ========================================
 // Core Data properties
 @property (assign) NSDate * date;
+@property (assign) NSURL * inputURL;
 @property (assign) NSString * MD5;
+@property (assign) NSURL * outputURL;
 @property (assign) NSString * SHA1;
-@property (assign) NSURL * URL;
 
 // ========================================
 // Core Data relationships

@@ -25,6 +25,7 @@ NSString * const	kMetadataCommentKey						= @"comment";
 NSString * const	kMetadataISRCKey						= @"ISRC";
 NSString * const	kMetadataMCNKey							= @"MCN";
 NSString * const	kMetadataMusicBrainzIDKey				= @"MusicBrainzID";
+NSString * const	kTrackMetadataArrayKey					= @"trackMetadataArray";
 
 @implementation EncodingOperation
 

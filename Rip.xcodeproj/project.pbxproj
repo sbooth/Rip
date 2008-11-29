@@ -21,6 +21,7 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
+		3207D4990ED66DDD00F35BD5 /* Logger.m in Sources */ = {isa = PBXBuildFile; fileRef = 3207D4980ED66DDD00F35BD5 /* Logger.m */; };
 		321B6B9B0DE11F14003B8E6A /* Rip.xcclassmodel in Resources */ = {isa = PBXBuildFile; fileRef = 321B6B9A0DE11F14003B8E6A /* Rip.xcclassmodel */; };
 		324EC6740DA2D411002A3CA7 /* Rip.icns in Resources */ = {isa = PBXBuildFile; fileRef = 324EC6730DA2D411002A3CA7 /* Rip.icns */; };
 		324F30C90E85CF47000E4E4E /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = 324F30C80E85CF47000E4E4E /* dsa_pub.pem */; };
@@ -308,6 +309,8 @@
 		2A37F4BAFDCFA73011CA2CEA /* English */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = English; path = English.lproj/Credits.rtf; sourceTree = "<group>"; };
 		2A37F4C4FDCFA73011CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		2A37F4C5FDCFA73011CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
+		3207D4970ED66DDD00F35BD5 /* Logger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Logger.h; path = Utilities/Logger.h; sourceTree = "<group>"; };
+		3207D4980ED66DDD00F35BD5 /* Logger.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Logger.m; path = Utilities/Logger.m; sourceTree = "<group>"; };
 		321B6B9A0DE11F14003B8E6A /* Rip.xcclassmodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcclassmodel; name = Rip.xcclassmodel; path = Models/Rip.xcclassmodel; sourceTree = "<group>"; };
 		324CAFCC0DD905AD0040FF7F /* DiscogsQueryOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DiscogsQueryOperation.h; sourceTree = "<group>"; };
 		324CAFCD0DD905AD0040FF7F /* DiscogsQueryOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DiscogsQueryOperation.m; sourceTree = "<group>"; };
@@ -774,6 +777,8 @@
 				325B2C5B0E781BC400696A1A /* FileUtilities.m */,
 				32544B880EB56C5400E14BE8 /* NSIndexSet+SetMethods.h */,
 				32544B890EB56C5400E14BE8 /* NSIndexSet+SetMethods.m */,
+				3207D4970ED66DDD00F35BD5 /* Logger.h */,
+				3207D4980ED66DDD00F35BD5 /* Logger.m */,
 			);
 			name = Utilities;
 			sourceTree = "<group>";
@@ -1323,6 +1328,7 @@
 				32C7B61E0EBD61AC00D1A722 /* AdvancedPreferencesViewController.m in Sources */,
 				32BBF0480EC6AF4700EC2FBE /* CompactDiscWindowController+CueSheetGeneration.m in Sources */,
 				32BBF08B0EC6B34A00EC2FBE /* ExtractedAudioFile.m in Sources */,
+				3207D4990ED66DDD00F35BD5 /* Logger.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

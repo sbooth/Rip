@@ -56,7 +56,7 @@
 	[result appendString:@"========================================\n"];
 	
 	for(TrackExtractionRecord *extractionRecord in sortedExtractionRecords) {		
-		[result appendFormat:@"Track %@ saved to %@\n", extractionRecord.track.number, [[extractionRecord.URL path] lastPathComponent]];
+		[result appendFormat:@"Track %@ saved to %@\n", extractionRecord.track.number, [[extractionRecord.outputURL path] lastPathComponent]];
 		
 		[result appendString:@"\n"];
 
@@ -109,6 +109,12 @@
 	NSParameterAssert(nil != logFileURL);
 	NSParameterAssert(nil != imageExtractionRecord);
 	
+	YesNoFormatter *yesNoFormatter = [[YesNoFormatter alloc] init];
+	NSNumberFormatter *numberFormatter = [[NSNumberFormatter alloc] init];
+	
+	[numberFormatter setFormatterBehavior:NSNumberFormatterBehavior10_4];
+	[numberFormatter setUsesGroupingSeparator:YES];
+	
 	NSMutableString *result = [NSMutableString string];
 	
 	[result appendString:[self headerSection]];
@@ -120,7 +126,65 @@
 	[result appendString:[self discSection]];
 	[result appendString:@"\n"];
 	
-	return [result writeToURL:logFileURL atomically:YES encoding:NSUTF8StringEncoding error:error];
+	[result appendString:@"Extracted Audio\n"];
+	[result appendString:@"========================================\n"];
+	
+	[result appendFormat:@"Image saved to %@\n", [[imageExtractionRecord.outputURL path] lastPathComponent]];
+	[result appendString:@"\n"];
+	[result appendFormat:@"Audio MD5 hash:     %@\n", imageExtractionRecord.MD5];
+	[result appendFormat:@"Audio SHA1 hash:    %@\n", imageExtractionRecord.SHA1];
+	[result appendString:@"\n"];
+
+	NSSortDescriptor *trackNumberSortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"track.number" ascending:YES];
+	NSArray *sortedExtractionRecords = [[imageExtractionRecord.tracks allObjects] sortedArrayUsingDescriptors:[NSArray arrayWithObject:trackNumberSortDescriptor]];
+	
+	for(TrackExtractionRecord *extractionRecord in sortedExtractionRecords) {				
+		[result appendFormat:@"Track %@ \n", extractionRecord.track.number];
+		
+		[result appendString:@"\n"];
+		
+		[result appendFormat:@"    Audio MD5 hash:         %@\n", extractionRecord.MD5];
+		[result appendFormat:@"    Audio SHA1 hash:        %@\n", extractionRecord.SHA1];
+		[result appendFormat:@"    AccurateRip checksum:   %08lx\n", extractionRecord.accurateRipChecksum.unsignedIntegerValue];
+		
+		if(extractionRecord.accurateRipConfidenceLevel) {
+			[result appendString:@"\n"];
+			
+			[result appendFormat:@"    Accurately ripped:      %@\n", [yesNoFormatter stringForObjectValue:[NSNumber numberWithBool:YES]]];
+			[result appendFormat:@"    Confidence level:       %@\n", [numberFormatter stringFromNumber:extractionRecord.accurateRipConfidenceLevel]];
+			
+			if(extractionRecord.accurateRipAlternatePressingChecksum) {
+				[result appendFormat:@"    Alt. pressing offset:   %@\n", [numberFormatter stringFromNumber:extractionRecord.accurateRipAlternatePressingOffset]];
+				[result appendFormat:@"    Alt. pressing checksum: %08lx\n", extractionRecord.accurateRipAlternatePressingChecksum.unsignedIntegerValue];
+			}
+		}		
+		else if([extractionRecord.blockErrorFlags count]) {
+			[result appendString:@"\n"];
+			[result appendFormat:@"    C2 block error count:   %@\n", [numberFormatter stringForObjectValue:[NSNumber numberWithUnsignedInteger:[extractionRecord.blockErrorFlags count]]]];
+			
+			//			NSIndexSet *onesIndexSet = [extractionRecord.errorFlags indexSetForOnes];
+		}
+		else {
+			[result appendString:@"\n"];
+			[result appendString:@"    Copy verified\n"];
+		}
+		
+		[result appendString:@"\n"];
+	}
+	
+	// If the file exists, append to it if desired
+	if(1 && [[NSFileManager defaultManager] fileExistsAtPath:[logFileURL path]]) {
+		// Read in the existing log file
+		NSString *existingLogFile = [NSString stringWithContentsOfURL:logFileURL encoding:NSUTF8StringEncoding error:error];
+		if(!existingLogFile)
+			return NO;
+		NSMutableString *appendedLogFile = [existingLogFile mutableCopy];
+		[appendedLogFile appendString:@"\n\n"];
+		[appendedLogFile appendString:result];
+		return [appendedLogFile writeToURL:logFileURL atomically:YES encoding:NSUTF8StringEncoding error:error];
+	}
+	else
+		return [result writeToURL:logFileURL atomically:YES encoding:NSUTF8StringEncoding error:error];
 }
 
 @end

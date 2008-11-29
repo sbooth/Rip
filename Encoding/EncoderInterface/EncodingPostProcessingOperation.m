@@ -8,6 +8,7 @@
 @implementation EncodingPostProcessingOperation
 
 @synthesize URLs = _URLs;
+@synthesize cueSheetURL = _cueSheetURL;
 @synthesize settings = _settings;
 @synthesize metadata = _metadata;
 @synthesize error = _error;
