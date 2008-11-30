@@ -435,7 +435,7 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.AudioExtr
 
 - (void) resetExtractionState
 {
-	_synthesizedFile = nil;
+	_synthesizedTrack = nil;
 	_copyOperation = nil;
 	_verificationOperation = nil;
 	_partialExtractions = [NSMutableArray array];
@@ -456,6 +456,13 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.AudioExtr
 	[self resetExtractionState];
 	
 	self.retryCount = 0;
+
+	if(_synthesizedCopyURL) {
+		NSError *error = nil;
+		if(![[NSFileManager defaultManager] removeItemAtPath:[_synthesizedCopyURL path] error:&error])
+			[[Logger sharedLogger] logMessage:@"Error removing temporary file: %@", error];
+		_synthesizedCopyURL = nil;
+	}
 	
 	[[Logger sharedLogger] logMessageWithLevel:eLogMessageLevelDebug format:@"Beginning extraction for track %@", track.number];
 
@@ -783,7 +790,7 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.AudioExtr
 		NSLog(@"ERROR: Extra copy operation performed (no support for ultra passes)");
 }
 
-- (void) processExtractionOperation:(ExtractionOperation *)operation forPartialTrack:(TrackDescriptor *)track;
+- (void) processExtractionOperation:(ExtractionOperation *)operation forPartialTrack:(TrackDescriptor *)track
 {
 	NSParameterAssert(nil != operation);
 	NSParameterAssert(nil != track);
@@ -840,12 +847,12 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.AudioExtr
 		[self.operationQueue cancelAllOperations];
 		
 		// Finish the file synthesis
-		NSURL *fileURL = _synthesizedFile.URL;
-		NSString *MD5 = _synthesizedFile.MD5;
-		NSString *SHA1 = _synthesizedFile.SHA1;
+		NSURL *fileURL = _synthesizedTrack.URL;
+		NSString *MD5 = _synthesizedTrack.MD5;
+		NSString *SHA1 = _synthesizedTrack.SHA1;
 		
-		[_synthesizedFile closeFile];
-		_synthesizedFile = nil;
+		[_synthesizedTrack closeFile];
+		_synthesizedTrack = nil;
 		
 		// Calculate the AccurateRip checksum
 		NSUInteger accurateRipChecksum = calculateAccurateRipChecksumForFile(fileURL,
@@ -974,6 +981,59 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.AudioExtr
 			}
 		}
 
+		// Compare the synthesized track to any previously synthesized versions
+		NSError *error = nil;
+		if(_synthesizedCopyURL) {
+			ExtractedAudioFile *previousFile = [ExtractedAudioFile openFileForReadingAtURL:_synthesizedCopyURL error:&error];
+			if(!previousFile) {
+				[[Logger sharedLogger] logMessage:@"Error opening file for reading: %@", error];
+				return;
+			}
+
+			NSString *previousSHA1 = previousFile.SHA1;
+			[previousFile closeFile];
+			
+			// If the two synthesized tracks match, send one to the encoder
+			if([previousSHA1 isEqualToString:SHA1]) {
+				// Create the extraction record
+				TrackExtractionRecord *extractionRecord = [NSEntityDescription insertNewObjectForEntityForName:@"TrackExtractionRecord" 
+																						inManagedObjectContext:self.managedObjectContext];
+				
+				extractionRecord.date = [NSDate date];
+				extractionRecord.drive = self.driveInformation;
+				extractionRecord.inputURL = fileURL;
+				extractionRecord.MD5 = MD5;
+				extractionRecord.SHA1 = SHA1;
+				extractionRecord.track = track;
+				extractionRecord.accurateRipChecksum = [NSNumber numberWithUnsignedInteger:accurateRipChecksum];
+				
+				if(eExtractionModeIndividualTracks == self.extractionMode) {
+					EncodingOperation *encodingOperation = nil;
+					if(![[EncoderManager sharedEncoderManager] encodeTrackExtractionRecord:extractionRecord encodingOperation:&encodingOperation delayPostProcessing:YES error:&error]) {
+						[self.managedObjectContext deleteObject:extractionRecord];
+						[self presentError:error modalForWindow:self.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
+						return;
+					}
+					
+					[_encodingOperations addObject:encodingOperation];
+				}
+				else if(eExtractionModeImage == self.extractionMode)
+					; // Nothing additional to do here
+				else
+					[[Logger sharedLogger] logMessage:@"Unknown extraction mode"];
+				
+				[_trackExtractionRecords addObject:extractionRecord];
+				[self startExtractingNextTrack];
+				
+				return;
+			}
+			else
+				[[Logger sharedLogger] logMessageWithLevel:eLogMessageLevelDebug format:@"Track synthesized before but SHA1 hashes don't match."];
+		}
+		// Save the URL for the synthesized track
+		else
+			_synthesizedCopyURL = fileURL;
+		
 		[[Logger sharedLogger] logMessageWithLevel:eLogMessageLevelDebug format:@"Track still has errors after synthesis"];
 
 		// Retry the track if the maximum retry count hasn't been exceeded
@@ -984,7 +1044,7 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.AudioExtr
 			[self removeTemporaryFiles];
 			[self resetExtractionState];
 
-			// Get started on the next track
+			// Get started on the track
 			[self extractWholeTrack:track];
 		}
 		// Failure
@@ -1087,18 +1147,31 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.AudioExtr
 			return nil;
 		}
 		
+//		int8_t buffer [kCDSectorSizeCDDA];
 		NSUInteger startingSector = operation.cushionSectors;
 		NSUInteger sectorCount = operation.sectors.length;
 		NSUInteger sectorCounter = 0;
 		
 		while(sectorCounter < sectorCount) {
+//			NSUInteger sectorsRead = [inputFile readAudioForSectors:NSMakeRange(startingSector, 1) intoBuffer:buffer error:error];
+//			if(0 == sectorsRead) {
+//				[inputFile closeFile];
+//				[outputFile closeFile];
+//				return nil;
+//			}
 			NSData *audioData = [inputFile audioDataForSector:startingSector error:error];
 			if(!audioData) {
 				[inputFile closeFile];
 				[outputFile closeFile];
 				return nil;
 			}
-			
+
+//			NSUInteger sectorsWritten = [outputFile setAudio:buffer forSectors:NSMakeRange(sectorCounter, 1) error:error];
+//			if(0 == sectorsWritten) {
+//				[inputFile closeFile];
+//				[outputFile closeFile];
+//				return nil;
+//			}
 			if(![outputFile setAudioData:audioData forSector:sectorCounter error:error]) {
 				[inputFile closeFile];
 				[outputFile closeFile];
@@ -1190,9 +1263,9 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.AudioExtr
 	}
 	
 	// Create the output file if it doesn't exist
-	if(!_synthesizedFile) {
-		_synthesizedFile = [ExtractedAudioFile createFileAtURL:temporaryURLWithExtension(@"wav") error:&error];
-		if(!_synthesizedFile) {
+	if(!_synthesizedTrack) {
+		_synthesizedTrack = [ExtractedAudioFile createFileAtURL:temporaryURLWithExtension(@"wav") error:&error];
+		if(!_synthesizedTrack) {
 			[inputFile closeFile];
 			[self presentError:error modalForWindow:self.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
 			return NO;
@@ -1215,12 +1288,12 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.AudioExtr
 			if(NSNotFound != firstIndex) {
 				if(firstIndex == latestIndex) {
 					NSData *sectorData = [inputFile audioDataForSector:(firstIndex - firstSectorInInputFile + inputFileCushionSectors) error:&error];
-					[_synthesizedFile setAudioData:sectorData forSector:(firstIndex - trackFirstSector) error:&error];
+					[_synthesizedTrack setAudioData:sectorData forSector:(firstIndex - trackFirstSector) error:&error];
 				}
 				else {
 					NSUInteger sectorCount = latestIndex - firstIndex + 1;
 					NSData *sectorsData = [inputFile audioDataForSectors:NSMakeRange(firstIndex - firstSectorInInputFile + inputFileCushionSectors, sectorCount) error:&error];
-					[_synthesizedFile setAudioData:sectorsData forSectors:NSMakeRange(firstIndex - trackFirstSector, sectorCount) error:&error];
+					[_synthesizedTrack setAudioData:sectorsData forSectors:NSMakeRange(firstIndex - trackFirstSector, sectorCount) error:&error];
 				}
 			}
 			
@@ -1235,12 +1308,12 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.AudioExtr
 			if(NSNotFound != firstIndex) {
 				if(firstIndex == latestIndex) {
 					NSData *sectorData = [inputFile audioDataForSector:(firstIndex - firstSectorInInputFile + inputFileCushionSectors) error:&error];
-					[_synthesizedFile setAudioData:sectorData forSector:(firstIndex - trackFirstSector) error:&error];
+					[_synthesizedTrack setAudioData:sectorData forSector:(firstIndex - trackFirstSector) error:&error];
 				}
 				else {
 					NSUInteger sectorCount = latestIndex - firstIndex + 1;
 					NSData *sectorsData = [inputFile audioDataForSectors:NSMakeRange(firstIndex - firstSectorInInputFile + inputFileCushionSectors, sectorCount) error:&error];
-					[_synthesizedFile setAudioData:sectorsData forSectors:NSMakeRange(firstIndex - trackFirstSector, sectorCount) error:&error];
+					[_synthesizedTrack setAudioData:sectorsData forSectors:NSMakeRange(firstIndex - trackFirstSector, sectorCount) error:&error];
 				}
 			}
 			

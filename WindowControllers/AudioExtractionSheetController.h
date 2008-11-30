@@ -60,7 +60,8 @@ typedef enum _eExtractionMode eExtractionMode;
 
 	eExtractionMode _extractionMode;
 	
-	ExtractedAudioFile *_synthesizedFile;
+	ExtractedAudioFile *_synthesizedTrack;
+	NSURL *_synthesizedCopyURL;
 
 	ImageExtractionRecord *_imageExtractionRecord;
 	NSMutableSet *_trackExtractionRecords;
