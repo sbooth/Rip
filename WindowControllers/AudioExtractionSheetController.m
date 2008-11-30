@@ -1282,8 +1282,8 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.AudioExtr
 
 - (ImageExtractionRecord *) createImageExtractionRecord
 {
-	[[Logger sharedLogger] logMessageWithLevel:eLogMessageLevelDebug format:@"Generating image"];
-	[_detailedStatusTextField setStringValue:NSLocalizedString(@"Creating image file", @"")];	
+	[_statusTextField setStringValue:NSLocalizedString(@"Creating image file", @"")];
+	[_detailedStatusTextField setStringValue:@""];
 	
 	// Create the output file
 	NSError *error = nil;
