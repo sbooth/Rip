@@ -35,6 +35,30 @@
 		goto cleanup;
 	}
 	
+	// Proxy support
+	if([[self.settings objectForKey:@"freeDBUseProxy"] boolValue]) {
+		cddb_http_proxy_enable(conn);
+
+		if([self.settings objectForKey:@"freeDBProxyServer"])
+			cddb_set_http_proxy_server_name(conn, [[self.settings objectForKey:@"freeDBProxyServer"] UTF8String]);
+		if([self.settings objectForKey:@"freeDBProxyServerPort"])
+			cddb_set_http_proxy_server_port(conn, [[self.settings objectForKey:@"freeDBProxyServerPort"] intValue]);
+
+		if([[self.settings objectForKey:@"freeDBUseProxyAuthentication"] boolValue]) {
+			cddb_set_http_proxy_username(conn, [[self.settings objectForKey:@"freeDBProxyServerUsername"] UTF8String]);
+			cddb_set_http_proxy_password(conn, [[self.settings objectForKey:@"freeDBProxyServerPassword"] UTF8String]);
+		}
+	}
+	
+	// Set ourselves as the cddb client
+	NSBundle *myBundle = [NSBundle bundleForClass:[self class]];
+	NSString *bundleIdentifier = [myBundle objectForInfoDictionaryKey:@"CFBundleIdentifier"];
+	NSString *bundleVersion = [myBundle objectForInfoDictionaryKey:@"CFBundleVersion"];
+	cddb_set_client(conn, [bundleIdentifier UTF8String], [bundleVersion UTF8String]);
+	
+	if([self.settings objectForKey:@"freeDBEMailAddress"])
+		cddb_set_email_address(conn, [[self.settings objectForKey:@"freeDBEMailAddress"] UTF8String]);
+	
 	// Determine the number of matching discs
 	int matches = cddb_query(conn, disc);
 	if(-1 == matches) {

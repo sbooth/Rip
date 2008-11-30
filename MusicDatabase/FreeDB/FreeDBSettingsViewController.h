@@ -7,6 +7,7 @@
 
 @interface FreeDBSettingsViewController : NSViewController
 {
+	IBOutlet NSTextField *_freeDBPasswordTextField;
 }
 
 @end

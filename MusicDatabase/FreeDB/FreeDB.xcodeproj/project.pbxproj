@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		324FCD610EE3399E00784FAA /* AddressBook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 324FCD600EE3399E00784FAA /* AddressBook.framework */; };
+		324FCD730EE33B2100784FAA /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 324FCD720EE33B2100784FAA /* Security.framework */; };
 		328DE3F00E5F917300F5BD13 /* MusicDatabaseInterface.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 328DE36D0E5F8C3100F5BD13 /* MusicDatabaseInterface.framework */; };
 		328DE6630E5FDB8000F5BD13 /* FreeDBDatabaseInterface.m in Sources */ = {isa = PBXBuildFile; fileRef = 328DE6600E5FDB8000F5BD13 /* FreeDBDatabaseInterface.m */; };
 		328DE6640E5FDB8000F5BD13 /* FreeDBQueryOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 328DE6620E5FDB8000F5BD13 /* FreeDBQueryOperation.m */; };
@@ -54,6 +56,8 @@
 		089C167EFE841241C02AAC07 /* English */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		089C167FFE841241C02AAC07 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		1058C7ADFEA557BF11CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
+		324FCD600EE3399E00784FAA /* AddressBook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AddressBook.framework; path = System/Library/Frameworks/AddressBook.framework; sourceTree = SDKROOT; };
+		324FCD720EE33B2100784FAA /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		328DE3680E5F8C3100F5BD13 /* MusicDatabaseInterface.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = MusicDatabaseInterface.xcodeproj; path = ../MusicDatabaseInterface/MusicDatabaseInterface.xcodeproj; sourceTree = SOURCE_ROOT; };
 		328DE65F0E5FDB8000F5BD13 /* FreeDBDatabaseInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FreeDBDatabaseInterface.h; sourceTree = "<group>"; };
 		328DE6600E5FDB8000F5BD13 /* FreeDBDatabaseInterface.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FreeDBDatabaseInterface.m; sourceTree = "<group>"; };
@@ -77,6 +81,8 @@
 				328DE3F00E5F917300F5BD13 /* MusicDatabaseInterface.framework in Frameworks */,
 				8D5B49B4048680CD000E48DA /* Cocoa.framework in Frameworks */,
 				328DEA320E607BA800F5BD13 /* cddb.framework in Frameworks */,
+				324FCD610EE3399E00784FAA /* AddressBook.framework in Frameworks */,
+				324FCD730EE33B2100784FAA /* Security.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -91,6 +97,8 @@
 				089C167CFE841241C02AAC07 /* Resources */,
 				089C1671FE841209C02AAC07 /* Frameworks and Libraries */,
 				19C28FB8FE9D52D311CA2CBB /* Products */,
+				324FCD600EE3399E00784FAA /* AddressBook.framework */,
+				324FCD720EE33B2100784FAA /* Security.framework */,
 			);
 			name = MusicBrainz;
 			sourceTree = "<group>";

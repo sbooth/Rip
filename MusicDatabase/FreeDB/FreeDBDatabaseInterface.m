@@ -7,11 +7,21 @@
 #import "FreeDBQueryOperation.h"
 #import "FreeDBSettingsViewController.h"
 
+#import <AddressBook/AddressBook.h>
+
 @implementation FreeDBDatabaseInterface
 
 - (NSDictionary *) defaultSettings
 {
 	NSMutableDictionary *defaultSettings = [[NSMutableDictionary alloc] init];
+
+	// Determine the logged-in user's primary e-mail address
+	ABPerson *me = [[ABAddressBook sharedAddressBook] me];
+	ABMultiValue *emailAddresses = [me valueForProperty:kABEmailProperty];
+	id primaryEmailAddress = [emailAddresses valueAtIndex:[emailAddresses indexForIdentifier:[emailAddresses primaryIdentifier]]];
+
+	[defaultSettings setObject:primaryEmailAddress forKey:@"freeDBEMailAddress"];
+	[defaultSettings setObject:[NSNumber numberWithBool:NO] forKey:@"freeDBUseProxy"];
 	
 	return defaultSettings;
 }
