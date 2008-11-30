@@ -45,10 +45,14 @@
 - (NSData *) audioDataForSector:(NSUInteger)sector error:(NSError **)error;
 - (NSData *) audioDataForSectors:(NSRange)sectors error:(NSError **)error;
 
+- (NSUInteger) readAudioForSectors:(NSRange)sectors intoBuffer:(void *)buffer error:(NSError **)error;
+
 // ========================================
 // Writing
 // ========================================
 - (BOOL) setAudioData:(NSData *)data forSector:(NSUInteger)sector error:(NSError **)error;
 - (BOOL) setAudioData:(NSData *)data forSectors:(NSRange)sectors error:(NSError **)error;
+
+- (NSUInteger) setAudio:(const void *)buffer forSectors:(NSRange)sectors error:(NSError **)error;
 
 @end

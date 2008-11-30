@@ -132,6 +132,25 @@
 - (NSData *) audioDataForSectors:(NSRange)sectors error:(NSError **)error
 {
 	int8_t *buffer = calloc(sectors.length, kCDSectorSizeCDDA);
+
+	NSError *localError = nil;
+	NSUInteger sectorsRead = [self readAudioForSectors:sectors intoBuffer:buffer error:&localError];
+	
+	if(0 == sectorsRead && localError) {
+		free(buffer);
+		if(error)
+			*error = localError;
+		return nil;
+	}
+	
+	// The returned NSData takes ownership of buffer
+	return [NSData dataWithBytesNoCopy:buffer length:(kCDSectorSizeCDDA * sectorsRead) freeWhenDone:YES];
+}
+
+- (NSUInteger) readAudioForSectors:(NSRange)sectors intoBuffer:(void *)buffer error:(NSError **)error
+{
+	NSParameterAssert(NULL != buffer);
+
 	UInt32 byteCount = kCDSectorSizeCDDA * sectors.length;		
 	UInt32 packetCount = AUDIO_FRAMES_PER_CDDA_SECTOR * sectors.length;
 	SInt64 startingPacket = AUDIO_FRAMES_PER_CDDA_SECTOR * sectors.location;
@@ -139,19 +158,12 @@
 	// Read the requested sectors
 	OSStatus status = AudioFileReadPackets(_file, false, &byteCount, NULL, startingPacket, &packetCount, buffer);
 	if(noErr != status) {
-		free(buffer);
 		if(error)
 			*error = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
-		return nil;
+		return 0;
 	}
 	
-	if((kCDSectorSizeCDDA * sectors.length) != byteCount) {
-		free(buffer);
-		return nil;
-	}
-	
-	// The returned NSData takes ownership of buffer
-	return [NSData dataWithBytesNoCopy:buffer length:byteCount freeWhenDone:YES];
+	return (byteCount / kCDSectorSizeCDDA);	
 }
 
 // ========================================
@@ -167,7 +179,25 @@
 	NSParameterAssert(nil != data);
 	NSParameterAssert([data length] >= (kCDSectorSizeCDDA * sectors.length));
 
-	const int8_t *buffer = [data bytes];
+	NSError *localError = nil;
+	NSUInteger sectorsWritten = [self setAudio:[data bytes] forSectors:sectors error:&localError];
+	
+	if(0 == sectorsWritten && localError) {
+		if(error)
+			*error = localError;
+		return NO;
+	}
+	
+	if(sectors.length != sectorsWritten)
+		return NO;
+	
+	return YES;	
+}
+
+- (NSUInteger) setAudio:(const void *)buffer forSectors:(NSRange)sectors error:(NSError **)error
+{
+	NSParameterAssert(NULL != buffer);
+	
 	UInt32 byteCount = kCDSectorSizeCDDA * sectors.length;		
 	UInt32 packetCount = AUDIO_FRAMES_PER_CDDA_SECTOR * sectors.length;
 	SInt64 startingPacket = AUDIO_FRAMES_PER_CDDA_SECTOR * sectors.location;
@@ -177,17 +207,14 @@
 	if(noErr != status) {
 		if(error)
 			*error = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
-		return NO;
+		return 0;
 	}
-	
-	if((kCDSectorSizeCDDA * sectors.length) != byteCount)
-		return NO;
 	
 	// Invalidate our cached digests
 	self.cachedMD5 = nil;
 	self.cachedSHA1 = nil;
 	
-	return YES;	
+	return (byteCount / kCDSectorSizeCDDA);	
 }
 
 @end
