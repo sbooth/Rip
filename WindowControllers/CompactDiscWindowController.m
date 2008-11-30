@@ -971,8 +971,12 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 										   didEndSelector:@selector(showDetectPregapsSheetDidEnd:returnCode:contextInfo:) 
 											  contextInfo:sheetController];
 	}
-	else
-		[self performShowCopyTracksSheet];
+	else {
+		if(eExtractionModeImage == self.extractionMode)
+			[self performShowCopyImageSheet];
+		else if(eExtractionModeIndividualTracks == self.extractionMode)
+			[self performShowCopyTracksSheet];
+	}
 }
 
 - (void) performShowCopyTracksSheet
