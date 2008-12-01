@@ -22,7 +22,6 @@
 
 /* Begin PBXBuildFile section */
 		3207D4990ED66DDD00F35BD5 /* Logger.m in Sources */ = {isa = PBXBuildFile; fileRef = 3207D4980ED66DDD00F35BD5 /* Logger.m */; };
-		321B6B9B0DE11F14003B8E6A /* Rip.xcclassmodel in Resources */ = {isa = PBXBuildFile; fileRef = 321B6B9A0DE11F14003B8E6A /* Rip.xcclassmodel */; };
 		324EC6740DA2D411002A3CA7 /* Rip.icns in Resources */ = {isa = PBXBuildFile; fileRef = 324EC6730DA2D411002A3CA7 /* Rip.icns */; };
 		324F30C90E85CF47000E4E4E /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = 324F30C80E85CF47000E4E4E /* dsa_pub.pem */; };
 		324F31320E86B3E2000E4E4E /* ReadMCNSheet.xib in Resources */ = {isa = PBXBuildFile; fileRef = 324F31300E86B3E2000E4E4E /* ReadMCNSheet.xib */; };
@@ -65,7 +64,6 @@
 		328DEE1F0E612F8B00F5BD13 /* EncoderPreferencesView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 328DEE1D0E612F8B00F5BD13 /* EncoderPreferencesView.xib */; };
 		329251E10EA5404400DF820C /* CalculateAccurateRipOffsetsSheetController.m in Sources */ = {isa = PBXBuildFile; fileRef = 329251E00EA5404400DF820C /* CalculateAccurateRipOffsetsSheetController.m */; };
 		3292521C0EA55CBC00DF820C /* CalculateAccurateRipOffsetsSheet.xib in Resources */ = {isa = PBXBuildFile; fileRef = 3292521A0EA55CBC00DF820C /* CalculateAccurateRipOffsetsSheet.xib */; };
-		329560E70DCC008E005DA87B /* TagEditingSheet.xib in Resources */ = {isa = PBXBuildFile; fileRef = 329560E50DCC008E005DA87B /* TagEditingSheet.xib */; };
 		32AB63A60E68B45800EA423A /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 32AB63A50E68B45800EA423A /* SystemConfiguration.framework */; };
 		32AC75640E7634A5009A5E1B /* ReadOffsetCalculationOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 32AC75630E7634A5009A5E1B /* ReadOffsetCalculationOperation.m */; };
 		32B1A36F0E8F0D35005A9AD9 /* DiscInspectorPanelController.m in Sources */ = {isa = PBXBuildFile; fileRef = 32B1A36E0E8F0D35005A9AD9 /* DiscInspectorPanelController.m */; };
@@ -311,7 +309,6 @@
 		2A37F4C5FDCFA73011CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		3207D4970ED66DDD00F35BD5 /* Logger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Logger.h; path = Utilities/Logger.h; sourceTree = "<group>"; };
 		3207D4980ED66DDD00F35BD5 /* Logger.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Logger.m; path = Utilities/Logger.m; sourceTree = "<group>"; };
-		321B6B9A0DE11F14003B8E6A /* Rip.xcclassmodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcclassmodel; name = Rip.xcclassmodel; path = Models/Rip.xcclassmodel; sourceTree = "<group>"; };
 		324CAFCC0DD905AD0040FF7F /* DiscogsQueryOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DiscogsQueryOperation.h; sourceTree = "<group>"; };
 		324CAFCD0DD905AD0040FF7F /* DiscogsQueryOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DiscogsQueryOperation.m; sourceTree = "<group>"; };
 		324EC6730DA2D411002A3CA7 /* Rip.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = Rip.icns; sourceTree = "<group>"; };
@@ -379,7 +376,6 @@
 		329251DF0EA5404400DF820C /* CalculateAccurateRipOffsetsSheetController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CalculateAccurateRipOffsetsSheetController.h; sourceTree = "<group>"; };
 		329251E00EA5404400DF820C /* CalculateAccurateRipOffsetsSheetController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CalculateAccurateRipOffsetsSheetController.m; sourceTree = "<group>"; };
 		3292521B0EA55CBC00DF820C /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/CalculateAccurateRipOffsetsSheet.xib; sourceTree = "<group>"; };
-		329560E60DCC008E005DA87B /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/TagEditingSheet.xib; sourceTree = "<group>"; };
 		32AB63260E68AF3F00EA423A /* NSViewController+PreferencesViewControllerMethods.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSViewController+PreferencesViewControllerMethods.h"; sourceTree = "<group>"; };
 		32AB63A50E68B45800EA423A /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		32AC75620E7634A5009A5E1B /* ReadOffsetCalculationOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReadOffsetCalculationOperation.h; sourceTree = "<group>"; };
@@ -645,7 +641,6 @@
 				2A37F4B9FDCFA73011CA2CEA /* Credits.rtf */,
 				8D15AC360486D014006FF6A4 /* Info.plist */,
 				089C165FFE840EACC02AAC07 /* InfoPlist.strings */,
-				329560E50DCC008E005DA87B /* TagEditingSheet.xib */,
 				328DEDD90E61274E00F5BD13 /* MusicDatabasePreferencesView.xib */,
 				32C7B6820EBE1AFA00D1A722 /* Growl Registration Ticket.growlRegDict */,
 			);
@@ -933,7 +928,6 @@
 			isa = PBXGroup;
 			children = (
 				8C807ABE0D3F069300B48E7A /* Rip.xcdatamodel */,
-				321B6B9A0DE11F14003B8E6A /* Rip.xcclassmodel */,
 			);
 			name = Models;
 			sourceTree = "<group>";
@@ -1191,9 +1185,7 @@
 				8C46E3CF0D775E0400AE4470 /* CompactDiscWindow.xib in Resources */,
 				8C46E3F10D775E7600AE4470 /* PreferencesWindow.xib in Resources */,
 				324EC6740DA2D411002A3CA7 /* Rip.icns in Resources */,
-				329560E70DCC008E005DA87B /* TagEditingSheet.xib in Resources */,
 				32E9F8300DD6C0FF00E8ACCA /* EncoderSettingsSheet.xib in Resources */,
-				321B6B9B0DE11F14003B8E6A /* Rip.xcclassmodel in Resources */,
 				328DEDDB0E61274E00F5BD13 /* MusicDatabasePreferencesView.xib in Resources */,
 				328DEE0D0E612D8B00F5BD13 /* GeneralPreferencesView.xib in Resources */,
 				328DEE1F0E612F8B00F5BD13 /* EncoderPreferencesView.xib in Resources */,
@@ -1477,14 +1469,6 @@
 				3292521B0EA55CBC00DF820C /* English */,
 			);
 			name = CalculateAccurateRipOffsetsSheet.xib;
-			sourceTree = "<group>";
-		};
-		329560E50DCC008E005DA87B /* TagEditingSheet.xib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				329560E60DCC008E005DA87B /* English */,
-			);
-			name = TagEditingSheet.xib;
 			sourceTree = "<group>";
 		};
 		32B1A37B0E8F10B1005A9AD9 /* DiscInspectorPanel.xib */ = {
