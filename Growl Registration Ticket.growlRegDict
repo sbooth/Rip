@@ -13,6 +13,8 @@
 			<string>Extraction Started</string>
 			<string>Extraction Canceled</string>
 			<string>Extraction Complete</string>
+			<string>Encoding Started</string>
+			<string>Encoding Complete</string>
 		</array>
 	</dict>
 </plist>
