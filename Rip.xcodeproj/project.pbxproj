@@ -86,9 +86,6 @@
 		32C793F60E291B4B0079706C /* Sparkle.framework in Copy Embedded Frameworks */ = {isa = PBXBuildFile; fileRef = 32C793F20E291B3D0079706C /* Sparkle.framework */; };
 		32C7B61E0EBD61AC00D1A722 /* AdvancedPreferencesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 32C7B61D0EBD61AC00D1A722 /* AdvancedPreferencesViewController.m */; };
 		32C7B6360EBD61E900D1A722 /* AdvancedPreferencesView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 32C7B6340EBD61E900D1A722 /* AdvancedPreferencesView.xib */; };
-		32C7B6740EBE1A7300D1A722 /* Growl.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 32C7B6730EBE1A7300D1A722 /* Growl.framework */; };
-		32C7B6770EBE1A8100D1A722 /* Growl.framework in Copy Embedded Frameworks */ = {isa = PBXBuildFile; fileRef = 32C7B6730EBE1A7300D1A722 /* Growl.framework */; };
-		32C7B6830EBE1B0C00D1A722 /* Growl Registration Ticket.growlRegDict in Resources */ = {isa = PBXBuildFile; fileRef = 32C7B6820EBE1AFA00D1A722 /* Growl Registration Ticket.growlRegDict */; };
 		32E9F8300DD6C0FF00E8ACCA /* EncoderSettingsSheet.xib in Resources */ = {isa = PBXBuildFile; fileRef = 32E9F82E0DD6C0FF00E8ACCA /* EncoderSettingsSheet.xib */; };
 		8C1BBC650D43DF0D00DAC484 /* GenreUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C1BBC640D43DF0D00DAC484 /* GenreUtilities.m */; };
 		8C34BB0B0D761A99003F2953 /* ApplicationDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C34BB0A0D761A99003F2953 /* ApplicationDelegate.m */; };
@@ -288,7 +285,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				32C7B6770EBE1A8100D1A722 /* Growl.framework in Copy Embedded Frameworks */,
 				328DE5150E5FC69600F5BD13 /* MusicDatabaseInterface.framework in Copy Embedded Frameworks */,
 				32C793F60E291B4B0079706C /* Sparkle.framework in Copy Embedded Frameworks */,
 				8C3C194A0D73EA35001BAC88 /* EncoderInterface.framework in Copy Embedded Frameworks */,
@@ -402,7 +398,6 @@
 		32C7B61C0EBD61AC00D1A722 /* AdvancedPreferencesViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AdvancedPreferencesViewController.h; sourceTree = "<group>"; };
 		32C7B61D0EBD61AC00D1A722 /* AdvancedPreferencesViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AdvancedPreferencesViewController.m; sourceTree = "<group>"; };
 		32C7B6350EBD61E900D1A722 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/AdvancedPreferencesView.xib; sourceTree = "<group>"; };
-		32C7B6730EBE1A7300D1A722 /* Growl.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Growl.framework; path = Frameworks/Growl.framework; sourceTree = "<group>"; };
 		32C7B6820EBE1AFA00D1A722 /* Growl Registration Ticket.growlRegDict */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = "Growl Registration Ticket.growlRegDict"; sourceTree = "<group>"; };
 		32DBCF750370BD2300C91783 /* Rip_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Rip_Prefix.pch; sourceTree = "<group>"; };
 		32E9F82F0DD6C0FF00E8ACCA /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/EncoderSettingsSheet.xib; sourceTree = SOURCE_ROOT; };
@@ -512,7 +507,6 @@
 				32C793F30E291B3D0079706C /* Sparkle.framework in Frameworks */,
 				328DE5130E5FC67500F5BD13 /* MusicDatabaseInterface.framework in Frameworks */,
 				32AB63A60E68B45800EA423A /* SystemConfiguration.framework in Frameworks */,
-				32C7B6740EBE1A7300D1A722 /* Growl.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -650,7 +644,6 @@
 		2A37F4C3FDCFA73011CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				32C7B6730EBE1A7300D1A722 /* Growl.framework */,
 				32C793F20E291B3D0079706C /* Sparkle.framework */,
 				8CA35F910D2F42A800F89E3B /* discid.framework */,
 				1058C7A6FEA54F5311CA2CBB /* Linked Frameworks */,
@@ -1198,7 +1191,6 @@
 				3292521C0EA55CBC00DF820C /* CalculateAccurateRipOffsetsSheet.xib in Resources */,
 				328371680EA7DD650011EB44 /* EncoderWindow.xib in Resources */,
 				32C7B6360EBD61E900D1A722 /* AdvancedPreferencesView.xib in Resources */,
-				32C7B6830EBE1B0C00D1A722 /* Growl Registration Ticket.growlRegDict in Resources */,
 				32BBF1510EC8875100EC2FBE /* CopyImageToolbarIcon.png in Resources */,
 				32BBF1520EC8875100EC2FBE /* CopyTracksToolbarIcon.png in Resources */,
 				32BBF1530EC8875100EC2FBE /* DetectPregapsToolbarIcon.png in Resources */,
