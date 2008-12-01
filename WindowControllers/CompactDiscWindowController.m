@@ -749,6 +749,45 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 	
 	AudioExtractionSheetController *sheetController = (AudioExtractionSheetController *)contextInfo;
 	
+	// Alert the user if any tracks failed to extract
+	if([sheetController.failedTrackIDs count]) {
+		// Fetch the tracks that failed and sort them by track number
+		NSPredicate *trackPredicate  = [NSPredicate predicateWithFormat:@"self IN %@", sheetController.failedTrackIDs];
+		NSSortDescriptor *trackNumberSortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"number" ascending:YES];
+		NSEntityDescription *trackEntityDescription = [NSEntityDescription entityForName:@"TrackDescriptor" inManagedObjectContext:self.managedObjectContext];
+		
+		NSFetchRequest *trackFetchRequest = [[NSFetchRequest alloc] init];
+		
+		[trackFetchRequest setEntity:trackEntityDescription];
+		[trackFetchRequest setPredicate:trackPredicate];
+		[trackFetchRequest setSortDescriptors:[NSArray arrayWithObject:trackNumberSortDescriptor]];
+		
+		NSError *error = nil;
+		NSArray *tracks = [self.managedObjectContext executeFetchRequest:trackFetchRequest error:&error];
+		if(!tracks) {
+			[self presentError:error modalForWindow:self.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
+			return;
+		}
+
+		NSString *albumTitle = self.compactDisc.metadata.title;
+		if(!albumTitle)
+			albumTitle = NSLocalizedString(@"Unknown Album", @"");
+		
+		NSArray *trackTitles = [tracks valueForKeyPath:@"metadata.title"];
+		NSString *trackTitlesString = [trackTitles componentsJoinedByString:@", "];
+		NSBeginCriticalAlertSheet([NSString stringWithFormat:NSLocalizedString(@"Some tracks from \u201c%@\u201d could not be copied because read errors occurred during audio extraction.", @""), albumTitle],
+								  NSLocalizedString(@"OK", @"Button"),
+								  nil,
+								  nil,
+								  self.window,
+								  nil,
+								  NULL,
+								  NULL,
+								  NULL, 
+								  NSLocalizedString(@"Unrecoverable read errors occurred for the following tracks: %@", @""),
+								  trackTitlesString);
+	}
+	
 	// Save an extraction log file if any tracks were successfully extracted
 	if(![sheetController.trackExtractionRecords count])
 		return;
@@ -797,6 +836,47 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 	
 	AudioExtractionSheetController *sheetController = (AudioExtractionSheetController *)contextInfo;
 	
+	// Alert the user if any tracks failed to extract
+	if([sheetController.failedTrackIDs count]) {
+		// Fetch the tracks that failed and sort them by track number
+		NSPredicate *trackPredicate  = [NSPredicate predicateWithFormat:@"self IN %@", sheetController.failedTrackIDs];
+		NSSortDescriptor *trackNumberSortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"number" ascending:YES];
+		NSEntityDescription *trackEntityDescription = [NSEntityDescription entityForName:@"TrackDescriptor" inManagedObjectContext:self.managedObjectContext];
+		
+		NSFetchRequest *trackFetchRequest = [[NSFetchRequest alloc] init];
+		
+		[trackFetchRequest setEntity:trackEntityDescription];
+		[trackFetchRequest setPredicate:trackPredicate];
+		[trackFetchRequest setSortDescriptors:[NSArray arrayWithObject:trackNumberSortDescriptor]];
+		
+		NSError *error = nil;
+		NSArray *tracks = [self.managedObjectContext executeFetchRequest:trackFetchRequest error:&error];
+		if(!tracks) {
+			[self presentError:error modalForWindow:self.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
+			return;
+		}
+
+		NSString *albumTitle = self.compactDisc.metadata.title;
+		if(!albumTitle)
+			albumTitle = NSLocalizedString(@"Unknown Album", @"");
+		
+		NSArray *trackTitles = [tracks valueForKeyPath:@"metadata.title"];
+		NSString *trackTitlesString = [trackTitles componentsJoinedByString:@", "];
+		NSBeginCriticalAlertSheet([NSString stringWithFormat:NSLocalizedString(@"The image of \u201c%@\u201d could not be created because read errors occurred during audio extraction.", @""), albumTitle],
+								  NSLocalizedString(@"OK", @"Button"),
+								  nil,
+								  nil,
+								  self.window,
+								  nil,
+								  NULL,
+								  NULL,
+								  NULL, 
+								  NSLocalizedString(@"Unrecoverable read errors occurred for the following tracks: %@", @""),
+								  trackTitlesString);
+	
+		return;
+	}
+
 	// Save an extraction log file if any tracks were successfully extracted
 	if(!sheetController.imageExtractionRecord)
 		return;
