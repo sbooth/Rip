@@ -107,7 +107,7 @@
 	<key>CFBundleVersion</key>
 	<string>GIT_COMMIT_UNQUOTED</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.0a</string>
+	<string>1.0pb1</string>
 	<key>NSMainNibFile</key>
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
