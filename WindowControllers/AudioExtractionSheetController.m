@@ -331,7 +331,7 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.AudioExtr
 - (NSArray *) orderedTracks
 {
 	// Fetch the tracks to be extracted and sort them by track number
-	NSPredicate *trackPredicate  = [NSPredicate predicateWithFormat:@"self IN %@", [self.trackIDs allObjects]];
+	NSPredicate *trackPredicate  = [NSPredicate predicateWithFormat:@"self IN %@", self.trackIDs];
 	NSSortDescriptor *trackNumberSortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"number" ascending:YES];
 	NSEntityDescription *trackEntityDescription = [NSEntityDescription entityForName:@"TrackDescriptor" inManagedObjectContext:self.managedObjectContext];
 	
@@ -354,7 +354,7 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.AudioExtr
 - (NSArray *) orderedTracksRemaining
 {
 	// Fetch the tracks to be extracted and sort them by track number
-	NSPredicate *trackPredicate  = [NSPredicate predicateWithFormat:@"self IN %@", [_tracksRemaining allObjects]];
+	NSPredicate *trackPredicate  = [NSPredicate predicateWithFormat:@"self IN %@", _tracksRemaining];
 	NSSortDescriptor *trackNumberSortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"number" ascending:YES];
 	NSEntityDescription *trackEntityDescription = [NSEntityDescription entityForName:@"TrackDescriptor" inManagedObjectContext:self.managedObjectContext];
 	
