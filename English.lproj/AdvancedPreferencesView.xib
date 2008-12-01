@@ -8,7 +8,6 @@
 		<string key="IBDocument.HIToolboxVersion">352.00</string>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="1" id="9"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -35,7 +34,7 @@
 				<string key="NSClassName">NSApplication</string>
 			</object>
 			<object class="NSCustomView" id="1005">
-				<reference key="NSNextResponder"/>
+				<nil key="NSNextResponder"/>
 				<int key="NSvFlags">268</int>
 				<object class="NSMutableArray" key="NSSubviews">
 					<bool key="EncodedWithXMLCoder">YES</bool>
@@ -242,7 +241,7 @@
 															</object>
 															<object class="NSMutableArray" key="dict.values">
 																<bool key="EncodedWithXMLCoder">YES</bool>
-																<reference ref="9"/>
+																<integer value="1" id="9"/>
 																<integer value="1040"/>
 															</object>
 														</object>
@@ -359,7 +358,6 @@
 								</object>
 								<string key="NSFrame">{{1, 17}, {558, 117}}</string>
 								<reference key="NSSuperview" ref="968558372"/>
-								<reference key="NSNextKeyView" ref="806331348"/>
 								<reference key="NSDocView" ref="806331348"/>
 								<reference key="NSBGColor" ref="141720956"/>
 								<int key="NScvFlags">4</int>
@@ -392,7 +390,6 @@
 								</object>
 								<string key="NSFrame">{{1, 0}, {558, 17}}</string>
 								<reference key="NSSuperview" ref="968558372"/>
-								<reference key="NSNextKeyView" ref="554983808"/>
 								<reference key="NSDocView" ref="554983808"/>
 								<reference key="NSBGColor" ref="141720956"/>
 								<int key="NScvFlags">4</int>
@@ -401,7 +398,6 @@
 						</object>
 						<string key="NSFrame">{{20, 49}, {560, 135}}</string>
 						<reference key="NSSuperview" ref="1005"/>
-						<reference key="NSNextKeyView" ref="186720515"/>
 						<int key="NSsFlags">562</int>
 						<reference key="NSVScroller" ref="870260785"/>
 						<reference key="NSHScroller" ref="986438808"/>
@@ -437,13 +433,13 @@
 					<object class="NSTextField" id="1058069053">
 						<reference key="NSNextResponder" ref="1005"/>
 						<int key="NSvFlags">268</int>
-						<string key="NSFrame">{{105, 269}, {183, 17}}</string>
+						<string key="NSFrame">{{69, 269}, {219, 17}}</string>
 						<reference key="NSSuperview" ref="1005"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="147561558">
 							<int key="NSCellFlags">68288064</int>
 							<int key="NSCellFlags2">272630784</int>
-							<string key="NSContents">Maximum re-read attempts:</string>
+							<string key="NSContents">Maximum track re-read attempts:</string>
 							<reference key="NSSupport" ref="1038475392"/>
 							<reference key="NSControlView" ref="1058069053"/>
 							<object class="NSColor" key="NSBackgroundColor" id="116599217">
@@ -617,14 +613,9 @@
 					</object>
 				</object>
 				<string key="NSFrameSize">{600, 309}</string>
-				<reference key="NSSuperview"/>
 				<string key="NSClassName">NSView</string>
 			</object>
 			<object class="NSUserDefaultsController" id="236891816">
-				<object class="NSMutableArray" key="NSDeclaredKeys">
-					<bool key="EncodedWithXMLCoder">YES</bool>
-					<string>requiredMatches</string>
-				</object>
 				<bool key="NSSharedInstance">YES</bool>
 			</object>
 			<object class="NSArrayController" id="389836083">
