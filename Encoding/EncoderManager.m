@@ -23,8 +23,6 @@
 #import "FileUtilities.h"
 #import "Logger.h"
 
-#import <Growl/GrowlApplicationBridge.h>
-
 // ========================================
 // Flatten the metadata objects into a single NSDictionary
 // ========================================
@@ -465,9 +463,6 @@ static EncoderManager *sSharedEncoderManager				= nil;
 	
 	[self.queue addOperation:operation];
 	
-	NSString *notificationDescription = [NSString stringWithFormat:NSLocalizedString(@"Encoding %@ to %@ using %@", @""), [operation.metadata objectForKey:kMetadataTitleKey], [[operation.outputURL path] lastPathComponent], [encoderBundle objectForInfoDictionaryKey:@"EncoderName"]];
-	[GrowlApplicationBridge notifyWithTitle:NSLocalizedString(@"Encoding started", @"") description:notificationDescription notificationName:@"Encoding Started" iconData:nil priority:0 isSticky:NO clickContext:nil];
-	
 	// Communicate the output URL back to the caller
 	trackExtractionRecord.outputURL = operation.outputURL;
 	
@@ -527,10 +522,7 @@ static EncoderManager *sSharedEncoderManager				= nil;
 		[self postProcessEncodingOperation:operation forImageExtractionRecord:imageExtractionRecord error:error];
 	
 	[self.queue addOperation:operation];
-	
-	NSString *notificationDescription = [NSString stringWithFormat:NSLocalizedString(@"Encoding %@ to %@ using %@", @""), [operation.metadata objectForKey:kMetadataTitleKey], [[operation.outputURL path] lastPathComponent], [encoderBundle objectForInfoDictionaryKey:@"EncoderName"]];
-	[GrowlApplicationBridge notifyWithTitle:NSLocalizedString(@"Encoding started", @"") description:notificationDescription notificationName:@"Encoding Started" iconData:nil priority:0 isSticky:NO clickContext:nil];
-	
+		
 	// Communicate the output URL back to the caller
 	imageExtractionRecord.outputURL = operation.outputURL;
 	
