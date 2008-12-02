@@ -137,11 +137,11 @@
 		[accurateRipResponseData getBytes:&arDiscID2 range:NSMakeRange(pressingDataOffset + 5, 4)];
 		arDiscID2 = OSSwapLittleToHostInt32(arDiscID2);
 		
-		int32_t arFreeDBID = 0;
+		uint32_t arFreeDBID = 0;
 		[accurateRipResponseData getBytes:&arFreeDBID range:NSMakeRange(pressingDataOffset + 9, 4)];
 		arFreeDBID = OSSwapLittleToHostInt32(arFreeDBID);
 		
-		if(arTrackCount != orderedTracks.count || arDiscID1 != accurateRipID1 || arDiscID2 != accurateRipID2 || (NSUInteger)arFreeDBID != compactDisc.freeDBDiscID) {
+		if(arTrackCount != orderedTracks.count || arDiscID1 != accurateRipID1 || arDiscID2 != accurateRipID2 || arFreeDBID != compactDisc.freeDBDiscID) {
 			[[Logger sharedLogger] logMessageWithLevel:eLogMessageLevelDebug format:@"AccurateRip track count or disc IDs don't match."];
 			
 			self.error = [NSError errorWithDomain:NSCocoaErrorDomain code:3 userInfo:nil];
