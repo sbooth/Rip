@@ -556,6 +556,10 @@ static EncoderManager *sSharedEncoderManager				= nil;
 	NSObject <EncoderInterface> *encoderInterface = [[encoderClass alloc] init];
 
 	EncodingPostProcessingOperation *operation = [encoderInterface encodingPostProcessingOperation];
+	
+	// Not all encoders support post-processing
+	if(!operation)
+		return YES;
 
 	operation.isImage = NO;
 	operation.trackURLs = [encodingOperations valueForKey:@"outputURL"];
@@ -595,6 +599,10 @@ static EncoderManager *sSharedEncoderManager				= nil;
 	
 	EncodingPostProcessingOperation *operation = [encoderInterface encodingPostProcessingOperation];
 	
+	// Not all encoders support post-processing
+	if(!operation)
+		return YES;
+
 	operation.isImage = YES;
 	operation.imageURL = encodingOperation.outputURL;
 	operation.imageMetadata = encodingOperation.metadata;
