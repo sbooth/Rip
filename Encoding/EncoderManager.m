@@ -446,6 +446,8 @@ static EncoderManager *sSharedEncoderManager				= nil;
 		return NO;
 	
 	EncodingOperation *operation = [encoderInterface encodingOperation];
+	if(!operation)
+		return NO;
 	
 	operation.inputURL = trackExtractionRecord.inputURL;
 	operation.outputURL = outputURL;
@@ -506,6 +508,8 @@ static EncoderManager *sSharedEncoderManager				= nil;
 		return NO;	
 	
 	EncodingOperation *operation = [encoderInterface encodingOperation];
+	if(!operation)
+		return NO;
 	
 	operation.inputURL = imageExtractionRecord.inputURL;
 	operation.outputURL = outputURL;
