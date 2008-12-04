@@ -6,6 +6,7 @@
 #import "EncoderWindowController.h"
 
 #import "EncoderManager.h"
+#import <EncoderInterface/EncodingOperation.h>
 
 // ========================================
 // Context objects for observeValueForKeyPath:ofObject:change:context:
@@ -38,12 +39,14 @@ static NSString * const kEncoderOperationQueueKVOContext		= @"org.sbooth.Rip.Enc
 		
 		if(NSKeyValueChangeInsertion == changeKind) {
 			for(NSOperation *operation in [change objectForKey:NSKeyValueChangeNewKey]) {
-				[_arrayController addObject:operation];
+				if([operation isKindOfClass:[EncodingOperation class]])
+					[_arrayController addObject:operation];
 			}
 		}
 		else if(NSKeyValueChangeRemoval == changeKind) {
 			for(NSOperation *operation in [change objectForKey:NSKeyValueChangeOldKey]) {
-				[_arrayController removeObject:operation];
+				if([operation isKindOfClass:[EncodingOperation class]])
+					[_arrayController removeObject:operation];
 			}
 		}
 	}
