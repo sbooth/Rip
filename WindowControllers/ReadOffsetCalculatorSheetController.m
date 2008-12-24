@@ -48,6 +48,10 @@ static NSString * const kCalculateOffsetsKVOContext		= @"org.sbooth.Rip.ReadOffs
 - (void) didPresentErrorWithRecovery:(BOOL)didRecover contextInfo:(void *)contextInfo;
 @end
 
+@interface ReadOffsetCalculatorSheetController (Private)
+- (void) readOffsetCalculationOperationDidFinish:(ReadOffsetCalculationOperation *)operation;
+@end
+
 @implementation ReadOffsetCalculatorSheetController
 
 @synthesize disk = _disk;
@@ -96,76 +100,59 @@ static NSString * const kCalculateOffsetsKVOContext		= @"org.sbooth.Rip.ReadOffs
 		AccurateRipQueryOperation *operation = (AccurateRipQueryOperation *)object;
 		
 		if([keyPath isEqualToString:@"isExecuting"]) {
-			if([operation isExecuting])
-				[_statusTextField setStringValue:NSLocalizedString(@"Checking for disc in AccurateRip", @"")];
+			if([operation isExecuting]) {
+				if([NSThread isMainThread])
+					[_statusTextField setStringValue:NSLocalizedString(@"Checking for disc in AccurateRip", @"")];
+				else
+					[_statusTextField performSelectorOnMainThread:@selector(setStringValue:) withObject:NSLocalizedString(@"Checking for disc in AccurateRip", @"") waitUntilDone:NO];
+			}
 		}
-		else if([keyPath isEqualToString:@"isCancelled"]) {
+		else if([keyPath isEqualToString:@"isCancelled"] || [keyPath isEqualToString:@"isFinished"]) {
 			[operation removeObserver:self forKeyPath:@"isExecuting"];
 			[operation removeObserver:self forKeyPath:@"isCancelled"];
 			[operation removeObserver:self forKeyPath:@"isFinished"];
 		}
-		else if([keyPath isEqualToString:@"isFinished"]) {
-			[operation removeObserver:self forKeyPath:@"isExecuting"];
-			[operation removeObserver:self forKeyPath:@"isCancelled"];
-			[operation removeObserver:self forKeyPath:@"isFinished"];
-		}		
 	}
 	else if(kExtractAudioKVOContext == context) {
 		ExtractionOperation *operation = (ExtractionOperation *)object;
 		
 		if([keyPath isEqualToString:@"isExecuting"]) {
-			if([operation isExecuting])
-				[_statusTextField setStringValue:NSLocalizedString(@"Extracting audio", @"")];
+			if([operation isExecuting]) {
+				if([NSThread isMainThread])
+					[_statusTextField setStringValue:NSLocalizedString(@"Extracting audio", @"")];
+				else
+					[_statusTextField performSelectorOnMainThread:@selector(setStringValue:) withObject:NSLocalizedString(@"Extracting audio", @"") waitUntilDone:NO];
+			}
 		}
-		else if([keyPath isEqualToString:@"isCancelled"]) {
+		else if([keyPath isEqualToString:@"isCancelled"] || [keyPath isEqualToString:@"isFinished"]) {
 			[operation removeObserver:self forKeyPath:@"isExecuting"];
 			[operation removeObserver:self forKeyPath:@"isCancelled"];
 			[operation removeObserver:self forKeyPath:@"isFinished"];
 		}
-		else if([keyPath isEqualToString:@"isFinished"]) {
-			[operation removeObserver:self forKeyPath:@"isExecuting"];
-			[operation removeObserver:self forKeyPath:@"isCancelled"];
-			[operation removeObserver:self forKeyPath:@"isFinished"];
-		}
-		
 	}
 	else if(kCalculateOffsetsKVOContext == context) {
 		ReadOffsetCalculationOperation *operation = (ReadOffsetCalculationOperation *)object;
 		
 		if([keyPath isEqualToString:@"isExecuting"]) {
-			if([operation isExecuting])
-				[_statusTextField setStringValue:NSLocalizedString(@"Calculating possible read offsets", @"")];
-		}
-		else if([keyPath isEqualToString:@"isCancelled"]) {
-			[operation removeObserver:self forKeyPath:@"isExecuting"];
-			[operation removeObserver:self forKeyPath:@"isCancelled"];
-			[operation removeObserver:self forKeyPath:@"isFinished"];
-		}
-		else if([keyPath isEqualToString:@"isFinished"]) {
-			if([operation isFinished]) {
-				[_possibleOffsetsArrayController addObjects:operation.possibleReadOffsets];
-
-				[_statusTextField setStringValue:[NSString stringWithFormat:NSLocalizedString(@"Detected %i possible read offsets", @""), [[_possibleOffsetsArrayController arrangedObjects] count]]];
-				[_progressIndicator stopAnimation:self];
-				
-				// The user may have reordered the table, so we can't rely on the first object in arrangedObjects
-				// being the offset with the highest confidence level
-				NSSortDescriptor *confidenceLevelSortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"confidenceLevel" ascending:NO];
-				NSArray *sortedPossibleOffsets = [[_possibleOffsetsArrayController arrangedObjects] sortedArrayUsingDescriptors:[NSArray arrayWithObject:confidenceLevelSortDescriptor]];
-				
-				NSDictionary *highestConfidenceLevel = nil;
-				if([sortedPossibleOffsets count])
-					highestConfidenceLevel = [sortedPossibleOffsets objectAtIndex:0];
-				
-				if(highestConfidenceLevel)
-					[_suggestedOffsetTextField setIntegerValue:[[highestConfidenceLevel valueForKey:kReadOffsetKey] integerValue]];
+			if([operation isExecuting]) {
+				if([NSThread isMainThread])
+					[_statusTextField setStringValue:NSLocalizedString(@"Calculating possible read offsets", @"")];
+				else
+					[_statusTextField performSelectorOnMainThread:@selector(setStringValue:) withObject:NSLocalizedString(@"Calculating possible read offsets", @"") waitUntilDone:NO];
 			}
-			
+		}
+		else if([keyPath isEqualToString:@"isCancelled"] || [keyPath isEqualToString:@"isFinished"]) {
 			[operation removeObserver:self forKeyPath:@"isExecuting"];
 			[operation removeObserver:self forKeyPath:@"isCancelled"];
 			[operation removeObserver:self forKeyPath:@"isFinished"];
-		}
-		
+
+			if([operation isFinished]) {
+				if([NSThread isMainThread])
+					[self readOffsetCalculationOperationDidFinish:operation];
+				else
+					[self performSelectorOnMainThread:@selector(readOffsetCalculationOperationDidFinish:) withObject:operation waitUntilDone:NO];
+			}
+		}		
 	}
 	else
 		[super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
@@ -395,6 +382,32 @@ static NSString * const kCalculateOffsetsKVOContext		= @"org.sbooth.Rip.ReadOffs
 	
 	[[NSApplication sharedApplication] endSheet:self.window returnCode:(didRecover ? NSOKButton : NSCancelButton)];	
 	[self.window orderOut:self];
+}
+
+@end
+
+@implementation ReadOffsetCalculatorSheetController (Private)
+
+- (void) readOffsetCalculationOperationDidFinish:(ReadOffsetCalculationOperation *)operation
+{
+	NSParameterAssert(nil != operation);
+	
+	[_possibleOffsetsArrayController addObjects:operation.possibleReadOffsets];
+	
+	[_statusTextField setStringValue:[NSString stringWithFormat:NSLocalizedString(@"Detected %i possible read offsets", @""), [[_possibleOffsetsArrayController arrangedObjects] count]]];
+	[_progressIndicator stopAnimation:self];
+	
+	// The user may have reordered the table, so we can't rely on the first object in arrangedObjects
+	// being the offset with the highest confidence level
+	NSSortDescriptor *confidenceLevelSortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"confidenceLevel" ascending:NO];
+	NSArray *sortedPossibleOffsets = [[_possibleOffsetsArrayController arrangedObjects] sortedArrayUsingDescriptors:[NSArray arrayWithObject:confidenceLevelSortDescriptor]];
+	
+	NSDictionary *highestConfidenceLevel = nil;
+	if([sortedPossibleOffsets count])
+		highestConfidenceLevel = [sortedPossibleOffsets objectAtIndex:0];
+	
+	if(highestConfidenceLevel)
+		[_suggestedOffsetTextField setIntegerValue:[[highestConfidenceLevel valueForKey:kReadOffsetKey] integerValue]];
 }
 
 @end

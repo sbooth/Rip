@@ -24,6 +24,8 @@ static NSString * const kOperationQueueKVOContext		= @"org.sbooth.Rip.DetectPreg
 @end
 
 @interface DetectPregapsSheetController (Private)
+- (void) setStatusTextForTrackID:(NSManagedObjectID *)trackID;
+- (void) operationDidReturn:(PregapDetectionOperation *)operation;
 - (NSManagedObjectContext *) managedObjectContext;
 @end
 
@@ -50,43 +52,23 @@ static NSString * const kOperationQueueKVOContext		= @"org.sbooth.Rip.DetectPreg
 		
 		if([keyPath isEqualToString:@"isExecuting"]) {
 			if([operation isExecuting]) {
-				NSManagedObjectID *trackID = operation.trackID;
-				
-				// Fetch the TrackDescriptor object from the context and ensure it is the correct class
-				NSManagedObject *managedObject = [self.managedObjectContext objectWithID:trackID];
-				if(![managedObject isKindOfClass:[TrackDescriptor class]])
-					return;
-				
-				TrackDescriptor *track = (TrackDescriptor *)managedObject;				
-				
-				NSString *trackDescription = nil;
-				if(track.metadata.title)
-					trackDescription = track.metadata.title;
+				// KVO is thread-safe, but doesn't guarantee observeValueForKeyPath: will be called from the main thread
+				if([NSThread isMainThread])
+					[self setStatusTextForTrackID:operation.trackID];
 				else
-					trackDescription = [track.number stringValue];
-				
-				[_statusTextField setStringValue:trackDescription];
+					[self performSelectorOnMainThread:@selector(setStatusTextForTrackID:) withObject:operation.trackID waitUntilDone:NO];
 			}
 		}
-		else if([keyPath isEqualToString:@"isCancelled"]) {
+		else if([keyPath isEqualToString:@"isCancelled"] || [keyPath isEqualToString:@"isFinished"]) {
 			[operation removeObserver:self forKeyPath:@"isExecuting"];
 			[operation removeObserver:self forKeyPath:@"isCancelled"];
 			[operation removeObserver:self forKeyPath:@"isFinished"];
 			
-			if(operation.error)
-				[self presentError:operation.error modalForWindow:self.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
-		}
-		else if([keyPath isEqualToString:@"isFinished"]) {
-			[operation removeObserver:self forKeyPath:@"isExecuting"];
-			[operation removeObserver:self forKeyPath:@"isCancelled"];
-			[operation removeObserver:self forKeyPath:@"isFinished"];
-			
-			if(operation.error)
-				[self presentError:operation.error modalForWindow:self.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
-			else if([operation isFinished] && 0 == [[self.operationQueue operations] count]) {
-				[[NSApplication sharedApplication] endSheet:self.window returnCode:NSOKButton];
-				[self.window orderOut:self];
-			}
+			// KVO is thread-safe, but doesn't guarantee observeValueForKeyPath: will be called from the main thread
+			if([NSThread isMainThread])
+				[self operationDidReturn:operation];
+			else
+				[self performSelectorOnMainThread:@selector(operationDidReturn:) withObject:operation waitUntilDone:NO];
 		}
 	}
 	else
@@ -144,6 +126,40 @@ static NSString * const kOperationQueueKVOContext		= @"org.sbooth.Rip.DetectPreg
 @end
 
 @implementation DetectPregapsSheetController (Private)
+
+- (void) setStatusTextForTrackID:(NSManagedObjectID *)trackID
+{
+	NSParameterAssert(nil != trackID);
+	
+	// Fetch the TrackDescriptor object from the context and ensure it is the correct class
+	NSManagedObject *managedObject = [self.managedObjectContext objectWithID:trackID];
+	if(![managedObject isKindOfClass:[TrackDescriptor class]])
+		return;
+	
+	TrackDescriptor *track = (TrackDescriptor *)managedObject;				
+	
+	NSString *trackDescription = nil;
+	if(track.metadata.title)
+		trackDescription = track.metadata.title;
+	else
+		trackDescription = [track.number stringValue];
+	
+	[_statusTextField setStringValue:trackDescription];
+}
+
+- (void) operationDidReturn:(PregapDetectionOperation *)operation
+{
+	NSParameterAssert(nil != operation);
+	
+	[_progressIndicator stopAnimation:self];
+	
+	if(operation.error)
+		[self presentError:operation.error modalForWindow:self.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
+	else if([operation isFinished] && 0 == [[self.operationQueue operations] count]) {
+		[[NSApplication sharedApplication] endSheet:self.window returnCode:NSOKButton];
+		[self.window orderOut:self];
+	}
+}
 
 - (NSManagedObjectContext *) managedObjectContext
 {

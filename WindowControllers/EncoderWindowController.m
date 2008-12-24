@@ -30,6 +30,7 @@ static NSString * const kEncoderOperationQueueKVOContext		= @"org.sbooth.Rip.Enc
 	[pathCell setControlSize:NSSmallControlSize];
 	[pathCell setEditable:NO];
 	[[[_tableView tableColumns] objectAtIndex:0] setDataCell:pathCell];
+	pathCell = nil;
 }
 
 - (void) observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context

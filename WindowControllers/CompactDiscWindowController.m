@@ -77,6 +77,9 @@ static NSString * const kMusicDatabaseQueryKVOContext	= @"org.sbooth.Rip.Compact
 - (void) updateMetadataWithMusicDatabaseEntry:(id)musicDatabaseEntry;
 
 - (void) toggleTableColumnVisible:(id)sender;
+
+- (void) accurateRipQueryOperationDidReturn:(AccurateRipQueryOperation *)operation;
+- (void) musicDatabaseQueryOperationDidReturn:(MusicDatabaseQueryOperation *)operation;
 @end
 
 // ========================================
@@ -253,76 +256,31 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 	if(kAccurateRipQueryKVOContext == context) {
 		AccurateRipQueryOperation *operation = (AccurateRipQueryOperation *)object;
 		
-		if([keyPath isEqualToString:@"isExecuting"]) {
-			if([operation isExecuting]) {
-			}
-		}
-		else if([keyPath isEqualToString:@"isCancelled"] || [keyPath isEqualToString:@"isFinished"]) {
+		if([keyPath isEqualToString:@"isCancelled"] || [keyPath isEqualToString:@"isFinished"]) {
 			[operation removeObserver:self forKeyPath:@"isExecuting"];
 			[operation removeObserver:self forKeyPath:@"isCancelled"];
 			[operation removeObserver:self forKeyPath:@"isFinished"];
 
-			if(operation.error) {
-				[self presentError:operation.error modalForWindow:self.window delegate:nil didPresentSelector:NULL contextInfo:NULL];
-				return;
-			}
-			
-			if(![self.compactDisc.accurateRipDiscs count]) {
-				NSBeginAlertSheet(NSLocalizedString(@"The disc was not found.", @"Music database search failed"), 
-								  NSLocalizedString(@"OK", @"Button"),
-								  nil, /* alternateButton */
-								  nil, /* otherButton */
-								  self.window, 
-								  nil, /* modalDelegate */
-								  NULL, /* didEndSelector */
-								  NULL, /* didDismissSelector */
-								  NULL, /* contextInfo */
-								  NSLocalizedString(@"No matching discs were found in the AccurateRip database.", @""));
-			}
+			// KVO is thread-safe, but doesn't guarantee observeValueForKeyPath: will be called from the main thread
+			if([NSThread isMainThread])
+				[self accurateRipQueryOperationDidReturn:operation];
+			else
+				[self performSelectorOnMainThread:@selector(accurateRipQueryOperationDidReturn:) withObject:operation waitUntilDone:NO];
 		}
 	}
 	else if(kMusicDatabaseQueryKVOContext == context) {
 		MusicDatabaseQueryOperation *operation = (MusicDatabaseQueryOperation *)object;
 		
-		if([keyPath isEqualToString:@"isExecuting"]) {
-			if([operation isExecuting]) {
-			}
-		}
-		else if([keyPath isEqualToString:@"isCancelled"] || [keyPath isEqualToString:@"isFinished"]) {
+		if([keyPath isEqualToString:@"isCancelled"] || [keyPath isEqualToString:@"isFinished"]) {
 			[operation removeObserver:self forKeyPath:@"isExecuting"];
 			[operation removeObserver:self forKeyPath:@"isCancelled"];
 			[operation removeObserver:self forKeyPath:@"isFinished"];
 			
-			if(operation.error) {
-				[self presentError:operation.error modalForWindow:self.window delegate:nil didPresentSelector:NULL contextInfo:NULL];
-				return;
-			}
-
-			NSUInteger matchCount = operation.queryResults.count;
-			
-			if(0 == matchCount) {
-				NSBeginAlertSheet(NSLocalizedString(@"The disc was not found.", @"Music database search failed"), 
-								  NSLocalizedString(@"OK", @"Button"),
-								  nil, /* alternateButton */
-								  nil, /* otherButton */
-								  self.window, 
-								  nil, /* modalDelegate */
-								  NULL, /* didEndSelector */
-								  NULL, /* didDismissSelector */
-								  NULL, /* contextInfo */
-								  NSLocalizedString(@"No matching discs were found in the database.", @""));
-			}
-			else if(1 == matchCount)
-				[self updateMetadataWithMusicDatabaseEntry:operation.queryResults.lastObject];
-			else {
-				MusicDatabaseMatchesSheetController *sheetController = [[MusicDatabaseMatchesSheetController alloc] init];		
-				sheetController.matches = operation.queryResults;
-				
-				[sheetController beginMusicDatabaseMatchesSheetForWindow:self.window 
-														   modalDelegate:self
-														  didEndSelector:@selector(showMusicDatabaseMatchesSheetDidEnd:returnCode:contextInfo:) 
-															 contextInfo:sheetController];
-			}
+			// KVO is thread-safe, but doesn't guarantee observeValueForKeyPath: will be called from the main thread
+			if([NSThread isMainThread])
+				[self musicDatabaseQueryOperationDidReturn:operation];
+			else
+				[self performSelectorOnMainThread:@selector(musicDatabaseQueryOperationDidReturn:) withObject:operation waitUntilDone:NO];
 		}
 	}
 	else
@@ -1093,6 +1051,65 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 										  modalDelegate:self 
 										 didEndSelector:@selector(showCopyImageSheetDidEnd:returnCode:contextInfo:) 
 											contextInfo:sheetController];
+}
+
+- (void) accurateRipQueryOperationDidReturn:(AccurateRipQueryOperation *)operation
+{
+	NSParameterAssert(nil != operation);
+	
+	if(operation.error) {
+		[self presentError:operation.error modalForWindow:self.window delegate:nil didPresentSelector:NULL contextInfo:NULL];
+		return;
+	}
+	
+	if(![self.compactDisc.accurateRipDiscs count]) {
+		NSBeginAlertSheet(NSLocalizedString(@"The disc was not found.", @"Music database search failed"), 
+						  NSLocalizedString(@"OK", @"Button"),
+						  nil, /* alternateButton */
+						  nil, /* otherButton */
+						  self.window, 
+						  nil, /* modalDelegate */
+						  NULL, /* didEndSelector */
+						  NULL, /* didDismissSelector */
+						  NULL, /* contextInfo */
+						  NSLocalizedString(@"No matching discs were found in the AccurateRip database.", @""));
+	}
+}
+
+- (void) musicDatabaseQueryOperationDidReturn:(MusicDatabaseQueryOperation *)operation
+{
+	NSParameterAssert(nil != operation);
+	
+	if(operation.error) {
+		[self presentError:operation.error modalForWindow:self.window delegate:nil didPresentSelector:NULL contextInfo:NULL];
+		return;
+	}
+	
+	NSUInteger matchCount = operation.queryResults.count;
+	
+	if(0 == matchCount) {
+		NSBeginAlertSheet(NSLocalizedString(@"The disc was not found.", @"Music database search failed"), 
+						  NSLocalizedString(@"OK", @"Button"),
+						  nil, /* alternateButton */
+						  nil, /* otherButton */
+						  self.window, 
+						  nil, /* modalDelegate */
+						  NULL, /* didEndSelector */
+						  NULL, /* didDismissSelector */
+						  NULL, /* contextInfo */
+						  NSLocalizedString(@"No matching discs were found in the database.", @""));
+	}
+	else if(1 == matchCount)
+		[self updateMetadataWithMusicDatabaseEntry:operation.queryResults.lastObject];
+	else {
+		MusicDatabaseMatchesSheetController *sheetController = [[MusicDatabaseMatchesSheetController alloc] init];		
+		sheetController.matches = operation.queryResults;
+		
+		[sheetController beginMusicDatabaseMatchesSheetForWindow:self.window 
+												   modalDelegate:self
+												  didEndSelector:@selector(showMusicDatabaseMatchesSheetDidEnd:returnCode:contextInfo:) 
+													 contextInfo:sheetController];
+	}
 }
 
 @end

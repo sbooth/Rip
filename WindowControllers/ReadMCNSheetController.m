@@ -19,6 +19,10 @@ static NSString * const kOperationQueueKVOContext		= @"org.sbooth.Rip.ReadMCNShe
 - (void) didPresentErrorWithRecovery:(BOOL)didRecover contextInfo:(void *)contextInfo;
 @end
 
+@interface ReadMCNSheetController (Private)
+- (void) operationDidReturn:(MCNDetectionOperation *)operation;
+@end
+
 @implementation ReadMCNSheetController
 
 @synthesize disk = _disk;
@@ -38,27 +42,15 @@ static NSString * const kOperationQueueKVOContext		= @"org.sbooth.Rip.ReadMCNShe
 	if(kOperationQueueKVOContext == context) {
 		MCNDetectionOperation *operation = (MCNDetectionOperation *)object;
 		
-		if([keyPath isEqualToString:@"isCancelled"]) {
+		if([keyPath isEqualToString:@"isCancelled"] || [keyPath isEqualToString:@"isFinished"]) {
 			[operation removeObserver:self forKeyPath:@"isCancelled"];
 			[operation removeObserver:self forKeyPath:@"isFinished"];
-			
-			[_progressIndicator stopAnimation:self];
-			
-			if(operation.error)
-				[self presentError:operation.error modalForWindow:self.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
-		}
-		else if([keyPath isEqualToString:@"isFinished"]) {
-			[operation removeObserver:self forKeyPath:@"isCancelled"];
-			[operation removeObserver:self forKeyPath:@"isFinished"];
-
-			[_progressIndicator stopAnimation:self];
-			
-			if(operation.error)
-				[self presentError:operation.error modalForWindow:self.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
-			else if([operation isFinished]) {
-				[[NSApplication sharedApplication] endSheet:self.window returnCode:NSOKButton];
-				[self.window orderOut:self];
-			}
+		
+			// KVO is thread-safe, but doesn't guarantee observeValueForKeyPath: will be called from the main thread
+			if([NSThread isMainThread])
+				[self operationDidReturn:operation];
+			else
+				[self performSelectorOnMainThread:@selector(operationDidReturn:) withObject:operation waitUntilDone:NO];
 		}
 	}
 	else
@@ -107,6 +99,24 @@ static NSString * const kOperationQueueKVOContext		= @"org.sbooth.Rip.ReadMCNShe
 	
 	[[NSApplication sharedApplication] endSheet:self.window returnCode:(didRecover ? NSOKButton : NSCancelButton)];	
 	[self.window orderOut:self];
+}
+
+@end
+
+@implementation ReadMCNSheetController (Private)
+
+- (void) operationDidReturn:(MCNDetectionOperation *)operation
+{
+	NSParameterAssert(nil != operation);
+	
+	[_progressIndicator stopAnimation:self];
+	
+	if(operation.error)
+		[self presentError:operation.error modalForWindow:self.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
+	else if([operation isFinished]) {
+		[[NSApplication sharedApplication] endSheet:self.window returnCode:NSOKButton];
+		[self.window orderOut:self];
+	}
 }
 
 @end

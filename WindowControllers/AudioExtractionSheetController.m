@@ -28,7 +28,7 @@
 #import "ReadMCNSheetController.h"
 #import "ReadISRCsSheetController.h"
 #import "DetectPregapsSheetController.h"
-#import "CalculateAccurateRipOffsetsSheetController.h"
+//#import "CalculateAccurateRipOffsetsSheetController.h"
 
 #import "EncoderManager.h"
 
@@ -90,6 +90,8 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.AudioExtr
 - (void) extractPartialTrack:(TrackDescriptor *)track sectorRange:(SectorRange *)sectorRange enforceMinimumReadSize:(BOOL)enforceMinimumReadSize cushionSectors:(NSUInteger)cushionSectors;
 
 - (void) extractSectors:(NSIndexSet *)sectorIndexes forTrack:(TrackDescriptor *)track coalesceRanges:(BOOL)coalesceRanges;
+
+- (void) extractionOperationDidExecute:(ExtractionOperation *)operation;
 
 - (void) processExtractionOperation:(ExtractionOperation *)operation;
 - (void) processExtractionOperation:(ExtractionOperation *)operation forWholeTrack:(TrackDescriptor *)track;
@@ -174,33 +176,11 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.AudioExtr
 				[[NSRunLoop mainRunLoop] addTimer:timer forMode:NSRunLoopCommonModes];
 				[_activeTimers addObject:timer];
 				
-				if(operation.trackID) {
-					// Fetch the TrackDescriptor object from the context and ensure it is the correct class
-					NSManagedObject *managedObject = [self.managedObjectContext objectWithID:operation.trackID];
-					if(![managedObject isKindOfClass:[TrackDescriptor class]])
-						return;
-					
-					TrackDescriptor *track = (TrackDescriptor *)managedObject;				
-					
-					// Create a user-friendly representation of the track being processed
-					if(track.metadata.title)
-						[_statusTextField setStringValue:track.metadata.title];
-					else
-						[_statusTextField setStringValue:[track.number stringValue]];
-					
-					// Determine if this operation represents a whole track extraction or a partial track extraction
-					BOOL isWholeTrack = [operation.sectors containsSectorRange:track.sectorRange];
-
-					// Check to see if this track has been extracted before
-					if(!isWholeTrack)
-						[_detailedStatusTextField setStringValue:[NSString stringWithFormat:NSLocalizedString(@"Re-extracting sectors %u - %u", @""), operation.sectors.firstSector, operation.sectors.lastSector]];
-					else if(_copyOperation)
-						[_detailedStatusTextField setStringValue:NSLocalizedString(@"Verifying audio", @"")];
-					else
-						[_detailedStatusTextField setStringValue:NSLocalizedString(@"Extracting audio", @"")];
-				}
+				// KVO is thread-safe, but doesn't guarantee observeValueForKeyPath: will be called from the main thread
+				if([NSThread isMainThread])
+					[self extractionOperationDidExecute:operation];
 				else
-					[_detailedStatusTextField setStringValue:NSLocalizedString(@"Unknown", @"")];
+					[self performSelectorOnMainThread:@selector(extractionOperationDidExecute:) withObject:operation waitUntilDone:NO];
 			}
 		}
 		else if([keyPath isEqualToString:@"isCancelled"] || [keyPath isEqualToString:@"isFinished"]) {
@@ -209,52 +189,11 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.AudioExtr
 			[operation removeObserver:self forKeyPath:@"isFinished"];
 			
 			// Process the extracted audio
-			[self processExtractionOperation:operation];
-
-			// If no tracks are being processed and none remain to be extracted, we are finished			
-			if(![[self.operationQueue operations] count] && ![_tracksRemaining count]) {
-				
-				// Post-process the encoded individual tracks as an album, if required
-				NSError *error = nil;
-				if(eExtractionModeIndividualTracks == self.extractionMode) {
-					if([_encodingOperations count]) {
-						// FIXME: If trackExtractionRecords are ever used, the order will be wrong
-						if(![[EncoderManager sharedEncoderManager] postProcessEncodingOperations:_encodingOperations forTrackExtractionRecords:[_trackExtractionRecords allObjects] error:&error])
-							[self presentError:error modalForWindow:self.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
-					}
-				}
-				else if(eExtractionModeImage == self.extractionMode) {
-					// If any tracks failed to extract the image can't be generated
-					if([_failedTrackIDs count]) {
-						// Remove the track extraction records from the store
-						for(TrackExtractionRecord *extractionRecord in _trackExtractionRecords)
-							[self.managedObjectContext deleteObject:extractionRecord];
-
-						[_trackExtractionRecords removeAllObjects];
-					}
-					else {
-						ImageExtractionRecord *imageExtractionRecord = [self createImageExtractionRecord];
-						if(!imageExtractionRecord)
-							[self presentError:error modalForWindow:self.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
-						
-						_imageExtractionRecord = imageExtractionRecord;
-						
-						if(![[EncoderManager sharedEncoderManager] encodeImageExtractionRecord:self.imageExtractionRecord error:&error])
-							[self presentError:error modalForWindow:self.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
-					}
-				}
-				else
-					[[Logger sharedLogger] logMessage:@"Unknown extraction mode"];
-				
-				// Remove any active timers
-				[_activeTimers makeObjectsPerformSelector:@selector(invalidate)];
-				[_activeTimers removeAllObjects];
-				
-				self.disk = NULL;
-				
-				[[NSApplication sharedApplication] endSheet:self.window returnCode:NSOKButton];
-				[self.window orderOut:self];
-			}
+			// KVO is thread-safe, but doesn't guarantee observeValueForKeyPath: will be called from the main thread
+			if([NSThread isMainThread])
+				[self processExtractionOperation:operation];
+			else
+				[self performSelectorOnMainThread:@selector(processExtractionOperation:) withObject:operation waitUntilDone:NO];
 		}
 	}
 	else
@@ -576,6 +515,39 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.AudioExtr
 	}	
 }
 
+- (void) extractionOperationDidExecute:(ExtractionOperation *)operation
+{
+	NSParameterAssert(nil != operation);
+
+	if(operation.trackID) {
+		// Fetch the TrackDescriptor object from the context and ensure it is the correct class
+		NSManagedObject *managedObject = [self.managedObjectContext objectWithID:operation.trackID];
+		if(![managedObject isKindOfClass:[TrackDescriptor class]])
+			return;
+		
+		TrackDescriptor *track = (TrackDescriptor *)managedObject;				
+		
+		// Create a user-friendly representation of the track being processed
+		if(track.metadata.title)
+			[_statusTextField setStringValue:track.metadata.title];
+		else
+			[_statusTextField setStringValue:[track.number stringValue]];
+		
+		// Determine if this operation represents a whole track extraction or a partial track extraction
+		BOOL isWholeTrack = [operation.sectors containsSectorRange:track.sectorRange];
+		
+		// Check to see if this track has been extracted before
+		if(!isWholeTrack)
+			[_detailedStatusTextField setStringValue:[NSString stringWithFormat:NSLocalizedString(@"Re-extracting sectors %u - %u", @""), operation.sectors.firstSector, operation.sectors.lastSector]];
+		else if(_copyOperation)
+			[_detailedStatusTextField setStringValue:NSLocalizedString(@"Verifying audio", @"")];
+		else
+			[_detailedStatusTextField setStringValue:NSLocalizedString(@"Extracting audio", @"")];
+	}
+	else
+		[_detailedStatusTextField setStringValue:NSLocalizedString(@"Unknown", @"")];
+}
+
 - (void) processExtractionOperation:(ExtractionOperation *)operation
 {
 	NSParameterAssert(nil != operation);
@@ -612,6 +584,51 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.AudioExtr
 		[self processExtractionOperation:operation forWholeTrack:track];
 	else
 		[self processExtractionOperation:operation forPartialTrack:track];
+
+	// If no tracks are being processed and none remain to be extracted, we are finished			
+	if(![[self.operationQueue operations] count] && ![_tracksRemaining count]) {
+		
+		// Post-process the encoded individual tracks as an album, if required
+		NSError *error = nil;
+		if(eExtractionModeIndividualTracks == self.extractionMode) {
+			if([_encodingOperations count]) {
+				// FIXME: If trackExtractionRecords are ever used, the order will be wrong
+				if(![[EncoderManager sharedEncoderManager] postProcessEncodingOperations:_encodingOperations forTrackExtractionRecords:[_trackExtractionRecords allObjects] error:&error])
+					[self presentError:error modalForWindow:self.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
+			}
+		}
+		else if(eExtractionModeImage == self.extractionMode) {
+			// If any tracks failed to extract the image can't be generated
+			if([_failedTrackIDs count]) {
+				// Remove the track extraction records from the store
+				for(TrackExtractionRecord *extractionRecord in _trackExtractionRecords)
+					[self.managedObjectContext deleteObject:extractionRecord];
+				
+				[_trackExtractionRecords removeAllObjects];
+			}
+			else {
+				ImageExtractionRecord *imageExtractionRecord = [self createImageExtractionRecord];
+				if(!imageExtractionRecord)
+					[self presentError:error modalForWindow:self.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
+				
+				_imageExtractionRecord = imageExtractionRecord;
+				
+				if(![[EncoderManager sharedEncoderManager] encodeImageExtractionRecord:self.imageExtractionRecord error:&error])
+					[self presentError:error modalForWindow:self.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
+			}
+		}
+		else
+			[[Logger sharedLogger] logMessage:@"Unknown extraction mode"];
+		
+		// Remove any active timers
+		[_activeTimers makeObjectsPerformSelector:@selector(invalidate)];
+		[_activeTimers removeAllObjects];
+		
+		self.disk = NULL;
+		
+		[[NSApplication sharedApplication] endSheet:self.window returnCode:NSOKButton];
+		[self.window orderOut:self];
+	}
 }
 
 - (void) processExtractionOperation:(ExtractionOperation *)operation forWholeTrack:(TrackDescriptor *)track
