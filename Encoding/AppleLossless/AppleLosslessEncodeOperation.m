@@ -98,6 +98,11 @@
 		[arguments addObject:@"--comment"];
 		[arguments addObject:[self.metadata objectForKey:kMetadataCommentKey]];
 	}
+	if([self.metadata objectForKey:kAlbumArtFrontCoverKey]) {
+		[arguments addObject:@"--artwork"];
+		NSURL *frontCoverURL = [self.metadata objectForKey:kAlbumArtFrontCoverKey];
+		[arguments addObject:[frontCoverURL path]];
+	}
 	
 	// Task setup
 	[task setCurrentDirectoryPath:[[self.outputURL path] stringByDeletingLastPathComponent]];

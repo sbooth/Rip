@@ -41,20 +41,20 @@
 		for(NSURL *trackURL in self.trackURLs)
 			[arguments addObject:[trackURL path]];
 	}
-			
+
 	// Task setup
 	[task setLaunchPath:metaflacPath];
 	[task setArguments:arguments];
-	
+
 	// Redirect input and output to /dev/null
 #if (!DEBUG)
 	[task setStandardOutput:[NSFileHandle fileHandleWithNullDevice]];
 	[task setStandardError:[NSFileHandle fileHandleWithNullDevice]];
 #endif
-	
+
 	// Run the task
 	[task launch];
-	
+
 	while([task isRunning]) {
 		
 		// Allow the task to be cancelled

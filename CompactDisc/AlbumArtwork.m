@@ -15,5 +15,16 @@
 // Core Data relationships
 @dynamic metadata;
 
+// ========================================
+// Computed properties
+- (NSImage *) frontCoverImage
+{
+	NSData *frontCoverData = [NSUnarchiver unarchiveObjectWithData:self.frontCover];
+	if(!frontCoverData)
+		return nil;
+
+	return [[NSImage alloc] initWithData:frontCoverData];
+}
+
 @end
 

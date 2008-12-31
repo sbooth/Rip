@@ -83,7 +83,15 @@ setArgumentForTag(NSMutableArray *arguments, NSDictionary *metadata, NSString *k
 	setArgumentForTag(arguments, self.metadata, kMetadataISRCKey, @"ISRC");
 	setArgumentForTag(arguments, self.metadata, kMetadataMCNKey, @"MCN");
 	setArgumentForTag(arguments, self.metadata, kMetadataMusicBrainzIDKey, @"MUSICBRAINZ_ID");
-	
+
+	// Application version
+	NSString *appName = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleName"];
+	NSString *shortVersionNumber = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
+	NSString *versionNumber = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"];	
+
+	[arguments addObject:@"-T"];
+	[arguments addObject:[NSString stringWithFormat:@"EXTRACTEDBY=%@ %@ (%@)", appName, shortVersionNumber, versionNumber]];
+
 	// Task setup
 	[task setCurrentDirectoryPath:[[self.inputURL path] stringByDeletingLastPathComponent]];
 	[task setLaunchPath:flacPath];
@@ -110,6 +118,58 @@ setArgumentForTag(NSMutableArray *arguments, NSDictionary *metadata, NSString *k
 	
 	// Get the result
 	int terminationStatus = [task terminationStatus];
+	if(EXIT_SUCCESS != terminationStatus) {
+		self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:terminationStatus userInfo:nil];
+		return;
+	}
+
+	// Add album artwork, if present
+	if(![self.metadata objectForKey:kAlbumArtFrontCoverKey])
+		return;
+
+	// Locate the metaflac executable
+	NSString *metaflacPath = [[NSBundle bundleWithIdentifier:@"org.sbooth.Rip.Encoder.FLAC"] pathForResource:@"metaflac" ofType:nil];
+	if(nil == metaflacPath) {
+		self.error = [NSError errorWithDomain:NSOSStatusErrorDomain code:fnfErr userInfo:nil];
+		return;
+	}
+	
+	// Create the task
+	task = [[NSTask alloc] init];
+	arguments = [NSMutableArray array];
+
+	// Album art
+	NSURL *frontCoverURL = [self.metadata objectForKey:kAlbumArtFrontCoverKey];
+	[arguments addObject:[NSString stringWithFormat:@"--import-picture-from=%@", [frontCoverURL path]]];
+	
+	// Input files
+	[arguments addObject:[self.outputURL path]];
+	
+	// Task setup
+	[task setLaunchPath:metaflacPath];
+	[task setArguments:arguments];
+	
+	// Redirect input and output to /dev/null
+#if (!DEBUG)
+	[task setStandardOutput:[NSFileHandle fileHandleWithNullDevice]];
+	[task setStandardError:[NSFileHandle fileHandleWithNullDevice]];
+#endif
+	
+	// Run the task
+	[task launch];
+	
+	while([task isRunning]) {
+		
+		// Allow the task to be cancelled
+		if(self.isCancelled)
+			[task terminate];
+		
+		// Sleep to avoid spinning
+		[NSThread sleepForTimeInterval:SLEEP_TIME_INTERVAL];
+	}
+	
+	// Get the result
+	terminationStatus = [task terminationStatus];
 	if(EXIT_SUCCESS != terminationStatus)
 		self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:terminationStatus userInfo:nil];
 }

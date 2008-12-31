@@ -27,7 +27,7 @@
 
 // ========================================
 // Core Data relationships
-@property (assign) NSSet * artwork;
+@property (assign) AlbumArtwork * artwork;
 @property (assign) CompactDisc * disc;
 
 @end

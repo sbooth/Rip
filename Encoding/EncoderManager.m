@@ -15,10 +15,13 @@
 #import "TrackDescriptor.h"
 
 #import "AlbumMetadata.h"
+#import "AlbumArtwork.h"
 #import "TrackMetadata.h"
 
 #import "TrackExtractionRecord.h"
 #import "ImageExtractionRecord.h"
+
+#import "NSImage+BitmapRepresentationMethods.h"
 
 #import "FileUtilities.h"
 #import "Logger.h"
@@ -58,7 +61,16 @@ metadataForTrackExtractionRecord(TrackExtractionRecord *trackExtractionRecord)
 		[metadata setObject:albumMetadata.MCN forKey:kMetadataMCNKey];
 	if(albumMetadata.title)
 		[metadata setObject:albumMetadata.title forKey:kMetadataAlbumTitleKey];
-	
+
+	// Album artwork
+	NSImage *frontCoverImage = albumMetadata.artwork.frontCoverImage;
+	if(frontCoverImage) {
+		NSURL *frontCoverURL = temporaryURLWithExtension(@"png");
+		NSData *frontCoverPNGData = [frontCoverImage PNGData];
+		[frontCoverPNGData writeToURL:frontCoverURL atomically:NO];
+		[metadata setObject:frontCoverURL forKey:kAlbumArtFrontCoverKey];
+	}
+
 	// Track metadata
 	if(trackMetadata.artist)
 		[metadata setObject:trackMetadata.artist forKey:kMetadataArtistKey];
@@ -104,6 +116,15 @@ metadataForImageExtractionRecord(ImageExtractionRecord *imageExtractionRecord)
 		[metadata setObject:albumMetadata.MCN forKey:kMetadataMCNKey];
 	if(albumMetadata.title)
 		[metadata setObject:albumMetadata.title forKey:kMetadataAlbumTitleKey];
+
+	// Album artwork
+	NSImage *frontCoverImage = albumMetadata.artwork.frontCoverImage;
+	if(frontCoverImage) {
+		NSURL *frontCoverURL = temporaryURLWithExtension(@"png");
+		NSData *frontCoverPNGData = [frontCoverImage PNGData];
+		[frontCoverPNGData writeToURL:frontCoverURL atomically:NO];
+		[metadata setObject:frontCoverURL forKey:kAlbumArtFrontCoverKey];
+	}
 
 	// Individual track metadata
 	NSMutableArray *trackMetadataArray = [NSMutableArray array];

@@ -22,4 +22,8 @@
 // Core Data relationships
 @property (assign) AlbumMetadata * metadata;
 
+// ========================================
+// Computed properties
+@property (readonly) NSImage * frontCoverImage;
+
 @end

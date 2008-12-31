@@ -25,7 +25,7 @@
 
 - (void) awakeFromInsert
 {
-	// Create the metadata relationship
+	// Create the artwork relationship
 	self.artwork = [NSEntityDescription insertNewObjectForEntityForName:@"AlbumArtwork"
 												 inManagedObjectContext:self.managedObjectContext];	
 }

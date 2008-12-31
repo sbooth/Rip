@@ -26,6 +26,8 @@ extern NSString * const		kMetadataISRCKey;					// NSString *
 extern NSString * const		kMetadataMCNKey;					// NSString *
 extern NSString * const		kMetadataMusicBrainzIDKey;			// NSString *
 
+extern NSString * const		kAlbumArtFrontCoverKey;				// NSURL *
+
 // ========================================
 // This value will only be present in imageMetadata
 // ========================================

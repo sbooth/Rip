@@ -26,6 +26,8 @@ extern NSString * const		kMetadataISRCKey;
 extern NSString * const		kMetadataMCNKey;
 extern NSString * const		kMetadataMusicBrainzIDKey;
 
+extern NSString * const		kAlbumArtFrontCoverKey;
+
 // ========================================
 // KVC key names for the query results
 // ========================================
