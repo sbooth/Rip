@@ -24,4 +24,9 @@
 	return [[iTunesQueryOperation alloc] init];
 }
 
+- (MusicDatabaseSubmissionOperation *) musicDatabaseSubmissionOperation
+{
+	return nil;
+}
+
 @end

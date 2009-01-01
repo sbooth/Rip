@@ -16,6 +16,7 @@
 		328DEA330E607BAE00F5BD13 /* cddb.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 328DEA310E607BA800F5BD13 /* cddb.framework */; };
 		32AC71260E7191DF009A5E1B /* FreeDBSettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 32AC71250E7191DF009A5E1B /* FreeDBSettingsViewController.m */; };
 		32AC71350E719246009A5E1B /* FreeDBSettings.xib in Resources */ = {isa = PBXBuildFile; fileRef = 32AC71330E719246009A5E1B /* FreeDBSettings.xib */; };
+		32CA7C670F0D2E0500771028 /* FreeDBSubmissionOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 32CA7C660F0D2E0500771028 /* FreeDBSubmissionOperation.m */; };
 		8D5B49B0048680CD000E48DA /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C167DFE841241C02AAC07 /* InfoPlist.strings */; };
 		8D5B49B4048680CD000E48DA /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7ADFEA557BF11CA2CBB /* Cocoa.framework */; };
 /* End PBXBuildFile section */
@@ -68,6 +69,8 @@
 		32AC71240E7191DF009A5E1B /* FreeDBSettingsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FreeDBSettingsViewController.h; sourceTree = "<group>"; };
 		32AC71250E7191DF009A5E1B /* FreeDBSettingsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FreeDBSettingsViewController.m; sourceTree = "<group>"; };
 		32AC71340E719246009A5E1B /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/FreeDBSettings.xib; sourceTree = "<group>"; };
+		32CA7C650F0D2E0500771028 /* FreeDBSubmissionOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FreeDBSubmissionOperation.h; sourceTree = "<group>"; };
+		32CA7C660F0D2E0500771028 /* FreeDBSubmissionOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FreeDBSubmissionOperation.m; sourceTree = "<group>"; };
 		8D5B49B6048680CD000E48DA /* FreeDB.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FreeDB.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
 		8D5B49B7048680CD000E48DA /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D2F7E65807B2D6F200F64583 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = /System/Library/Frameworks/CoreData.framework; sourceTree = "<absolute>"; };
@@ -132,6 +135,8 @@
 				328DE6620E5FDB8000F5BD13 /* FreeDBQueryOperation.m */,
 				32AC71240E7191DF009A5E1B /* FreeDBSettingsViewController.h */,
 				32AC71250E7191DF009A5E1B /* FreeDBSettingsViewController.m */,
+				32CA7C650F0D2E0500771028 /* FreeDBSubmissionOperation.h */,
+				32CA7C660F0D2E0500771028 /* FreeDBSubmissionOperation.m */,
 			);
 			name = Classes;
 			sourceTree = "<group>";
@@ -255,6 +260,7 @@
 				328DE6630E5FDB8000F5BD13 /* FreeDBDatabaseInterface.m in Sources */,
 				328DE6640E5FDB8000F5BD13 /* FreeDBQueryOperation.m in Sources */,
 				32AC71260E7191DF009A5E1B /* FreeDBSettingsViewController.m in Sources */,
+				32CA7C670F0D2E0500771028 /* FreeDBSubmissionOperation.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

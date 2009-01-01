@@ -1,11 +1,11 @@
 /*
- *  Copyright (C) 2008 Stephen F. Booth <me@sbooth.org>
+ *  Copyright (C) 2008 - 2009 Stephen F. Booth <me@sbooth.org>
  *  All Rights Reserved
  */
 
 #import <Cocoa/Cocoa.h>
 
-@class MusicDatabaseQueryOperation;
+@class MusicDatabaseQueryOperation, MusicDatabaseSubmissionOperation;
 
 // ========================================
 // The interface a music database (FreeDB, MusicBrainz, etc) must implement to integrate with Rip
@@ -21,5 +21,8 @@
 
 // Provide an instance of an MusicDatabaseQueryOperation subclass
 - (MusicDatabaseQueryOperation *) musicDatabaseQueryOperation;
+
+// Provide an instance of an MusicDatabaseSubmissionOperation subclass
+- (MusicDatabaseSubmissionOperation *) musicDatabaseSubmissionOperation;
 
 @end

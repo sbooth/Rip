@@ -5,6 +5,7 @@
 
 #import "MusicBrainzDatabaseInterface.h"
 #import "MusicBrainzQueryOperation.h"
+#import "MusicBrainzSubmissionOperation.h"
 #import "MusicBrainzSettingsViewController.h"
 
 @implementation MusicBrainzDatabaseInterface
@@ -26,6 +27,11 @@
 - (MusicDatabaseQueryOperation *) musicDatabaseQueryOperation
 {
 	return [[MusicBrainzQueryOperation alloc] init];
+}
+
+- (MusicDatabaseSubmissionOperation *) musicDatabaseSubmissionOperation
+{
+	return [[MusicBrainzSubmissionOperation alloc] init];
 }
 
 @end

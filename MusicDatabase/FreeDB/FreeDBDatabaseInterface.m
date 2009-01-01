@@ -1,10 +1,11 @@
 /*
- *  Copyright (C) 2008 Stephen F. Booth <me@sbooth.org>
+ *  Copyright (C) 2008 - 2009 Stephen F. Booth <me@sbooth.org>
  *  All Rights Reserved
  */
 
 #import "FreeDBDatabaseInterface.h"
 #import "FreeDBQueryOperation.h"
+#import "FreeDBSubmissionOperation.h"
 #import "FreeDBSettingsViewController.h"
 
 #import <AddressBook/AddressBook.h>
@@ -34,6 +35,11 @@
 - (MusicDatabaseQueryOperation *) musicDatabaseQueryOperation
 {
 	return [[FreeDBQueryOperation alloc] init];
+}
+
+- (MusicDatabaseSubmissionOperation *) musicDatabaseSubmissionOperation
+{
+	return [[FreeDBSubmissionOperation alloc] init];
 }
 
 @end
