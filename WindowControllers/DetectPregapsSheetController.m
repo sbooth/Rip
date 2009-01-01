@@ -151,11 +151,11 @@ static NSString * const kOperationQueueKVOContext		= @"org.sbooth.Rip.DetectPreg
 {
 	NSParameterAssert(nil != operation);
 	
-	[_progressIndicator stopAnimation:self];
-	
 	if(operation.error)
 		[self presentError:operation.error modalForWindow:self.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
 	else if([operation isFinished] && 0 == [[self.operationQueue operations] count]) {
+		[_progressIndicator stopAnimation:self];
+		
 		[[NSApplication sharedApplication] endSheet:self.window returnCode:NSOKButton];
 		[self.window orderOut:self];
 	}

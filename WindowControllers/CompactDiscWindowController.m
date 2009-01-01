@@ -19,6 +19,7 @@
 
 #import "MusicDatabaseInterface/MusicDatabaseInterface.h"
 #import "MusicDatabaseInterface/MusicDatabaseQueryOperation.h"
+#import "MusicDatabaseInterface/MusicDatabaseSubmissionOperation.h"
 #import "MusicDatabaseMatchesSheetController.h"
 
 #import "ReadOffsetCalculatorSheetController.h"
@@ -129,8 +130,9 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 
 @implementation CompactDiscWindowController
 
-@synthesize trackController = _trackController;
 @synthesize driveInformationController = _driveInformationController;
+@synthesize compactDiscController = _compactDiscController;
+@synthesize trackController = _trackController;
 @synthesize operationQueue = _operationQueue;
 @synthesize extractionMode = _extractionMode;
 
@@ -556,6 +558,10 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 	id <MusicDatabaseInterface> musicDatabaseInterface = [[[defaultMusicDatabaseBundle principalClass] alloc] init];
 	
 	MusicDatabaseQueryOperation *operation = [musicDatabaseInterface musicDatabaseQueryOperation];
+//	MusicDatabaseSubmissionOperation *operation = [musicDatabaseInterface musicDatabaseSubmissionOperation];
+	if(!operation)
+		return;
+
 	operation.settings = musicDatabaseSettings;
 	operation.discTOC = self.compactDisc.discTOC;
 	operation.freeDBDiscID = self.compactDisc.freeDBDiscID;
@@ -583,6 +589,9 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 	id <MusicDatabaseInterface> musicDatabaseInterface = [[[musicDatabaseBundle principalClass] alloc] init];
 	
 	MusicDatabaseQueryOperation *operation = [musicDatabaseInterface musicDatabaseQueryOperation];
+	if(!operation)
+		return;
+
 	operation.settings = musicDatabaseSettings;
 	operation.discTOC = self.compactDisc.discTOC;
 	operation.freeDBDiscID = self.compactDisc.freeDBDiscID;
@@ -597,6 +606,9 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 #pragma unused(sender)
 
 	AccurateRipQueryOperation *operation = [[AccurateRipQueryOperation alloc] init];
+	if(!operation)
+		return;
+
 	operation.compactDiscID = self.compactDisc.objectID;
 
 	// Observe the operation's progress

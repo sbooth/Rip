@@ -28,8 +28,9 @@
 // ========================================
 // Properties useful for binding
 // ========================================
-@property (readonly) NSArrayController * trackController;
 @property (readonly) NSObjectController * driveInformationController;
+@property (readonly) NSObjectController * compactDiscController;
+@property (readonly) NSArrayController * trackController;
 
 // ========================================
 // Properties

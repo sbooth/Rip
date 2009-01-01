@@ -109,11 +109,11 @@ static NSString * const kOperationQueueKVOContext		= @"org.sbooth.Rip.ReadMCNShe
 {
 	NSParameterAssert(nil != operation);
 	
-	[_progressIndicator stopAnimation:self];
-	
 	if(operation.error)
 		[self presentError:operation.error modalForWindow:self.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
 	else if([operation isFinished]) {
+		[_progressIndicator stopAnimation:self];
+		
 		[[NSApplication sharedApplication] endSheet:self.window returnCode:NSOKButton];
 		[self.window orderOut:self];
 	}
