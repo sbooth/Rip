@@ -19,6 +19,9 @@
 // Computed properties
 - (NSImage *) frontCoverImage
 {
+	if(!self.frontCover)
+		return nil;
+	
 	NSData *frontCoverData = [NSUnarchiver unarchiveObjectWithData:self.frontCover];
 	if(!frontCoverData)
 		return nil;
