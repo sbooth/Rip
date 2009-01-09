@@ -168,7 +168,7 @@ static PreferencesWindowController *sSharedPreferencesWindowController = nil;
     else if([itemIdentifier isEqualToString:AdvancedPreferencesToolbarItemIdentifier]) {
 		[toolbarItem setLabel:NSLocalizedString(@"Advanced", @"Advanced preference pane name")];
 		[toolbarItem setPaletteLabel:NSLocalizedString(@"Advanced", @"")];
-		[toolbarItem setToolTip:NSLocalizedString(@"Control the size of the audio buffers used by Play", @"")];
+		[toolbarItem setToolTip:NSLocalizedString(@"Configure some of the audio extraction parameters used by Rip", @"")];
 		[toolbarItem setImage:[NSImage imageNamed:@"NSAdvanced"]];
 	}
 	
