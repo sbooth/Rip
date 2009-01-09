@@ -105,9 +105,9 @@
 	<key>CFBundleSignature</key>
 	<string>riPP</string>
 	<key>CFBundleVersion</key>
-	<string>GIT_COMMIT_UNQUOTED</string>
+	<string>${PROJECT_VERSION}</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.0pb1</string>
+	<string>${MARKETING_VERSION}</string>
 	<key>NSMainNibFile</key>
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
