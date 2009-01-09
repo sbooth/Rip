@@ -27,7 +27,7 @@
 	if(!submissionURL)
 		return;
 
-	[[NSWorkspace sharedWorkspace] openURL:submissionURL];
+	[[NSWorkspace sharedWorkspace] performSelectorOnMainThread:@selector(openURL:) withObject:submissionURL waitUntilDone:NO];
 }
 
 @end
