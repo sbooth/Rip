@@ -90,7 +90,7 @@ setArgumentForTag(NSMutableArray *arguments, NSDictionary *metadata, NSString *k
 	NSString *versionNumber = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"];	
 
 	[arguments addObject:@"-T"];
-	[arguments addObject:[NSString stringWithFormat:@"EXTRACTEDBY=%@ %@ (%@)", appName, shortVersionNumber, versionNumber]];
+	[arguments addObject:[NSString stringWithFormat:@"EXTRACTED_BY=%@ %@ (%@)", appName, shortVersionNumber, versionNumber]];
 
 	// Task setup
 	[task setCurrentDirectoryPath:[[self.inputURL path] stringByDeletingLastPathComponent]];
