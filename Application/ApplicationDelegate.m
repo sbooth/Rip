@@ -15,6 +15,10 @@
 #import "ReadOffsetCalculatorSheetController.h"
 #import "Logger.h"
 
+#import "MusicDatabaseInterface/MusicDatabaseInterface.h"
+#import "MusicDatabaseInterface/MusicDatabaseQueryOperation.h"
+#import "MusicDatabaseInterface/MusicDatabaseSubmissionOperation.h"
+
 #include <CoreFoundation/CoreFoundation.h>
 #include <DiskArbitration/DiskArbitration.h>
 
@@ -169,23 +173,40 @@ diskDisappearedCallback(DADiskRef disk, void *context)
 	
 	// Build the "Lookup Metadata Using" menu so it includes all the loaded MusicDatabases
 	NSMenu *lookupMetadataUsingMenu = [[NSMenu alloc] initWithTitle:@"Lookup Metadata Using Menu"];
+	NSMenu *submitMetadataUsingMenu = [[NSMenu alloc] initWithTitle:@"Submit Metadata Using Menu"];
 	
 	MusicDatabaseManager *musicDatabaseManager = [MusicDatabaseManager sharedMusicDatabaseManager];
 	for(NSBundle *musicDatabaseBundle in musicDatabaseManager.availableMusicDatabases) {
-		NSMenuItem *menuItem = [[NSMenuItem alloc] initWithTitle:[musicDatabaseBundle objectForInfoDictionaryKey:@"MusicDatabaseName"]
-														  action:@selector(queryMusicDatabase:)
-												   keyEquivalent:@""];
+		id <MusicDatabaseInterface> musicDatabaseInterface = [[[musicDatabaseBundle principalClass] alloc] init];
 
-		[menuItem setRepresentedObject:musicDatabaseBundle];
+		MusicDatabaseQueryOperation *queryOperation = [musicDatabaseInterface musicDatabaseQueryOperation];
+		if(queryOperation) {
+			NSMenuItem *menuItem = [[NSMenuItem alloc] initWithTitle:[musicDatabaseBundle objectForInfoDictionaryKey:@"MusicDatabaseName"]
+															  action:@selector(queryMusicDatabase:)
+													   keyEquivalent:@""];
+			
+			[menuItem setRepresentedObject:musicDatabaseBundle];			
+			[lookupMetadataUsingMenu addItem:menuItem];
+		}
 		
-		[lookupMetadataUsingMenu addItem:menuItem];
+		MusicDatabaseSubmissionOperation *submissionOperation = [musicDatabaseInterface musicDatabaseSubmissionOperation];
+		if(submissionOperation) {
+			NSMenuItem *menuItem = [[NSMenuItem alloc] initWithTitle:[musicDatabaseBundle objectForInfoDictionaryKey:@"MusicDatabaseName"]
+															  action:@selector(submitToMusicDatabase:)
+													   keyEquivalent:@""];
+			
+			[menuItem setRepresentedObject:musicDatabaseBundle];			
+			[submitMetadataUsingMenu addItem:menuItem];
+		}
 	}
 	
 	// Add the menu
 	NSMenuItem *compactDiscMenuItem = [[[NSApplication sharedApplication] mainMenu] itemAtIndex:3];
 	NSMenu *compactDiscMenuItemSubmenu = [compactDiscMenuItem submenu];
 	NSMenuItem *lookupTagsUsingMenuItem = [compactDiscMenuItemSubmenu itemWithTag:1];
+	NSMenuItem *submitTagsUsingMenuItem = [compactDiscMenuItemSubmenu itemWithTag:2];
 	[lookupTagsUsingMenuItem setSubmenu:lookupMetadataUsingMenu];
+	[submitTagsUsingMenuItem setSubmenu:submitMetadataUsingMenu];
 	
 	// Use DiskArbitration to request mount/unmount information for audio CDs
 	// Create a dictionary which will match IOMedia objects of type kIOCDMediaClass

@@ -63,6 +63,9 @@
 - (IBAction) queryDefaultMusicDatabase:(id)sender;
 - (IBAction) queryMusicDatabase:(id)sender;
 
+- (IBAction) submitToDefaultMusicDatabase:(id)sender;
+- (IBAction) submitToMusicDatabase:(id)sender;
+
 - (IBAction) queryAccurateRip:(id)sender;
 
 - (IBAction) ejectDisc:(id)sender;

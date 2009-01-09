@@ -235,6 +235,26 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 //			
 //		return YES;
 //	}
+	else if([anItem action] == @selector(queryDefaultMusicDatabase:)) {
+		NSBundle *defaultMusicDatabaseBundle = [[MusicDatabaseManager sharedMusicDatabaseManager] defaultMusicDatabase];
+		id <MusicDatabaseInterface> musicDatabaseInterface = [[[defaultMusicDatabaseBundle principalClass] alloc] init];
+		
+		MusicDatabaseQueryOperation *queryOperation = [musicDatabaseInterface musicDatabaseQueryOperation];
+//		if(queryOperation)
+//			[anItem setTitle:[NSString stringWithFormat:NSLocalizedString(@"Lookup Metadata Using %@", @""), [defaultMusicDatabaseBundle objectForInfoDictionaryKey:@"MusicDatabaseName"]]];
+
+		return (nil != queryOperation);
+	}
+	else if([anItem action] == @selector(submitToDefaultMusicDatabase:)) {
+		NSBundle *defaultMusicDatabaseBundle = [[MusicDatabaseManager sharedMusicDatabaseManager] defaultMusicDatabase];
+		id <MusicDatabaseInterface> musicDatabaseInterface = [[[defaultMusicDatabaseBundle principalClass] alloc] init];
+		
+		MusicDatabaseSubmissionOperation *submissionOperation = [musicDatabaseInterface musicDatabaseSubmissionOperation];
+//		if(submissionOperation)
+//			[anItem setTitle:[NSString stringWithFormat:NSLocalizedString(@"Submit Metadata to %@ ", @""), [defaultMusicDatabaseBundle objectForInfoDictionaryKey:@"MusicDatabaseName"]]];
+		
+		return (nil != submissionOperation);
+	}
 	else if([self respondsToSelector:[anItem action]])
 		return YES;
 	else
@@ -558,7 +578,6 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 	id <MusicDatabaseInterface> musicDatabaseInterface = [[[defaultMusicDatabaseBundle principalClass] alloc] init];
 	
 	MusicDatabaseQueryOperation *operation = [musicDatabaseInterface musicDatabaseQueryOperation];
-//	MusicDatabaseSubmissionOperation *operation = [musicDatabaseInterface musicDatabaseSubmissionOperation];
 	if(!operation)
 		return;
 
@@ -598,6 +617,68 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 	operation.musicBrainzDiscID = self.compactDisc.musicBrainzDiscID;
 	
 	[self.operationQueue addOperation:operation];	
+}
+
+- (IBAction) submitToDefaultMusicDatabase:(id)sender
+{
+	
+#pragma unused(sender)
+	
+	NSBundle *defaultMusicDatabaseBundle = [[MusicDatabaseManager sharedMusicDatabaseManager] defaultMusicDatabase];
+	
+	// If the default music database wasn't found, try to fail gracefully
+	if(!defaultMusicDatabaseBundle) {
+		NSBeep();
+		NSRunAlertPanel(@"Music Database Not Found", @"The default music database was not found." , @"OK", nil, nil);
+		return;
+	}
+	
+	// Grab the music database's settings dictionary
+	NSDictionary *musicDatabaseSettings = [[MusicDatabaseManager sharedMusicDatabaseManager] settingsForMusicDatabase:defaultMusicDatabaseBundle];
+	
+	// Instantiate the music database interface
+	id <MusicDatabaseInterface> musicDatabaseInterface = [[[defaultMusicDatabaseBundle principalClass] alloc] init];
+	
+	MusicDatabaseSubmissionOperation *operation = [musicDatabaseInterface musicDatabaseSubmissionOperation];
+	if(!operation)
+		return;
+	
+	operation.settings = musicDatabaseSettings;
+	operation.discTOC = self.compactDisc.discTOC;
+	operation.freeDBDiscID = self.compactDisc.freeDBDiscID;
+	operation.musicBrainzDiscID = self.compactDisc.musicBrainzDiscID;
+	
+	// Observe the operation's progress
+	[operation addObserver:self forKeyPath:@"isExecuting" options:NSKeyValueObservingOptionNew context:kMusicDatabaseQueryKVOContext];
+	[operation addObserver:self forKeyPath:@"isCancelled" options:NSKeyValueObservingOptionNew context:kMusicDatabaseQueryKVOContext];
+	[operation addObserver:self forKeyPath:@"isFinished" options:NSKeyValueObservingOptionNew context:kMusicDatabaseQueryKVOContext];
+	
+	[self.operationQueue addOperation:operation];
+}
+
+- (IBAction) submitToMusicDatabase:(id)sender
+{
+	NSParameterAssert([sender isKindOfClass:[NSMenuItem class]]);
+	NSParameterAssert([[sender representedObject] isKindOfClass:[NSBundle class]]);
+	
+	NSBundle *musicDatabaseBundle = (NSBundle *)[sender representedObject];
+	
+	// Grab the music database's settings dictionary
+	NSDictionary *musicDatabaseSettings = [[MusicDatabaseManager sharedMusicDatabaseManager] settingsForMusicDatabase:musicDatabaseBundle];
+	
+	// Instantiate the music database interface
+	id <MusicDatabaseInterface> musicDatabaseInterface = [[[musicDatabaseBundle principalClass] alloc] init];
+	
+	MusicDatabaseSubmissionOperation *operation = [musicDatabaseInterface musicDatabaseSubmissionOperation];
+	if(!operation)
+		return;
+	
+	operation.settings = musicDatabaseSettings;
+	operation.discTOC = self.compactDisc.discTOC;
+	operation.freeDBDiscID = self.compactDisc.freeDBDiscID;
+	operation.musicBrainzDiscID = self.compactDisc.musicBrainzDiscID;
+	
+	[self.operationQueue addOperation:operation];
 }
 
 - (IBAction) queryAccurateRip:(id)sender
