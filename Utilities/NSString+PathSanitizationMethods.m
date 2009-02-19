@@ -7,12 +7,12 @@
 
 @implementation NSString (PathSanitizationMethods)
 
-- (NSString *) stripIllegalPathCharacters
+- (NSString *) stringByRemovingIllegalPathCharacters
 {
-	return [self replaceIllegalPathCharactersWithString:@""];
+	return [self stringByReplacingIllegalPathCharactersWithString:@""];
 }
 
-- (NSString *) replaceIllegalPathCharactersWithString:(NSString *)string
+- (NSString *) stringByReplacingIllegalPathCharactersWithString:(NSString *)string
 {
 	NSParameterAssert(nil != string);
 
@@ -27,6 +27,29 @@
 	}
 	
 	return [result copy];
+}
+
+@end
+
+@implementation NSMutableString (PathSanitizationMethods)
+
+- (void) removeIllegalPathCharacters
+{
+	[self replaceIllegalPathCharactersWithString:@""];
+}
+
+- (void) replaceIllegalPathCharactersWithString:(NSString *)string
+{
+	NSParameterAssert(nil != string);
+	
+	// The following character set contains the characters that should not appear in pathnames or filenames
+	NSCharacterSet *illegalFilenameCharacters = [NSCharacterSet characterSetWithCharactersInString:@"\"\\/<>?:*|"];
+	
+	NSRange range = [self rangeOfCharacterFromSet:illegalFilenameCharacters];		
+	while(NSNotFound != range.location && 0 != range.length) {
+		[self replaceCharactersInRange:range withString:string];
+		range = [self rangeOfCharacterFromSet:illegalFilenameCharacters];		
+	}
 }
 
 @end

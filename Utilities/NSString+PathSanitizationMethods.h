@@ -9,6 +9,11 @@
 // NSString class extension
 // ========================================
 @interface NSString (PathSanitizationMethods)
-- (NSString *) stripIllegalPathCharacters;
-- (NSString *) replaceIllegalPathCharactersWithString:(NSString *)string;
+- (NSString *) stringByRemovingIllegalPathCharacters;
+- (NSString *) stringByReplacingIllegalPathCharactersWithString:(NSString *)string;
+@end
+
+@interface NSMutableString (PathSanitizationMethods)
+- (void) removeIllegalPathCharacters;
+- (void) replaceIllegalPathCharactersWithString:(NSString *)string;
 @end

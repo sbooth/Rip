@@ -26,21 +26,3 @@ temporaryURLWithExtension(NSString *extension)
 	
 	return [NSURL fileURLWithPath:temporaryFilename];
 }
-
-NSString * 
-makeStringSafeForFilename(NSString *string)
-{
-	NSCParameterAssert(nil != string);
-	
-	// The following character set contains the characters that should not appear in filenames
-	NSCharacterSet *illegalFilenameCharacters = [NSCharacterSet characterSetWithCharactersInString:@"\"\\/<>?:*|"];
-	NSMutableString *result = [string mutableCopy];
-
-	NSRange range = [result rangeOfCharacterFromSet:illegalFilenameCharacters];		
-	while(NSNotFound != range.location && 0 != range.length) {
-		[result replaceCharactersInRange:range withString:@"_"];
-		range = [result rangeOfCharacterFromSet:illegalFilenameCharacters];		
-	}
-	
-	return [result copy];
-}

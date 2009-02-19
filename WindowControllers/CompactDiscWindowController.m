@@ -36,6 +36,8 @@
 #import "AccurateRipDiscRecord.h"
 #import "AccurateRipTrackRecord.h"
 
+#import "NSString+PathSanitizationMethods.h"
+
 #define WINDOW_BORDER_THICKNESS ((CGFloat)20)
 
 // ========================================
@@ -550,7 +552,7 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 	NSURL *baseURL = [[EncoderManager sharedEncoderManager] outputURLForCompactDisc:self.compactDisc];
 
 	[savePanel beginSheetForDirectory:[baseURL path]
-								 file:makeStringSafeForFilename(self.compactDisc.metadata.title)
+								 file:[self.compactDisc.metadata.title stringByReplacingIllegalPathCharactersWithString:@"_"]
 					   modalForWindow:self.window
 						modalDelegate:self
 					   didEndSelector:@selector(createCueSheetSavePanelDidEnd:returnCode:contextInfo:)
@@ -848,7 +850,7 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 		title = NSLocalizedString(@"Unknown Album", @"");
 	
 	NSURL *baseURL = [[EncoderManager sharedEncoderManager] outputURLForCompactDisc:self.compactDisc];
-	NSString *filename = makeStringSafeForFilename(title);
+	NSString *filename = [title stringByReplacingIllegalPathCharactersWithString:@"_"];
 	NSString *pathname = [filename stringByAppendingPathExtension:@"log"];
 	NSString *outputPath = [[baseURL path] stringByAppendingPathComponent:pathname];
 	NSURL *logFileURL = [NSURL fileURLWithPath:outputPath];
@@ -937,7 +939,7 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 		title = NSLocalizedString(@"Unknown Album", @"");
 	
 	NSURL *baseURL = [[EncoderManager sharedEncoderManager] outputURLForCompactDisc:self.compactDisc];
-	NSString *filename = makeStringSafeForFilename(title);
+	NSString *filename = [title stringByReplacingIllegalPathCharactersWithString:@"_"];
 	NSString *pathname = [filename stringByAppendingPathExtension:@"log"];
 	NSString *outputPath = [[baseURL path] stringByAppendingPathComponent:pathname];
 	NSURL *logFileURL = [NSURL fileURLWithPath:outputPath];

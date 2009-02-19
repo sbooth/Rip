@@ -22,6 +22,7 @@
 #import "ImageExtractionRecord.h"
 
 #import "NSImage+BitmapRepresentationMethods.h"
+#import "NSString+PathSanitizationMethods.h"
 
 #import "FileUtilities.h"
 #import "Logger.h"
@@ -153,7 +154,7 @@ filenameForTrackExtractionRecord(TrackExtractionRecord *trackExtractionRecord)
 		title = NSLocalizedString(@"Unknown Title", @"");
 	
 	// Build up the sanitized track name
-	return [NSString stringWithFormat:@"%02lu %@", track.number.unsignedIntegerValue, makeStringSafeForFilename(title)];
+	return [NSString stringWithFormat:@"%02lu %@", track.number.unsignedIntegerValue, [title stringByReplacingIllegalPathCharactersWithString:@"_"]];
 }
 
 static NSString *
@@ -172,10 +173,10 @@ filenameForImageExtractionRecord(ImageExtractionRecord *imageExtractionRecord)
 		TrackExtractionRecord *firstTrack = imageExtractionRecord.firstTrack;
 		TrackExtractionRecord *lastTrack = imageExtractionRecord.lastTrack;
 		
-		filename = [NSString stringWithFormat:@"%@ (%@ - %@)", makeStringSafeForFilename(title), firstTrack.track.number, lastTrack.track.number];
+		filename = [NSString stringWithFormat:@"%@ (%@ - %@)", [title stringByReplacingIllegalPathCharactersWithString:@"_"], firstTrack.track.number, lastTrack.track.number];
 	}
 	else
-		filename = makeStringSafeForFilename(title);
+		filename = [title stringByReplacingIllegalPathCharactersWithString:@"_"];
 
 	return filename;
 }
@@ -423,7 +424,7 @@ static EncoderManager *sSharedEncoderManager				= nil;
 		artist = NSLocalizedString(@"Unknown Artist", @"");
 	
 	// Build up the sanitized Artist/Album structure
-	NSArray *pathComponents = [NSArray arrayWithObjects:makeStringSafeForFilename(artist), makeStringSafeForFilename(title), nil];
+	NSArray *pathComponents = [NSArray arrayWithObjects:[artist stringByReplacingIllegalPathCharactersWithString:@"_"], [title stringByReplacingIllegalPathCharactersWithString:@"_"], nil];
 	NSString *path = [NSString pathWithComponents:pathComponents];
 	
 	// Append it to the output folder
