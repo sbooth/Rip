@@ -79,6 +79,7 @@
 		32C7B6360EBD61E900D1A722 /* AdvancedPreferencesView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 32C7B6340EBD61E900D1A722 /* AdvancedPreferencesView.xib */; };
 		32CA7D690F0D57B500771028 /* MetadataEditorPanelController.m in Sources */ = {isa = PBXBuildFile; fileRef = 32CA7D680F0D57B500771028 /* MetadataEditorPanelController.m */; };
 		32CA7D990F0D5FC300771028 /* MetadataEditorPanel.xib in Resources */ = {isa = PBXBuildFile; fileRef = 32CA7D970F0D5FC300771028 /* MetadataEditorPanel.xib */; };
+		32CE93870F5657E900AB328A /* WavPack.bundle in Copy PlugIns */ = {isa = PBXBuildFile; fileRef = 32CE936D0F56579900AB328A /* WavPack.bundle */; };
 		32E9F8300DD6C0FF00E8ACCA /* EncoderSettingsSheet.xib in Resources */ = {isa = PBXBuildFile; fileRef = 32E9F82E0DD6C0FF00E8ACCA /* EncoderSettingsSheet.xib */; };
 		8C1BBC650D43DF0D00DAC484 /* GenreUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C1BBC640D43DF0D00DAC484 /* GenreUtilities.m */; };
 		8C34BB0B0D761A99003F2953 /* ApplicationDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C34BB0A0D761A99003F2953 /* ApplicationDelegate.m */; };
@@ -232,6 +233,20 @@
 			remoteGlobalIDString = 8D5B49AC048680CD000E48DA;
 			remoteInfo = WAVE;
 		};
+		32CE936C0F56579900AB328A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 32CE93640F56579900AB328A /* WavPack.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 8D5B49B6048680CD000E48DA /* WavPack.bundle */;
+			remoteInfo = WavPack;
+		};
+		32CE93810F5657B300AB328A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 32CE93640F56579900AB328A /* WavPack.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 8D5B49AC048680CD000E48DA /* WavPack */;
+			remoteInfo = WavPack;
+		};
 		8C3C19450D73EA0B001BAC88 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 8C3C193E0D73EA0B001BAC88 /* EncoderInterface.xcodeproj */;
@@ -255,6 +270,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
+				32CE93870F5657E900AB328A /* WavPack.bundle in Copy PlugIns */,
 				32C5ACA50E6D220D007C1E7A /* WAVE.bundle in Copy PlugIns */,
 				32C5ABF90E6D1B36007C1E7A /* AppleLossless.bundle in Copy PlugIns */,
 				328DE6FD0E5FE07000F5BD13 /* iTunes.bundle in Copy PlugIns */,
@@ -396,6 +412,7 @@
 		32CA7D670F0D57B500771028 /* MetadataEditorPanelController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MetadataEditorPanelController.h; sourceTree = "<group>"; };
 		32CA7D680F0D57B500771028 /* MetadataEditorPanelController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MetadataEditorPanelController.m; sourceTree = "<group>"; };
 		32CA7D980F0D5FC300771028 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/MetadataEditorPanel.xib; sourceTree = "<group>"; };
+		32CE93640F56579900AB328A /* WavPack.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = WavPack.xcodeproj; path = WavPack/WavPack.xcodeproj; sourceTree = "<group>"; };
 		32DBCF750370BD2300C91783 /* Rip_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Rip_Prefix.pch; sourceTree = "<group>"; };
 		32E9F82F0DD6C0FF00E8ACCA /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/EncoderSettingsSheet.xib; sourceTree = SOURCE_ROOT; };
 		8C1BBC630D43DF0D00DAC484 /* GenreUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GenreUtilities.h; path = Utilities/GenreUtilities.h; sourceTree = "<group>"; };
@@ -745,9 +762,18 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		32CE93650F56579900AB328A /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				32CE936D0F56579900AB328A /* WavPack.bundle */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		8C19B2EA0D729637002BE7BF /* Encoding */ = {
 			isa = PBXGroup;
 			children = (
+				32CE93640F56579900AB328A /* WavPack.xcodeproj */,
 				32C5AC980E6D21EA007C1E7A /* WAVE.xcodeproj */,
 				32C5ABE20E6D1AF5007C1E7A /* AppleLossless.xcodeproj */,
 				3252C1790DD237C500856BFE /* FLAC.xcodeproj */,
@@ -1053,6 +1079,7 @@
 				3252C1C90DD2387500856BFE /* PBXTargetDependency */,
 				32C5ABF80E6D1B0E007C1E7A /* PBXTargetDependency */,
 				32C5ACA40E6D21FE007C1E7A /* PBXTargetDependency */,
+				32CE93820F5657B300AB328A /* PBXTargetDependency */,
 			);
 			name = Rip;
 			productInstallPath = "$(HOME)/Applications";
@@ -1102,6 +1129,10 @@
 				{
 					ProductGroup = 32C5AC990E6D21EA007C1E7A /* Products */;
 					ProjectRef = 32C5AC980E6D21EA007C1E7A /* WAVE.xcodeproj */;
+				},
+				{
+					ProductGroup = 32CE93650F56579900AB328A /* Products */;
+					ProjectRef = 32CE93640F56579900AB328A /* WavPack.xcodeproj */;
 				},
 			);
 			projectRoot = "";
@@ -1160,6 +1191,13 @@
 			fileType = wrapper.cfbundle;
 			path = WAVE.bundle;
 			remoteRef = 32C5ACA00E6D21EA007C1E7A /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		32CE936D0F56579900AB328A /* WavPack.bundle */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = WavPack.bundle;
+			remoteRef = 32CE936C0F56579900AB328A /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		8C3C19460D73EA0B001BAC88 /* EncoderInterface.framework */ = {
@@ -1358,6 +1396,11 @@
 			isa = PBXTargetDependency;
 			name = WAVE;
 			targetProxy = 32C5ACA30E6D21FE007C1E7A /* PBXContainerItemProxy */;
+		};
+		32CE93820F5657B300AB328A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = WavPack;
+			targetProxy = 32CE93810F5657B300AB328A /* PBXContainerItemProxy */;
 		};
 		8C3C19490D73EA21001BAC88 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
