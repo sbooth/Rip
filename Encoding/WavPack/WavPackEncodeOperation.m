@@ -27,7 +27,7 @@ setArgumentForTag(NSMutableArray *arguments, NSDictionary *metadata, NSString *k
 	NSString *tagValue = [metadata objectForKey:keyName];
 	if(tagValue) {
 		[arguments addObject:@"-w"];
-		[arguments addObject:[NSString stringWithFormat:@"\"%@=%@\"", tagName, tagValue]];
+		[arguments addObject:[NSString stringWithFormat:@"%@=%@", tagName, tagValue]];
 	}
 }
 
@@ -99,7 +99,7 @@ setArgumentForTag(NSMutableArray *arguments, NSDictionary *metadata, NSString *k
 	NSString *versionNumber = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"];	
 
 	[arguments addObject:@"-w"];
-	[arguments addObject:[NSString stringWithFormat:@"\"EXTRACTED_BY=%@ %@ (%@)\"", appName, shortVersionNumber, versionNumber]];
+	[arguments addObject:[NSString stringWithFormat:@"EXTRACTED_BY=%@ %@ (%@)", appName, shortVersionNumber, versionNumber]];
 
 	// Task setup
 	[task setCurrentDirectoryPath:[[self.inputURL path] stringByDeletingLastPathComponent]];
