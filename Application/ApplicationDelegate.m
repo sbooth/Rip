@@ -9,7 +9,6 @@
 #import "CompactDiscWindowController.h"
 #import "CompactDisc.h"
 #import "DriveInformation.h"
-#import "AquaticPrime.h"
 #import "EncoderManager.h"
 #import "MusicDatabaseManager.h"
 #import "ReadOffsetCalculatorSheetController.h"
@@ -160,18 +159,6 @@ diskDisappearedCallback(DADiskRef disk, void *context)
 													   andSelector:@selector(handleGetURLAppleEvent:withReplyEvent:) 
 													 forEventClass:kInternetEventClass 
 														andEventID:kAEGetURL];
-
-	// Determine if this application is registered, and if not, display a nag dialog
-	NSURL *licenseURL = [self locateLicenseURL];
-	if(licenseURL) {
-		NSError *error = nil;
-		if(![self validateLicenseURL:licenseURL error:&error]) {
-			[[NSApplication sharedApplication] presentError:error];
-			[[NSApplication sharedApplication] terminate:self];
-		}
-	}
-	else
-		[self displayNagDialog];
 	
 	// Build the "Lookup Metadata Using" menu so it includes all the loaded MusicDatabases
 	NSMenu *lookupMetadataUsingMenu = [[NSMenu alloc] initWithTitle:@"Lookup Metadata Using Menu"];
@@ -507,87 +494,6 @@ diskDisappearedCallback(DADiskRef disk, void *context)
 		matchingWindowController.disk = NULL;
 		[matchingWindowController close];
 	}
-}
-
-- (NSURL *) locateLicenseURL
-{
-	// Search for a license file in the Application Support folder
-	NSString *applicationSupportFolderPath = self.applicationSupportFolderURL.path;
-	NSDirectoryEnumerator *directoryEnumerator = [[NSFileManager defaultManager] enumeratorAtPath:applicationSupportFolderPath];
-	
-	NSString *path = nil;
-	while((path = [directoryEnumerator nextObject])) {
-		// Just return the first one found
-		if([path.pathExtension isEqualToString:@"riplicense"])
-			return [NSURL fileURLWithPath:[applicationSupportFolderPath stringByAppendingPathComponent:path]];			
-	}
-	
-	return nil;
-}
-
-- (BOOL) validateLicenseURL:(NSURL *)licenseURL error:(NSError **)error
-{
-	NSParameterAssert(nil != licenseURL);
-	
-	// This string is specially constructed to prevent key replacement
-	NSMutableString *publicKey = [NSMutableString string];
-	[publicKey appendString:@"0xB41079DB7"];
-	[publicKey appendString:@"B"];
-	[publicKey appendString:@"B"];
-	[publicKey appendString:@"B3FA82DEFD95ABC7E"];
-	[publicKey appendString:@"D923F96C0C"];
-	[publicKey appendString:@"2"];
-	[publicKey appendString:@"2"];
-	[publicKey appendString:@"174947E10FAC0BAD48"];
-	[publicKey appendString:@"4"];
-	[publicKey appendString:@"E"];
-	[publicKey appendString:@"E"];
-	[publicKey appendString:@"37F5672F71C0D5DE95B9D8BECE2"];
-	[publicKey appendString:@"6D4A2076E149E4C35"];
-	[publicKey appendString:@"0"];
-	[publicKey appendString:@"0"];
-	[publicKey appendString:@"16662D0E41D"];
-	[publicKey appendString:@"6231FB7ED6E9"];
-	[publicKey appendString:@"5"];
-	[publicKey appendString:@"5"];
-	[publicKey appendString:@"A56E975ECCB6566E"];
-	[publicKey appendString:@"4C701DEA7A62B620878E1B534C19B4"];
-	[publicKey appendString:@"9C9A95D9E52"];
-	[publicKey appendString:@"3"];
-	[publicKey appendString:@"3"];
-	[publicKey appendString:@"1D8708BA81E325AB6"];
-	[publicKey appendString:@"54F"];
-	[publicKey appendString:@"C"];
-	[publicKey appendString:@"C"];
-	[publicKey appendString:@"89B2FF1CC1026247D6B2BB1C3"];
-	[publicKey appendString:@"DCC8564BED5E2E46F1"];
-	
-	AquaticPrime *licenseValidator = [AquaticPrime aquaticPrimeWithKey:publicKey];
-	NSDictionary *licenseDictionary = [licenseValidator dictionaryForLicenseFile:licenseURL.path];
-
-	// This is an invalid license
-	if(!licenseDictionary) {
-		if(error) {
-			NSMutableDictionary *userInfo = [NSMutableDictionary dictionary];
-			[userInfo setObject:licenseURL.path forKey:NSFilePathErrorKey];
-			[userInfo setObject:NSLocalizedString(@"Your license is invalid or corrupted.", @"") forKey:NSLocalizedDescriptionKey];
-			[userInfo setObject:NSLocalizedString(@"The license file could be incomplete or might contain an invalid key.", @"") forKey:NSLocalizedRecoverySuggestionErrorKey];
-			
-			*error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadCorruptFileError userInfo:userInfo];
-		}
-		
-		return NO;		
-	}
-
-	// TODO: Make sure the license is sane
-	return YES;
-}
-
-- (void) displayNagDialog
-{
-	NSRunAlertPanel(NSLocalizedString(@"This copy of Rip is unregistered.", @""), 
-					NSLocalizedString(@"You may purchase a license from http://sbooth.org/Rip/", @""), 
-					NSLocalizedString(@"OK", @"Button"), nil, nil);
 }
 
 - (void) handleGetURLAppleEvent:(NSAppleEventDescriptor *)event withReplyEvent:(NSAppleEventDescriptor *)replyEvent

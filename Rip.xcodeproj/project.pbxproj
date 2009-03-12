@@ -92,7 +92,6 @@
 		8C46E3CF0D775E0400AE4470 /* CompactDiscWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8C46E3CD0D775E0400AE4470 /* CompactDiscWindow.xib */; };
 		8C46E3F10D775E7600AE4470 /* PreferencesWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8C46E3EF0D775E7600AE4470 /* PreferencesWindow.xib */; };
 		8C46E3F40D775E8D00AE4470 /* PreferencesWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C46E3F30D775E8D00AE4470 /* PreferencesWindowController.m */; };
-		8C46E4070D778DDB00AE4470 /* AquaticPrime.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C46E4060D778DDB00AE4470 /* AquaticPrime.m */; };
 		8C4C8B750D5C1DA700DC0279 /* ByteSizeValueTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C4C8B740D5C1DA700DC0279 /* ByteSizeValueTransformer.m */; };
 		8C4C8B820D5C1DE600DC0279 /* AlbumMetadata.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C4C8B770D5C1DE600DC0279 /* AlbumMetadata.m */; };
 		8C4C8B830D5C1DE600DC0279 /* CompactDisc.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C4C8B790D5C1DE600DC0279 /* CompactDisc.m */; };
@@ -237,14 +236,14 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = 32CE93640F56579900AB328A /* WavPack.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 8D5B49B6048680CD000E48DA /* WavPack.bundle */;
+			remoteGlobalIDString = 8D5B49B6048680CD000E48DA;
 			remoteInfo = WavPack;
 		};
 		32CE93810F5657B300AB328A /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 32CE93640F56579900AB328A /* WavPack.xcodeproj */;
 			proxyType = 1;
-			remoteGlobalIDString = 8D5B49AC048680CD000E48DA /* WavPack */;
+			remoteGlobalIDString = 8D5B49AC048680CD000E48DA;
 			remoteInfo = WavPack;
 		};
 		8C3C19450D73EA0B001BAC88 /* PBXContainerItemProxy */ = {
@@ -430,8 +429,6 @@
 		8C46E3F00D775E7600AE4470 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/PreferencesWindow.xib; sourceTree = "<group>"; };
 		8C46E3F20D775E8D00AE4470 /* PreferencesWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PreferencesWindowController.h; sourceTree = "<group>"; };
 		8C46E3F30D775E8D00AE4470 /* PreferencesWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PreferencesWindowController.m; sourceTree = "<group>"; };
-		8C46E4050D778DDB00AE4470 /* AquaticPrime.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AquaticPrime.h; path = AquaticPrime/AquaticPrime.h; sourceTree = "<group>"; };
-		8C46E4060D778DDB00AE4470 /* AquaticPrime.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AquaticPrime.m; path = AquaticPrime/AquaticPrime.m; sourceTree = "<group>"; };
 		8C4C8B730D5C1DA700DC0279 /* ByteSizeValueTransformer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ByteSizeValueTransformer.h; sourceTree = "<group>"; };
 		8C4C8B740D5C1DA700DC0279 /* ByteSizeValueTransformer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ByteSizeValueTransformer.m; sourceTree = "<group>"; };
 		8C4C8B760D5C1DE600DC0279 /* AlbumMetadata.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AlbumMetadata.h; sourceTree = "<group>"; };
@@ -580,7 +577,6 @@
 				8C4C8B600D5C1AC600DC0279 /* ValueTransformers */,
 				8C1BBC620D43DEF800DAC484 /* Utilities */,
 				2A37F4AFFDCFA73011CA2CEA /* Other Sources */,
-				8CA1EA160D091F0A00980383 /* ThirdParty */,
 				8C4C8AA70D5A902F00DC0279 /* Images */,
 				3227175C0D9F140600A421F0 /* Icons */,
 				2A37F4B8FDCFA73011CA2CEA /* Resources */,
@@ -867,13 +863,6 @@
 			path = Preferences;
 			sourceTree = "<group>";
 		};
-		8C46E3FE0D778DA400AE4470 /* ImageAndTextCell */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = ImageAndTextCell;
-			sourceTree = "<group>";
-		};
 		8C4C8AA70D5A902F00DC0279 /* Images */ = {
 			isa = PBXGroup;
 			children = (
@@ -980,15 +969,6 @@
 			path = InspectorPanels;
 			sourceTree = "<group>";
 		};
-		8CA1EA160D091F0A00980383 /* ThirdParty */ = {
-			isa = PBXGroup;
-			children = (
-				8CB2A67B0D2B04490028332F /* AquaticPrime */,
-				8C46E3FE0D778DA400AE4470 /* ImageAndTextCell */,
-			);
-			path = ThirdParty;
-			sourceTree = "<group>";
-		};
 		8CA35CC80D2E707800F89E3B /* MusicDatabase */ = {
 			isa = PBXGroup;
 			children = (
@@ -1015,15 +995,6 @@
 				8CB209740D050EE9003A90A6 /* DriveInformation.m */,
 			);
 			name = Drive;
-			sourceTree = "<group>";
-		};
-		8CB2A67B0D2B04490028332F /* AquaticPrime */ = {
-			isa = PBXGroup;
-			children = (
-				8C46E4050D778DDB00AE4470 /* AquaticPrime.h */,
-				8C46E4060D778DDB00AE4470 /* AquaticPrime.m */,
-			);
-			name = AquaticPrime;
 			sourceTree = "<group>";
 		};
 		8CDBEE630CFA092E000EC553 /* Application */ = {
@@ -1325,7 +1296,6 @@
 				8C34BB0E0D761AB7003F2953 /* PlugInManager.m in Sources */,
 				8C46E3880D77550E00AE4470 /* EncoderManager.m in Sources */,
 				8C46E3F40D775E8D00AE4470 /* PreferencesWindowController.m in Sources */,
-				8C46E4070D778DDB00AE4470 /* AquaticPrime.m in Sources */,
 				328DE21C0E5E628700F5BD13 /* PregapFormatter.m in Sources */,
 				328DE4CE0E5FC08500F5BD13 /* MusicDatabaseManager.m in Sources */,
 				328DEDD60E6126E800F5BD13 /* MusicDatabasePreferencesViewController.m in Sources */,

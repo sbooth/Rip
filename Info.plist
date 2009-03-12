@@ -60,24 +60,6 @@
 			<key>NSPersistentStoreTypeKey</key>
 			<string>SQLite</string>
 		</dict>
-		<dict>
-			<key>CFBundleTypeExtensions</key>
-			<array>
-				<string>riplicense</string>
-			</array>
-			<key>CFBundleTypeMIMETypes</key>
-			<array>
-				<string>text/plain</string>
-			</array>
-			<key>CFBundleTypeName</key>
-			<string>Rip License</string>
-			<key>CFBundleTypeRole</key>
-			<string>Viewer</string>
-			<key>LSTypeIsPackage</key>
-			<false/>
-			<key>NSPersistentStoreTypeKey</key>
-			<string>Binary</string>
-		</dict>
 	</array>
 	<key>CFBundleExecutable</key>
 	<string>${EXECUTABLE_NAME}</string>
@@ -91,6 +73,10 @@
 	<string>${PRODUCT_NAME}</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>${MARKETING_VERSION}</string>
+	<key>CFBundleSignature</key>
+	<string>riPP</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
@@ -102,12 +88,8 @@
 			</array>
 		</dict>
 	</array>
-	<key>CFBundleSignature</key>
-	<string>riPP</string>
 	<key>CFBundleVersion</key>
 	<string>${PROJECT_VERSION}</string>
-	<key>CFBundleShortVersionString</key>
-	<string>${MARKETING_VERSION}</string>
 	<key>NSMainNibFile</key>
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
