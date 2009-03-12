@@ -44,9 +44,6 @@
 @interface ApplicationDelegate (Private)
 - (void) diskAppeared:(DADiskRef)disk;
 - (void) diskDisappeared:(DADiskRef)disk;
-- (NSURL *) locateLicenseURL;
-- (BOOL) validateLicenseURL:(NSURL *)licenseURL error:(NSError **)error;
-- (void) displayNagDialog;
 - (void) handleGetURLAppleEvent:(NSAppleEventDescriptor *)event withReplyEvent:(NSAppleEventDescriptor *)replyEvent;
 - (void) readOffsetKnownSheetDidEnd:(NSWindow *)sheet returnCode:(NSInteger)returnCode contextInfo:(void *)contextInfo;
 - (void) readOffsetNotConfiguredSheetDidEnd:(NSWindow *)sheet returnCode:(NSInteger)returnCode contextInfo:(void *)contextInfo;
@@ -295,24 +292,9 @@ diskDisappearedCallback(DADiskRef disk, void *context)
 	
 	NSParameterAssert(nil != filename);
 
-	NSString *pathExtension = [filename pathExtension];
-
 //	CFStringRef myUTI = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, (CFStringRef)pathExtension, kUTTypePlainText);
 
-	if([pathExtension isEqualToString:@"riplicense"]) {
-		NSError *error = nil;
-		if([self validateLicenseURL:[NSURL fileURLWithPath:filename] error:&error]) {
-			NSString *licenseCopyPath = [self.applicationSupportFolderURL.path stringByAppendingPathComponent:filename.lastPathComponent];
-			if(![[NSFileManager defaultManager] copyItemAtPath:filename toPath:licenseCopyPath error:&error])
-				[[NSApplication sharedApplication] presentError:error];
-		}
-		else
-			[[NSApplication sharedApplication] presentError:error];
-		
-		return YES;
-	}
-	else
-		return NO;
+	return NO;
 }
 
 - (NSURL *) applicationSupportFolderURL
