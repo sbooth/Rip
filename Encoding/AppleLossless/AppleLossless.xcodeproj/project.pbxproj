@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		324529690F6A0D0600CC2341 /* FileUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 324529680F6A0D0600CC2341 /* FileUtilities.m */; };
 		328378360EAEDEF50011EB44 /* AppleLosslessEncodeOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 328378350EAEDEF50011EB44 /* AppleLosslessEncodeOperation.m */; };
 		328378530EAEE2EB0011EB44 /* AtomicParsley in Resources */ = {isa = PBXBuildFile; fileRef = 328378520EAEE2EB0011EB44 /* AtomicParsley */; };
 		32C5ABCC0E6D1A27007C1E7A /* AppleLosslessSettings.xib in Resources */ = {isa = PBXBuildFile; fileRef = 32C5ABCA0E6D1A27007C1E7A /* AppleLosslessSettings.xib */; };
@@ -41,6 +42,8 @@
 		089C167EFE841241C02AAC07 /* English */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		089C167FFE841241C02AAC07 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		1058C7ADFEA557BF11CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
+		324529670F6A0D0600CC2341 /* FileUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FileUtilities.h; path = ../../Utilities/FileUtilities.h; sourceTree = SOURCE_ROOT; };
+		324529680F6A0D0600CC2341 /* FileUtilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FileUtilities.m; path = ../../Utilities/FileUtilities.m; sourceTree = SOURCE_ROOT; };
 		328378340EAEDEF50011EB44 /* AppleLosslessEncodeOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppleLosslessEncodeOperation.h; sourceTree = "<group>"; };
 		328378350EAEDEF50011EB44 /* AppleLosslessEncodeOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppleLosslessEncodeOperation.m; sourceTree = "<group>"; };
 		328378520EAEE2EB0011EB44 /* AtomicParsley */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = AtomicParsley; sourceTree = "<group>"; };
@@ -150,6 +153,8 @@
 		32C88E010371C26100C91783 /* Other Sources */ = {
 			isa = PBXGroup;
 			children = (
+				324529670F6A0D0600CC2341 /* FileUtilities.h */,
+				324529680F6A0D0600CC2341 /* FileUtilities.m */,
 				8C3C19610D73EAB7001BAC88 /* EncoderInterface.xcodeproj */,
 				32DBCF630370AF2F00C91783 /* CoreAudio_Prefix.pch */,
 			);
@@ -241,6 +246,7 @@
 				32E9F8F90DD7584500E8ACCA /* AppleLosslessSettingsViewController.m in Sources */,
 				32C5ABD00E6D1A9B007C1E7A /* CoreAudioEncodeOperation.m in Sources */,
 				328378360EAEDEF50011EB44 /* AppleLosslessEncodeOperation.m in Sources */,
+				324529690F6A0D0600CC2341 /* FileUtilities.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

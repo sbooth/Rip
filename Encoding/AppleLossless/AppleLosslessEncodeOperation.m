@@ -1,9 +1,10 @@
 /*
- *  Copyright (C) 2008 Stephen F. Booth <me@sbooth.org>
+ *  Copyright (C) 2008 - 2009 Stephen F. Booth <me@sbooth.org>
  *  All Rights Reserved
  */
 
 #import "AppleLosslessEncodeOperation.h"
+#import "FileUtilities.h"
 
 @implementation AppleLosslessEncodeOperation
 
@@ -13,10 +14,10 @@
 #define SLEEP_TIME_INTERVAL ((NSTimeInterval)0.25)
 
 - (void) main
-{
+{	
 	// The superclass takes care of the encoding
 	[super main];
-	
+		
 	// Stop now if the operation was cancelled or any errors occurred
 	if(self.isCancelled || self.error)
 		return;
@@ -38,8 +39,11 @@
 	// The file to tag
 	[arguments addObject:[self.outputURL path]];
 
-	// Overwrite the original file
-	[arguments addObject:@"--overWrite"];
+	// Don't overwrite the original file- save to a temp file and then rename it
+	NSURL *taggedURL = temporaryURLWithExtension(@"m4a");
+
+	[arguments addObject:@"-o"];
+	[arguments addObject:[taggedURL path]];
 
 	// Metadata
 	if([self.metadata objectForKey:kMetadataTitleKey]) {
@@ -104,6 +108,14 @@
 		[arguments addObject:[frontCoverURL path]];
 	}
 	
+	// Application version
+	NSString *appName = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleName"];
+	NSString *shortVersionNumber = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
+	NSString *versionNumber = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"];	
+	
+	[arguments addObject:@"--encodingTool"];
+	[arguments addObject:[NSString stringWithFormat:@"%@ %@ (%@)", appName, shortVersionNumber, versionNumber]];
+
 	// Task setup
 	[task setCurrentDirectoryPath:[[self.outputURL path] stringByDeletingLastPathComponent]];
 	[task setLaunchPath:apPath];
@@ -132,6 +144,18 @@
 	int terminationStatus = [task terminationStatus];
 	if(EXIT_SUCCESS != terminationStatus)
 		self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:terminationStatus userInfo:nil];
+	// If successful, delete the untagged file and replace it with the tagged version
+	else {
+		NSError *error = nil;
+		BOOL removeSuccessful = [[NSFileManager defaultManager] removeItemAtPath:[self.outputURL path] error:&error];
+		if(removeSuccessful) {
+			BOOL renameSuccessful = [[NSFileManager defaultManager] moveItemAtPath:[taggedURL path] toPath:[self.outputURL path] error:&error];
+			if(!renameSuccessful)
+				self.error = error;
+		}
+		else
+			self.error = error;
+	}
 }
 
 @end
