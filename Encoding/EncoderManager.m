@@ -142,13 +142,13 @@ metadataForImageExtractionRecord(ImageExtractionRecord *imageExtractionRecord)
 // Create the output filename to use for the given ExtractionRecord
 // ========================================
 static NSString *
-filenameForTrackExtractionRecord(TrackExtractionRecord *trackExtractionRecord)
+defaultFilenameForTrackExtractionRecord(TrackExtractionRecord *trackExtractionRecord)
 {
 	NSCParameterAssert(nil != trackExtractionRecord);
-		
+	
 	// Only a single track was extracted
 	TrackDescriptor *track = trackExtractionRecord.track;
-
+	
 	NSString *title = track.metadata.title;
 	if(nil == title)
 		title = NSLocalizedString(@"Unknown Title", @"");
@@ -158,7 +158,74 @@ filenameForTrackExtractionRecord(TrackExtractionRecord *trackExtractionRecord)
 }
 
 static NSString *
-filenameForImageExtractionRecord(ImageExtractionRecord *imageExtractionRecord)
+customFilenameForTrackExtractionRecord(TrackExtractionRecord *trackExtractionRecord)
+{
+	NSCParameterAssert(nil != trackExtractionRecord);
+	
+	NSString *format = [[NSUserDefaults standardUserDefaults] stringForKey:@"customOutputFileNamingFormat"];
+	NSMutableString *path = [[format lastPathComponent] mutableCopy];
+	
+	// Flesh out the album metadata, substituting as required
+	AlbumMetadata *albumMetadata = trackExtractionRecord.track.session.disc.metadata;
+	
+	NSString *albumTitle = albumMetadata.title ? albumMetadata.title : @"";
+	[path replaceOccurrencesOfString:@"{albumTitle}" withString:albumTitle options:0 range:NSMakeRange(0, [path length])];
+	
+	NSString *albumArtist = albumMetadata.artist ? albumMetadata.artist : @"";
+	[path replaceOccurrencesOfString:@"{albumArtist}" withString:albumArtist options:0 range:NSMakeRange(0, [path length])];
+	
+	NSString *albumDate = albumMetadata.date ? albumMetadata.date : @"";
+	[path replaceOccurrencesOfString:@"{albumDate}" withString:albumDate options:0 range:NSMakeRange(0, [path length])];
+	
+	NSString *discNumber = albumMetadata.discNumber ? [NSString stringWithFormat:@"%02lu", [albumMetadata.discNumber unsignedIntegerValue]] : @"";
+	[path replaceOccurrencesOfString:@"{discNumber}" withString:discNumber options:0 range:NSMakeRange(0, [path length])];
+	
+	NSString *discTotal = albumMetadata.discTotal ? [NSString stringWithFormat:@"%02lu", [albumMetadata.discTotal unsignedIntegerValue]] : @"";
+	[path replaceOccurrencesOfString:@"{discTotal}" withString:discTotal options:0 range:NSMakeRange(0, [path length])];
+
+	// Do the same for the track metadata
+	TrackMetadata *trackMetadata = trackExtractionRecord.track.metadata;
+
+	NSString *trackTitle = trackMetadata.title ? trackMetadata.title : @"";
+	[path replaceOccurrencesOfString:@"{trackTitle}" withString:trackTitle options:0 range:NSMakeRange(0, [path length])];
+	
+	NSString *trackArtist = trackMetadata.artist ? trackMetadata.artist : @"";
+	[path replaceOccurrencesOfString:@"{trackArtist}" withString:trackArtist options:0 range:NSMakeRange(0, [path length])];
+	
+	NSString *trackDate = trackMetadata.date ? trackMetadata.date : @"";
+	[path replaceOccurrencesOfString:@"{trackDate}" withString:trackDate options:0 range:NSMakeRange(0, [path length])];
+
+	NSString *trackGenre = trackMetadata.genre ? trackMetadata.genre : @"";
+	[path replaceOccurrencesOfString:@"{trackGenre}" withString:trackGenre options:0 range:NSMakeRange(0, [path length])];
+
+	NSString *trackComposer = trackMetadata.composer ? trackMetadata.composer : @"";
+	[path replaceOccurrencesOfString:@"{trackComposer}" withString:trackComposer options:0 range:NSMakeRange(0, [path length])];
+
+	NSString *trackNumber = trackExtractionRecord.track.number ? [NSString stringWithFormat:@"%02lu", [trackExtractionRecord.track.number unsignedIntegerValue]] : @"";
+	[path replaceOccurrencesOfString:@"{trackNumber}" withString:trackNumber options:0 range:NSMakeRange(0, [path length])];
+	
+	NSString *trackTotal = [trackExtractionRecord.track.session.tracks count] ? [NSString stringWithFormat:@"%02lu", [trackExtractionRecord.track.session.tracks count]] : @"";
+	[path replaceOccurrencesOfString:@"{trackTotal}" withString:trackTotal options:0 range:NSMakeRange(0, [path length])];
+	
+	// Don't allow any illegal characters
+	[path replaceIllegalPathCharactersWithString:@"_"];
+	
+	return [path copy];
+}
+
+static NSString *
+filenameForTrackExtractionRecord(TrackExtractionRecord *trackExtractionRecord)
+{
+	NSCParameterAssert(nil != trackExtractionRecord);
+		
+	if([[NSUserDefaults standardUserDefaults] boolForKey:@"useCustomOutputFileNaming"])
+		return customFilenameForTrackExtractionRecord(trackExtractionRecord);
+	else
+		return defaultFilenameForTrackExtractionRecord(trackExtractionRecord);
+}
+
+static NSString *
+defaultFilenameForImageExtractionRecord(ImageExtractionRecord *imageExtractionRecord)
 {
 	NSCParameterAssert(nil != imageExtractionRecord);
 	
@@ -177,8 +244,51 @@ filenameForImageExtractionRecord(ImageExtractionRecord *imageExtractionRecord)
 	}
 	else
 		filename = [title stringByReplacingIllegalPathCharactersWithString:@"_"];
-
+	
 	return filename;
+}
+
+static NSString *
+customFilenameForImageExtractionRecord(ImageExtractionRecord *imageExtractionRecord)
+{
+	NSCParameterAssert(nil != imageExtractionRecord);
+	
+	NSString *format = [[NSUserDefaults standardUserDefaults] stringForKey:@"customOutputFileNamingFormat"];
+	NSMutableString *path = [[format lastPathComponent] mutableCopy];
+	
+	// Flesh out the album metadata, substituting as required
+	AlbumMetadata *albumMetadata = imageExtractionRecord.disc.metadata;
+	
+	NSString *albumTitle = albumMetadata.title ? albumMetadata.title : @"";
+	[path replaceOccurrencesOfString:@"{albumTitle}" withString:albumTitle options:0 range:NSMakeRange(0, [path length])];
+	
+	NSString *albumArtist = albumMetadata.artist ? albumMetadata.artist : @"";
+	[path replaceOccurrencesOfString:@"{albumArtist}" withString:albumArtist options:0 range:NSMakeRange(0, [path length])];
+	
+	NSString *albumDate = albumMetadata.date ? albumMetadata.date : @"";
+	[path replaceOccurrencesOfString:@"{albumDate}" withString:albumDate options:0 range:NSMakeRange(0, [path length])];
+	
+	NSString *discNumber = albumMetadata.discNumber ? [NSString stringWithFormat:@"%02lu", [albumMetadata.discNumber unsignedIntegerValue]] : @"";
+	[path replaceOccurrencesOfString:@"{discNumber}" withString:discNumber options:0 range:NSMakeRange(0, [path length])];
+	
+	NSString *discTotal = albumMetadata.discTotal ? [NSString stringWithFormat:@"%02lu", [albumMetadata.discTotal unsignedIntegerValue]] : @"";
+	[path replaceOccurrencesOfString:@"{discTotal}" withString:discTotal options:0 range:NSMakeRange(0, [path length])];
+		
+	// Don't allow any illegal characters
+	[path replaceIllegalPathCharactersWithString:@"_"];
+	
+	return [path copy];
+}
+
+static NSString *
+filenameForImageExtractionRecord(ImageExtractionRecord *imageExtractionRecord)
+{
+	NSCParameterAssert(nil != imageExtractionRecord);
+	
+	if([[NSUserDefaults standardUserDefaults] boolForKey:@"useCustomOutputFileNaming"])
+		return customFilenameForImageExtractionRecord(imageExtractionRecord);
+	else
+		return defaultFilenameForImageExtractionRecord(imageExtractionRecord);
 }
 
 // ========================================
@@ -220,6 +330,8 @@ static EncoderManager *sSharedEncoderManager				= nil;
 
 @interface EncoderManager (Private)
 - (NSURL *) outputURLForBaseURL:(NSURL *)baseURL filename:(NSString *)filename pathExtension:(NSString *)pathExtension error:(NSError **)error;
+- (NSString *) standardPathnameForCompactDisc:(CompactDisc *)disc;
+- (NSString *) customPathnameForCompactDisc:(CompactDisc *)disc;
 @end
 
 @implementation EncoderManager
@@ -414,22 +526,17 @@ static EncoderManager *sSharedEncoderManager				= nil;
 - (NSURL *) outputURLForCompactDisc:(CompactDisc *)disc
 {
 	NSParameterAssert(nil != disc);
-	
-	NSString *title = disc.metadata.title;
-	if(nil == title)
-		title = NSLocalizedString(@"Unknown Album", @"");
-	
-	NSString *artist = disc.metadata.artist;
-	if(nil == artist)
-		artist = NSLocalizedString(@"Unknown Artist", @"");
-	
-	// Build up the sanitized Artist/Album structure
-	NSArray *pathComponents = [NSArray arrayWithObjects:[artist stringByReplacingIllegalPathCharactersWithString:@"_"], [title stringByReplacingIllegalPathCharactersWithString:@"_"], nil];
-	NSString *path = [NSString pathWithComponents:pathComponents];
-	
+
+	// Create the pathname
+	NSString *pathForCompactDisc = nil;
+	if([[NSUserDefaults standardUserDefaults] boolForKey:@"useCustomOutputFileNaming"])
+		pathForCompactDisc = [self customPathnameForCompactDisc:disc];
+	else
+		pathForCompactDisc = [self standardPathnameForCompactDisc:disc];
+
 	// Append it to the output folder
 	NSURL *outputFolderURL = [NSUnarchiver unarchiveObjectWithData:[[NSUserDefaults standardUserDefaults] dataForKey:@"outputDirectory"]];
-	NSString *outputPath = [[outputFolderURL path] stringByAppendingPathComponent:path];
+	NSString *outputPath = [[outputFolderURL path] stringByAppendingPathComponent:pathForCompactDisc];
 	
 	return [NSURL fileURLWithPath:outputPath];
 }
@@ -721,6 +828,66 @@ static EncoderManager *sSharedEncoderManager				= nil;
 	}
 	
 	return [NSURL fileURLWithPath:outputPath];
+}
+
+- (NSString *) standardPathnameForCompactDisc:(CompactDisc *)disc
+{
+	NSParameterAssert(nil != disc);
+	
+	NSString *title = disc.metadata.title;
+	if(nil == title)
+		title = NSLocalizedString(@"Unknown Album", @"");
+	
+	NSString *artist = disc.metadata.artist;
+	if(nil == artist)
+		artist = NSLocalizedString(@"Unknown Artist", @"");
+	
+	// Build up the sanitized Artist/Album structure
+	NSArray *pathComponents = [NSArray arrayWithObjects:[artist stringByReplacingIllegalPathCharactersWithString:@"_"], [title stringByReplacingIllegalPathCharactersWithString:@"_"], nil];
+	return [NSString pathWithComponents:pathComponents];	
+}
+
+- (NSString *) customPathnameForCompactDisc:(CompactDisc *)disc
+{
+	NSParameterAssert(nil != disc);
+	
+	NSString *outputNamingFormat = [[NSUserDefaults standardUserDefaults] stringForKey:@"customOutputFileNamingFormat"];
+	NSString *pathFormat = [outputNamingFormat stringByDeletingLastPathComponent];
+
+	// Error checking
+	NSRange illegalSpecifierRange = [pathFormat rangeOfString:@"{track"];
+	if(NSNotFound != illegalSpecifierRange.location && 0 != illegalSpecifierRange.length)
+		[[Logger sharedLogger] logMessageWithLevel:eLogMessageLevelDebug format:@"Custom file output format contains track specifiers: %@", pathFormat];
+
+	NSArray *pathComponents = [pathFormat pathComponents];
+	NSMutableArray *replacedComponents = [NSMutableArray array];
+
+	// Replace the relevant format specifiers in each component separately
+	AlbumMetadata *albumMetadata = disc.metadata;
+	for(NSString *component in pathComponents) {
+		NSMutableString *partialPath = [component mutableCopy];
+		
+		NSString *albumTitle = albumMetadata.title ? albumMetadata.title : @"";
+		[partialPath replaceOccurrencesOfString:@"{albumTitle}" withString:albumTitle options:0 range:NSMakeRange(0, [partialPath length])];
+		
+		NSString *albumArtist = albumMetadata.artist ? albumMetadata.artist : @"";
+		[partialPath replaceOccurrencesOfString:@"{albumArtist}" withString:albumArtist options:0 range:NSMakeRange(0, [partialPath length])];
+		
+		NSString *albumDate = albumMetadata.date ? albumMetadata.date : @"";
+		[partialPath replaceOccurrencesOfString:@"{albumDate}" withString:albumDate options:0 range:NSMakeRange(0, [partialPath length])];
+		
+		NSString *discNumber = albumMetadata.discNumber ? [NSString stringWithFormat:@"%02lu", [albumMetadata.discNumber unsignedIntegerValue]] : @"";
+		[partialPath replaceOccurrencesOfString:@"{discNumber}" withString:discNumber options:0 range:NSMakeRange(0, [partialPath length])];
+		
+		NSString *discTotal = albumMetadata.discTotal ? [NSString stringWithFormat:@"%02lu", [albumMetadata.discTotal unsignedIntegerValue]] : @"";
+		[partialPath replaceOccurrencesOfString:@"{discTotal}" withString:discTotal options:0 range:NSMakeRange(0, [partialPath length])];
+		
+		[partialPath replaceIllegalPathCharactersWithString:@"_"];
+		
+		[replacedComponents addObject:partialPath];
+	}
+	
+	return [NSString pathWithComponents:replacedComponents];
 }
 
 @end
