@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2007 - 2008 Stephen F. Booth <me@sbooth.org>
+ *  Copyright (C) 2007 - 2009 Stephen F. Booth <me@sbooth.org>
  *  All Rights Reserved
  */
 
@@ -65,6 +65,9 @@ setArgumentForTag(NSMutableArray *arguments, NSDictionary *metadata, NSString *k
 
 	// Verify encoding
 	[arguments addObject:@"-V"];
+
+	// NSTask doesn't encode text as UTF8, which flac expects
+	[arguments addObject:@"--no-utf8-convert"];
 
 	// Metadata
 	setArgumentForTag(arguments, self.metadata, kMetadataTitleKey, @"TITLE");
