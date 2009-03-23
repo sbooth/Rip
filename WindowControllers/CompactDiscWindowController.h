@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2007 - 2008 Stephen F. Booth <me@sbooth.org>
+ *  Copyright (C) 2007 - 2009 Stephen F. Booth <me@sbooth.org>
  *  All Rights Reserved
  */
 
@@ -13,8 +13,7 @@
 	IBOutlet NSObjectController *_driveInformationController;
 	IBOutlet NSObjectController *_compactDiscController;
 	IBOutlet NSArrayController *_trackController;
-	IBOutlet NSTableView *_trackTable;
-	IBOutlet NSDrawer *_metadataDrawer;
+	IBOutlet NSView *_mainView;
 	
 @private
 	__strong DADiskRef _disk;
@@ -23,6 +22,8 @@
 	
 	NSOperationQueue *_operationQueue;
 	int _extractionMode; // eExtractionMode
+	
+	NSViewController *_mainViewController;
 }
 
 // ========================================
@@ -45,8 +46,6 @@
 // ========================================
 - (IBAction) selectAllTracks:(id)sender;
 - (IBAction) deselectAllTracks:(id)sender;
-
-- (IBAction) toggleMetadataDrawer:(id)sender;
 
 - (IBAction) determineDriveReadOffset:(id)sender;
 

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2007 - 2008 Stephen F. Booth <me@sbooth.org>
+ *  Copyright (C) 2007 - 2009 Stephen F. Booth <me@sbooth.org>
  *  All Rights Reserved
  */
 
@@ -12,6 +12,8 @@
 #import "TrackDescriptor.h"
 #import "AlbumMetadata.h"
 #import "TrackMetadata.h"
+
+#import "MetadataViewController.h"
 
 #import "AccurateRipQueryOperation.h"
 
@@ -168,23 +170,11 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 	[self.window setAutorecalculatesContentBorderThickness:YES forEdge:NSMinYEdge];
 	[self.window setContentBorderThickness:WINDOW_BORDER_THICKNESS forEdge:NSMinYEdge];
 	
-	// Create the menu for the table's header, to allow showing and hiding of columns
-	NSMenu *menu = [[NSMenu alloc] initWithTitle:NSLocalizedString(@"Track Table Columns", @"")];
-	NSSortDescriptor *tableColumnsNameSortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"headerCell.title" ascending:YES];
-	NSArray *sortedTableColumns = [_trackTable.tableColumns sortedArrayUsingDescriptors:[NSArray arrayWithObject:tableColumnsNameSortDescriptor]];
-	for(NSTableColumn *column in sortedTableColumns) {
-		NSMenuItem *menuItem = [menu addItemWithTitle:[column.headerCell title]
-											   action:@selector(toggleTableColumnVisible:) 
-										keyEquivalent:@""];
-		[menuItem setTarget:self];
-		[menuItem setRepresentedObject:column];
-		[menuItem setState:!column.isHidden];
-	}
-	[_trackTable.headerView setMenu:menu];
-	
-	// Set the default sort descriptors for the track table
-	NSSortDescriptor *trackNumberSortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"number" ascending:YES];
-	[self.trackController setSortDescriptors:[NSArray arrayWithObject:trackNumberSortDescriptor]];	
+	// Initially the main view in the window shows the disc's metadata
+	_mainViewController = [[MetadataViewController alloc] init];
+	[_mainViewController setRepresentedObject:self.compactDisc];
+
+	[_mainView addSubview:_mainViewController.view];
 }
 
 - (BOOL) validateMenuItem:(NSMenuItem *)anItem
@@ -218,16 +208,6 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 			[anItem setTitle:NSLocalizedString(@"Read ISRCs", @"")];
 			
 		return (0 != countOfSelectedTracks);
-	}
-	else if([anItem action] == @selector(toggleMetadataDrawer:)) {
-		NSDrawerState state = [_metadataDrawer state];
-		
-		if(NSDrawerClosedState == state || NSDrawerClosingState == state)
-			[anItem setTitle:NSLocalizedString(@"Show Metadata", @"")];
-		else
-			[anItem setTitle:NSLocalizedString(@"Hide Metadata", @"")];
-		
-		return YES;
 	}
 //	else if([anItem action] == @selector(determineDriveReadOffset:)) {
 //		if(self.driveInformation.productName)
@@ -427,11 +407,6 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 	[self.compactDisc.firstSession.tracks setValue:[NSNumber numberWithBool:NO] forKey:@"isSelected"];
 }
 
-- (IBAction) toggleMetadataDrawer:(id)sender
-{
-	[_metadataDrawer toggle:sender];	
-}
-
 // ========================================
 // Run the drive offset calculation routines
 - (IBAction) determineDriveReadOffset:(id)sender
@@ -462,6 +437,11 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 		return;
 	}
 	
+	// Save the metadata
+	NSError *error = nil;
+	if([self.managedObjectContext hasChanges] && ![self.managedObjectContext save:&error])
+		[self presentError:error modalForWindow:self.window delegate:nil didPresentSelector:NULL contextInfo:NULL];
+
 	self.extractionMode = eExtractionModeIndividualTracks;
 	
 	// Start the sheet cascade
@@ -472,6 +452,11 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 {
 
 #pragma unused(sender)
+
+	// Save the metadata
+	NSError *error = nil;
+	if([self.managedObjectContext hasChanges] && ![self.managedObjectContext save:&error])
+		[self presentError:error modalForWindow:self.window delegate:nil didPresentSelector:NULL contextInfo:NULL];
 
 	self.extractionMode = eExtractionModeImage;
 	
