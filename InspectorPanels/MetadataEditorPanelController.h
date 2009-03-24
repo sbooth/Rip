@@ -7,14 +7,18 @@
 
 @interface MetadataEditorPanelController : NSWindowController
 {
-	IBOutlet NSObjectController *_documentObjectController;
-	
 @private
 	id _inspectedDocument;
 }
 
+// ========================================
+// Properties
+// ========================================
 @property (readonly, assign) id inspectedDocument;
 
+// ========================================
+// Action Methods
+// ========================================
 - (IBAction) toggleMetadataEditorPanel:(id)sender;
 
 @end
