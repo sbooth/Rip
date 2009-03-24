@@ -5,6 +5,9 @@
 
 #import <Cocoa/Cocoa.h>
 
+// ========================================
+// A HUD panel displaying information about selected tracks on a compact disc
+// ========================================
 @interface TrackInspectorPanelController : NSWindowController
 {
 @private
@@ -13,12 +16,10 @@
 
 // ========================================
 // Properties
-// ========================================
 @property (readonly, assign) id inspectedDocument;
 
 // ========================================
 // Action Methods
-// ========================================
 - (IBAction) toggleTrackInspectorPanel:(id)sender;
 
 @end

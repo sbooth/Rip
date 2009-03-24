@@ -9,6 +9,9 @@
 @class CompactDisc, DriveInformation;
 @class MetadataViewController;
 
+// ========================================
+// The main window representing a single compact disc
+// ========================================
 @interface CompactDiscWindowController : NSWindowController
 {
 	IBOutlet NSView *_mainView;
@@ -26,7 +29,6 @@
 
 // ========================================
 // Properties
-// ========================================
 @property (assign) DADiskRef disk;
 
 @property (readonly, assign) CompactDisc * compactDisc;
@@ -36,7 +38,6 @@
 
 // ========================================
 // Action Methods
-// ========================================
 - (IBAction) selectAllTracks:(id)sender;
 - (IBAction) deselectAllTracks:(id)sender;
 

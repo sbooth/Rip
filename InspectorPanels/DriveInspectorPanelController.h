@@ -5,6 +5,9 @@
 
 #import <Cocoa/Cocoa.h>
 
+// ========================================
+// A HUD panel displaying information about a drive
+// ========================================
 @interface DriveInspectorPanelController : NSWindowController
 {
 @private
@@ -13,12 +16,10 @@
 
 // ========================================
 // Properties
-// ========================================
 @property (readonly, assign) id inspectedDocument;
 
 // ========================================
 // Action Methods
-// ========================================
 - (IBAction) toggleDriveInspectorPanel:(id)sender;
 
 @end

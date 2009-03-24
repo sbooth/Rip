@@ -5,6 +5,9 @@
 
 #import <Cocoa/Cocoa.h>
 
+// ========================================
+// A HUD panel displaying information about a compact disc
+// ========================================
 @interface DiscInspectorPanelController : NSWindowController
 {
 @private
@@ -13,12 +16,10 @@
 
 // ========================================
 // Properties
-// ========================================
 @property (readonly, assign) id inspectedDocument;
 
 // ========================================
 // Action Methods
-// ========================================
 - (IBAction) toggleDiscInspectorPanel:(id)sender;
 
 @end

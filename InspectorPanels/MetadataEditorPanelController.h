@@ -5,6 +5,9 @@
 
 #import <Cocoa/Cocoa.h>
 
+// ========================================
+// A HUD panel for editing the metadata of the selected tracks
+// ========================================
 @interface MetadataEditorPanelController : NSWindowController
 {
 @private
@@ -13,12 +16,10 @@
 
 // ========================================
 // Properties
-// ========================================
 @property (readonly, assign) id inspectedDocument;
 
 // ========================================
 // Action Methods
-// ========================================
 - (IBAction) toggleMetadataEditorPanel:(id)sender;
 
 @end
