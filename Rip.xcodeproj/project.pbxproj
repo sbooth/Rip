@@ -1053,6 +1053,7 @@
 				8D15AC330486D014006FF6A4 /* Frameworks */,
 				8CA35D6B0D2E7B1900F89E3B /* Copy Embedded Frameworks */,
 				8C3C17F80D73981A001BAC88 /* Copy PlugIns */,
+				32C9F1180F782C4F0050F4B2 /* Delete BGHudAppKit Resources */,
 			);
 			buildRules = (
 			);
@@ -1261,6 +1262,20 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "# Run the unit tests in this test bundle.\n\"${SYSTEM_DEVELOPER_DIR}/Tools/RunUnitTests\"\n";
+		};
+		32C9F1180F782C4F0050F4B2 /* Delete BGHudAppKit Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Delete BGHudAppKit Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "rm -fR \"${CONFIGURATION_BUILD_DIR}/${WRAPPER_NAME}/Contents/Frameworks/BGHUDAppKit.framework/Versions/Current/Resources\"";
 		};
 /* End PBXShellScriptBuildPhase section */
 

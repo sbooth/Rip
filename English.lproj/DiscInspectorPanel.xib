@@ -236,6 +236,10 @@
 					<string>compactDiscController.selection.sessions.tracks.@count</string>
 					<string>compactDiscController.selection.MCN</string>
 					<string>compactDiscController.selection.metadata.MCN</string>
+					<string>sessions.@count</string>
+					<string>musicBrainzDiscID</string>
+					<string>freeDBDiscID</string>
+					<string>metadata.MCN</string>
 				</object>
 				<string key="NSObjectClassName">DriveInformation</string>
 				<bool key="NSEditable">YES</bool>
@@ -260,88 +264,72 @@
 					<int key="connectionID">55</int>
 				</object>
 				<object class="IBConnectionRecord">
-					<object class="IBBindingConnection" key="connection">
-						<string key="label">contentObject: inspectedDocument</string>
-						<reference key="source" ref="1035033860"/>
-						<reference key="destination" ref="1001"/>
-						<object class="NSNibBindingConnector" key="connector">
-							<reference key="NSSource" ref="1035033860"/>
-							<reference key="NSDestination" ref="1001"/>
-							<string key="NSLabel">contentObject: inspectedDocument</string>
-							<string key="NSBinding">contentObject</string>
-							<string key="NSKeyPath">inspectedDocument</string>
-							<int key="NSNibBindingConnectorVersion">2</int>
-						</object>
-					</object>
-					<int key="connectionID">66</int>
-				</object>
-				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
-						<string key="label">_documentObjectController</string>
-						<reference key="source" ref="1001"/>
-						<reference key="destination" ref="1035033860"/>
-					</object>
-					<int key="connectionID">158</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBBindingConnection" key="connection">
-						<string key="label">value: selection.compactDiscController.selection.musicBrainzDiscID</string>
-						<reference key="source" ref="817509671"/>
-						<reference key="destination" ref="1035033860"/>
-						<object class="NSNibBindingConnector" key="connector">
-							<reference key="NSSource" ref="817509671"/>
-							<reference key="NSDestination" ref="1035033860"/>
-							<string key="NSLabel">value: selection.compactDiscController.selection.musicBrainzDiscID</string>
-							<string key="NSBinding">value</string>
-							<string key="NSKeyPath">selection.compactDiscController.selection.musicBrainzDiscID</string>
-							<int key="NSNibBindingConnectorVersion">2</int>
-						</object>
-					</object>
-					<int key="connectionID">159</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBBindingConnection" key="connection">
-						<string key="label">value: selection.compactDiscController.selection.freeDBDiscID</string>
+						<string key="label">formatter</string>
 						<reference key="source" ref="357238578"/>
-						<reference key="destination" ref="1035033860"/>
-						<object class="NSNibBindingConnector" key="connector">
-							<reference key="NSSource" ref="357238578"/>
-							<reference key="NSDestination" ref="1035033860"/>
-							<string key="NSLabel">value: selection.compactDiscController.selection.freeDBDiscID</string>
-							<string key="NSBinding">value</string>
-							<string key="NSKeyPath">selection.compactDiscController.selection.freeDBDiscID</string>
-							<int key="NSNibBindingConnectorVersion">2</int>
-						</object>
+						<reference key="destination" ref="857068925"/>
 					</object>
-					<int key="connectionID">161</int>
+					<int key="connectionID">177</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBBindingConnection" key="connection">
-						<string key="label">value: selection.compactDiscController.selection.sessions.@count</string>
+						<string key="label">value: selection.sessions.@count</string>
 						<reference key="source" ref="377308274"/>
 						<reference key="destination" ref="1035033860"/>
 						<object class="NSNibBindingConnector" key="connector">
 							<reference key="NSSource" ref="377308274"/>
 							<reference key="NSDestination" ref="1035033860"/>
-							<string key="NSLabel">value: selection.compactDiscController.selection.sessions.@count</string>
+							<string key="NSLabel">value: selection.sessions.@count</string>
 							<string key="NSBinding">value</string>
-							<string key="NSKeyPath">selection.compactDiscController.selection.sessions.@count</string>
+							<string key="NSKeyPath">selection.sessions.@count</string>
 							<int key="NSNibBindingConnectorVersion">2</int>
 						</object>
 					</object>
-					<int key="connectionID">166</int>
+					<int key="connectionID">179</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBBindingConnection" key="connection">
-						<string key="label">value: selection.compactDiscController.selection.metadata.MCN</string>
+						<string key="label">value: selection.musicBrainzDiscID</string>
+						<reference key="source" ref="817509671"/>
+						<reference key="destination" ref="1035033860"/>
+						<object class="NSNibBindingConnector" key="connector">
+							<reference key="NSSource" ref="817509671"/>
+							<reference key="NSDestination" ref="1035033860"/>
+							<string key="NSLabel">value: selection.musicBrainzDiscID</string>
+							<string key="NSBinding">value</string>
+							<string key="NSKeyPath">selection.musicBrainzDiscID</string>
+							<int key="NSNibBindingConnectorVersion">2</int>
+						</object>
+					</object>
+					<int key="connectionID">180</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBBindingConnection" key="connection">
+						<string key="label">value: selection.freeDBDiscID</string>
+						<reference key="source" ref="357238578"/>
+						<reference key="destination" ref="1035033860"/>
+						<object class="NSNibBindingConnector" key="connector">
+							<reference key="NSSource" ref="357238578"/>
+							<reference key="NSDestination" ref="1035033860"/>
+							<string key="NSLabel">value: selection.freeDBDiscID</string>
+							<string key="NSBinding">value</string>
+							<string key="NSKeyPath">selection.freeDBDiscID</string>
+							<int key="NSNibBindingConnectorVersion">2</int>
+						</object>
+					</object>
+					<int key="connectionID">181</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBBindingConnection" key="connection">
+						<string key="label">value: selection.metadata.MCN</string>
 						<reference key="source" ref="395699135"/>
 						<reference key="destination" ref="1035033860"/>
 						<object class="NSNibBindingConnector" key="connector">
 							<reference key="NSSource" ref="395699135"/>
 							<reference key="NSDestination" ref="1035033860"/>
-							<string key="NSLabel">value: selection.compactDiscController.selection.metadata.MCN</string>
+							<string key="NSLabel">value: selection.metadata.MCN</string>
 							<string key="NSBinding">value</string>
-							<string key="NSKeyPath">selection.compactDiscController.selection.metadata.MCN</string>
+							<string key="NSKeyPath">selection.metadata.MCN</string>
 							<object class="NSDictionary" key="NSOptions">
 								<string key="NS.key.0">NSNullPlaceholder</string>
 								<string key="NS.object.0">Unknown</string>
@@ -349,15 +337,23 @@
 							<int key="NSNibBindingConnectorVersion">2</int>
 						</object>
 					</object>
-					<int key="connectionID">175</int>
+					<int key="connectionID">182</int>
 				</object>
 				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">formatter</string>
-						<reference key="source" ref="357238578"/>
-						<reference key="destination" ref="857068925"/>
+					<object class="IBBindingConnection" key="connection">
+						<string key="label">contentObject: inspectedDocument.compactDisc</string>
+						<reference key="source" ref="1035033860"/>
+						<reference key="destination" ref="1001"/>
+						<object class="NSNibBindingConnector" key="connector">
+							<reference key="NSSource" ref="1035033860"/>
+							<reference key="NSDestination" ref="1001"/>
+							<string key="NSLabel">contentObject: inspectedDocument.compactDisc</string>
+							<string key="NSBinding">contentObject</string>
+							<string key="NSKeyPath">inspectedDocument.compactDisc</string>
+							<int key="NSNibBindingConnectorVersion">2</int>
+						</object>
 					</object>
-					<int key="connectionID">177</int>
+					<int key="connectionID">183</int>
 				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -424,6 +420,7 @@
 						<int key="objectID">64</int>
 						<reference key="object" ref="1035033860"/>
 						<reference key="parent" ref="1002"/>
+						<string key="objectName">CompactDisc</string>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">94</int>
@@ -634,7 +631,7 @@
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">177</int>
+			<int key="maxID">183</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -645,10 +642,6 @@
 					<object class="NSMutableDictionary" key="actions">
 						<string key="NS.key.0">toggleDiscInspectorPanel:</string>
 						<string key="NS.object.0">id</string>
-					</object>
-					<object class="NSMutableDictionary" key="outlets">
-						<string key="NS.key.0">_documentObjectController</string>
-						<string key="NS.object.0">NSObjectController</string>
 					</object>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>

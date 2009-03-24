@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2007 Stephen F. Booth <me@sbooth.org>
+ *  Copyright (C) 2007 - 2009 Stephen F. Booth <me@sbooth.org>
  *  All Rights Reserved
  */
 
@@ -7,14 +7,18 @@
 
 @interface DriveInspectorPanelController : NSWindowController
 {
-	IBOutlet NSObjectController *_documentObjectController;
-
 @private
 	id _inspectedDocument;
 }
 
+// ========================================
+// Properties
+// ========================================
 @property (readonly, assign) id inspectedDocument;
 
+// ========================================
+// Action Methods
+// ========================================
 - (IBAction) toggleDriveInspectorPanel:(id)sender;
 
 @end

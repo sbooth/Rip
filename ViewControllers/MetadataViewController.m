@@ -45,7 +45,7 @@
 #pragma unused(aTableView)
 	
 	if([aTableColumn.identifier isEqualToString:@"isSelected"])
-		[aCell setTitle:[[[_trackController.arrangedObjects objectAtIndex:rowIndex] valueForKey:@"number"] stringValue]];
+		[aCell setTitle:[[[[_trackController arrangedObjects] objectAtIndex:rowIndex] valueForKey:@"number"] stringValue]];
 }
 
 @end

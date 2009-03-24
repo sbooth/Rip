@@ -53,6 +53,8 @@ static NSString * const kMusicDatabaseQueryKVOContext	= @"org.sbooth.Rip.Compact
 @property (assign) CompactDisc * compactDisc;
 @property (assign) DriveInformation * driveInformation;
 
+@property (assign) MetadataViewController * metadataViewController;
+
 @property (readonly) NSOperationQueue * operationQueue;
 @property (assign) int extractionMode;
 
@@ -134,15 +136,14 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 
 @implementation CompactDiscWindowController
 
-@synthesize driveInformationController = _driveInformationController;
-@synthesize compactDiscController = _compactDiscController;
-@synthesize trackController = _trackController;
 @synthesize operationQueue = _operationQueue;
 @synthesize extractionMode = _extractionMode;
 
 @synthesize disk = _disk;
 @synthesize compactDisc = _compactDisc;
 @synthesize driveInformation = _driveInformation;
+
+@synthesize metadataViewController = _metadataViewController;
 
 - (id) init
 {
@@ -171,10 +172,10 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 	[self.window setContentBorderThickness:WINDOW_BORDER_THICKNESS forEdge:NSMinYEdge];
 	
 	// Initially the main view in the window shows the disc's metadata
-	_mainViewController = [[MetadataViewController alloc] init];
-	[_mainViewController setRepresentedObject:self.compactDisc];
+	self.metadataViewController = [[MetadataViewController alloc] init];
+	[self.metadataViewController setRepresentedObject:self.compactDisc];
 
-	[_mainView addSubview:_mainViewController.view];
+	[_mainView addSubview:self.metadataViewController.view];
 }
 
 - (BOOL) validateMenuItem:(NSMenuItem *)anItem
@@ -375,18 +376,6 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 			[self.window setRepresentedURL:nil];
 	}
 }
-
-#pragma mark NSTableView Delegate Methods
-
-- (void) tableView:(NSTableView *)aTableView willDisplayCell:(id)aCell forTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex
-{
-
-#pragma unused(aTableView)
-
-	if([aTableColumn.identifier isEqualToString:@"isSelected"])
-		[aCell setTitle:[[[_trackController.arrangedObjects objectAtIndex:rowIndex] valueForKey:@"number"] stringValue]];
-}
-
 
 #pragma mark Action Methods
 

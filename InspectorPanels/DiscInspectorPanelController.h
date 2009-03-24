@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2007 - 2008 Stephen F. Booth <me@sbooth.org>
+ *  Copyright (C) 2007 - 2009 Stephen F. Booth <me@sbooth.org>
  *  All Rights Reserved
  */
 
@@ -7,14 +7,18 @@
 
 @interface DiscInspectorPanelController : NSWindowController
 {
-	IBOutlet NSObjectController *_documentObjectController;
-
 @private
 	id _inspectedDocument;
 }
 
+// ========================================
+// Properties
+// ========================================
 @property (readonly, assign) id inspectedDocument;
 
+// ========================================
+// Action Methods
+// ========================================
 - (IBAction) toggleDiscInspectorPanel:(id)sender;
 
 @end

@@ -7,12 +7,10 @@
 #include <DiskArbitration/DiskArbitration.h>
 
 @class CompactDisc, DriveInformation;
+@class MetadataViewController;
 
 @interface CompactDiscWindowController : NSWindowController
 {
-	IBOutlet NSObjectController *_driveInformationController;
-	IBOutlet NSObjectController *_compactDiscController;
-	IBOutlet NSArrayController *_trackController;
 	IBOutlet NSView *_mainView;
 	
 @private
@@ -23,15 +21,8 @@
 	NSOperationQueue *_operationQueue;
 	int _extractionMode; // eExtractionMode
 	
-	NSViewController *_mainViewController;
+	MetadataViewController *_metadataViewController;
 }
-
-// ========================================
-// Properties useful for binding
-// ========================================
-@property (readonly) NSObjectController * driveInformationController;
-@property (readonly) NSObjectController * compactDiscController;
-@property (readonly) NSArrayController * trackController;
 
 // ========================================
 // Properties
@@ -40,6 +31,8 @@
 
 @property (readonly, assign) CompactDisc * compactDisc;
 @property (readonly, assign) DriveInformation * driveInformation;
+
+@property (readonly, assign) MetadataViewController * metadataViewController;
 
 // ========================================
 // Action Methods

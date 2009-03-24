@@ -537,13 +537,6 @@ ELIAAAAAAAgACAAIAAgAAQABAAEAAQ</bytes>
 			<object class="NSCustomObject" id="796877042">
 				<string key="NSClassName">NSApplication</string>
 			</object>
-			<object class="NSObjectController" id="443700511">
-				<string key="NSObjectClassName">DriveInformation</string>
-				<object class="_NSManagedProxy" key="_NSManagedProxy">
-					<string key="NSEntityName">DriveInformation</string>
-				</object>
-				<bool key="_NSIsUsingManagedProxy">YES</bool>
-			</object>
 			<object class="NSObjectController" id="1040778454">
 				<object class="NSMutableArray" key="NSDeclaredKeys">
 					<bool key="EncodedWithXMLCoder">YES</bool>
@@ -573,12 +566,47 @@ ELIAAAAAAAgACAAIAAgAAQABAAEAAQ</bytes>
 					<string>metadata.artwork.frontCover</string>
 					<string>accurateRipDiscs</string>
 					<string>accurateRipDiscs.count</string>
+					<string>@count.firstSession.tracks</string>
+					<string>firstSession.tracks.@count</string>
+					<string>firstSession.tracks.@sum.duration</string>
+					<string>firstSession.tracks.@sum.sectorCout</string>
+					<string>firstSession.tracks.@sum.sectorCount</string>
+					<string>firstSession.tracks.sectorCount.@sum</string>
 				</object>
 				<bool key="NSEditable">YES</bool>
 				<object class="_NSManagedProxy" key="_NSManagedProxy">
 					<string key="NSEntityName">CompactDisc</string>
 				</object>
 				<bool key="_NSIsUsingManagedProxy">YES</bool>
+			</object>
+			<object class="NSCustomObject" id="878790515">
+				<string key="NSClassName">ByteSizeFormatter</string>
+			</object>
+			<object class="NSObjectController" id="68188349">
+				<object class="NSMutableArray" key="NSDeclaredKeys">
+					<bool key="EncodedWithXMLCoder">YES</bool>
+					<string>operations</string>
+				</object>
+				<string key="NSObjectClassName">NSOperationQueue</string>
+				<bool key="NSEditable">YES</bool>
+				<object class="_NSManagedProxy" key="_NSManagedProxy"/>
+			</object>
+			<object class="NSArrayController" id="426227781">
+				<object class="NSMutableArray" key="NSDeclaredKeys">
+					<bool key="EncodedWithXMLCoder">YES</bool>
+					<string>@sum.sectorCount</string>
+					<object class="NSMutableString">
+						<characters key="NS.bytes">firstSession.tracks.@count</characters>
+					</object>
+					<string>@count</string>
+				</object>
+				<bool key="NSEditable">YES</bool>
+				<object class="_NSManagedProxy" key="_NSManagedProxy"/>
+				<bool key="NSAvoidsEmptySelection">YES</bool>
+				<bool key="NSPreservesSelection">YES</bool>
+				<bool key="NSSelectsInsertedObjects">YES</bool>
+				<bool key="NSFilterRestrictsInsertion">YES</bool>
+				<bool key="NSClearsFilterPredicateOnInsertion">YES</bool>
 			</object>
 			<object class="NSArrayController" id="366418222">
 				<object class="NSMutableArray" key="NSDeclaredKeys">
@@ -598,64 +626,6 @@ ELIAAAAAAAgACAAIAAgAAQABAAEAAQ</bytes>
 				<bool key="NSSelectsInsertedObjects">YES</bool>
 				<bool key="NSFilterRestrictsInsertion">YES</bool>
 				<bool key="NSClearsFilterPredicateOnInsertion">YES</bool>
-			</object>
-			<object class="NSArrayController" id="988271532">
-				<object class="NSMutableArray" key="NSDeclaredKeys">
-					<bool key="EncodedWithXMLCoder">YES</bool>
-					<string>number</string>
-					<string>composer</string>
-					<string>title</string>
-					<string>metadata.title</string>
-					<string>metadata.composer</string>
-					<string>isSelected</string>
-					<string>sectorCount</string>
-					<string>@count</string>
-					<string>artist</string>
-					<string>metadata.artist</string>
-					<object class="NSMutableString">
-						<characters key="NS.bytes">firstSession.tracks</characters>
-					</object>
-					<string>arrangedObjects</string>
-					<string>selection</string>
-					<string>q</string>
-					<string>self</string>
-					<string>metadata.genre</string>
-					<string>@sum.uncompressedSize</string>
-					<string>@sum.sectorCount</string>
-					<object class="NSMutableString">
-						<characters key="NS.bytes">firstSession.leadOut</characters>
-					</object>
-					<string>preGap</string>
-					<string>@distinct.metadata.genre</string>
-					<string>metadata.@distinct.genre</string>
-					<string>@distinctUnionOfObjects.metadata.genre</string>
-					<string>metadata.comment</string>
-					<string>pregap</string>
-					<string>@distinctUnionOfObjects.metadata.composer</string>
-					<string>@distinctUnionOfObjects.metadata.artist</string>
-				</object>
-				<bool key="NSEditable">YES</bool>
-				<object class="_NSManagedProxy" key="_NSManagedProxy">
-					<string key="NSEntityName">TrackDescriptor</string>
-				</object>
-				<bool key="_NSIsUsingManagedProxy">YES</bool>
-				<bool key="NSAvoidsEmptySelection">YES</bool>
-				<bool key="NSPreservesSelection">YES</bool>
-				<bool key="NSSelectsInsertedObjects">YES</bool>
-				<bool key="NSFilterRestrictsInsertion">YES</bool>
-				<bool key="NSClearsFilterPredicateOnInsertion">YES</bool>
-			</object>
-			<object class="NSCustomObject" id="878790515">
-				<string key="NSClassName">ByteSizeFormatter</string>
-			</object>
-			<object class="NSObjectController" id="68188349">
-				<object class="NSMutableArray" key="NSDeclaredKeys">
-					<bool key="EncodedWithXMLCoder">YES</bool>
-					<string>operations</string>
-				</object>
-				<string key="NSObjectClassName">NSOperationQueue</string>
-				<bool key="NSEditable">YES</bool>
-				<object class="_NSManagedProxy" key="_NSManagedProxy"/>
 			</object>
 		</object>
 		<object class="IBObjectContainer" key="IBDocument.Objects">
@@ -687,30 +657,6 @@ ELIAAAAAAAgACAAIAAgAAQABAAEAAQ</bytes>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBBindingConnection" key="connection">
-						<string key="label">contentObject: driveInformation</string>
-						<reference key="source" ref="443700511"/>
-						<reference key="destination" ref="512844837"/>
-						<object class="NSNibBindingConnector" key="connector">
-							<reference key="NSSource" ref="443700511"/>
-							<reference key="NSDestination" ref="512844837"/>
-							<string key="NSLabel">contentObject: driveInformation</string>
-							<string key="NSBinding">contentObject</string>
-							<string key="NSKeyPath">driveInformation</string>
-							<int key="NSNibBindingConnectorVersion">2</int>
-						</object>
-					</object>
-					<int key="connectionID">100314</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">_driveInformationController</string>
-						<reference key="source" ref="512844837"/>
-						<reference key="destination" ref="443700511"/>
-					</object>
-					<int key="connectionID">100315</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBBindingConnection" key="connection">
 						<string key="label">contentObject: compactDisc</string>
 						<reference key="source" ref="1040778454"/>
 						<reference key="destination" ref="512844837"/>
@@ -726,151 +672,12 @@ ELIAAAAAAAgACAAIAAgAAQABAAEAAQ</bytes>
 					<int key="connectionID">100375</int>
 				</object>
 				<object class="IBConnectionRecord">
-					<object class="IBBindingConnection" key="connection">
-						<string key="label">contentSet: selection.firstSession.tracks</string>
-						<reference key="source" ref="988271532"/>
-						<reference key="destination" ref="1040778454"/>
-						<object class="NSNibBindingConnector" key="connector">
-							<reference key="NSSource" ref="988271532"/>
-							<reference key="NSDestination" ref="1040778454"/>
-							<string key="NSLabel">contentSet: selection.firstSession.tracks</string>
-							<string key="NSBinding">contentSet</string>
-							<string key="NSKeyPath">selection.firstSession.tracks</string>
-							<int key="NSNibBindingConnectorVersion">2</int>
-						</object>
-					</object>
-					<int key="connectionID">100376</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">_trackController</string>
-						<reference key="source" ref="512844837"/>
-						<reference key="destination" ref="988271532"/>
-					</object>
-					<int key="connectionID">100387</int>
-				</object>
-				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
 						<string key="label">delegate</string>
 						<reference key="source" ref="954211299"/>
 						<reference key="destination" ref="512844837"/>
 					</object>
 					<int key="connectionID">100439</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBBindingConnection" key="connection">
-						<string key="label">displayPatternValue1: arrangedObjects.@count</string>
-						<reference key="source" ref="378431119"/>
-						<reference key="destination" ref="988271532"/>
-						<object class="NSNibBindingConnector" key="connector" id="323576645">
-							<reference key="NSSource" ref="378431119"/>
-							<reference key="NSDestination" ref="988271532"/>
-							<string key="NSLabel">displayPatternValue1: arrangedObjects.@count</string>
-							<string key="NSBinding">displayPatternValue1</string>
-							<string key="NSKeyPath">arrangedObjects.@count</string>
-							<object class="NSDictionary" key="NSOptions">
-								<bool key="EncodedWithXMLCoder">YES</bool>
-								<object class="NSMutableArray" key="dict.sortedKeys">
-									<bool key="EncodedWithXMLCoder">YES</bool>
-									<string>NSDisplayPattern</string>
-									<string>NSMultipleValuesPlaceholder</string>
-									<string>NSNoSelectionPlaceholder</string>
-									<string>NSNotApplicablePlaceholder</string>
-									<string>NSNullPlaceholder</string>
-								</object>
-								<object class="NSMutableArray" key="dict.values">
-									<bool key="EncodedWithXMLCoder">YES</bool>
-									<string>%{value1}@ tracks, %{value2}@</string>
-									<string/>
-									<string/>
-									<string/>
-									<string/>
-								</object>
-							</object>
-							<int key="NSNibBindingConnectorVersion">2</int>
-						</object>
-					</object>
-					<int key="connectionID">100576</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBBindingConnection" key="connection">
-						<string key="label">displayPatternValue2: arrangedObjects.@sum.sectorCount</string>
-						<reference key="source" ref="378431119"/>
-						<reference key="destination" ref="988271532"/>
-						<object class="NSNibBindingConnector" key="connector" id="1005628925">
-							<reference key="NSSource" ref="378431119"/>
-							<reference key="NSDestination" ref="988271532"/>
-							<string key="NSLabel">displayPatternValue2: arrangedObjects.@sum.sectorCount</string>
-							<string key="NSBinding">displayPatternValue2</string>
-							<string key="NSKeyPath">arrangedObjects.@sum.sectorCount</string>
-							<object class="NSDictionary" key="NSOptions">
-								<bool key="EncodedWithXMLCoder">YES</bool>
-								<object class="NSMutableArray" key="dict.sortedKeys">
-									<bool key="EncodedWithXMLCoder">YES</bool>
-									<string>NSDisplayPattern</string>
-									<string>NSMultipleValuesPlaceholder</string>
-									<string>NSNoSelectionPlaceholder</string>
-									<string>NSNotApplicablePlaceholder</string>
-									<string>NSNullPlaceholder</string>
-									<string>NSRaisesForNotApplicableKeys</string>
-									<string>NSValueTransformerName</string>
-								</object>
-								<object class="NSMutableArray" key="dict.values">
-									<bool key="EncodedWithXMLCoder">YES</bool>
-									<string>%{value1}@ tracks, %{value2}@ total, %{value3}@</string>
-									<string/>
-									<string/>
-									<string/>
-									<string/>
-									<integer value="1" id="9"/>
-									<string>DurationValueTransformer</string>
-								</object>
-							</object>
-							<reference key="NSPreviousConnector" ref="323576645"/>
-							<int key="NSNibBindingConnectorVersion">2</int>
-						</object>
-					</object>
-					<int key="connectionID">100581</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBBindingConnection" key="connection">
-						<string key="label">displayPatternValue3: arrangedObjects.@sum.sectorCount</string>
-						<reference key="source" ref="378431119"/>
-						<reference key="destination" ref="988271532"/>
-						<object class="NSNibBindingConnector" key="connector">
-							<reference key="NSSource" ref="378431119"/>
-							<reference key="NSDestination" ref="988271532"/>
-							<string key="NSLabel">displayPatternValue3: arrangedObjects.@sum.sectorCount</string>
-							<string key="NSBinding">displayPatternValue3</string>
-							<string key="NSKeyPath">arrangedObjects.@sum.sectorCount</string>
-							<object class="NSDictionary" key="NSOptions">
-								<bool key="EncodedWithXMLCoder">YES</bool>
-								<object class="NSMutableArray" key="dict.sortedKeys">
-									<bool key="EncodedWithXMLCoder">YES</bool>
-									<string>NSDisplayPattern</string>
-									<string>NSMultipleValuesPlaceholder</string>
-									<string>NSNoSelectionPlaceholder</string>
-									<string>NSNotApplicablePlaceholder</string>
-									<string>NSNullPlaceholder</string>
-									<string>NSRaisesForNotApplicableKeys</string>
-									<string>NSValueTransformerName</string>
-								</object>
-								<object class="NSMutableArray" key="dict.values">
-									<bool key="EncodedWithXMLCoder">YES</bool>
-									<string>%{value1}@ tracks, %{value2}@ total, %{value3}@</string>
-									<string/>
-									<string/>
-									<string/>
-									<string/>
-									<reference ref="9"/>
-									<string>ByteSizeValueTransformer</string>
-								</object>
-							</object>
-							<reference key="NSPreviousConnector" ref="1005628925"/>
-							<int key="NSNibBindingConnectorVersion">2</int>
-						</object>
-					</object>
-					<int key="connectionID">100582</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBBindingConnection" key="connection">
@@ -933,7 +740,7 @@ ELIAAAAAAAgACAAIAAgAAQABAAEAAQ</bytes>
 									<string/>
 									<string/>
 									<string>Unknown Disc</string>
-									<reference ref="9"/>
+									<integer value="1" id="9"/>
 								</object>
 							</object>
 							<int key="NSNibBindingConnectorVersion">2</int>
@@ -1018,14 +825,6 @@ ELIAAAAAAAgACAAIAAgAAQABAAEAAQ</bytes>
 					<int key="connectionID">100798</int>
 				</object>
 				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">_compactDiscController</string>
-						<reference key="source" ref="512844837"/>
-						<reference key="destination" ref="1040778454"/>
-					</object>
-					<int key="connectionID">100802</int>
-				</object>
-				<object class="IBConnectionRecord">
 					<object class="IBBindingConnection" key="connection">
 						<string key="label">contentObject: operationQueue</string>
 						<reference key="source" ref="68188349"/>
@@ -1048,6 +847,102 @@ ELIAAAAAAAgACAAIAAgAAQABAAEAAQ</bytes>
 						<reference key="destination" ref="381069397"/>
 					</object>
 					<int key="connectionID">100871</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBBindingConnection" key="connection">
+						<string key="label">contentSet: selection.firstSession.tracks</string>
+						<reference key="source" ref="426227781"/>
+						<reference key="destination" ref="1040778454"/>
+						<object class="NSNibBindingConnector" key="connector">
+							<reference key="NSSource" ref="426227781"/>
+							<reference key="NSDestination" ref="1040778454"/>
+							<string key="NSLabel">contentSet: selection.firstSession.tracks</string>
+							<string key="NSBinding">contentSet</string>
+							<string key="NSKeyPath">selection.firstSession.tracks</string>
+							<int key="NSNibBindingConnectorVersion">2</int>
+						</object>
+					</object>
+					<int key="connectionID">100881</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBBindingConnection" key="connection">
+						<string key="label">displayPatternValue1: arrangedObjects.@count</string>
+						<reference key="source" ref="378431119"/>
+						<reference key="destination" ref="426227781"/>
+						<object class="NSNibBindingConnector" key="connector" id="180381895">
+							<reference key="NSSource" ref="378431119"/>
+							<reference key="NSDestination" ref="426227781"/>
+							<string key="NSLabel">displayPatternValue1: arrangedObjects.@count</string>
+							<string key="NSBinding">displayPatternValue1</string>
+							<string key="NSKeyPath">arrangedObjects.@count</string>
+							<object class="NSDictionary" key="NSOptions">
+								<string key="NS.key.0">NSDisplayPattern</string>
+								<string key="NS.object.0">%{value1}@ tracks, %{value2}@ total, %{value3}@</string>
+							</object>
+							<int key="NSNibBindingConnectorVersion">2</int>
+						</object>
+					</object>
+					<int key="connectionID">100887</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBBindingConnection" key="connection">
+						<string key="label">displayPatternValue2: arrangedObjects.@sum.sectorCount</string>
+						<reference key="source" ref="378431119"/>
+						<reference key="destination" ref="426227781"/>
+						<object class="NSNibBindingConnector" key="connector" id="736009134">
+							<reference key="NSSource" ref="378431119"/>
+							<reference key="NSDestination" ref="426227781"/>
+							<string key="NSLabel">displayPatternValue2: arrangedObjects.@sum.sectorCount</string>
+							<string key="NSBinding">displayPatternValue2</string>
+							<string key="NSKeyPath">arrangedObjects.@sum.sectorCount</string>
+							<object class="NSDictionary" key="NSOptions">
+								<bool key="EncodedWithXMLCoder">YES</bool>
+								<object class="NSMutableArray" key="dict.sortedKeys">
+									<bool key="EncodedWithXMLCoder">YES</bool>
+									<string>NSDisplayPattern</string>
+									<string>NSValueTransformerName</string>
+								</object>
+								<object class="NSMutableArray" key="dict.values">
+									<bool key="EncodedWithXMLCoder">YES</bool>
+									<string>%{value1}@ tracks, %{value2}@ total, %{value3}@</string>
+									<string>DurationValueTransformer</string>
+								</object>
+							</object>
+							<reference key="NSPreviousConnector" ref="180381895"/>
+							<int key="NSNibBindingConnectorVersion">2</int>
+						</object>
+					</object>
+					<int key="connectionID">100895</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBBindingConnection" key="connection">
+						<string key="label">displayPatternValue3: arrangedObjects.@sum.sectorCount</string>
+						<reference key="source" ref="378431119"/>
+						<reference key="destination" ref="426227781"/>
+						<object class="NSNibBindingConnector" key="connector">
+							<reference key="NSSource" ref="378431119"/>
+							<reference key="NSDestination" ref="426227781"/>
+							<string key="NSLabel">displayPatternValue3: arrangedObjects.@sum.sectorCount</string>
+							<string key="NSBinding">displayPatternValue3</string>
+							<string key="NSKeyPath">arrangedObjects.@sum.sectorCount</string>
+							<object class="NSDictionary" key="NSOptions">
+								<bool key="EncodedWithXMLCoder">YES</bool>
+								<object class="NSMutableArray" key="dict.sortedKeys">
+									<bool key="EncodedWithXMLCoder">YES</bool>
+									<string>NSDisplayPattern</string>
+									<string>NSValueTransformerName</string>
+								</object>
+								<object class="NSMutableArray" key="dict.values">
+									<bool key="EncodedWithXMLCoder">YES</bool>
+									<string>%{value1}@ tracks, %{value2}@ total, %{value3}@</string>
+									<string>ByteSizeValueTransformer</string>
+								</object>
+							</object>
+							<reference key="NSPreviousConnector" ref="736009134"/>
+							<int key="NSNibBindingConnectorVersion">2</int>
+						</object>
+					</object>
+					<int key="connectionID">100896</int>
 				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -1152,12 +1047,6 @@ ELIAAAAAAAgACAAIAAgAAQABAAEAAQ</bytes>
 						<reference key="parent" ref="954211299"/>
 					</object>
 					<object class="IBObjectRecord">
-						<int key="objectID">100313</int>
-						<reference key="object" ref="443700511"/>
-						<reference key="parent" ref="906013984"/>
-						<string key="objectName">Drive Information Controller</string>
-					</object>
-					<object class="IBObjectRecord">
 						<int key="objectID">100316</int>
 						<reference key="object" ref="517153635"/>
 						<object class="NSMutableArray" key="children">
@@ -1180,13 +1069,7 @@ ELIAAAAAAAgACAAIAAgAAQABAAEAAQ</bytes>
 						<int key="objectID">100333</int>
 						<reference key="object" ref="1040778454"/>
 						<reference key="parent" ref="906013984"/>
-						<string key="objectName">Compact Disc Controller</string>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">100367</int>
-						<reference key="object" ref="988271532"/>
-						<reference key="parent" ref="906013984"/>
-						<string key="objectName">Track Information Controller</string>
+						<string key="objectName">Compact Disc</string>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">100396</int>
@@ -1229,12 +1112,6 @@ ELIAAAAAAAgACAAIAAgAAQABAAEAAQ</bytes>
 						<reference key="parent" ref="954211299"/>
 					</object>
 					<object class="IBObjectRecord">
-						<int key="objectID">100788</int>
-						<reference key="object" ref="366418222"/>
-						<reference key="parent" ref="906013984"/>
-						<string key="objectName">AR Disc Controller</string>
-					</object>
-					<object class="IBObjectRecord">
 						<int key="objectID">100796</int>
 						<reference key="object" ref="1022285606"/>
 						<reference key="parent" ref="954211299"/>
@@ -1248,6 +1125,18 @@ ELIAAAAAAAgACAAIAAgAAQABAAEAAQ</bytes>
 						<int key="objectID">100870</int>
 						<reference key="object" ref="381069397"/>
 						<reference key="parent" ref="568628114"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">100880</int>
+						<reference key="object" ref="426227781"/>
+						<reference key="parent" ref="906013984"/>
+						<string key="objectName">Tracks</string>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">100788</int>
+						<reference key="object" ref="366418222"/>
+						<reference key="parent" ref="906013984"/>
+						<string key="objectName">AccurateRip Discs</string>
 					</object>
 				</object>
 			</object>
@@ -1264,12 +1153,10 @@ ELIAAAAAAAgACAAIAAgAAQABAAEAAQ</bytes>
 					<string>100193.IBPluginDependency</string>
 					<string>100309.IBPluginDependency</string>
 					<string>100310.IBPluginDependency</string>
-					<string>100313.IBPluginDependency</string>
 					<string>100316.IBPluginDependency</string>
 					<string>100317.IBPluginDependency</string>
 					<string>100328.IBPluginDependency</string>
 					<string>100333.IBPluginDependency</string>
-					<string>100367.IBPluginDependency</string>
 					<string>100396.IBPluginDependency</string>
 					<string>100440.IBPluginDependency</string>
 					<string>100441.IBPluginDependency</string>
@@ -1281,6 +1168,7 @@ ELIAAAAAAAgACAAIAAgAAQABAAEAAQ</bytes>
 					<string>100796.IBPluginDependency</string>
 					<string>100816.IBPluginDependency</string>
 					<string>100870.IBPluginDependency</string>
+					<string>100880.IBPluginDependency</string>
 					<string>5.IBEditorWindowLastContentRect</string>
 					<string>5.IBWindowTemplateEditedContentRect</string>
 					<string>5.ImportedFromIB2</string>
@@ -1298,7 +1186,6 @@ ELIAAAAAAAgACAAIAAgAAQABAAEAAQ</bytes>
 					<string>{{48, 772}, {616, 0}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>{{92, 734}, {616, 0}}</string>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -1348,7 +1235,7 @@ ELIAAAAAAAgACAAIAAgAAQABAAEAAQ</bytes>
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">100871</int>
+			<int key="maxID">100901</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -1411,21 +1298,8 @@ ELIAAAAAAAgACAAIAAgAAQABAAEAAQ</bytes>
 						</object>
 					</object>
 					<object class="NSMutableDictionary" key="outlets">
-						<bool key="EncodedWithXMLCoder">YES</bool>
-						<object class="NSMutableArray" key="dict.sortedKeys">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>_compactDiscController</string>
-							<string>_driveInformationController</string>
-							<string>_mainView</string>
-							<string>_trackController</string>
-						</object>
-						<object class="NSMutableArray" key="dict.values">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>NSObjectController</string>
-							<string>NSObjectController</string>
-							<string>NSView</string>
-							<string>NSArrayController</string>
-						</object>
+						<string key="NS.key.0">_mainView</string>
+						<string key="NS.object.0">NSView</string>
 					</object>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
