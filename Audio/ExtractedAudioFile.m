@@ -33,9 +33,7 @@
 	NSParameterAssert(nil != URL);
 	NSParameterAssert([URL isFileURL]);
 	
-	ExtractedAudioFile *file = [[ExtractedAudioFile alloc] init];
-	
-	file.URL = URL;
+	ExtractedAudioFile *file = [[ExtractedAudioFile alloc] initWithURL:URL];
 	
 	return ([file createFile:error] ? file : nil);	
 }
@@ -45,9 +43,7 @@
 	NSParameterAssert(nil != URL);
 	NSParameterAssert([URL isFileURL]);
 	
-	ExtractedAudioFile *file = [[ExtractedAudioFile alloc] init];
-	
-	file.URL = URL;
+	ExtractedAudioFile *file = [[ExtractedAudioFile alloc] initWithURL:URL];
 	
 	return ([file openFileForReading:error] ? file : nil);	
 }
@@ -57,9 +53,7 @@
 	NSParameterAssert(nil != URL);
 	NSParameterAssert([URL isFileURL]);
 	
-	ExtractedAudioFile *file = [[ExtractedAudioFile alloc] init];
-	
-	file.URL = URL;
+	ExtractedAudioFile *file = [[ExtractedAudioFile alloc] initWithURL:URL];
 	
 	return ([file openFileForReadingAndWriting:error] ? file : nil);	
 }
@@ -70,6 +64,13 @@
 @synthesize URL = _URL;
 @synthesize cachedMD5 = _cachedMD5;
 @synthesize cachedSHA1 = _cachedSHA1;
+
+// Disallow explicit init
+- (id) init
+{
+	[self doesNotRecognizeSelector:_cmd];
+	return nil;
+}
 
 - (void) finalize
 {
@@ -221,6 +222,15 @@
 
 @implementation ExtractedAudioFile (Private)
 
+- (id) initWithURL:(NSURL *)URL
+{
+	NSParameterAssert(nil != URL);
+	
+	if((self = [super init]))
+		self.URL = URL;
+	
+	return self;
+}
 - (BOOL) createFile:(NSError **)error
 {
 	// Set up the ASBD for CDDA audio
