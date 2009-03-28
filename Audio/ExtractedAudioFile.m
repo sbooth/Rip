@@ -17,6 +17,7 @@
 @end
 
 @interface ExtractedAudioFile (Private)
+- (id) initWithURL:(NSURL *)URL;
 - (BOOL) createFile:(NSError **)error;
 - (BOOL) openFileForReading:(NSError **)error;
 - (BOOL) openFileForReadingAndWriting:(NSError **)error;
