@@ -14,6 +14,7 @@
 #import "TrackMetadata.h"
 
 #import "MetadataViewController.h"
+#import "ExtractionViewController.h"
 
 #import "AccurateRipQueryOperation.h"
 
@@ -29,7 +30,7 @@
 #import "ReadISRCsSheetController.h"
 #import "DetectPregapsSheetController.h"
 
-#import "AudioExtractionSheetController.h"
+//#import "AudioExtractionSheetController.h"
 
 #import "EncoderManager.h"
 #import "MusicDatabaseManager.h"
@@ -56,7 +57,9 @@ static NSString * const kMusicDatabaseQueryKVOContext	= @"org.sbooth.Rip.Compact
 @property (assign) MetadataViewController * metadataViewController;
 
 @property (readonly) NSOperationQueue * operationQueue;
+
 @property (assign) int extractionMode;
+@property (assign) BOOL extracting;
 
 @property (readonly) NSManagedObjectContext * managedObjectContext;
 @property (readonly) id managedObjectModel;
@@ -65,28 +68,20 @@ static NSString * const kMusicDatabaseQueryKVOContext	= @"org.sbooth.Rip.Compact
 @interface CompactDiscWindowController (SheetCallbacks)
 - (void) showMusicDatabaseMatchesSheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode contextInfo:(void *)contextInfo;
 - (void) createCueSheetSavePanelDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode  contextInfo:(void *)contextInfo;
-- (void) showReadMCNSheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode contextInfo:(void *)contextInfo;
-- (void) showReadISRCsSheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode contextInfo:(void *)contextInfo;
-- (void) showDetectPregapsSheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode contextInfo:(void *)contextInfo;
-- (void) showCopyTracksSheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode contextInfo:(void *)contextInfo;
-- (void) showCopyImageSheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode contextInfo:(void *)contextInfo;
+- (void) showSuccessfulExtractionSheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode contextInfo:(void *)contextInfo;
+@end
+
+@interface CompactDiscWindowController (ExtractionViewControllerMethods)
+- (void) extractionFinishedWithReturnCode:(int)returnCode;
 @end
 
 @interface CompactDiscWindowController (Private)
-- (void) beginReadMCNSheet;
-- (void) beginReadISRCsSheet;
-- (void) beginDetectPregapsSheet;
-- (void) performShowCopyTracksSheet;
-- (void) performShowCopyImageSheet;
-
 - (void) diskWasEjected;
-
 - (void) updateMetadataWithMusicDatabaseEntry:(id)musicDatabaseEntry;
-
 - (void) toggleTableColumnVisible:(id)sender;
-
 - (void) accurateRipQueryOperationDidReturn:(AccurateRipQueryOperation *)operation;
 - (void) musicDatabaseQueryOperationDidReturn:(MusicDatabaseQueryOperation *)operation;
+- (void) showSuccessfulExtractionSheetDismissalTimerFired:(NSTimer *)timer;
 @end
 
 // ========================================
@@ -143,7 +138,10 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 @synthesize compactDisc = _compactDisc;
 @synthesize driveInformation = _driveInformation;
 
+@synthesize extracting = _extracting;
+
 @synthesize metadataViewController = _metadataViewController;
+@synthesize extractionViewController = _extractionViewController;
 
 - (id) init
 {
@@ -180,7 +178,9 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 
 - (BOOL) validateMenuItem:(NSMenuItem *)anItem
 {
-	if([anItem action] == @selector(copySelectedTracks:)) {
+	if(self.isExtracting)
+		return NO;
+	else if([anItem action] == @selector(copySelectedTracks:)) {
 		NSUInteger countOfSelectedTracks = self.compactDisc.firstSession.selectedTracks.count;
 		
 		if(1 == countOfSelectedTracks)
@@ -246,7 +246,9 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 
 - (BOOL) validateToolbarItem:(NSToolbarItem *)theItem
 {
-	if([theItem action] == @selector(copySelectedTracks:))
+	if(self.isExtracting)
+		return NO;
+	else if([theItem action] == @selector(copySelectedTracks:))
 		return (0 != self.compactDisc.firstSession.selectedTracks.count);
 	else if([theItem action] == @selector(detectPregaps:))
 		return (0 != self.compactDisc.firstSession.selectedTracks.count);
@@ -432,9 +434,57 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 		[self presentError:error modalForWindow:self.window delegate:nil didPresentSelector:NULL contextInfo:NULL];
 
 	self.extractionMode = eExtractionModeIndividualTracks;
+	self.extracting = YES;
 	
-	// Start the sheet cascade
-	[self beginReadMCNSheet];
+	if(!_extractionViewController)
+		_extractionViewController = [[ExtractionViewController alloc] init];
+	
+	// Set the view's frame, so when added it will have the correct size (views are not auto-sized when added)
+	_extractionViewController.view.frame = _metadataViewController.view.frame;
+
+	// Swap it in
+#if USE_ANIMATION
+	NSMutableDictionary *fadeOutAnimationDictionary = [NSMutableDictionary dictionary];
+	
+	[fadeOutAnimationDictionary setObject:_metadataViewController.view forKey:NSViewAnimationTargetKey];
+	[fadeOutAnimationDictionary setObject:NSViewAnimationFadeOutEffect forKey:NSViewAnimationEffectKey];
+	
+	NSViewAnimation *fadeOutAnimation = [[NSViewAnimation alloc] initWithViewAnimations:[NSArray arrayWithObject:fadeOutAnimationDictionary]];
+	
+	[fadeOutAnimation setDuration:0.125];
+	[fadeOutAnimation setAnimationCurve:NSAnimationEaseIn];
+	[fadeOutAnimation setAnimationBlockingMode:NSAnimationBlocking];
+	
+	[fadeOutAnimation startAnimation];
+
+	[_metadataViewController.view removeFromSuperview];
+	[_mainView addSubview:_extractionViewController.view];
+	
+	NSMutableDictionary *fadeInAnimationDictionary = [NSMutableDictionary dictionary];
+	
+	[fadeInAnimationDictionary setObject:_extractionViewController.view forKey:NSViewAnimationTargetKey];	 
+	[fadeInAnimationDictionary setObject:NSViewAnimationFadeInEffect forKey:NSViewAnimationEffectKey];
+	
+	NSViewAnimation *fadeInAnimation = [[NSViewAnimation alloc] initWithViewAnimations:[NSArray arrayWithObject:fadeInAnimationDictionary]];
+	
+	[fadeInAnimation setDuration:0.125];
+	[fadeInAnimation setAnimationCurve:NSAnimationEaseIn];
+	
+	[fadeInAnimation startAnimation];
+#else	
+	[_mainView replaceSubview:_metadataViewController.view with:_extractionViewController.view];
+#endif
+	
+	// Set up the audio extraction parameters
+	_extractionViewController.disk = self.disk;
+	_extractionViewController.extractionMode = eExtractionModeIndividualTracks;
+	_extractionViewController.trackIDs = [selectedTracks valueForKey:@"objectID"];
+	
+	_extractionViewController.maxRetries = [[NSUserDefaults standardUserDefaults] integerForKey:@"maxRetries"];
+	_extractionViewController.requiredMatches = [[NSUserDefaults standardUserDefaults] integerForKey:@"requiredMatches"];
+	
+	// Start extracting
+	[_extractionViewController extract:sender];
 }
 
 - (IBAction) copyImage:(id)sender
@@ -448,9 +498,8 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 		[self presentError:error modalForWindow:self.window delegate:nil didPresentSelector:NULL contextInfo:NULL];
 
 	self.extractionMode = eExtractionModeImage;
-	
-	// Start the sheet cascade
-	[self beginReadMCNSheet];
+	self.extracting = YES;
+
 }
 
 - (IBAction) detectPregaps:(id)sender
@@ -717,69 +766,38 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 		[self presentError:error modalForWindow:self.window delegate:nil didPresentSelector:NULL contextInfo:NULL];
 }
 
-- (void) showReadMCNSheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode contextInfo:(void *)contextInfo
+- (void) showSuccessfulExtractionSheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode contextInfo:(void *)contextInfo
 {
-	NSParameterAssert(nil != sheet);
+	
+	NSURL *logFileURL = (NSURL *)contextInfo;
 	
 	[sheet orderOut:self];
 	
-	ReadMCNSheetController *sheetController = (ReadMCNSheetController *)contextInfo;
-	sheetController = nil;
+	// Details
+	if(NSAlertAlternateReturn == returnCode)
+		[[NSWorkspace sharedWorkspace] openURL:logFileURL];
 	
-	if(NSCancelButton == returnCode)
-		return;
-	
-	[self beginReadISRCsSheet];
 }
 
-- (void) showReadISRCsSheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode contextInfo:(void *)contextInfo
-{
-	NSParameterAssert(nil != sheet);
-	
-	[sheet orderOut:self];
-	
-	ReadISRCsSheetController *sheetController = (ReadISRCsSheetController *)contextInfo;
-	sheetController = nil;
-	
-	if(NSCancelButton == returnCode)
-		return;
-	
-	[self beginDetectPregapsSheet];
-}
+@end
 
-- (void) showDetectPregapsSheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode contextInfo:(void *)contextInfo
-{
-	NSParameterAssert(nil != sheet);
-	
-	[sheet orderOut:self];
-	
-	DetectPregapsSheetController *sheetController = (DetectPregapsSheetController *)contextInfo;
-	sheetController = nil;
-	
-	if(NSCancelButton == returnCode)
-		return;
-	
-	if(eExtractionModeImage == self.extractionMode)
-		[self performShowCopyImageSheet];
-	else if(eExtractionModeIndividualTracks == self.extractionMode)
-		[self performShowCopyTracksSheet];
-}
+@implementation CompactDiscWindowController (ExtractionViewControllerMethods)
 
-- (void) showCopyTracksSheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode contextInfo:(void *)contextInfo
+- (void) extractionFinishedWithReturnCode:(int)returnCode
 {
-	NSParameterAssert(nil != sheet);
+	self.extracting = NO;
 	
-	[sheet orderOut:self];
+	// Replace the extraction view with the metadata view
+	_metadataViewController.view.frame = _extractionViewController.view.frame;
+	[_mainView replaceSubview:_extractionViewController.view with:_metadataViewController.view];
 	
 	if(NSCancelButton == returnCode)
 		return;
-	
-	AudioExtractionSheetController *sheetController = (AudioExtractionSheetController *)contextInfo;
 	
 	// Alert the user if any tracks failed to extract
-	if([sheetController.failedTrackIDs count]) {
+	if([_extractionViewController.failedTrackIDs count]) {
 		// Fetch the tracks that failed and sort them by track number
-		NSPredicate *trackPredicate  = [NSPredicate predicateWithFormat:@"self IN %@", sheetController.failedTrackIDs];
+		NSPredicate *trackPredicate  = [NSPredicate predicateWithFormat:@"self IN %@", _extractionViewController.failedTrackIDs];
 		NSSortDescriptor *trackNumberSortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"number" ascending:YES];
 		NSEntityDescription *trackEntityDescription = [NSEntityDescription entityForName:@"TrackDescriptor" inManagedObjectContext:self.managedObjectContext];
 		
@@ -795,14 +813,19 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 			[self presentError:error modalForWindow:self.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
 			return;
 		}
-
+		
 		NSString *albumTitle = self.compactDisc.metadata.title;
 		if(!albumTitle)
 			albumTitle = NSLocalizedString(@"Unknown Album", @"");
 		
 		NSArray *trackTitles = [tracks valueForKeyPath:@"metadata.title"];
 		NSString *trackTitlesString = [trackTitles componentsJoinedByString:@", "];
-		NSBeginCriticalAlertSheet([NSString stringWithFormat:NSLocalizedString(@"Some tracks from \u201c%@\u201d could not be copied because read errors occurred during audio extraction.", @""), albumTitle],
+		NSString *alertMessage = nil;
+		if(eExtractionModeImage == self.extractionMode)
+			alertMessage = [NSString stringWithFormat:NSLocalizedString(@"The image of \u201c%@\u201d could not be created because read errors occurred during audio extraction.", @""), albumTitle];
+		else
+			alertMessage = [NSString stringWithFormat:NSLocalizedString(@"Some tracks from \u201c%@\u201d could not be copied because read errors occurred during audio extraction.", @""), albumTitle];
+		NSBeginCriticalAlertSheet(alertMessage,
 								  NSLocalizedString(@"OK", @"Button"),
 								  nil,
 								  nil,
@@ -815,8 +838,8 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 								  trackTitlesString);
 	}
 	
-	// Save an extraction log file if any tracks were successfully extracted
-	if(![sheetController.trackExtractionRecords count])
+	// Save an extraction log file if any tracks (in track mode) or the image (in the image mode) were/was successfully extracted
+	if((eExtractionModeImage == self.extractionMode && !_extractionViewController.imageExtractionRecord) || (eExtractionModeIndividualTracks == self.extractionMode && ![_extractionViewController.trackExtractionRecords count]))
 		return;
 	
 	NSString *title = self.compactDisc.metadata.title;
@@ -846,99 +869,34 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 	}
 	
 	NSError *error = nil;
-	if(![self writeLogFileToURL:logFileURL forTrackExtractionRecords:sheetController.trackExtractionRecords error:&error])
+	if(![self writeLogFileToURL:logFileURL forTrackExtractionRecords:_extractionViewController.trackExtractionRecords error:&error])
 		[self presentError:error modalForWindow:self.window delegate:nil didPresentSelector:NULL contextInfo:NULL];
 	
 	// Save a cue sheet
-}
-
-- (void) showCopyImageSheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode contextInfo:(void *)contextInfo
-{
-	NSParameterAssert(nil != sheet);
 	
-	[sheet orderOut:self];
-	
-	if(NSCancelButton == returnCode)
-		return;
-	
-	AudioExtractionSheetController *sheetController = (AudioExtractionSheetController *)contextInfo;
-	
-	// Alert the user if any tracks failed to extract
-	if([sheetController.failedTrackIDs count]) {
-		// Fetch the tracks that failed and sort them by track number
-		NSPredicate *trackPredicate  = [NSPredicate predicateWithFormat:@"self IN %@", sheetController.failedTrackIDs];
-		NSSortDescriptor *trackNumberSortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"number" ascending:YES];
-		NSEntityDescription *trackEntityDescription = [NSEntityDescription entityForName:@"TrackDescriptor" inManagedObjectContext:self.managedObjectContext];
+	if(![_extractionViewController.failedTrackIDs count]) {
+		// Create a sheet that will auto-dismiss notifying the user that the extraction was successful
+		NSPanel *panel = NSGetAlertPanel(NSLocalizedString(@"Success!", @""),
+										 NSLocalizedString(@"All tracks were successfully extracted.", @""),
+										 NSLocalizedString(@"OK", @"Button"),
+										 NSLocalizedString(@"Details", @"Button"),
+										 nil);
 		
-		NSFetchRequest *trackFetchRequest = [[NSFetchRequest alloc] init];
+		[[NSApplication sharedApplication] beginSheet:panel 
+									   modalForWindow:self.window 
+										modalDelegate:self 
+									   didEndSelector:@selector(showSuccessfulExtractionSheetDidEnd:returnCode:contextInfo:) 
+										  contextInfo:logFileURL];
 		
-		[trackFetchRequest setEntity:trackEntityDescription];
-		[trackFetchRequest setPredicate:trackPredicate];
-		[trackFetchRequest setSortDescriptors:[NSArray arrayWithObject:trackNumberSortDescriptor]];
+		NSReleaseAlertPanel(panel);
 		
-		NSError *error = nil;
-		NSArray *tracks = [self.managedObjectContext executeFetchRequest:trackFetchRequest error:&error];
-		if(!tracks) {
-			[self presentError:error modalForWindow:self.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
-			return;
-		}
-
-		NSString *albumTitle = self.compactDisc.metadata.title;
-		if(!albumTitle)
-			albumTitle = NSLocalizedString(@"Unknown Album", @"");
-		
-		NSArray *trackTitles = [tracks valueForKeyPath:@"metadata.title"];
-		NSString *trackTitlesString = [trackTitles componentsJoinedByString:@", "];
-		NSBeginCriticalAlertSheet([NSString stringWithFormat:NSLocalizedString(@"The image of \u201c%@\u201d could not be created because read errors occurred during audio extraction.", @""), albumTitle],
-								  NSLocalizedString(@"OK", @"Button"),
-								  nil,
-								  nil,
-								  self.window,
-								  nil,
-								  NULL,
-								  NULL,
-								  NULL, 
-								  NSLocalizedString(@"Unrecoverable read errors occurred for the following tracks: %@", @""),
-								  trackTitlesString);
-	
-		return;
-	}
-
-	// Save an extraction log file if any tracks were successfully extracted
-	if(!sheetController.imageExtractionRecord)
-		return;
-	
-	NSString *title = self.compactDisc.metadata.title;
-	if(nil == title)
-		title = NSLocalizedString(@"Unknown Album", @"");
-	
-	NSURL *baseURL = [[EncoderManager sharedEncoderManager] outputURLForCompactDisc:self.compactDisc];
-	NSString *filename = [title stringByReplacingIllegalPathCharactersWithString:@"_"];
-	NSString *pathname = [filename stringByAppendingPathExtension:@"log"];
-	NSString *outputPath = [[baseURL path] stringByAppendingPathComponent:pathname];
-	NSURL *logFileURL = [NSURL fileURLWithPath:outputPath];
-	
-	// Don't overwrite existing log files
-	if([[NSFileManager defaultManager] fileExistsAtPath:[logFileURL path]]) {
-		
-		NSString *backupFilename = [filename copy];
-		NSString *backupPathname = nil;
-		NSString *backupPath = nil;
-		
-		do {
-			backupFilename = [backupFilename stringByAppendingPathExtension:@"old"];
-			backupPathname = [backupFilename stringByAppendingPathExtension:@"log"];
-			backupPath = [[baseURL path] stringByAppendingPathComponent:backupPathname];
-		} while([[NSFileManager defaultManager] fileExistsAtPath:backupPath]);
-		
-		[[NSFileManager defaultManager] movePath:[logFileURL path] toPath:backupPath handler:nil];
+		[NSTimer scheduledTimerWithTimeInterval:5.0 
+										 target:self 
+									   selector:@selector(showSuccessfulExtractionSheetDismissalTimerFired:) 
+									   userInfo:[NSArray arrayWithObject:panel] 
+										repeats:NO];
 	}
 	
-	NSError *error = nil;
-	if(![self writeLogFileToURL:logFileURL forImageExtractionRecord:sheetController.imageExtractionRecord error:&error])
-		[self presentError:error modalForWindow:self.window delegate:nil didPresentSelector:NULL contextInfo:NULL];
-	
-	// Save a cue sheet
 }
 
 @end
@@ -1001,127 +959,6 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 	[menuItem setState:!column.isHidden];
 }
 
-- (void) beginReadMCNSheet
-{
-	// Read the MCN for the disc, if not present
-	if(!self.compactDisc.metadata.MCN) {
-		ReadMCNSheetController *sheetController = [[ReadMCNSheetController alloc] init];
-		
-		sheetController.disk = self.disk;
-		
-		[sheetController beginReadMCNSheetForWindow:self.window
-									  modalDelegate:self 
-									 didEndSelector:@selector(showReadMCNSheetDidEnd:returnCode:contextInfo:) 
-										contextInfo:sheetController];
-	}
-	else
-		[self beginReadISRCsSheet];
-}
-
-- (void) beginReadISRCsSheet
-{
-	NSArray *tracksToIterate = nil;
-	if(eExtractionModeIndividualTracks == self.extractionMode)
-		tracksToIterate = self.compactDisc.firstSession.orderedSelectedTracks;
-	else if(eExtractionModeImage == self.extractionMode)
-		tracksToIterate = self.compactDisc.firstSession.orderedTracks;
-
-	NSMutableArray *tracksWithoutISRCs = [NSMutableArray array];
-	
-	// Ensure ISRCs have been read for the desired tracks
-	for(TrackDescriptor *track in tracksToIterate) {
-		// Don't waste time re-reading a pre-existing ISRC
-		if(!track.metadata.ISRC)
-			[tracksWithoutISRCs addObject:track];
-	}
-	
-	if([tracksWithoutISRCs count]) {
-		ReadISRCsSheetController *sheetController = [[ReadISRCsSheetController alloc] init];
-		
-		sheetController.disk = self.disk;
-		sheetController.trackIDs = [tracksWithoutISRCs valueForKey:@"objectID"];
-		
-		[sheetController beginReadISRCsSheetForWindow:self.window
-										modalDelegate:self 
-									   didEndSelector:@selector(showReadISRCsSheetDidEnd:returnCode:contextInfo:) 
-										  contextInfo:sheetController];
-	}
-	else
-		[self beginDetectPregapsSheet];
-}
-
-- (void) beginDetectPregapsSheet
-{
-	NSArray *tracksToIterate = nil;
-	if(eExtractionModeIndividualTracks == self.extractionMode)
-		tracksToIterate = self.compactDisc.firstSession.orderedSelectedTracks;
-	else if(eExtractionModeImage == self.extractionMode)
-		tracksToIterate = self.compactDisc.firstSession.orderedTracks;
-
-	NSMutableArray *tracksWithoutPregaps = [NSMutableArray array];
-	
-	// Ensure pregaps have been read for the desired tracks
-	for(TrackDescriptor *track in tracksToIterate) {
-		// Grab pre-gaps
-		if(!track.pregap)
-			[tracksWithoutPregaps addObject:track];
-	}
-	
-	if([tracksWithoutPregaps count]) {
-		DetectPregapsSheetController *sheetController = [[DetectPregapsSheetController alloc] init];
-		
-		sheetController.disk = self.disk;
-		sheetController.trackIDs = [tracksWithoutPregaps valueForKey:@"objectID"];
-		
-		[sheetController beginDetectPregapsSheetForWindow:self.window
-											modalDelegate:self 
-										   didEndSelector:@selector(showDetectPregapsSheetDidEnd:returnCode:contextInfo:) 
-											  contextInfo:sheetController];
-	}
-	else {
-		if(eExtractionModeImage == self.extractionMode)
-			[self performShowCopyImageSheet];
-		else if(eExtractionModeIndividualTracks == self.extractionMode)
-			[self performShowCopyTracksSheet];
-	}
-}
-
-- (void) performShowCopyTracksSheet
-{
-	NSSet *selectedTracks = self.compactDisc.firstSession.selectedTracks;
-
-	AudioExtractionSheetController *sheetController = [[AudioExtractionSheetController alloc] init];
-	
-	sheetController.disk = self.disk;
-	sheetController.extractionMode = eExtractionModeIndividualTracks;
-	sheetController.trackIDs = [selectedTracks valueForKey:@"objectID"];
-	
-	sheetController.maxRetries = [[NSUserDefaults standardUserDefaults] integerForKey:@"maxRetries"];
-	sheetController.requiredMatches = [[NSUserDefaults standardUserDefaults] integerForKey:@"requiredMatches"];
-	
-	[sheetController beginAudioExtractionSheetForWindow:self.window
-										  modalDelegate:self 
-										 didEndSelector:@selector(showCopyTracksSheetDidEnd:returnCode:contextInfo:) 
-											contextInfo:sheetController];
-}
-
-- (void) performShowCopyImageSheet
-{
-	AudioExtractionSheetController *sheetController = [[AudioExtractionSheetController alloc] init];
-	
-	sheetController.disk = self.disk;
-	sheetController.extractionMode = eExtractionModeImage;
-	sheetController.trackIDs = [self.compactDisc.firstSession.tracks valueForKey:@"objectID"];
-	
-	sheetController.maxRetries = [[NSUserDefaults standardUserDefaults] integerForKey:@"maxRetries"];
-	sheetController.requiredMatches = [[NSUserDefaults standardUserDefaults] integerForKey:@"requiredMatches"];
-	
-	[sheetController beginAudioExtractionSheetForWindow:self.window
-										  modalDelegate:self 
-										 didEndSelector:@selector(showCopyImageSheetDidEnd:returnCode:contextInfo:) 
-											contextInfo:sheetController];
-}
-
 - (void) accurateRipQueryOperationDidReturn:(AccurateRipQueryOperation *)operation
 {
 	NSParameterAssert(nil != operation);
@@ -1179,6 +1016,12 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 												  didEndSelector:@selector(showMusicDatabaseMatchesSheetDidEnd:returnCode:contextInfo:) 
 													 contextInfo:sheetController];
 	}
+}
+
+- (void) showSuccessfulExtractionSheetDismissalTimerFired:(NSTimer *)timer
+{
+	NSPanel *panel = [[timer userInfo] lastObject];
+	[[NSApplication sharedApplication] endSheet:panel returnCode:NSAlertDefaultReturn];
 }
 
 @end

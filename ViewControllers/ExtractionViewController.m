@@ -1,9 +1,9 @@
 /*
- *  Copyright (C) 2008 Stephen F. Booth <me@sbooth.org>
+ *  Copyright (C) 2008 - 2009 Stephen F. Booth <me@sbooth.org>
  *  All Rights Reserved
  */
 
-#import "AudioExtractionSheetController.h"
+#import "ExtractionViewController.h"
 
 #import "CompactDisc.h"
 #import "DriveInformation.h"
@@ -16,6 +16,9 @@
 #import "SectorRange.h"
 #import "ExtractionOperation.h"
 
+#import "MCNDetectionOperation.h"
+#import "ISRCDetectionOperation.h"
+#import "PregapDetectionOperation.h"
 #import "ReadOffsetCalculationOperation.h"
 
 #import "TrackExtractionRecord.h"
@@ -30,6 +33,7 @@
 #import "DetectPregapsSheetController.h"
 
 #import "EncoderManager.h"
+#import "CompactDiscWindowController.h"
 
 #import "ExtractedAudioFile.h"
 
@@ -46,7 +50,10 @@
 // ========================================
 // Context objects for observeValueForKeyPath:ofObject:change:context:
 // ========================================
-static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.AudioExtractionSheetController.ExtractAudioKVOContext";
+static NSString * const kMCNDetectionKVOContext			= @"org.sbooth.Rip.ExtractionViewController.MCNDetectionKVOContext";
+static NSString * const kISRCDetectionKVOContext		= @"org.sbooth.Rip.ExtractionViewController.ISRCDetectionKVOContext";
+static NSString * const kPregapDetectionKVOContext		= @"org.sbooth.Rip.ExtractionViewController.PregapDetectionKVOContext";
+static NSString * const kkAudioExtractionKVOContext		= @"org.sbooth.Rip.ExtractionViewController.ExtractAudioKVOContext";
 
 // ========================================
 // The number of sectors which will be scanned during offset verification
@@ -58,7 +65,14 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.AudioExtr
 // ========================================
 #define MINIMUM_DISC_READ_SIZE (2048 * 1024)
 
-@interface AudioExtractionSheetController ()
+// ========================================
+// Secret goodness
+// ========================================
+@interface CompactDiscWindowController (ExtractionViewControllerMethods)
+- (void) extractionFinishedWithReturnCode:(int)returnCode;
+@end
+
+@interface ExtractionViewController ()
 @property (assign) CompactDisc * compactDisc;
 @property (assign) DriveInformation * driveInformation;
 @property (assign) NSManagedObjectContext * managedObjectContext;
@@ -72,12 +86,12 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.AudioExtr
 
 @end
 
-@interface AudioExtractionSheetController (Callbacks)
+@interface ExtractionViewController (Callbacks)
 - (void) didPresentErrorWithRecovery:(BOOL)didRecover contextInfo:(void *)contextInfo;
 - (void) audioExtractionTimerFired:(NSTimer *)timer;
 @end
 
-@interface AudioExtractionSheetController (Private)
+@interface ExtractionViewController (Private)
 - (void) removeTemporaryFiles;
 - (void) resetExtractionState;
 
@@ -90,6 +104,9 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.AudioExtr
 
 - (void) extractSectors:(NSIndexSet *)sectorIndexes forTrack:(TrackDescriptor *)track coalesceRanges:(BOOL)coalesceRanges;
 
+- (void) detectMCNOperationDidExecute:(MCNDetectionOperation *)operation;
+- (void) detectISRCOperationDidExecute:(ISRCDetectionOperation *)operation;
+- (void) detectPregapOperationDidExecute:(PregapDetectionOperation *)operation;
 - (void) extractionOperationDidExecute:(ExtractionOperation *)operation;
 
 - (void) processExtractionOperation:(ExtractionOperation *)operation;
@@ -115,7 +132,7 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.AudioExtr
 - (ImageExtractionRecord *) createImageExtractionRecord;
 @end
 
-@implementation AudioExtractionSheetController
+@implementation ExtractionViewController
 
 @synthesize disk = _disk;
 @synthesize trackIDs = _trackIDs;
@@ -138,11 +155,11 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.AudioExtr
 
 - (id) init
 {
-	if((self = [super initWithWindowNibName:@"AudioExtractionSheet"])) {
+	if((self = [super initWithNibName:@"ExtractionView" bundle:nil])) {
 		// Create our own context for accessing the store
 		self.managedObjectContext = [[NSManagedObjectContext alloc] init];
 		[self.managedObjectContext setPersistentStoreCoordinator:[[[NSApplication sharedApplication] delegate] persistentStoreCoordinator]];
-
+		
 		self.operationQueue = [[NSOperationQueue alloc] init];
 		[self.operationQueue setMaxConcurrentOperationCount:1];
 		
@@ -165,13 +182,67 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.AudioExtr
 
 - (void) observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
 {
-	if(kAudioExtractionKVOContext == context) {
+	if(kMCNDetectionKVOContext == context) {
+		MCNDetectionOperation *operation = (MCNDetectionOperation *)object;
+		
+		if([keyPath isEqualToString:@"isExecuting"]) {			
+			if([operation isExecuting]) {
+				// KVO is thread-safe, but doesn't guarantee observeValueForKeyPath: will be called from the main thread
+				if([NSThread isMainThread])
+					[self detectMCNOperationDidExecute:operation];
+				else
+					[self performSelectorOnMainThread:@selector(detectMCNOperationDidExecute:) withObject:operation waitUntilDone:NO];
+			}
+		}
+		else if([keyPath isEqualToString:@"isCancelled"] || [keyPath isEqualToString:@"isFinished"]) {
+			[operation removeObserver:self forKeyPath:@"isExecuting"];
+			[operation removeObserver:self forKeyPath:@"isCancelled"];
+			[operation removeObserver:self forKeyPath:@"isFinished"];
+		}
+	}
+	else if(kISRCDetectionKVOContext == context) {
+		ISRCDetectionOperation *operation = (ISRCDetectionOperation *)object;
+		
+		if([keyPath isEqualToString:@"isExecuting"]) {
+			if([operation isExecuting]) {
+				// KVO is thread-safe, but doesn't guarantee observeValueForKeyPath: will be called from the main thread
+				if([NSThread isMainThread])
+					[self detectISRCOperationDidExecute:operation];
+				else
+					[self performSelectorOnMainThread:@selector(detectISRCOperationDidExecute:) withObject:operation waitUntilDone:NO];
+			}
+		}
+		else if([keyPath isEqualToString:@"isCancelled"] || [keyPath isEqualToString:@"isFinished"]) {
+			[operation removeObserver:self forKeyPath:@"isExecuting"];
+			[operation removeObserver:self forKeyPath:@"isCancelled"];
+			[operation removeObserver:self forKeyPath:@"isFinished"];
+		}
+	}
+	else if(kPregapDetectionKVOContext == context) {
+		PregapDetectionOperation *operation = (PregapDetectionOperation *)object;
+		
+		if([keyPath isEqualToString:@"isExecuting"]) {
+			if([operation isExecuting]) {
+				// KVO is thread-safe, but doesn't guarantee observeValueForKeyPath: will be called from the main thread
+				if([NSThread isMainThread])
+					[self detectPregapOperationDidExecute:operation];
+				else
+					[self performSelectorOnMainThread:@selector(detectPregapOperationDidExecute:) withObject:operation waitUntilDone:NO];
+			}
+		}
+		else if([keyPath isEqualToString:@"isCancelled"] || [keyPath isEqualToString:@"isFinished"]) {
+			[operation removeObserver:self forKeyPath:@"isExecuting"];
+			[operation removeObserver:self forKeyPath:@"isCancelled"];
+			[operation removeObserver:self forKeyPath:@"isFinished"];
+		}
+	}
+	else if(kkAudioExtractionKVOContext == context) {
 		ExtractionOperation *operation = (ExtractionOperation *)object;
 		
 		if([keyPath isEqualToString:@"isExecuting"]) {
 			if([operation isExecuting]) {
 				// Schedule a timer which will update the UI while the operations runs
-				NSTimer *timer = [NSTimer timerWithTimeInterval:0.3 target:self selector:@selector(audioExtractionTimerFired:) userInfo:operation repeats:YES];
+				NSTimer *timer = [NSTimer timerWithTimeInterval:(1.0 / 3.0) target:self selector:@selector(audioExtractionTimerFired:) userInfo:operation repeats:YES];
 				[[NSRunLoop mainRunLoop] addTimer:timer forMode:NSRunLoopCommonModes];
 				[_activeTimers addObject:timer];
 				
@@ -194,7 +265,7 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.AudioExtr
 			else
 				[self performSelectorOnMainThread:@selector(processExtractionOperation:) withObject:operation waitUntilDone:NO];
 		}
-	}
+	}	
 	else
 		[super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
 }
@@ -217,16 +288,10 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.AudioExtr
 	}
 }
 
-- (void) beginAudioExtractionSheetForWindow:(NSWindow *)window modalDelegate:(id)modalDelegate didEndSelector:(SEL)didEndSelector contextInfo:(void *)contextInfo
+- (IBAction) extract:(id)sender
 {
-	NSParameterAssert(nil != window);
-	
-	// Show ourselves
-	[[NSApplication sharedApplication] beginSheet:self.window
-								   modalForWindow:window
-									modalDelegate:modalDelegate
-								   didEndSelector:didEndSelector
-									  contextInfo:contextInfo];
+
+#pragma unused(sender)
 	
 	// Copy the array containing the tracks to be extracted
 	_tracksRemaining = [self.trackIDs mutableCopy];
@@ -235,7 +300,22 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.AudioExtr
 	_trackExtractionRecords = [NSMutableSet set];
 	_failedTrackIDs = [NSMutableSet set];
 	_encodingOperations =  [NSMutableArray array];
+	
+	[_tracksRemainingArrayController setContent:self.orderedTracksRemaining];
+
+	// Before starting extraction, ensure the disc's MCN has been read
+	if(!self.compactDisc.metadata.MCN) {
+		MCNDetectionOperation *operation = [[MCNDetectionOperation alloc] init];
 		
+		operation.disk = self.disk;
+		
+		[operation addObserver:self forKeyPath:@"isExecuting" options:NSKeyValueObservingOptionNew context:kMCNDetectionKVOContext];
+		[operation addObserver:self forKeyPath:@"isFinished" options:NSKeyValueObservingOptionNew context:kMCNDetectionKVOContext];
+		[operation addObserver:self forKeyPath:@"isCancelled" options:NSKeyValueObservingOptionNew context:kMCNDetectionKVOContext];
+		
+		[self.operationQueue addOperation:operation];
+	}
+	
 	// Get started on the first one
 	[self startExtractingNextTrack];
 }
@@ -244,13 +324,16 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.AudioExtr
 // tracks that were successfully extracted
 - (IBAction) cancel:(id)sender
 {
-	[self.operationQueue cancelAllOperations];
 
+#pragma unused(sender)
+
+	[self.operationQueue cancelAllOperations];
+	
 	// Post-process the encoded tracks, if required
 	if([_encodingOperations count]) {
 		NSError *error = nil;
 		if(![[EncoderManager sharedEncoderManager] postProcessEncodingOperations:_encodingOperations forTrackExtractionRecords:[_trackExtractionRecords allObjects] error:&error])
-			[self presentError:error modalForWindow:self.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
+			[self presentError:error modalForWindow:self.view.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
 	}
 	
 	// Remove any active timers
@@ -259,11 +342,10 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.AudioExtr
 	
 	// Remove temporary files
 	[self removeTemporaryFiles];	
-
-	self.disk = NULL;
 	
-	[[NSApplication sharedApplication] endSheet:self.window returnCode:NSCancelButton];
-	[self.window orderOut:sender];
+	self.disk = NULL;
+
+	[self.view.window.windowController extractionFinishedWithReturnCode:NSCancelButton];
 }
 
 - (NSArray *) orderedTracks
@@ -282,7 +364,7 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.AudioExtr
 	NSError *error = nil;
 	NSArray *tracks = [self.managedObjectContext executeFetchRequest:trackFetchRequest error:&error];
 	if(!tracks) {
-		[self presentError:error modalForWindow:self.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
+		[self presentError:error modalForWindow:self.view.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
 		return nil;
 	}
 	
@@ -305,7 +387,7 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.AudioExtr
 	NSError *error = nil;
 	NSArray *tracks = [self.managedObjectContext executeFetchRequest:trackFetchRequest error:&error];
 	if(!tracks) {
-		[self presentError:error modalForWindow:self.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
+		[self presentError:error modalForWindow:self.view.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
 		return nil;
 	}
 	
@@ -314,7 +396,7 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.AudioExtr
 
 @end
 
-@implementation AudioExtractionSheetController (Callbacks)
+@implementation ExtractionViewController (Callbacks)
 
 - (void) didPresentErrorWithRecovery:(BOOL)didRecover contextInfo:(void *)contextInfo
 {
@@ -326,9 +408,8 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.AudioExtr
 	[_activeTimers removeAllObjects];
 	
 	self.disk = NULL;
-
-	[[NSApplication sharedApplication] endSheet:self.window returnCode:(didRecover ? NSOKButton : NSCancelButton)];	
-	[self.window orderOut:self];
+	
+	[self.view.window.windowController extractionFinishedWithReturnCode:(didRecover ? NSOKButton : NSCancelButton)];
 }
 
 - (void) audioExtractionTimerFired:(NSTimer *)timer
@@ -342,16 +423,16 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.AudioExtr
 	}
 	
 	[_progressIndicator setDoubleValue:operation.fractionComplete];
-
+	
 //	NSTimeInterval secondsElapsed = [[NSDate date] timeIntervalSinceDate:operation.startTime];
 //	NSTimeInterval estimatedTimeRemaining = (secondsElapsed / operation.fractionComplete) - secondsElapsed;
-	
+
 //	NSLog(@"C2 errors: %i", [operation.errorFlags countOfOnes]);
 }
 
 @end
 
-@implementation AudioExtractionSheetController (Private)
+@implementation ExtractionViewController (Private)
 
 - (void) removeTemporaryFiles
 {
@@ -363,7 +444,7 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.AudioExtr
 		if(![[NSFileManager defaultManager] removeItemAtPath:[URL path] error:&error])
 			[[Logger sharedLogger] logMessage:@"Error removing temporary file: %@", error];
 	}
-
+	
 	if(_copyOperation && ![[NSFileManager defaultManager] removeItemAtPath:[_copyOperation.URL path] error:&error])
 		[[Logger sharedLogger] logMessage:@"Error removing temporary file: %@", error];
 	
@@ -383,7 +464,7 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.AudioExtr
 - (void) startExtractingNextTrack
 {
 	NSArray *tracks = self.orderedTracksRemaining;
-
+	
 	if(![tracks count])
 		return;
 	
@@ -394,7 +475,7 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.AudioExtr
 	[self resetExtractionState];
 	
 	self.retryCount = 0;
-
+	
 	if(_synthesizedCopyURL) {
 		NSError *error = nil;
 		if(![[NSFileManager defaultManager] removeItemAtPath:[_synthesizedCopyURL path] error:&error])
@@ -403,7 +484,37 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.AudioExtr
 	}
 	
 	[[Logger sharedLogger] logMessageWithLevel:eLogMessageLevelDebug format:@"Beginning extraction for track %@", track.number];
-
+	
+	// Ensure the track's ISRC and pregap have been read
+	if(!track.metadata.ISRC) {
+		ISRCDetectionOperation *operation = [[ISRCDetectionOperation alloc] init];
+		
+		operation.disk = self.disk;
+		operation.trackID = track.objectID;
+		
+		[operation addObserver:self forKeyPath:@"isExecuting" options:NSKeyValueObservingOptionNew context:kISRCDetectionKVOContext];
+		[operation addObserver:self forKeyPath:@"isCancelled" options:NSKeyValueObservingOptionNew context:kISRCDetectionKVOContext];
+		[operation addObserver:self forKeyPath:@"isFinished" options:NSKeyValueObservingOptionNew context:kISRCDetectionKVOContext];
+		
+		[self.operationQueue addOperation:operation];
+	}	
+	
+	if(!track.pregap) {
+		PregapDetectionOperation *operation = [[PregapDetectionOperation alloc] init];
+		
+		operation.disk = self.disk;
+		operation.trackID = track.objectID;
+		
+		[operation addObserver:self forKeyPath:@"isExecuting" options:NSKeyValueObservingOptionNew context:kPregapDetectionKVOContext];
+		[operation addObserver:self forKeyPath:@"isCancelled" options:NSKeyValueObservingOptionNew context:kPregapDetectionKVOContext];
+		[operation addObserver:self forKeyPath:@"isFinished" options:NSKeyValueObservingOptionNew context:kPregapDetectionKVOContext];
+		
+		[self.operationQueue addOperation:operation];
+	}	
+	
+	// Remove from the list of pending tracks
+//	[_tracksRemainingArrayController removeObject:track];
+	
 	[self extractWholeTrack:track];
 }
 
@@ -451,11 +562,11 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.AudioExtr
 	extractionOperation.readOffset = self.driveInformation.readOffset;
 	extractionOperation.URL = temporaryURLWithExtension(@"wav");
 	extractionOperation.useC2 = [self.driveInformation.useC2 boolValue];
-
+	
 	// Observe the operation's progress
-	[extractionOperation addObserver:self forKeyPath:@"isExecuting" options:NSKeyValueObservingOptionNew context:kAudioExtractionKVOContext];
-	[extractionOperation addObserver:self forKeyPath:@"isCancelled" options:NSKeyValueObservingOptionNew context:kAudioExtractionKVOContext];
-	[extractionOperation addObserver:self forKeyPath:@"isFinished" options:NSKeyValueObservingOptionNew context:kAudioExtractionKVOContext];
+	[extractionOperation addObserver:self forKeyPath:@"isExecuting" options:NSKeyValueObservingOptionNew context:kkAudioExtractionKVOContext];
+	[extractionOperation addObserver:self forKeyPath:@"isCancelled" options:NSKeyValueObservingOptionNew context:kkAudioExtractionKVOContext];
+	[extractionOperation addObserver:self forKeyPath:@"isFinished" options:NSKeyValueObservingOptionNew context:kkAudioExtractionKVOContext];
 	
 	// Do it.  Do it.  Do it.
 	[self.operationQueue addOperation:extractionOperation];
@@ -465,13 +576,13 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.AudioExtr
 {
 	NSParameterAssert(nil != track);
 	NSParameterAssert(nil != sectorIndexes);
-
+	
 	// Coalesce the index set into ranges to minimize the number of disc accesses
 	if(coalesceRanges) {
 		NSUInteger firstIndex = NSNotFound;
 		NSUInteger latestIndex = NSNotFound;
 		NSUInteger sectorIndex = [sectorIndexes firstIndex];
-
+		
 		for(;;) {
 			// Last sector
 			if(NSNotFound == sectorIndex) {
@@ -514,10 +625,77 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.AudioExtr
 	}	
 }
 
+- (void) detectMCNOperationDidExecute:(MCNDetectionOperation *)operation
+{
+
+#pragma unused(operation)
+
+	[_progressIndicator setIndeterminate:YES];
+	[_progressIndicator startAnimation:self];
+	
+	NSString *discDescription = nil;
+	if(self.compactDisc.metadata.title)
+		discDescription = self.compactDisc.metadata.title;
+	else
+		discDescription = self.compactDisc.musicBrainzDiscID;
+	
+	[_statusTextField setStringValue:discDescription];
+	[_detailedStatusTextField setStringValue:NSLocalizedString(@"Reading the disc's Media Catalog Number", @"")];
+}
+
+- (void) detectISRCOperationDidExecute:(ISRCDetectionOperation *)operation
+{
+	[_progressIndicator setIndeterminate:YES];
+	[_progressIndicator startAnimation:self];
+	
+	// Fetch the TrackDescriptor object from the context and ensure it is the correct class
+	NSManagedObject *managedObject = [self.managedObjectContext objectWithID:operation.trackID];
+	if(![managedObject isKindOfClass:[TrackDescriptor class]])
+		return;
+	
+	TrackDescriptor *track = (TrackDescriptor *)managedObject;
+	
+	NSString *trackDescription = nil;
+	if(track.metadata.title)
+		trackDescription = track.metadata.title;
+	else
+		trackDescription = [track.number stringValue];
+	
+	[_detailedStatusTextField setStringValue:NSLocalizedString(@"Reading the International Standard Recording Code", @"")];
+	[_statusTextField setStringValue:trackDescription];
+}
+
+- (void) detectPregapOperationDidExecute:(PregapDetectionOperation *)operation
+{
+	[_progressIndicator setIndeterminate:YES];
+	[_progressIndicator startAnimation:self];
+	
+	// Fetch the TrackDescriptor object from the context and ensure it is the correct class
+	NSManagedObject *managedObject = [self.managedObjectContext objectWithID:operation.trackID];
+	if(![managedObject isKindOfClass:[TrackDescriptor class]])
+		return;
+	
+	TrackDescriptor *track = (TrackDescriptor *)managedObject;
+	
+	NSString *trackDescription = nil;
+	if(track.metadata.title)
+		trackDescription = track.metadata.title;
+	else
+		trackDescription = [track.number stringValue];
+	
+	[_detailedStatusTextField setStringValue:NSLocalizedString(@"Detecting the pregap", @"")];
+	[_statusTextField setStringValue:trackDescription];
+}
+
 - (void) extractionOperationDidExecute:(ExtractionOperation *)operation
 {
 	NSParameterAssert(nil != operation);
-
+	
+	[_progressIndicator setIndeterminate:NO];
+	[_progressIndicator setMinValue:0.0];
+	[_progressIndicator setMaxValue:1.0];
+	[_progressIndicator setDoubleValue:0.0];
+	
 	if(operation.trackID) {
 		// Fetch the TrackDescriptor object from the context and ensure it is the correct class
 		NSManagedObject *managedObject = [self.managedObjectContext objectWithID:operation.trackID];
@@ -551,15 +729,20 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.AudioExtr
 {
 	NSParameterAssert(nil != operation);
 	
+	[_progressIndicator setIndeterminate:YES];
+	[_progressIndicator startAnimation:self];
+
+	[_detailedStatusTextField setStringValue:NSLocalizedString(@"Analyzing audio", @"")];
+	
 	// Delete the output file if the operation was cancelled or did not succeed
 	if(operation.error || operation.isCancelled) {
 		if(operation.error)
-			[self presentError:operation.error modalForWindow:self.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
+			[self presentError:operation.error modalForWindow:self.view.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
 		
 		NSError *error = nil;
 		if([[NSFileManager defaultManager] fileExistsAtPath:operation.URL.path] && ![[NSFileManager defaultManager] removeItemAtPath:operation.URL.path error:&error])
-			[self presentError:error modalForWindow:self.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
-
+			[self presentError:error modalForWindow:self.view.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
+		
 		return;
 	}
 	
@@ -575,15 +758,15 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.AudioExtr
 	NSManagedObject *managedObject = [self.managedObjectContext objectWithID:operation.trackID];
 	if(![managedObject isKindOfClass:[TrackDescriptor class]])
 		return;
-
+	
 	TrackDescriptor *track = (TrackDescriptor *)managedObject;			
-
+	
 	// Determine if this operation represents a whole track extraction or a partial track extraction
 	if([operation.sectors containsSectorRange:track.sectorRange])
 		[self processExtractionOperation:operation forWholeTrack:track];
 	else
 		[self processExtractionOperation:operation forPartialTrack:track];
-
+	
 	// If no tracks are being processed and none remain to be extracted, we are finished			
 	if(![[self.operationQueue operations] count] && ![_tracksRemaining count]) {
 		
@@ -593,7 +776,7 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.AudioExtr
 			if([_encodingOperations count]) {
 				// FIXME: If trackExtractionRecords are ever used, the order will be wrong
 				if(![[EncoderManager sharedEncoderManager] postProcessEncodingOperations:_encodingOperations forTrackExtractionRecords:[_trackExtractionRecords allObjects] error:&error])
-					[self presentError:error modalForWindow:self.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
+					[self presentError:error modalForWindow:self.view.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
 			}
 		}
 		else if(eExtractionModeImage == self.extractionMode) {
@@ -608,12 +791,12 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.AudioExtr
 			else {
 				ImageExtractionRecord *imageExtractionRecord = [self createImageExtractionRecord];
 				if(!imageExtractionRecord)
-					[self presentError:error modalForWindow:self.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
+					[self presentError:error modalForWindow:self.view.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
 				
 				_imageExtractionRecord = imageExtractionRecord;
 				
 				if(![[EncoderManager sharedEncoderManager] encodeImageExtractionRecord:self.imageExtractionRecord error:&error])
-					[self presentError:error modalForWindow:self.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
+					[self presentError:error modalForWindow:self.view.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
 			}
 		}
 		else
@@ -625,8 +808,7 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.AudioExtr
 		
 		self.disk = NULL;
 		
-		[[NSApplication sharedApplication] endSheet:self.window returnCode:NSOKButton];
-		[self.window orderOut:self];
+		[self.view.window.windowController extractionFinishedWithReturnCode:NSOKButton];
 	}
 }
 
@@ -634,30 +816,30 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.AudioExtr
 {
 	NSParameterAssert(nil != operation);
 	NSParameterAssert(nil != track);
-
+	
 	// Calculate the actual AccurateRip checksum of the extracted audio
 	NSUInteger trackActualAccurateRipChecksum = [self calculateAccurateRipChecksumForTrack:track extractionOperation:operation];
-
+	
 	// Determine the possible AccurateRip offsets for the extracted audio, if any
 	NSArray *possibleAccurateRipOffsets = [self determinePossibleAccurateRipOffsetForTrack:track URL:operation.URL startingSector:operation.cushionSectors];
-
+	
 	// Determine which pressings (if any) are the primary ones (offset checksum matches with a zero read offset)
 	NSPredicate *zeroOffsetPredicate = [NSPredicate predicateWithFormat:@"%K == 0", kReadOffsetKey];
 	NSArray *matchingPressingsWithZeroOffset = [possibleAccurateRipOffsets filteredArrayUsingPredicate:zeroOffsetPredicate];
 	
 	// Iterate through each pressing and compare the track's AccurateRip checksums
 	if([matchingPressingsWithZeroOffset count]) {
-
+		
 		for(NSDictionary *matchingPressingInfo in matchingPressingsWithZeroOffset) {
 			NSManagedObjectID *accurateRipTrackID = [matchingPressingInfo objectForKey:kAccurateRipTrackIDKey];
-
+			
 			// Fetch the AccurateRipTrackRecord object from the context and ensure it is the correct class
 			NSManagedObject *managedObject = [self.managedObjectContext objectWithID:accurateRipTrackID];
 			if(![managedObject isKindOfClass:[AccurateRipTrackRecord class]])
 				continue;
 			
 			AccurateRipTrackRecord *accurateRipTrack = (AccurateRipTrackRecord *)managedObject;
-
+			
 			// If the track was accurately ripped, ship it off to the encoder
 			if([accurateRipTrack.checksum unsignedIntegerValue] == trackActualAccurateRipChecksum) {
 				NSError *error = nil;
@@ -665,7 +847,7 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.AudioExtr
 					if([self sendTrackToEncoder:track extractionOperation:operation accurateRipChecksum:trackActualAccurateRipChecksum accurateRipConfidenceLevel:accurateRipTrack.confidenceLevel error:&error])
 						[self startExtractingNextTrack];
 					else
-						[self presentError:error modalForWindow:self.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
+						[self presentError:error modalForWindow:self.view.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
 				}
 				else if(eExtractionModeImage == self.extractionMode) {
 					TrackExtractionRecord *extractionRecord = [self createTrackExtractionRecordForTrack:track extractionOperation:operation accurateRipChecksum:trackActualAccurateRipChecksum accurateRipConfidenceLevel:accurateRipTrack.confidenceLevel error:&error];
@@ -674,7 +856,7 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.AudioExtr
 						[self startExtractingNextTrack];
 					}
 					else
-						[self presentError:error modalForWindow:self.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
+						[self presentError:error modalForWindow:self.view.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
 				}
 				else
 					[[Logger sharedLogger] logMessage:@"Unknown extraction mode"];
@@ -697,11 +879,11 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.AudioExtr
 				continue;
 			
 			AccurateRipTrackRecord *accurateRipTrack = (AccurateRipTrackRecord *)managedObject;
-
+			
 			// Calculate the AccurateRip checksum for the alternate pressing
 			NSNumber *alternatePressingOffset = [alternatePressingInfo objectForKey:kReadOffsetKey];
 			NSUInteger trackAlternateAccurateRipChecksum = [self calculateAccurateRipChecksumForTrack:track extractionOperation:operation readOffsetAdjustment:[alternatePressingOffset unsignedIntegerValue]];
-						
+			
 			// If the track was accurately ripped, ship it off to the encoder
 			if([accurateRipTrack.checksum unsignedIntegerValue] == trackAlternateAccurateRipChecksum) {
 				NSError *error = nil;
@@ -709,7 +891,7 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.AudioExtr
 					if([self sendTrackToEncoder:track extractionOperation:operation accurateRipChecksum:trackActualAccurateRipChecksum accurateRipConfidenceLevel:accurateRipTrack.confidenceLevel accurateRipAlternatePressingChecksum:trackAlternateAccurateRipChecksum accurateRipAlternatePressingOffset:alternatePressingOffset error:&error])
 						[self startExtractingNextTrack];
 					else
-						[self presentError:error modalForWindow:self.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
+						[self presentError:error modalForWindow:self.view.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
 				}
 				else if(eExtractionModeImage == self.extractionMode) {
 					TrackExtractionRecord *extractionRecord = [self createTrackExtractionRecordForTrack:track extractionOperation:operation accurateRipChecksum:trackActualAccurateRipChecksum accurateRipConfidenceLevel:accurateRipTrack.confidenceLevel accurateRipAlternatePressingChecksum:trackAlternateAccurateRipChecksum accurateRipAlternatePressingOffset:alternatePressingOffset error:&error];
@@ -718,20 +900,20 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.AudioExtr
 						[self startExtractingNextTrack];
 					}
 					else
-						[self presentError:error modalForWindow:self.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
+						[self presentError:error modalForWindow:self.view.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
 				}
 				else
 					[[Logger sharedLogger] logMessage:@"Unknown extraction mode"];
-
+				
 				return;
 			}
 		}
 	}
-
+	
 	// Re-rip only portions of the track if any C2 block error flags were returned
 	if(operation.useC2 && operation.blockErrorFlags.count) {
 		NSIndexSet *positionOfErrors = operation.blockErrorFlags;
-
+		
 		// Determine which sectors have no C2 errors
 		SectorRange *trackSectorRange = track.sectorRange;
 		NSMutableIndexSet *sectorsWithNoErrors = [NSMutableIndexSet indexSetWithIndexesInRange:NSMakeRange(trackSectorRange.firstSector, trackSectorRange.length)];
@@ -739,16 +921,16 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.AudioExtr
 		
 		// Save the sectors from this operation with no C2 errors
 		[self saveSectors:sectorsWithNoErrors fromOperation:operation forTrack:track];
-
+		
 		// Mark the bad sectors
 		[_sectorsNeedingVerification addIndexes:positionOfErrors];
-
+		
 		[self extractSectors:positionOfErrors forTrack:track coalesceRanges:YES];
 	}
 	// No C2 errors were encountered or C2 is disabled
 	else {
 		[_detailedStatusTextField setStringValue:NSLocalizedString(@"Verifying copy integrity", @"")];
-
+		
 		// The track is verified if a copy operation has already been performed
 		// and the SHA1 hashes for the copy and this verification operation match
 		if(_copyOperation && [_copyOperation.SHA1 isEqualToString:operation.SHA1]) {
@@ -756,8 +938,8 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.AudioExtr
 			if([self sendTrackToEncoder:track extractionOperation:operation accurateRipChecksum:trackActualAccurateRipChecksum accurateRipConfidenceLevel:nil error:&error])
 				[self startExtractingNextTrack];
 			else
-				[self presentError:error modalForWindow:self.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
-
+				[self presentError:error modalForWindow:self.view.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
+			
 			return;
 		}
 		// This track has been extracted before but the SHA1 hashes don't match
@@ -772,7 +954,7 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.AudioExtr
 				[[Logger sharedLogger] logMessage:@"Internal inconsistency: SHA1 hashes don't match but no sector-level differences found"];
 				return;
 			}
-
+			
 			// Convert from sector indexes to sector numbers
 			NSMutableIndexSet *nonMatchingSectors = [nonMatchingSectorIndexes mutableCopy];
 			[nonMatchingSectors shiftIndexesStartingAtIndex:[nonMatchingSectorIndexes firstIndex] by:_copyOperation.sectors.firstSector];
@@ -786,9 +968,9 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.AudioExtr
 			// Start with the sectors from this operation that matched the copy operation
 			if([matchingSectors count])
 				[self saveSectors:matchingSectors fromOperation:operation forTrack:track];
-
+			
 			[[Logger sharedLogger] logMessageWithLevel:eLogMessageLevelDebug format:@"Sectors with differences: %@", nonMatchingSectors];
-
+			
 			[_sectorsNeedingVerification addIndexes:nonMatchingSectors];
 			
 			[self extractSectors:nonMatchingSectors forTrack:track coalesceRanges:YES];
@@ -816,7 +998,7 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.AudioExtr
 		return;
 	
 	[[Logger sharedLogger] logMessageWithLevel:eLogMessageLevelDebug format:@"Sectors needing verification: %@", _sectorsNeedingVerification];
-
+	
 	// Only check sectors that are contained in this extraction operation
 	NSIndexSet *operationSectors = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange([operation.sectors firstSector], [operation.sectors length])];
 	NSIndexSet *sectorsToCheck = [_sectorsNeedingVerification intersectedIndexSet:operationSectors];
@@ -836,7 +1018,7 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.AudioExtr
 			
 			if(sectorInFilesMatches(operation.URL, [operation.sectors indexForSector:sectorIndex], previousOperation.URL, [previousOperation.sectors indexForSector:sectorIndex])) {
 				++matchCount;
-
+				
 				// Save the sector from this operation if the required number of matches were made
 				if(matchCount >= self.requiredMatches) {
 					[[Logger sharedLogger] logMessageWithLevel:eLogMessageLevelDebug format:@"Sector %ld verified", sectorIndex];
@@ -874,17 +1056,17 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.AudioExtr
 		NSUInteger accurateRipChecksum = calculateAccurateRipChecksumForFile(fileURL,
 																			 [self.compactDisc.firstSession.firstTrack.number isEqualToNumber:track.number],
 																			 [self.compactDisc.firstSession.lastTrack.number isEqualToNumber:track.number]);
-
+		
 		// Determine the possible AccurateRip offsets for the extracted audio, if any
 		NSArray *possibleAccurateRipOffsets = [self determinePossibleAccurateRipOffsetForTrack:track URL:fileURL];
-
+		
 		// Determine which pressings (if any) are the primary ones (offset checksum matches with a zero read offset)
 		NSPredicate *zeroOffsetPredicate = [NSPredicate predicateWithFormat:@"%K == 0", kReadOffsetKey];
 		NSArray *matchingPressingsWithZeroOffset = [possibleAccurateRipOffsets filteredArrayUsingPredicate:zeroOffsetPredicate];
 		
 		// Iterate through each pressing and compare the track's AccurateRip checksums
 		if([matchingPressingsWithZeroOffset count]) {
-
+			
 			for(NSDictionary *matchingPressingInfo in matchingPressingsWithZeroOffset) {
 				NSManagedObjectID *accurateRipTrackID = [matchingPressingInfo objectForKey:kAccurateRipTrackIDKey];
 				
@@ -894,7 +1076,7 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.AudioExtr
 					continue;
 				
 				AccurateRipTrackRecord *accurateRipTrack = (AccurateRipTrackRecord *)managedObject;
-		
+				
 				[[Logger sharedLogger] logMessageWithLevel:eLogMessageLevelDebug format:@"Track AR checksum = %.8lx, checking against %.8lx", accurateRipChecksum, accurateRipTrack.checksum.unsignedIntegerValue];
 				
 				// If the track was accurately ripped, ship it off to the encoder
@@ -911,13 +1093,13 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.AudioExtr
 					extractionRecord.track = track;
 					extractionRecord.accurateRipChecksum = [NSNumber numberWithUnsignedInteger:accurateRipChecksum];
 					extractionRecord.accurateRipConfidenceLevel = accurateRipTrack.confidenceLevel;
-
+					
 					NSError *error = nil;					
 					if(eExtractionModeIndividualTracks == self.extractionMode) {
 						EncodingOperation *encodingOperation = nil;
 						if(![[EncoderManager sharedEncoderManager] encodeTrackExtractionRecord:extractionRecord encodingOperation:&encodingOperation delayPostProcessing:YES error:&error]) {
 							[self.managedObjectContext deleteObject:extractionRecord];
-							[self presentError:error modalForWindow:self.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
+							[self presentError:error modalForWindow:self.view.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
 							return;
 						}
 						
@@ -927,7 +1109,7 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.AudioExtr
 						; // Nothing additonal to do here
 					else
 						[[Logger sharedLogger] logMessage:@"Unknown extraction mode"];
-
+					
 					[_trackExtractionRecords addObject:extractionRecord];
 					[self startExtractingNextTrack];
 					
@@ -955,7 +1137,7 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.AudioExtr
 				NSUInteger trackAlternateAccurateRipChecksum = [self calculateAccurateRipChecksumForTrack:track extractionOperation:operation readOffsetAdjustment:[alternatePressingOffset unsignedIntegerValue]];
 				
 				[[Logger sharedLogger] logMessageWithLevel:eLogMessageLevelDebug format:@"Track alternate pressing AR checksum = %.8lx, checking against %.8lx", trackAlternateAccurateRipChecksum, accurateRipTrack.checksum.unsignedIntegerValue];
-
+				
 				// If the track was accurately ripped, ship it off to the encoder
 				if([accurateRipTrack.checksum unsignedIntegerValue] == trackAlternateAccurateRipChecksum) {
 					// Create the extraction record
@@ -978,10 +1160,10 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.AudioExtr
 						EncodingOperation *encodingOperation = nil;
 						if(![[EncoderManager sharedEncoderManager] encodeTrackExtractionRecord:extractionRecord encodingOperation:&encodingOperation delayPostProcessing:YES error:&error]) {
 							[self.managedObjectContext deleteObject:extractionRecord];
-							[self presentError:error modalForWindow:self.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
+							[self presentError:error modalForWindow:self.view.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
 							return;
 						}
-
+						
 						[_encodingOperations addObject:encodingOperation];
 					}
 					else if(eExtractionModeImage == self.extractionMode)
@@ -996,7 +1178,7 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.AudioExtr
 				}
 			}
 		}
-
+		
 		// Compare the synthesized track to any previously synthesized versions
 		NSError *error = nil;
 		if(_synthesizedCopyURL) {
@@ -1005,7 +1187,7 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.AudioExtr
 				[[Logger sharedLogger] logMessage:@"Error opening file for reading: %@", error];
 				return;
 			}
-
+			
 			NSString *previousSHA1 = previousFile.SHA1;
 			[previousFile closeFile];
 			
@@ -1027,7 +1209,7 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.AudioExtr
 					EncodingOperation *encodingOperation = nil;
 					if(![[EncoderManager sharedEncoderManager] encodeTrackExtractionRecord:extractionRecord encodingOperation:&encodingOperation delayPostProcessing:YES error:&error]) {
 						[self.managedObjectContext deleteObject:extractionRecord];
-						[self presentError:error modalForWindow:self.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
+						[self presentError:error modalForWindow:self.view.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
 						return;
 					}
 					
@@ -1051,7 +1233,7 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.AudioExtr
 			_synthesizedCopyURL = fileURL;
 		
 		[[Logger sharedLogger] logMessageWithLevel:eLogMessageLevelDebug format:@"Track still has errors after synthesis"];
-
+		
 		// Retry the track if the maximum retry count hasn't been exceeded
 		if(self.retryCount <= self.maxRetries) {
 			++_retryCount;
@@ -1059,7 +1241,7 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.AudioExtr
 			// Remove temporary files
 			[self removeTemporaryFiles];
 			[self resetExtractionState];
-
+			
 			// Get started on the track
 			[self extractWholeTrack:track];
 		}
@@ -1068,7 +1250,7 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.AudioExtr
 			[[Logger sharedLogger] logMessage:@"Extraction failed for track %@: maximum retry count exceeded", track.number];
 			
 			[_failedTrackIDs addObject:[track objectID]];
-
+			
 			// A failure for a single track still allows individual tracks to be extracted
 			if(eExtractionModeIndividualTracks == self.extractionMode)
 				[self startExtractingNextTrack];
@@ -1101,8 +1283,8 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.AudioExtr
 																[self.compactDisc.firstSession.lastTrack.number isEqualToNumber:track.number],
 																readOffsetAdjustment);
 }
-	
-	
+
+
 - (NSArray *) determinePossibleAccurateRipOffsetForTrack:(TrackDescriptor *)track URL:(NSURL *)URL
 {
 	return [self determinePossibleAccurateRipOffsetForTrack:track URL:URL startingSector:0];
@@ -1148,7 +1330,7 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.AudioExtr
 	NSParameterAssert(nil != operation);
 	
 	[_detailedStatusTextField setStringValue:NSLocalizedString(@"Creating output file", @"")];	
-
+	
 	NSURL *URL = operation.URL;
 	
 	// Strip off the cushion sectors before encoding, if present
@@ -1181,7 +1363,7 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.AudioExtr
 				[outputFile closeFile];
 				return nil;
 			}
-
+			
 //			NSUInteger sectorsWritten = [outputFile setAudio:buffer forSectors:NSMakeRange(sectorCounter, 1) error:error];
 //			if(0 == sectorsWritten) {
 //				[inputFile closeFile];
@@ -1233,7 +1415,7 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.AudioExtr
 {
 	NSParameterAssert(nil != track);
 	NSParameterAssert(nil != operation);
-
+	
 	// Create the output file, if required
 	NSURL *fileURL = [self generateOutputFileForOperation:operation error:error];
 	if(nil == fileURL)
@@ -1274,7 +1456,7 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.AudioExtr
 	NSError *error = nil;
 	ExtractedAudioFile *inputFile = [ExtractedAudioFile openFileForReadingAtURL:operation.URL error:&error];
 	if(!inputFile) {
-		[self presentError:error modalForWindow:self.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
+		[self presentError:error modalForWindow:self.view.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
 		return NO;
 	}
 	
@@ -1283,7 +1465,7 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.AudioExtr
 		_synthesizedTrack = [ExtractedAudioFile createFileAtURL:temporaryURLWithExtension(@"wav") error:&error];
 		if(!_synthesizedTrack) {
 			[inputFile closeFile];
-			[self presentError:error modalForWindow:self.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
+			[self presentError:error modalForWindow:self.view.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
 			return NO;
 		}
 	}
@@ -1431,7 +1613,7 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.AudioExtr
 	extractionRecord.inputURL = imageFile.URL;
 	extractionRecord.MD5 = imageFile.MD5;
 	extractionRecord.SHA1 = imageFile.SHA1;
-
+	
 	[extractionRecord addTracks:_trackExtractionRecords];
 	
 	[imageFile closeFile];

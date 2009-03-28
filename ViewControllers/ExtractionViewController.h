@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2008 Stephen F. Booth <me@sbooth.org>
+ *  Copyright (C) 2008 - 2009 Stephen F. Booth <me@sbooth.org>
  *  All Rights Reserved
  */
 
@@ -20,30 +20,32 @@ enum _eExtractionMode {
 typedef enum _eExtractionMode eExtractionMode;
 
 // ========================================
-// An NSWindowController subclass for customizing the extraction
+// An NSViewController subclass for customizing the extraction
 // of one or more tracks from a CD
 //
 // The general extraction strategy looks like:
 //  - Extract the entire track (copy)
 //  - Compare
 // ========================================
-@interface AudioExtractionSheetController : NSWindowController
+@interface ExtractionViewController : NSViewController
 {
 	IBOutlet NSProgressIndicator *_progressIndicator;
 	IBOutlet NSTextField *_statusTextField;
 	IBOutlet NSTextField *_detailedStatusTextField;
 	
+	IBOutlet NSArrayController *_tracksRemainingArrayController;
+
 @private
 	__strong DADiskRef _disk;
 	NSSet *_trackIDs;
-
+	
 	CompactDisc *_compactDisc;
 	DriveInformation *_driveInformation;
 	NSManagedObjectContext *_managedObjectContext;
-
+	
 	NSMutableArray *_activeTimers;
 	NSOperationQueue *_operationQueue;
-
+	
 	NSMutableSet *_tracksRemaining;
 	
 	ExtractionOperation *_copyOperation;
@@ -51,18 +53,18 @@ typedef enum _eExtractionMode eExtractionMode;
 	
 	NSMutableArray *_partialExtractions;
 	NSMutableIndexSet *_sectorsNeedingVerification;
-
+	
 	NSMutableArray *_encodingOperations;
-
+	
 	NSUInteger _requiredMatches;
 	NSUInteger _retryCount;
 	NSUInteger _maxRetries;
-
+	
 	eExtractionMode _extractionMode;
 	
 	ExtractedAudioFile *_synthesizedTrack;
 	NSURL *_synthesizedCopyURL;
-
+	
 	ImageExtractionRecord *_imageExtractionRecord;
 	NSMutableSet *_trackExtractionRecords;
 	NSMutableSet *_failedTrackIDs;
@@ -84,7 +86,7 @@ typedef enum _eExtractionMode eExtractionMode;
 
 // ========================================
 // The meat & potatoes
-- (void) beginAudioExtractionSheetForWindow:(NSWindow *)window modalDelegate:(id)modalDelegate didEndSelector:(SEL)didEndSelector contextInfo:(void *)contextInfo;
+- (IBAction) extract:(id)sender;
 
 // ========================================
 // Action methods

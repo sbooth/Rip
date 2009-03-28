@@ -7,7 +7,7 @@
 #include <DiskArbitration/DiskArbitration.h>
 
 @class CompactDisc, DriveInformation;
-@class MetadataViewController;
+@class MetadataViewController, ExtractionViewController;
 
 // ========================================
 // The main window representing a single compact disc
@@ -22,9 +22,12 @@
 	DriveInformation *_driveInformation;
 	
 	NSOperationQueue *_operationQueue;
+	
+	BOOL _extracting;
 	int _extractionMode; // eExtractionMode
 	
 	MetadataViewController *_metadataViewController;
+	ExtractionViewController *_extractionViewController;
 }
 
 // ========================================
@@ -34,7 +37,10 @@
 @property (readonly, assign) CompactDisc * compactDisc;
 @property (readonly, assign) DriveInformation * driveInformation;
 
+@property (readonly, assign, getter = isExtracting) BOOL extracting;
+
 @property (readonly, assign) MetadataViewController * metadataViewController;
+@property (readonly, assign) ExtractionViewController * extractionViewController;
 
 // ========================================
 // Action Methods
