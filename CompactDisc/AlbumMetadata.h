@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2008 Stephen F. Booth <me@sbooth.org>
+ *  Copyright (C) 2008 - 2009 Stephen F. Booth <me@sbooth.org>
  *  All Rights Reserved
  */
 
@@ -16,6 +16,7 @@
 
 // ========================================
 // Core Data properties
+@property (assign) NSDictionary * additionalMetadata;
 @property (assign) NSString * artist;
 @property (assign) NSString * date;
 @property (assign) NSNumber * discNumber;

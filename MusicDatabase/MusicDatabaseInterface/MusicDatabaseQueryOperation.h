@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2008 Stephen F. Booth <me@sbooth.org>
+ *  Copyright (C) 2008 - 2009 Stephen F. Booth <me@sbooth.org>
  *  All Rights Reserved
  */
 
@@ -26,7 +26,10 @@ extern NSString * const		kMetadataISRCKey;
 extern NSString * const		kMetadataMCNKey;
 extern NSString * const		kMetadataMusicBrainzIDKey;
 
+extern NSString * const		kMetadataAdditionalMetadataKey;
+
 extern NSString * const		kAlbumArtFrontCoverKey;
+
 
 // ========================================
 // KVC key names for the query results

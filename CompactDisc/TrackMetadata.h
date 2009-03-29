@@ -16,6 +16,7 @@
 
 // ========================================
 // Core Data properties
+@property (assign) NSDictionary * additionalMetadata;
 @property (assign) NSString * artist;
 @property (assign) NSString * composer;
 @property (assign) NSString * date;

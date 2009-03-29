@@ -9,6 +9,7 @@
 
 // ========================================
 // Core Data properties
+@dynamic additionalMetadata;
 @dynamic artist;
 @dynamic composer;
 @dynamic date;

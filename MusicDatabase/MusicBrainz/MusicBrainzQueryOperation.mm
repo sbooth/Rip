@@ -134,26 +134,37 @@
 			continue;
 		}
 		
-		NSMutableDictionary *releaseDictionary = [NSMutableDictionary dictionary];
+		NSMutableDictionary *releaseMetadata = [NSMutableDictionary dictionary];
+		NSMutableDictionary *additionalReleaseMetadata = [NSMutableDictionary dictionary];
 		
 		// ID
 		if(!release->getId().empty()) {
 			NSURL *albumURI = [NSURL URLWithString:[NSString stringWithCString:release->getId().c_str() encoding:NSUTF8StringEncoding]];
-			[releaseDictionary setObject:[[albumURI path] lastPathComponent] forKey:kMetadataMusicBrainzIDKey];
+			[releaseMetadata setObject:[[albumURI path] lastPathComponent] forKey:kMetadataMusicBrainzIDKey];
 		}
 		
 		// Title
 		if(!release->getTitle().empty())
-			[releaseDictionary setObject:[NSString stringWithCString:release->getTitle().c_str() encoding:NSUTF8StringEncoding] forKey:kMetadataAlbumTitleKey];
+			[releaseMetadata setObject:[NSString stringWithCString:release->getTitle().c_str() encoding:NSUTF8StringEncoding] forKey:kMetadataAlbumTitleKey];
+		
+		// Artist ID
+		if(NULL != release->getArtist()) {
+			NSURL *artistURI = [NSURL URLWithString:[NSString stringWithCString:release->getArtist()->getId().c_str() encoding:NSUTF8StringEncoding]];
+			[additionalReleaseMetadata setObject:[[artistURI path] lastPathComponent] forKey:@"MUSICBRAINZ_ALBUMARTISTID"];
+
+			// Sort name
+			if(!release->getArtist()->getSortName().empty())
+				[additionalReleaseMetadata setObject:[NSString stringWithCString:release->getArtist()->getSortName().c_str() encoding:NSUTF8StringEncoding] forKey:@"MUSICBRAINZ_SORTNAME"];
+		}
 		
 		// Artist
 		if(NULL != release->getArtist() && !release->getArtist()->getName().empty())
-			[releaseDictionary setObject:[NSString stringWithCString:release->getArtist()->getName().c_str() encoding:NSUTF8StringEncoding] forKey:kMetadataAlbumArtistKey];
+			[releaseMetadata setObject:[NSString stringWithCString:release->getArtist()->getName().c_str() encoding:NSUTF8StringEncoding] forKey:kMetadataAlbumArtistKey];
 		
 		// Take a best guess on the release date
 		if(1 == release->getNumReleaseEvents()) {
 			MusicBrainz::ReleaseEvent *releaseEvent = release->getReleaseEvent(0);
-			[releaseDictionary setObject:[NSString stringWithCString:releaseEvent->getDate().c_str() encoding:NSUTF8StringEncoding] forKey:kMetadataReleaseDateKey];
+			[releaseMetadata setObject:[NSString stringWithCString:releaseEvent->getDate().c_str() encoding:NSUTF8StringEncoding] forKey:kMetadataReleaseDateKey];
 		}
 		else {
 			NSString	*currentLocale		= [[NSUserDefaults standardUserDefaults] objectForKey:@"AppleLocale"];
@@ -166,40 +177,63 @@
 				MusicBrainz::ReleaseEvent *releaseEvent = release->getReleaseEvent(k);
 				NSString *releaseEventCountry = [NSString stringWithCString:releaseEvent->getCountry().c_str() encoding:NSASCIIStringEncoding];
 				if(NSOrderedSame == [releaseEventCountry caseInsensitiveCompare:currentCountry])
-					[releaseDictionary setObject:[NSString stringWithCString:releaseEvent->getDate().c_str() encoding:NSUTF8StringEncoding] forKey:kMetadataReleaseDateKey];
+					[releaseMetadata setObject:[NSString stringWithCString:releaseEvent->getDate().c_str() encoding:NSUTF8StringEncoding] forKey:kMetadataReleaseDateKey];
 			}
 			
 			// Nothing matched, just take the first one
-			if(nil == [releaseDictionary valueForKey:kMetadataReleaseDateKey] && 0 < release->getNumReleaseEvents()) {
+			if(nil == [releaseMetadata valueForKey:kMetadataReleaseDateKey] && 0 < release->getNumReleaseEvents()) {
 				MusicBrainz::ReleaseEvent *releaseEvent = release->getReleaseEvent(0);
-				[releaseDictionary setObject:[NSString stringWithCString:releaseEvent->getDate().c_str() encoding:NSUTF8StringEncoding] forKey:kMetadataReleaseDateKey];
+				[releaseMetadata setObject:[NSString stringWithCString:releaseEvent->getDate().c_str() encoding:NSUTF8StringEncoding] forKey:kMetadataReleaseDateKey];
 			}
 		}
-		
+
+		// Store the other metadata if any was found
+		if([additionalReleaseMetadata count])
+			[releaseMetadata setObject:additionalReleaseMetadata forKey:kMetadataAdditionalMetadataKey];
+
 		// Iterate through the tracks
 		NSMutableArray *tracksDictionary = [NSMutableArray array];
 		NSInteger trackno = 1;
 		for(MusicBrainz::TrackList::iterator j = release->getTracks().begin(); j != release->getTracks().end(); j++) {
 			MusicBrainz::Track *track = *j;
-			NSMutableDictionary *trackDictionary = [NSMutableDictionary dictionary];
+			NSMutableDictionary *trackMetadata = [NSMutableDictionary dictionary];
+			NSMutableDictionary *additionalTrackMetadata = [NSMutableDictionary dictionary];
 			
 			// Number
-			[trackDictionary setObject:[NSNumber numberWithInteger:trackno] forKey:kMetadataTrackNumberKey];
+			[trackMetadata setObject:[NSNumber numberWithInteger:trackno] forKey:kMetadataTrackNumberKey];
 			
 			// ID
 			if(!track->getId().empty()) {
 				NSURL *trackURI = [NSURL URLWithString:[NSString stringWithCString:track->getId().c_str() encoding:NSUTF8StringEncoding]];
-				[trackDictionary setObject:[[trackURI path] lastPathComponent] forKey:kMetadataMusicBrainzIDKey];
+				[trackMetadata setObject:[[trackURI path] lastPathComponent] forKey:kMetadataMusicBrainzIDKey];
 			}
 			
 			// Track title
-			[trackDictionary setObject:[NSString stringWithCString:track->getTitle().c_str() encoding:NSUTF8StringEncoding] forKey:kMetadataTitleKey];
+			[trackMetadata setObject:[NSString stringWithCString:track->getTitle().c_str() encoding:NSUTF8StringEncoding] forKey:kMetadataTitleKey];
 			
+			// Artist ID
+			if(NULL != track->getArtist()) {
+				NSURL *artistURI = [NSURL URLWithString:[NSString stringWithCString:track->getArtist()->getId().c_str() encoding:NSUTF8StringEncoding]];
+				[additionalTrackMetadata setObject:[[artistURI path] lastPathComponent] forKey:@"MUSICBRAINZ_ARTISTID"];
+				
+				// Sort name
+				if(!track->getArtist()->getSortName().empty())
+					[additionalTrackMetadata setObject:[NSString stringWithCString:track->getArtist()->getSortName().c_str() encoding:NSUTF8StringEncoding] forKey:@"MUSICBRAINZ_SORTNAME"];
+			}
+			else if(NULL != release->getArtist()) {
+				NSURL *artistURI = [NSURL URLWithString:[NSString stringWithCString:release->getArtist()->getId().c_str() encoding:NSUTF8StringEncoding]];
+				[additionalTrackMetadata setObject:[[artistURI path] lastPathComponent] forKey:@"MUSICBRAINZ_ARTISTID"];
+				
+				// Sort name
+				if(!release->getArtist()->getSortName().empty())
+					[additionalTrackMetadata setObject:[NSString stringWithCString:release->getArtist()->getSortName().c_str() encoding:NSUTF8StringEncoding] forKey:@"MUSICBRAINZ_SORTNAME"];
+			}
+
 			// Ensure the track's artist is set if an artist was retrieved from MusicBrainz
 			if(NULL != track->getArtist() && !track->getArtist()->getName().empty())
-				[trackDictionary setObject:[NSString stringWithCString:track->getArtist()->getName().c_str() encoding:NSUTF8StringEncoding] forKey:kMetadataArtistKey];
+				[trackMetadata setObject:[NSString stringWithCString:track->getArtist()->getName().c_str() encoding:NSUTF8StringEncoding] forKey:kMetadataArtistKey];
 			else if(NULL != release->getArtist() && !release->getArtist()->getName().empty())
-				[trackDictionary setObject:[NSString stringWithCString:release->getArtist()->getName().c_str() encoding:NSUTF8StringEncoding] forKey:kMetadataArtistKey];
+				[trackMetadata setObject:[NSString stringWithCString:release->getArtist()->getName().c_str() encoding:NSUTF8StringEncoding] forKey:kMetadataArtistKey];
 
 			// Look for Composer relations
 			MusicBrainz::RelationList relations = track->getRelations(MusicBrainz::Relation::TO_TRACK);
@@ -222,21 +256,24 @@
 							continue;
 						}
 						
-						[trackDictionary setObject:[NSString stringWithCString:composer->getName().c_str() encoding:NSUTF8StringEncoding] forKey:kMetadataComposerKey];
+						[trackMetadata setObject:[NSString stringWithCString:composer->getName().c_str() encoding:NSUTF8StringEncoding] forKey:kMetadataComposerKey];
 						
 						delete composer;
 					}
 				}				
 			}
 			
+			if([additionalTrackMetadata count])
+				[trackMetadata setObject:additionalTrackMetadata forKey:kMetadataAdditionalMetadataKey];
+			
 			++trackno;
 			
-			[tracksDictionary addObject:trackDictionary];
+			[tracksDictionary addObject:trackMetadata];
 			delete track;
 		}
 		
-		[releaseDictionary setObject:tracksDictionary forKey:kMusicDatabaseTracksKey];
-		[matchingReleases addObject:releaseDictionary];
+		[releaseMetadata setObject:tracksDictionary forKey:kMusicDatabaseTracksKey];
+		[matchingReleases addObject:releaseMetadata];
 
 		delete result;
 	}

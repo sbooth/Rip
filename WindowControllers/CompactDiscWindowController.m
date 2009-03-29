@@ -363,7 +363,7 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 			_disk = DADiskCopyWholeDisk(disk);
 			self.compactDisc = [CompactDisc compactDiscWithDADiskRef:self.disk inManagedObjectContext:self.managedObjectContext];
 			self.driveInformation = [DriveInformation driveInformationWithDADiskRef:self.disk inManagedObjectContext:self.managedObjectContext];
-			
+
 			// Set the window's represented URL to the disc's path
 			CFDictionaryRef description = DADiskCopyDescription(_disk);
 			
@@ -852,6 +852,7 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 	NSParameterAssert(nil != musicDatabaseEntry);
 
 	// Set the album's metadata
+	self.compactDisc.metadata.additionalMetadata = [musicDatabaseEntry valueForKey:kMetadataAdditionalMetadataKey];
 	self.compactDisc.metadata.artist = [musicDatabaseEntry valueForKey:kMetadataAlbumArtistKey];
 	self.compactDisc.metadata.date = [musicDatabaseEntry valueForKey:kMetadataReleaseDateKey];
 	self.compactDisc.metadata.discNumber = [musicDatabaseEntry valueForKey:kMetadataDiscNumberKey];
@@ -870,13 +871,14 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 		if(!track)
 			continue;
 		
+		track.metadata.additionalMetadata = [trackMetadata valueForKey:kMetadataAdditionalMetadataKey];
 		track.metadata.artist = [trackMetadata valueForKey:kMetadataArtistKey];
 		track.metadata.composer = [trackMetadata valueForKey:kMetadataComposerKey];
 		track.metadata.date = [trackMetadata valueForKey:kMetadataReleaseDateKey];
 		track.metadata.genre = [trackMetadata valueForKey:kMetadataGenreKey];
-		track.metadata.ISRC = [musicDatabaseEntry valueForKey:kMetadataISRCKey];
+//		track.metadata.ISRC = [musicDatabaseEntry valueForKey:kMetadataISRCKey];
 		track.metadata.lyrics = [trackMetadata valueForKey:kMetadataLyricsKey];
-		track.metadata.musicBrainzID = [musicDatabaseEntry valueForKey:kMetadataMusicBrainzIDKey];
+		track.metadata.musicBrainzID = [trackMetadata valueForKey:kMetadataMusicBrainzIDKey];
 		track.metadata.title = [trackMetadata valueForKey:kMetadataTitleKey];
 	}
 	

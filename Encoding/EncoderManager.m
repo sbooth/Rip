@@ -41,6 +41,8 @@ metadataForTrackExtractionRecord(TrackExtractionRecord *trackExtractionRecord)
 	TrackMetadata *trackMetadata = trackExtractionRecord.track.metadata;
 	AlbumMetadata *albumMetadata = trackMetadata.track.session.disc.metadata;
 
+	NSMutableDictionary *additionalMetadata = [NSMutableDictionary dictionary];
+	
 	// Track number and total
 	if(trackMetadata.track.number)
 		[metadata setObject:trackMetadata.track.number forKey:kMetadataTrackNumberKey];
@@ -48,6 +50,8 @@ metadataForTrackExtractionRecord(TrackExtractionRecord *trackExtractionRecord)
 		[metadata setObject:[NSNumber numberWithUnsignedInteger:trackMetadata.track.session.tracks.count] forKey:kMetadataTrackTotalKey];
 	
 	// Album metadata
+	if(albumMetadata.additionalMetadata)
+		[additionalMetadata addEntriesFromDictionary:albumMetadata.additionalMetadata];
 	if(albumMetadata.artist)
 		[metadata setObject:albumMetadata.artist forKey:kMetadataAlbumArtistKey];
 	if(albumMetadata.date)
@@ -75,6 +79,8 @@ metadataForTrackExtractionRecord(TrackExtractionRecord *trackExtractionRecord)
 	}
 
 	// Track metadata
+	if(trackMetadata.additionalMetadata)
+		[additionalMetadata addEntriesFromDictionary:trackMetadata.additionalMetadata];
 	if(trackMetadata.artist)
 		[metadata setObject:trackMetadata.artist forKey:kMetadataArtistKey];
 	if(trackMetadata.composer)
@@ -90,6 +96,9 @@ metadataForTrackExtractionRecord(TrackExtractionRecord *trackExtractionRecord)
 	if(trackMetadata.title)
 		[metadata setObject:trackMetadata.title forKey:kMetadataTitleKey];
 
+	if([additionalMetadata count])
+		[metadata setObject:[additionalMetadata copy] forKey:kMetadataAdditionalMetadataKey];
+	
 	return [metadata copy];
 }
 
@@ -107,6 +116,8 @@ metadataForImageExtractionRecord(ImageExtractionRecord *imageExtractionRecord)
 	[metadata setObject:[NSNumber numberWithUnsignedInteger:imageExtractionRecord.tracks.count] forKey:kMetadataTrackTotalKey];
 	
 	// Album metadata
+	if(albumMetadata.additionalMetadata)
+		[metadata setObject:albumMetadata.additionalMetadata forKey:kMetadataAdditionalMetadataKey];
 	if(albumMetadata.artist)
 		[metadata setObject:albumMetadata.artist forKey:kMetadataAlbumArtistKey];
 	if(albumMetadata.date)
