@@ -1,11 +1,9 @@
 /*
- *  Copyright (C) 2007 - 2008 Stephen F. Booth <me@sbooth.org>
+ *  Copyright (C) 2007 - 2009 Stephen F. Booth <me@sbooth.org>
  *  All Rights Reserved
  */
 
 #import "ApplicationDelegate.h"
-#import "ByteSizeValueTransformer.h"
-#import "DurationValueTransformer.h"
 #import "CompactDiscWindowController.h"
 #import "CompactDisc.h"
 #import "DriveInformation.h"
@@ -13,6 +11,9 @@
 #import "MusicDatabaseManager.h"
 #import "ReadOffsetCalculatorSheetController.h"
 #import "Logger.h"
+
+#import "ByteSizeValueTransformer.h"
+#import "DurationValueTransformer.h"
 
 #import "MusicDatabaseInterface/MusicDatabaseInterface.h"
 #import "MusicDatabaseInterface/MusicDatabaseQueryOperation.h"

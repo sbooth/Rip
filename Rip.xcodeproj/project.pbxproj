@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		3207D4990ED66DDD00F35BD5 /* Logger.m in Sources */ = {isa = PBXBuildFile; fileRef = 3207D4980ED66DDD00F35BD5 /* Logger.m */; };
 		324EC6740DA2D411002A3CA7 /* Rip.icns in Resources */ = {isa = PBXBuildFile; fileRef = 324EC6730DA2D411002A3CA7 /* Rip.icns */; };
 		324F30C90E85CF47000E4E4E /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = 324F30C80E85CF47000E4E4E /* dsa_pub.pem */; };
 		324F31320E86B3E2000E4E4E /* ReadMCNSheet.xib in Resources */ = {isa = PBXBuildFile; fileRef = 324F31300E86B3E2000E4E4E /* ReadMCNSheet.xib */; };
@@ -20,20 +19,15 @@
 		324F324A0E87007A000E4E4E /* DetectPregapsSheet.xib in Resources */ = {isa = PBXBuildFile; fileRef = 324F32480E87007A000E4E4E /* DetectPregapsSheet.xib */; };
 		324F325D0E870269000E4E4E /* PregapDetectionOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 324F325C0E870269000E4E4E /* PregapDetectionOperation.m */; };
 		3252C1E50DD239C500856BFE /* FLAC.bundle in Copy PlugIns */ = {isa = PBXBuildFile; fileRef = 3252C1820DD237C500856BFE /* FLAC.bundle */; };
-		32544B8A0EB56C5400E14BE8 /* NSIndexSet+SetMethods.m in Sources */ = {isa = PBXBuildFile; fileRef = 32544B890EB56C5400E14BE8 /* NSIndexSet+SetMethods.m */; };
-		325B2C5C0E781BC400696A1A /* FileUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 325B2C5B0E781BC400696A1A /* FileUtilities.m */; };
-		325B2D490E78D83000696A1A /* CDDAUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 325B2D480E78D83000696A1A /* CDDAUtilities.m */; };
 		325B2FDD0E7B6B4300696A1A /* ReadOffsetCalculatorSheet.xib in Resources */ = {isa = PBXBuildFile; fileRef = 325B2FDB0E7B6B4300696A1A /* ReadOffsetCalculatorSheet.xib */; };
 		3268C3760EB04CC500FF62F8 /* BitArrayTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 3268C3750EB04CC500FF62F8 /* BitArrayTest.m */; };
 		3268C3830EB04D3B00FF62F8 /* BitArray.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C4C8DFF0D5E2A0600DC0279 /* BitArray.m */; };
-		326A90340F4C0AC500023650 /* NSString+PathSanitizationMethods.m in Sources */ = {isa = PBXBuildFile; fileRef = 326A90330F4C0AC500023650 /* NSString+PathSanitizationMethods.m */; };
 		3274C2DA0F171827005B28BB /* Version.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 3274C2D90F171827005B28BB /* Version.xcconfig */; };
 		328371610EA7DCFB0011EB44 /* EncoderWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 328371600EA7DCFB0011EB44 /* EncoderWindowController.m */; };
 		328371680EA7DD650011EB44 /* EncoderWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 328371660EA7DD650011EB44 /* EncoderWindow.xib */; };
 		328374400EAA691D0011EB44 /* TrackExtractionRecord.m in Sources */ = {isa = PBXBuildFile; fileRef = 3283743F0EAA691D0011EB44 /* TrackExtractionRecord.m */; };
 		328374620EAA6B580011EB44 /* ImageExtractionRecord.m in Sources */ = {isa = PBXBuildFile; fileRef = 328374610EAA6B580011EB44 /* ImageExtractionRecord.m */; };
 		328374FB0EAB07340011EB44 /* CompactDiscWindowController+LogFileGeneration.m in Sources */ = {isa = PBXBuildFile; fileRef = 328374FA0EAB07340011EB44 /* CompactDiscWindowController+LogFileGeneration.m */; };
-		328375F60EABB7D30011EB44 /* AudioUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 328375F50EABB7D30011EB44 /* AudioUtilities.m */; };
 		3284CFA50EE1CF5600FEC9A1 /* CompactDisc+CueSheetGeneration.m in Sources */ = {isa = PBXBuildFile; fileRef = 3284CFA40EE1CF5600FEC9A1 /* CompactDisc+CueSheetGeneration.m */; };
 		328DE21C0E5E628700F5BD13 /* PregapFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = 328DE21B0E5E628700F5BD13 /* PregapFormatter.m */; };
 		328DE4C20E5FBFE500F5BD13 /* MusicBrainz.bundle in Copy PlugIns */ = {isa = PBXBuildFile; fileRef = 328DE4C00E5FBFBF00F5BD13 /* MusicBrainz.bundle */; };
@@ -49,16 +43,27 @@
 		328DEE110E612E9300F5BD13 /* EncoderPreferencesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 328DEE100E612E9300F5BD13 /* EncoderPreferencesViewController.m */; };
 		328DEE1F0E612F8B00F5BD13 /* EncoderPreferencesView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 328DEE1D0E612F8B00F5BD13 /* EncoderPreferencesView.xib */; };
 		3292521C0EA55CBC00DF820C /* CalculateAccurateRipOffsetsSheet.xib in Resources */ = {isa = PBXBuildFile; fileRef = 3292521A0EA55CBC00DF820C /* CalculateAccurateRipOffsetsSheet.xib */; };
+		3295B3790F7F001400AF55EF /* AudioUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 3295B3680F7F001400AF55EF /* AudioUtilities.m */; };
+		3295B37A0F7F001400AF55EF /* CDDAUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 3295B36A0F7F001400AF55EF /* CDDAUtilities.m */; };
+		3295B37B0F7F001400AF55EF /* FileUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 3295B36C0F7F001400AF55EF /* FileUtilities.m */; };
+		3295B37C0F7F001400AF55EF /* GenreUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 3295B36E0F7F001400AF55EF /* GenreUtilities.m */; };
+		3295B37D0F7F001400AF55EF /* Logger.m in Sources */ = {isa = PBXBuildFile; fileRef = 3295B3700F7F001400AF55EF /* Logger.m */; };
+		3295B37E0F7F001400AF55EF /* NSImage+BitmapRepresentationMethods.m in Sources */ = {isa = PBXBuildFile; fileRef = 3295B3720F7F001400AF55EF /* NSImage+BitmapRepresentationMethods.m */; };
+		3295B37F0F7F001400AF55EF /* NSIndexSet+SetMethods.m in Sources */ = {isa = PBXBuildFile; fileRef = 3295B3740F7F001400AF55EF /* NSIndexSet+SetMethods.m */; };
+		3295B3810F7F001400AF55EF /* NSString+PathSanitizationMethods.m in Sources */ = {isa = PBXBuildFile; fileRef = 3295B3780F7F001400AF55EF /* NSString+PathSanitizationMethods.m */; };
+		3295B3B40F7F09C900AF55EF /* SecondsFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = 3295B35B0F7EFF1000AF55EF /* SecondsFormatter.m */; };
+		3295B4250F7F13E800AF55EF /* ETAFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = 3295B4240F7F13E800AF55EF /* ETAFormatter.m */; };
+		3295B4690F7F232A00AF55EF /* ImageAndTextCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 3295B4680F7F232A00AF55EF /* ImageAndTextCell.m */; };
+		3295B4930F7F267100AF55EF /* Green Check.png in Resources */ = {isa = PBXBuildFile; fileRef = 3295B4920F7F267100AF55EF /* Green Check.png */; };
+		3295B4B30F7F2F0200AF55EF /* Red X.png in Resources */ = {isa = PBXBuildFile; fileRef = 3295B4B20F7F2F0200AF55EF /* Red X.png */; };
 		32A2C10D0F0A8EE000CA8DDE /* BGHUDAppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A2C10C0F0A8EE000CA8DDE /* BGHUDAppKit.framework */; };
 		32A2C1100F0A8EF100CA8DDE /* BGHUDAppKit.framework in Copy Embedded Frameworks */ = {isa = PBXBuildFile; fileRef = 32A2C10C0F0A8EE000CA8DDE /* BGHUDAppKit.framework */; };
 		32A2C1440F0A91A300CA8DDE /* HexadecimalNumberFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = 32A2C1430F0A91A300CA8DDE /* HexadecimalNumberFormatter.m */; };
-		32A2C1D30F0BF94A00CA8DDE /* NSImage+BitmapRepresentationMethods.m in Sources */ = {isa = PBXBuildFile; fileRef = 32A2C1D20F0BF94A00CA8DDE /* NSImage+BitmapRepresentationMethods.m */; };
 		32AB63A60E68B45800EA423A /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 32AB63A50E68B45800EA423A /* SystemConfiguration.framework */; };
 		32AC75640E7634A5009A5E1B /* ReadOffsetCalculationOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 32AC75630E7634A5009A5E1B /* ReadOffsetCalculationOperation.m */; };
 		32B1A36F0E8F0D35005A9AD9 /* DiscInspectorPanelController.m in Sources */ = {isa = PBXBuildFile; fileRef = 32B1A36E0E8F0D35005A9AD9 /* DiscInspectorPanelController.m */; };
 		32B1A37D0E8F10B1005A9AD9 /* DiscInspectorPanel.xib in Resources */ = {isa = PBXBuildFile; fileRef = 32B1A37B0E8F10B1005A9AD9 /* DiscInspectorPanel.xib */; };
 		32BBEFD10EC63B4200EC2FBE /* CDDAUtilitiesTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 32BBEFD00EC63B4200EC2FBE /* CDDAUtilitiesTest.m */; };
-		32BBEFE70EC63C1C00EC2FBE /* CDDAUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 325B2D480E78D83000696A1A /* CDDAUtilities.m */; };
 		32BBF08B0EC6B34A00EC2FBE /* ExtractedAudioFile.m in Sources */ = {isa = PBXBuildFile; fileRef = 32BBF08A0EC6B34A00EC2FBE /* ExtractedAudioFile.m */; };
 		32BBF1510EC8875100EC2FBE /* CopyImageToolbarIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 32BBF1480EC8875100EC2FBE /* CopyImageToolbarIcon.png */; };
 		32BBF1520EC8875100EC2FBE /* CopyTracksToolbarIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 32BBF1490EC8875100EC2FBE /* CopyTracksToolbarIcon.png */; };
@@ -84,7 +89,6 @@
 		32CE93870F5657E900AB328A /* WavPack.bundle in Copy PlugIns */ = {isa = PBXBuildFile; fileRef = 32CE936D0F56579900AB328A /* WavPack.bundle */; };
 		32E622CC0F74189600DC1A15 /* DriveOffsets.plist in Resources */ = {isa = PBXBuildFile; fileRef = 32E622CB0F74189600DC1A15 /* DriveOffsets.plist */; };
 		32E9F8300DD6C0FF00E8ACCA /* EncoderSettingsSheet.xib in Resources */ = {isa = PBXBuildFile; fileRef = 32E9F82E0DD6C0FF00E8ACCA /* EncoderSettingsSheet.xib */; };
-		8C1BBC650D43DF0D00DAC484 /* GenreUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C1BBC640D43DF0D00DAC484 /* GenreUtilities.m */; };
 		8C34BB0B0D761A99003F2953 /* ApplicationDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C34BB0A0D761A99003F2953 /* ApplicationDelegate.m */; };
 		8C34BB0E0D761AB7003F2953 /* PlugInManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C34BB0D0D761AB7003F2953 /* PlugInManager.m */; };
 		8C3C19470D73EA12001BAC88 /* EncoderInterface.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8C3C19460D73EA0B001BAC88 /* EncoderInterface.framework */; };
@@ -308,8 +312,6 @@
 		2A37F4BAFDCFA73011CA2CEA /* English */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = English; path = English.lproj/Credits.rtf; sourceTree = "<group>"; };
 		2A37F4C4FDCFA73011CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		2A37F4C5FDCFA73011CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
-		3207D4970ED66DDD00F35BD5 /* Logger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Logger.h; path = Utilities/Logger.h; sourceTree = "<group>"; };
-		3207D4980ED66DDD00F35BD5 /* Logger.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Logger.m; path = Utilities/Logger.m; sourceTree = "<group>"; };
 		32362B810EE4EC1C00001E58 /* Base.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Base.xcconfig; sourceTree = "<group>"; };
 		324EC6730DA2D411002A3CA7 /* Rip.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = Rip.icns; sourceTree = "<group>"; };
 		324F30C80E85CF47000E4E4E /* dsa_pub.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = dsa_pub.pem; sourceTree = "<group>"; };
@@ -329,19 +331,11 @@
 		324F325B0E870269000E4E4E /* PregapDetectionOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PregapDetectionOperation.h; sourceTree = "<group>"; };
 		324F325C0E870269000E4E4E /* PregapDetectionOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PregapDetectionOperation.m; sourceTree = "<group>"; };
 		3252C1790DD237C500856BFE /* FLAC.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = FLAC.xcodeproj; path = FLAC/FLAC.xcodeproj; sourceTree = "<group>"; };
-		32544B880EB56C5400E14BE8 /* NSIndexSet+SetMethods.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSIndexSet+SetMethods.h"; path = "Utilities/NSIndexSet+SetMethods.h"; sourceTree = "<group>"; };
-		32544B890EB56C5400E14BE8 /* NSIndexSet+SetMethods.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSIndexSet+SetMethods.m"; path = "Utilities/NSIndexSet+SetMethods.m"; sourceTree = "<group>"; };
-		325B2C5A0E781BC400696A1A /* FileUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FileUtilities.h; path = Utilities/FileUtilities.h; sourceTree = "<group>"; };
-		325B2C5B0E781BC400696A1A /* FileUtilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FileUtilities.m; path = Utilities/FileUtilities.m; sourceTree = "<group>"; };
-		325B2D470E78D83000696A1A /* CDDAUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CDDAUtilities.h; path = Utilities/CDDAUtilities.h; sourceTree = "<group>"; };
-		325B2D480E78D83000696A1A /* CDDAUtilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CDDAUtilities.m; path = Utilities/CDDAUtilities.m; sourceTree = "<group>"; };
 		325B2FDC0E7B6B4300696A1A /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/ReadOffsetCalculatorSheet.xib; sourceTree = "<group>"; };
 		3268C35A0EB04C2300FF62F8 /* Tests.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Tests.octest; sourceTree = BUILT_PRODUCTS_DIR; };
 		3268C35B0EB04C2300FF62F8 /* Tests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Tests-Info.plist"; sourceTree = "<group>"; };
 		3268C3740EB04CC500FF62F8 /* BitArrayTest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BitArrayTest.h; path = Tests/BitArrayTest.h; sourceTree = "<group>"; };
 		3268C3750EB04CC500FF62F8 /* BitArrayTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BitArrayTest.m; path = Tests/BitArrayTest.m; sourceTree = "<group>"; };
-		326A90320F4C0AC500023650 /* NSString+PathSanitizationMethods.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSString+PathSanitizationMethods.h"; path = "Utilities/NSString+PathSanitizationMethods.h"; sourceTree = "<group>"; };
-		326A90330F4C0AC500023650 /* NSString+PathSanitizationMethods.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSString+PathSanitizationMethods.m"; path = "Utilities/NSString+PathSanitizationMethods.m"; sourceTree = "<group>"; };
 		3274C2D90F171827005B28BB /* Version.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Version.xcconfig; sourceTree = "<group>"; };
 		3283715F0EA7DCFB0011EB44 /* EncoderWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EncoderWindowController.h; sourceTree = "<group>"; };
 		328371600EA7DCFB0011EB44 /* EncoderWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EncoderWindowController.m; sourceTree = "<group>"; };
@@ -352,8 +346,6 @@
 		328374610EAA6B580011EB44 /* ImageExtractionRecord.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ImageExtractionRecord.m; sourceTree = "<group>"; };
 		328374F90EAB07340011EB44 /* CompactDiscWindowController+LogFileGeneration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "CompactDiscWindowController+LogFileGeneration.h"; sourceTree = "<group>"; };
 		328374FA0EAB07340011EB44 /* CompactDiscWindowController+LogFileGeneration.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "CompactDiscWindowController+LogFileGeneration.m"; sourceTree = "<group>"; };
-		328375F40EABB7D30011EB44 /* AudioUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AudioUtilities.h; path = Utilities/AudioUtilities.h; sourceTree = "<group>"; };
-		328375F50EABB7D30011EB44 /* AudioUtilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AudioUtilities.m; path = Utilities/AudioUtilities.m; sourceTree = "<group>"; };
 		3284CFA30EE1CF5600FEC9A1 /* CompactDisc+CueSheetGeneration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "CompactDisc+CueSheetGeneration.h"; sourceTree = "<group>"; };
 		3284CFA40EE1CF5600FEC9A1 /* CompactDisc+CueSheetGeneration.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "CompactDisc+CueSheetGeneration.m"; sourceTree = "<group>"; };
 		328DE21A0E5E628700F5BD13 /* PregapFormatter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PregapFormatter.h; sourceTree = "<group>"; };
@@ -374,11 +366,33 @@
 		328DEE100E612E9300F5BD13 /* EncoderPreferencesViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EncoderPreferencesViewController.m; sourceTree = "<group>"; };
 		328DEE1E0E612F8B00F5BD13 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/EncoderPreferencesView.xib; sourceTree = "<group>"; };
 		3292521B0EA55CBC00DF820C /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/CalculateAccurateRipOffsetsSheet.xib; sourceTree = "<group>"; };
+		3295B35A0F7EFF1000AF55EF /* SecondsFormatter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SecondsFormatter.h; sourceTree = "<group>"; };
+		3295B35B0F7EFF1000AF55EF /* SecondsFormatter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SecondsFormatter.m; sourceTree = "<group>"; };
+		3295B3670F7F001400AF55EF /* AudioUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AudioUtilities.h; sourceTree = "<group>"; };
+		3295B3680F7F001400AF55EF /* AudioUtilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AudioUtilities.m; sourceTree = "<group>"; };
+		3295B3690F7F001400AF55EF /* CDDAUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDDAUtilities.h; sourceTree = "<group>"; };
+		3295B36A0F7F001400AF55EF /* CDDAUtilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDDAUtilities.m; sourceTree = "<group>"; };
+		3295B36B0F7F001400AF55EF /* FileUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FileUtilities.h; sourceTree = "<group>"; };
+		3295B36C0F7F001400AF55EF /* FileUtilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FileUtilities.m; sourceTree = "<group>"; };
+		3295B36D0F7F001400AF55EF /* GenreUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GenreUtilities.h; sourceTree = "<group>"; };
+		3295B36E0F7F001400AF55EF /* GenreUtilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GenreUtilities.m; sourceTree = "<group>"; };
+		3295B36F0F7F001400AF55EF /* Logger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Logger.h; sourceTree = "<group>"; };
+		3295B3700F7F001400AF55EF /* Logger.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Logger.m; sourceTree = "<group>"; };
+		3295B3710F7F001400AF55EF /* NSImage+BitmapRepresentationMethods.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSImage+BitmapRepresentationMethods.h"; sourceTree = "<group>"; };
+		3295B3720F7F001400AF55EF /* NSImage+BitmapRepresentationMethods.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSImage+BitmapRepresentationMethods.m"; sourceTree = "<group>"; };
+		3295B3730F7F001400AF55EF /* NSIndexSet+SetMethods.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSIndexSet+SetMethods.h"; sourceTree = "<group>"; };
+		3295B3740F7F001400AF55EF /* NSIndexSet+SetMethods.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSIndexSet+SetMethods.m"; sourceTree = "<group>"; };
+		3295B3770F7F001400AF55EF /* NSString+PathSanitizationMethods.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+PathSanitizationMethods.h"; sourceTree = "<group>"; };
+		3295B3780F7F001400AF55EF /* NSString+PathSanitizationMethods.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+PathSanitizationMethods.m"; sourceTree = "<group>"; };
+		3295B4230F7F13E800AF55EF /* ETAFormatter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ETAFormatter.h; sourceTree = "<group>"; };
+		3295B4240F7F13E800AF55EF /* ETAFormatter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ETAFormatter.m; sourceTree = "<group>"; };
+		3295B4670F7F232A00AF55EF /* ImageAndTextCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImageAndTextCell.h; sourceTree = "<group>"; };
+		3295B4680F7F232A00AF55EF /* ImageAndTextCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ImageAndTextCell.m; sourceTree = "<group>"; };
+		3295B4920F7F267100AF55EF /* Green Check.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Green Check.png"; sourceTree = "<group>"; };
+		3295B4B20F7F2F0200AF55EF /* Red X.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Red X.png"; sourceTree = "<group>"; };
 		32A2C10C0F0A8EE000CA8DDE /* BGHUDAppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = BGHUDAppKit.framework; path = Frameworks/BGHUDAppKit.framework; sourceTree = "<group>"; };
 		32A2C1420F0A91A300CA8DDE /* HexadecimalNumberFormatter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HexadecimalNumberFormatter.h; sourceTree = "<group>"; };
 		32A2C1430F0A91A300CA8DDE /* HexadecimalNumberFormatter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HexadecimalNumberFormatter.m; sourceTree = "<group>"; };
-		32A2C1D10F0BF94A00CA8DDE /* NSImage+BitmapRepresentationMethods.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSImage+BitmapRepresentationMethods.h"; path = "Utilities/NSImage+BitmapRepresentationMethods.h"; sourceTree = "<group>"; };
-		32A2C1D20F0BF94A00CA8DDE /* NSImage+BitmapRepresentationMethods.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSImage+BitmapRepresentationMethods.m"; path = "Utilities/NSImage+BitmapRepresentationMethods.m"; sourceTree = "<group>"; };
 		32AB63260E68AF3F00EA423A /* NSViewController+PreferencesViewControllerMethods.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSViewController+PreferencesViewControllerMethods.h"; sourceTree = "<group>"; };
 		32AB63A50E68B45800EA423A /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		32AC75620E7634A5009A5E1B /* ReadOffsetCalculationOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReadOffsetCalculationOperation.h; sourceTree = "<group>"; };
@@ -420,8 +434,6 @@
 		32DBCF750370BD2300C91783 /* Rip_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Rip_Prefix.pch; sourceTree = "<group>"; };
 		32E622CB0F74189600DC1A15 /* DriveOffsets.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = DriveOffsets.plist; sourceTree = "<group>"; };
 		32E9F82F0DD6C0FF00E8ACCA /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/EncoderSettingsSheet.xib; sourceTree = SOURCE_ROOT; };
-		8C1BBC630D43DF0D00DAC484 /* GenreUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GenreUtilities.h; path = Utilities/GenreUtilities.h; sourceTree = "<group>"; };
-		8C1BBC640D43DF0D00DAC484 /* GenreUtilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = GenreUtilities.m; path = Utilities/GenreUtilities.m; sourceTree = "<group>"; };
 		8C34BB090D761A99003F2953 /* ApplicationDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ApplicationDelegate.h; sourceTree = "<group>"; };
 		8C34BB0A0D761A99003F2953 /* ApplicationDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ApplicationDelegate.m; sourceTree = "<group>"; };
 		8C34BB0C0D761AB7003F2953 /* PlugInManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PlugInManager.h; sourceTree = "<group>"; };
@@ -584,6 +596,7 @@
 				8C3EFB370D02841B0086181E /* Formatters */,
 				8C4C8B600D5C1AC600DC0279 /* ValueTransformers */,
 				8C1BBC620D43DEF800DAC484 /* Utilities */,
+				3295B4660F7F231100AF55EF /* ThirdParty */,
 				2A37F4AFFDCFA73011CA2CEA /* Other Sources */,
 				8C4C8AA70D5A902F00DC0279 /* Images */,
 				3227175C0D9F140600A421F0 /* Icons */,
@@ -741,6 +754,15 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		3295B4660F7F231100AF55EF /* ThirdParty */ = {
+			isa = PBXGroup;
+			children = (
+				3295B4670F7F232A00AF55EF /* ImageAndTextCell.h */,
+				3295B4680F7F232A00AF55EF /* ImageAndTextCell.m */,
+			);
+			path = ThirdParty;
+			sourceTree = "<group>";
+		};
 		32BBF0880EC6B32300EC2FBE /* Audio */ = {
 			isa = PBXGroup;
 			children = (
@@ -802,24 +824,24 @@
 		8C1BBC620D43DEF800DAC484 /* Utilities */ = {
 			isa = PBXGroup;
 			children = (
-				328375F40EABB7D30011EB44 /* AudioUtilities.h */,
-				328375F50EABB7D30011EB44 /* AudioUtilities.m */,
-				325B2D470E78D83000696A1A /* CDDAUtilities.h */,
-				325B2D480E78D83000696A1A /* CDDAUtilities.m */,
-				8C1BBC630D43DF0D00DAC484 /* GenreUtilities.h */,
-				8C1BBC640D43DF0D00DAC484 /* GenreUtilities.m */,
-				325B2C5A0E781BC400696A1A /* FileUtilities.h */,
-				325B2C5B0E781BC400696A1A /* FileUtilities.m */,
-				32544B880EB56C5400E14BE8 /* NSIndexSet+SetMethods.h */,
-				32544B890EB56C5400E14BE8 /* NSIndexSet+SetMethods.m */,
-				3207D4970ED66DDD00F35BD5 /* Logger.h */,
-				3207D4980ED66DDD00F35BD5 /* Logger.m */,
-				32A2C1D10F0BF94A00CA8DDE /* NSImage+BitmapRepresentationMethods.h */,
-				32A2C1D20F0BF94A00CA8DDE /* NSImage+BitmapRepresentationMethods.m */,
-				326A90320F4C0AC500023650 /* NSString+PathSanitizationMethods.h */,
-				326A90330F4C0AC500023650 /* NSString+PathSanitizationMethods.m */,
+				3295B3670F7F001400AF55EF /* AudioUtilities.h */,
+				3295B3680F7F001400AF55EF /* AudioUtilities.m */,
+				3295B3690F7F001400AF55EF /* CDDAUtilities.h */,
+				3295B36A0F7F001400AF55EF /* CDDAUtilities.m */,
+				3295B36B0F7F001400AF55EF /* FileUtilities.h */,
+				3295B36C0F7F001400AF55EF /* FileUtilities.m */,
+				3295B36D0F7F001400AF55EF /* GenreUtilities.h */,
+				3295B36E0F7F001400AF55EF /* GenreUtilities.m */,
+				3295B36F0F7F001400AF55EF /* Logger.h */,
+				3295B3700F7F001400AF55EF /* Logger.m */,
+				3295B3710F7F001400AF55EF /* NSImage+BitmapRepresentationMethods.h */,
+				3295B3720F7F001400AF55EF /* NSImage+BitmapRepresentationMethods.m */,
+				3295B3730F7F001400AF55EF /* NSIndexSet+SetMethods.h */,
+				3295B3740F7F001400AF55EF /* NSIndexSet+SetMethods.m */,
+				3295B3770F7F001400AF55EF /* NSString+PathSanitizationMethods.h */,
+				3295B3780F7F001400AF55EF /* NSString+PathSanitizationMethods.m */,
 			);
-			name = Utilities;
+			path = Utilities;
 			sourceTree = "<group>";
 		};
 		8C3C193F0D73EA0B001BAC88 /* Products */ = {
@@ -860,6 +882,10 @@
 				328DE21B0E5E628700F5BD13 /* PregapFormatter.m */,
 				32A2C1420F0A91A300CA8DDE /* HexadecimalNumberFormatter.h */,
 				32A2C1430F0A91A300CA8DDE /* HexadecimalNumberFormatter.m */,
+				3295B35A0F7EFF1000AF55EF /* SecondsFormatter.h */,
+				3295B35B0F7EFF1000AF55EF /* SecondsFormatter.m */,
+				3295B4230F7F13E800AF55EF /* ETAFormatter.h */,
+				3295B4240F7F13E800AF55EF /* ETAFormatter.m */,
 			);
 			path = Formatters;
 			sourceTree = "<group>";
@@ -885,6 +911,8 @@
 		8C4C8AA70D5A902F00DC0279 /* Images */ = {
 			isa = PBXGroup;
 			children = (
+				3295B4920F7F267100AF55EF /* Green Check.png */,
+				3295B4B20F7F2F0200AF55EF /* Red X.png */,
 				32BBF1480EC8875100EC2FBE /* CopyImageToolbarIcon.png */,
 				32BBF1490EC8875100EC2FBE /* CopyTracksToolbarIcon.png */,
 				32BBF14A0EC8875100EC2FBE /* DetectPregapsToolbarIcon.png */,
@@ -1246,6 +1274,8 @@
 				32E622CC0F74189600DC1A15 /* DriveOffsets.plist in Resources */,
 				32C9F2C20F7B1B5D0050F4B2 /* ExtractionView.xib in Resources */,
 				32C9F2C70F7B1B940050F4B2 /* MetadataView.xib in Resources */,
+				3295B4930F7F267100AF55EF /* Green Check.png in Resources */,
+				3295B4B30F7F2F0200AF55EF /* Red X.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1289,7 +1319,6 @@
 				3268C3760EB04CC500FF62F8 /* BitArrayTest.m in Sources */,
 				3268C3830EB04D3B00FF62F8 /* BitArray.m in Sources */,
 				32BBEFD10EC63B4200EC2FBE /* CDDAUtilitiesTest.m in Sources */,
-				32BBEFE70EC63C1C00EC2FBE /* CDDAUtilities.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1301,7 +1330,6 @@
 				8CB2094E0D0507F5003A90A6 /* Drive.m in Sources */,
 				8CB209750D050EE9003A90A6 /* DriveInformation.m in Sources */,
 				8C807ABF0D3F069300B48E7A /* Rip.xcdatamodel in Sources */,
-				8C1BBC650D43DF0D00DAC484 /* GenreUtilities.m in Sources */,
 				8C4C8B750D5C1DA700DC0279 /* ByteSizeValueTransformer.m in Sources */,
 				8C4C8B820D5C1DE600DC0279 /* AlbumMetadata.m in Sources */,
 				8C4C8B830D5C1DE600DC0279 /* CompactDisc.m in Sources */,
@@ -1336,8 +1364,6 @@
 				328DEE050E612CF900F5BD13 /* GeneralPreferencesViewController.m in Sources */,
 				328DEE110E612E9300F5BD13 /* EncoderPreferencesViewController.m in Sources */,
 				32AC75640E7634A5009A5E1B /* ReadOffsetCalculationOperation.m in Sources */,
-				325B2C5C0E781BC400696A1A /* FileUtilities.m in Sources */,
-				325B2D490E78D83000696A1A /* CDDAUtilities.m in Sources */,
 				324F318D0E86E2E2000E4E4E /* CompactDiscWindowController.m in Sources */,
 				324F318E0E86E2E2000E4E4E /* ReadMCNSheetController.m in Sources */,
 				324F318F0E86E2E2000E4E4E /* ReadOffsetCalculatorSheetController.m in Sources */,
@@ -1349,18 +1375,24 @@
 				328374400EAA691D0011EB44 /* TrackExtractionRecord.m in Sources */,
 				328374620EAA6B580011EB44 /* ImageExtractionRecord.m in Sources */,
 				328374FB0EAB07340011EB44 /* CompactDiscWindowController+LogFileGeneration.m in Sources */,
-				328375F60EABB7D30011EB44 /* AudioUtilities.m in Sources */,
-				32544B8A0EB56C5400E14BE8 /* NSIndexSet+SetMethods.m in Sources */,
 				32C7B61E0EBD61AC00D1A722 /* AdvancedPreferencesViewController.m in Sources */,
 				32BBF08B0EC6B34A00EC2FBE /* ExtractedAudioFile.m in Sources */,
-				3207D4990ED66DDD00F35BD5 /* Logger.m in Sources */,
 				3284CFA50EE1CF5600FEC9A1 /* CompactDisc+CueSheetGeneration.m in Sources */,
 				32A2C1440F0A91A300CA8DDE /* HexadecimalNumberFormatter.m in Sources */,
-				32A2C1D30F0BF94A00CA8DDE /* NSImage+BitmapRepresentationMethods.m in Sources */,
 				32CA7D690F0D57B500771028 /* MetadataEditorPanelController.m in Sources */,
-				326A90340F4C0AC500023650 /* NSString+PathSanitizationMethods.m in Sources */,
 				32C9F0470F7804AA0050F4B2 /* MetadataViewController.m in Sources */,
 				32C9F2BA0F7B1AB90050F4B2 /* ExtractionViewController.m in Sources */,
+				3295B3790F7F001400AF55EF /* AudioUtilities.m in Sources */,
+				3295B37A0F7F001400AF55EF /* CDDAUtilities.m in Sources */,
+				3295B37B0F7F001400AF55EF /* FileUtilities.m in Sources */,
+				3295B37C0F7F001400AF55EF /* GenreUtilities.m in Sources */,
+				3295B37D0F7F001400AF55EF /* Logger.m in Sources */,
+				3295B37E0F7F001400AF55EF /* NSImage+BitmapRepresentationMethods.m in Sources */,
+				3295B37F0F7F001400AF55EF /* NSIndexSet+SetMethods.m in Sources */,
+				3295B3810F7F001400AF55EF /* NSString+PathSanitizationMethods.m in Sources */,
+				3295B3B40F7F09C900AF55EF /* SecondsFormatter.m in Sources */,
+				3295B4250F7F13E800AF55EF /* ETAFormatter.m in Sources */,
+				3295B4690F7F232A00AF55EF /* ImageAndTextCell.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

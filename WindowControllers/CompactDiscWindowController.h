@@ -24,7 +24,6 @@
 	NSOperationQueue *_operationQueue;
 	
 	BOOL _extracting;
-	int _extractionMode; // eExtractionMode
 	
 	MetadataViewController *_metadataViewController;
 	ExtractionViewController *_extractionViewController;

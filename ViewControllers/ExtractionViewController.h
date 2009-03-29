@@ -34,6 +34,9 @@ typedef enum _eExtractionMode eExtractionMode;
 	IBOutlet NSTextField *_detailedStatusTextField;
 	
 	IBOutlet NSArrayController *_tracksRemainingArrayController;
+	IBOutlet NSArrayController *_tracksCompletedArrayController;
+	IBOutlet NSTableView *_tracksRemainingTable;
+	IBOutlet NSTableView *_tracksCompletedTable;
 
 @private
 	__strong DADiskRef _disk;
@@ -46,7 +49,7 @@ typedef enum _eExtractionMode eExtractionMode;
 	NSMutableArray *_activeTimers;
 	NSOperationQueue *_operationQueue;
 	
-	NSMutableSet *_tracksRemaining;
+	NSMutableSet *_trackIDsRemaining;
 	
 	ExtractionOperation *_copyOperation;
 	ExtractionOperation *_verificationOperation;
@@ -68,6 +71,13 @@ typedef enum _eExtractionMode eExtractionMode;
 	ImageExtractionRecord *_imageExtractionRecord;
 	NSMutableSet *_trackExtractionRecords;
 	NSMutableSet *_failedTrackIDs;
+	
+	// Properties maintained for UI
+	NSMutableSet *_tracksRemaining;
+	NSMutableSet *_tracksCompleted;
+	NSTimeInterval _secondsElapsed;
+	NSTimeInterval _estimatedSecondsRemaining;
+	NSUInteger _c2ErrorCount;
 }
 
 // ========================================
@@ -83,6 +93,11 @@ typedef enum _eExtractionMode eExtractionMode;
 @property (readonly) ImageExtractionRecord * imageExtractionRecord;
 @property (readonly) NSSet * trackExtractionRecords;
 @property (readonly) NSSet * failedTrackIDs;
+
+// UI properties
+@property (readonly, assign) NSTimeInterval secondsElapsed;
+@property (readonly, assign) NSTimeInterval estimatedSecondsRemaining;
+@property (readonly, assign) NSUInteger c2ErrorCount;
 
 // ========================================
 // The meat & potatoes

@@ -84,6 +84,9 @@ static NSString * const kkAudioExtractionKVOContext		= @"org.sbooth.Rip.Extracti
 
 @property (assign) NSUInteger retryCount;
 
+@property (assign) NSTimeInterval secondsElapsed;
+@property (assign) NSTimeInterval estimatedSecondsRemaining;
+@property (assign) NSUInteger c2ErrorCount;
 @end
 
 @interface ExtractionViewController (Callbacks)
@@ -145,6 +148,10 @@ static NSString * const kkAudioExtractionKVOContext		= @"org.sbooth.Rip.Extracti
 @synthesize trackExtractionRecords = _trackExtractionRecords;
 @synthesize failedTrackIDs = _failedTrackIDs;
 
+@synthesize secondsElapsed = _secondsElapsed;
+@synthesize estimatedSecondsRemaining = _estimatedSecondsRemaining;
+@synthesize c2ErrorCount = _c2ErrorCount;
+
 @synthesize compactDisc = _compactDisc;
 @synthesize driveInformation = _driveInformation;
 @synthesize managedObjectContext = _managedObjectContext;
@@ -178,6 +185,9 @@ static NSString * const kkAudioExtractionKVOContext		= @"org.sbooth.Rip.Extracti
 
 - (void) awakeFromNib
 {
+	NSSortDescriptor *trackNumberSortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"number" ascending:YES];
+	[_tracksRemainingArrayController setSortDescriptors:[NSArray arrayWithObject:trackNumberSortDescriptor]];
+	[_tracksCompletedArrayController setSortDescriptors:[NSArray arrayWithObject:trackNumberSortDescriptor]];
 }
 
 - (void) observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
@@ -294,15 +304,21 @@ static NSString * const kkAudioExtractionKVOContext		= @"org.sbooth.Rip.Extracti
 #pragma unused(sender)
 	
 	// Copy the array containing the tracks to be extracted
-	_tracksRemaining = [self.trackIDs mutableCopy];
+	_trackIDsRemaining = [self.trackIDs mutableCopy];
 	
 	// Set up the extraction records
 	_trackExtractionRecords = [NSMutableSet set];
 	_failedTrackIDs = [NSMutableSet set];
 	_encodingOperations =  [NSMutableArray array];
 	
-	[_tracksRemainingArrayController setContent:self.orderedTracksRemaining];
+	[self willChangeValueForKey:@"tracksRemaining"];
+	_tracksRemaining = [NSMutableSet setWithArray:self.orderedTracksRemaining];
+	[self didChangeValueForKey:@"tracksRemaining"];
 
+	[self willChangeValueForKey:@"tracksCompleted"];
+	_tracksCompleted = [NSMutableSet set];
+	[self didChangeValueForKey:@"tracksCompleted"];
+	
 	// Before starting extraction, ensure the disc's MCN has been read
 	if(!self.compactDisc.metadata.MCN) {
 		MCNDetectionOperation *operation = [[MCNDetectionOperation alloc] init];
@@ -374,7 +390,7 @@ static NSString * const kkAudioExtractionKVOContext		= @"org.sbooth.Rip.Extracti
 - (NSArray *) orderedTracksRemaining
 {
 	// Fetch the tracks to be extracted and sort them by track number
-	NSPredicate *trackPredicate  = [NSPredicate predicateWithFormat:@"self IN %@", _tracksRemaining];
+	NSPredicate *trackPredicate  = [NSPredicate predicateWithFormat:@"self IN %@", _trackIDsRemaining];
 	NSSortDescriptor *trackNumberSortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"number" ascending:YES];
 	NSEntityDescription *trackEntityDescription = [NSEntityDescription entityForName:@"TrackDescriptor" inManagedObjectContext:self.managedObjectContext];
 	
@@ -392,6 +408,21 @@ static NSString * const kkAudioExtractionKVOContext		= @"org.sbooth.Rip.Extracti
 	}
 	
 	return tracks;
+}
+
+#pragma mark NSTableView Delegate Methods
+
+- (void) tableView:(NSTableView *)aTableView willDisplayCell:(id)aCell forTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex
+{
+	if(aTableView == _tracksCompletedTable) {
+		if([aTableColumn.identifier isEqualToString:@"title"]) {
+			TrackDescriptor *track = [[_tracksCompletedArrayController arrangedObjects] objectAtIndex:rowIndex];
+			if([_failedTrackIDs containsObject:track.objectID])
+				[aCell setImage:[NSImage imageNamed:@"Red X"]];
+			else
+				[aCell setImage:[NSImage imageNamed:@"Green Check"]];
+		}
+	}
 }
 
 @end
@@ -424,10 +455,11 @@ static NSString * const kkAudioExtractionKVOContext		= @"org.sbooth.Rip.Extracti
 	
 	[_progressIndicator setDoubleValue:operation.fractionComplete];
 	
-//	NSTimeInterval secondsElapsed = [[NSDate date] timeIntervalSinceDate:operation.startTime];
-//	NSTimeInterval estimatedTimeRemaining = (secondsElapsed / operation.fractionComplete) - secondsElapsed;
-
-//	NSLog(@"C2 errors: %i", [operation.errorFlags countOfOnes]);
+	NSTimeInterval secondsElapsed = [[NSDate date] timeIntervalSinceDate:operation.startTime];
+	
+	self.secondsElapsed = secondsElapsed;
+	self.estimatedSecondsRemaining = (secondsElapsed / operation.fractionComplete) - secondsElapsed;
+	self.c2ErrorCount = [operation.errorFlags count];
 }
 
 @end
@@ -469,7 +501,11 @@ static NSString * const kkAudioExtractionKVOContext		= @"org.sbooth.Rip.Extracti
 		return;
 	
 	TrackDescriptor *track = [tracks objectAtIndex:0];
-	[_tracksRemaining removeObject:[track objectID]];
+	[_trackIDsRemaining removeObject:[track objectID]];
+	
+	[self willChangeValueForKey:@"tracksRemaining"];
+	[_tracksRemaining removeObject:track];
+	[self didChangeValueForKey:@"tracksRemaining"];
 	
 	[self removeTemporaryFiles];
 	[self resetExtractionState];
@@ -768,7 +804,7 @@ static NSString * const kkAudioExtractionKVOContext		= @"org.sbooth.Rip.Extracti
 		[self processExtractionOperation:operation forPartialTrack:track];
 	
 	// If no tracks are being processed and none remain to be extracted, we are finished			
-	if(![[self.operationQueue operations] count] && ![_tracksRemaining count]) {
+	if(![[self.operationQueue operations] count] && ![_trackIDsRemaining count]) {
 		
 		// Post-process the encoded individual tracks as an album, if required
 		NSError *error = nil;
@@ -1251,13 +1287,17 @@ static NSString * const kkAudioExtractionKVOContext		= @"org.sbooth.Rip.Extracti
 			
 			[_failedTrackIDs addObject:[track objectID]];
 			
+			[self willChangeValueForKey:@"tracksCompleted"];
+			[_tracksCompleted addObject:track];
+			[self didChangeValueForKey:@"tracksCompleted"];
+			
 			// A failure for a single track still allows individual tracks to be extracted
 			if(eExtractionModeIndividualTracks == self.extractionMode)
 				[self startExtractingNextTrack];
 			// If a single tracks fails to extract an image cannot be generated
 			else if(eExtractionModeImage == self.extractionMode) {
 				[self resetExtractionState];
-				[_tracksRemaining removeAllObjects];
+				[_trackIDsRemaining removeAllObjects];
 			}
 		}
 	}
@@ -1547,6 +1587,10 @@ static NSString * const kkAudioExtractionKVOContext		= @"org.sbooth.Rip.Extracti
 	
 	[_trackExtractionRecords addObject:extractionRecord];
 	[_encodingOperations addObject:encodingOperation];
+	
+	[self willChangeValueForKey:@"tracksCompleted"];
+	[_tracksCompleted addObject:track];
+	[self didChangeValueForKey:@"tracksCompleted"];
 	
 	return YES;
 }

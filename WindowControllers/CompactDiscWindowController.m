@@ -55,10 +55,10 @@ static NSString * const kMusicDatabaseQueryKVOContext	= @"org.sbooth.Rip.Compact
 @property (assign) DriveInformation * driveInformation;
 
 @property (assign) MetadataViewController * metadataViewController;
+@property (assign) ExtractionViewController * extractionViewController;
 
 @property (readonly) NSOperationQueue * operationQueue;
 
-@property (assign) int extractionMode;
 @property (assign) BOOL extracting;
 
 @property (readonly) NSManagedObjectContext * managedObjectContext;
@@ -81,6 +81,7 @@ static NSString * const kMusicDatabaseQueryKVOContext	= @"org.sbooth.Rip.Compact
 - (void) toggleTableColumnVisible:(id)sender;
 - (void) accurateRipQueryOperationDidReturn:(AccurateRipQueryOperation *)operation;
 - (void) musicDatabaseQueryOperationDidReturn:(MusicDatabaseQueryOperation *)operation;
+- (void) extractTracks:(NSSet *)tracks extractionMode:(eExtractionMode)extractionMode;
 - (void) showSuccessfulExtractionSheetDismissalTimerFired:(NSTimer *)timer;
 @end
 
@@ -132,7 +133,6 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 @implementation CompactDiscWindowController
 
 @synthesize operationQueue = _operationQueue;
-@synthesize extractionMode = _extractionMode;
 
 @synthesize disk = _disk;
 @synthesize compactDisc = _compactDisc;
@@ -170,10 +170,12 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 	[self.window setContentBorderThickness:WINDOW_BORDER_THICKNESS forEdge:NSMinYEdge];
 	
 	// Initially the main view in the window shows the disc's metadata
-	self.metadataViewController = [[MetadataViewController alloc] init];
-	[self.metadataViewController setRepresentedObject:self.compactDisc];
+	_metadataViewController = [[MetadataViewController alloc] init];
+	[_metadataViewController setRepresentedObject:self.compactDisc];
+	
+	_extractionViewController = [[ExtractionViewController alloc] init];
 
-	[_mainView addSubview:self.metadataViewController.view];
+	[_mainView addSubview:_metadataViewController.view];
 }
 
 - (BOOL) validateMenuItem:(NSMenuItem *)anItem
@@ -428,63 +430,7 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 		return;
 	}
 	
-	// Save the metadata
-	NSError *error = nil;
-	if([self.managedObjectContext hasChanges] && ![self.managedObjectContext save:&error])
-		[self presentError:error modalForWindow:self.window delegate:nil didPresentSelector:NULL contextInfo:NULL];
-
-	self.extractionMode = eExtractionModeIndividualTracks;
-	self.extracting = YES;
-	
-	if(!_extractionViewController)
-		_extractionViewController = [[ExtractionViewController alloc] init];
-	
-	// Set the view's frame, so when added it will have the correct size (views are not auto-sized when added)
-	_extractionViewController.view.frame = _metadataViewController.view.frame;
-
-	// Swap it in
-#if USE_ANIMATION
-	NSMutableDictionary *fadeOutAnimationDictionary = [NSMutableDictionary dictionary];
-	
-	[fadeOutAnimationDictionary setObject:_metadataViewController.view forKey:NSViewAnimationTargetKey];
-	[fadeOutAnimationDictionary setObject:NSViewAnimationFadeOutEffect forKey:NSViewAnimationEffectKey];
-	
-	NSViewAnimation *fadeOutAnimation = [[NSViewAnimation alloc] initWithViewAnimations:[NSArray arrayWithObject:fadeOutAnimationDictionary]];
-	
-	[fadeOutAnimation setDuration:0.125];
-	[fadeOutAnimation setAnimationCurve:NSAnimationEaseIn];
-	[fadeOutAnimation setAnimationBlockingMode:NSAnimationBlocking];
-	
-	[fadeOutAnimation startAnimation];
-
-	[_metadataViewController.view removeFromSuperview];
-	[_mainView addSubview:_extractionViewController.view];
-	
-	NSMutableDictionary *fadeInAnimationDictionary = [NSMutableDictionary dictionary];
-	
-	[fadeInAnimationDictionary setObject:_extractionViewController.view forKey:NSViewAnimationTargetKey];	 
-	[fadeInAnimationDictionary setObject:NSViewAnimationFadeInEffect forKey:NSViewAnimationEffectKey];
-	
-	NSViewAnimation *fadeInAnimation = [[NSViewAnimation alloc] initWithViewAnimations:[NSArray arrayWithObject:fadeInAnimationDictionary]];
-	
-	[fadeInAnimation setDuration:0.125];
-	[fadeInAnimation setAnimationCurve:NSAnimationEaseIn];
-	
-	[fadeInAnimation startAnimation];
-#else	
-	[_mainView replaceSubview:_metadataViewController.view with:_extractionViewController.view];
-#endif
-	
-	// Set up the audio extraction parameters
-	_extractionViewController.disk = self.disk;
-	_extractionViewController.extractionMode = eExtractionModeIndividualTracks;
-	_extractionViewController.trackIDs = [selectedTracks valueForKey:@"objectID"];
-	
-	_extractionViewController.maxRetries = [[NSUserDefaults standardUserDefaults] integerForKey:@"maxRetries"];
-	_extractionViewController.requiredMatches = [[NSUserDefaults standardUserDefaults] integerForKey:@"requiredMatches"];
-	
-	// Start extracting
-	[_extractionViewController extract:sender];
+	[self extractTracks:selectedTracks extractionMode:eExtractionModeIndividualTracks];
 }
 
 - (IBAction) copyImage:(id)sender
@@ -492,14 +438,7 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 
 #pragma unused(sender)
 
-	// Save the metadata
-	NSError *error = nil;
-	if([self.managedObjectContext hasChanges] && ![self.managedObjectContext save:&error])
-		[self presentError:error modalForWindow:self.window delegate:nil didPresentSelector:NULL contextInfo:NULL];
-
-	self.extractionMode = eExtractionModeImage;
-	self.extracting = YES;
-
+	[self extractTracks:self.compactDisc.firstSession.tracks extractionMode:eExtractionModeIndividualTracks];
 }
 
 - (IBAction) detectPregaps:(id)sender
@@ -821,7 +760,7 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 		NSArray *trackTitles = [tracks valueForKeyPath:@"metadata.title"];
 		NSString *trackTitlesString = [trackTitles componentsJoinedByString:@", "];
 		NSString *alertMessage = nil;
-		if(eExtractionModeImage == self.extractionMode)
+		if(eExtractionModeImage == _extractionViewController.extractionMode)
 			alertMessage = [NSString stringWithFormat:NSLocalizedString(@"The image of \u201c%@\u201d could not be created because read errors occurred during audio extraction.", @""), albumTitle];
 		else
 			alertMessage = [NSString stringWithFormat:NSLocalizedString(@"Some tracks from \u201c%@\u201d could not be copied because read errors occurred during audio extraction.", @""), albumTitle];
@@ -839,7 +778,7 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 	}
 	
 	// Save an extraction log file if any tracks (in track mode) or the image (in the image mode) were/was successfully extracted
-	if((eExtractionModeImage == self.extractionMode && !_extractionViewController.imageExtractionRecord) || (eExtractionModeIndividualTracks == self.extractionMode && ![_extractionViewController.trackExtractionRecords count]))
+	if((eExtractionModeImage == _extractionViewController.extractionMode && !_extractionViewController.imageExtractionRecord) || (eExtractionModeIndividualTracks == _extractionViewController.extractionMode && ![_extractionViewController.trackExtractionRecords count]))
 		return;
 	
 	NSString *title = self.compactDisc.metadata.title;
@@ -890,7 +829,7 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 		
 		NSReleaseAlertPanel(panel);
 		
-		[NSTimer scheduledTimerWithTimeInterval:5.0 
+		[NSTimer scheduledTimerWithTimeInterval:3.0 
 										 target:self 
 									   selector:@selector(showSuccessfulExtractionSheetDismissalTimerFired:) 
 									   userInfo:[NSArray arrayWithObject:panel] 
@@ -1016,6 +955,35 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 												  didEndSelector:@selector(showMusicDatabaseMatchesSheetDidEnd:returnCode:contextInfo:) 
 													 contextInfo:sheetController];
 	}
+}
+
+- (void) extractTracks:(NSSet *)tracks extractionMode:(eExtractionMode)extractionMode
+{
+	NSParameterAssert(nil != tracks);
+	
+	// Save the metadata
+	NSError *error = nil;
+	if([self.managedObjectContext hasChanges] && ![self.managedObjectContext save:&error])
+		[self presentError:error modalForWindow:self.window delegate:nil didPresentSelector:NULL contextInfo:NULL];
+	
+	self.extracting = YES;
+	
+	// Set the view's frame, so when added it will have the correct size (views are not auto-sized when added)
+	_extractionViewController.view.frame = _metadataViewController.view.frame;
+	
+	// Swap it in
+	[_mainView replaceSubview:_metadataViewController.view with:_extractionViewController.view];
+	
+	// Set up the audio extraction parameters
+	_extractionViewController.disk = self.disk;
+	_extractionViewController.extractionMode = extractionMode;
+	_extractionViewController.trackIDs = [tracks valueForKey:@"objectID"];
+	
+	_extractionViewController.maxRetries = [[NSUserDefaults standardUserDefaults] integerForKey:@"maxRetries"];
+	_extractionViewController.requiredMatches = [[NSUserDefaults standardUserDefaults] integerForKey:@"requiredMatches"];
+	
+	// Start extracting
+	[_extractionViewController extract:self];
 }
 
 - (void) showSuccessfulExtractionSheetDismissalTimerFired:(NSTimer *)timer
