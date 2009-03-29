@@ -28,7 +28,7 @@
 	
 	NSTimeInterval interval = [anObject doubleValue];
 	
-	NSTimeInterval intervalInSeconds = fabs(interval);
+	double intervalInSeconds = fabs(interval);
 	double intervalInMinutes = round(intervalInSeconds / SECONDS_PER_MINUTE);
 	
 	if(intervalInMinutes >= 0 && intervalInMinutes <= 1) {
