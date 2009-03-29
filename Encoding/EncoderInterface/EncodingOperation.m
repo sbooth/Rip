@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2008 Stephen F. Booth <me@sbooth.org>
+ *  Copyright (C) 2008 - 2009 Stephen F. Booth <me@sbooth.org>
  *  All Rights Reserved
  */
 
@@ -24,7 +24,8 @@ NSString * const	kMetadataLyricsKey						= @"lyrics";
 NSString * const	kMetadataCommentKey						= @"comment";
 NSString * const	kMetadataISRCKey						= @"ISRC";
 NSString * const	kMetadataMCNKey							= @"MCN";
-NSString * const	kMetadataMusicBrainzIDKey				= @"MusicBrainzID";
+NSString * const	kMetadataMusicBrainzAlbumIDKey			= @"MusicBrainzAlbumID";
+NSString * const	kMetadataMusicBrainzTrackIDKey			= @"MusicBrainzTrackID";
 NSString * const	kTrackMetadataArrayKey					= @"trackMetadataArray";
 NSString * const	kAlbumArtFrontCoverKey					= @"albumArtFrontCover";
 

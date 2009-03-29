@@ -85,7 +85,8 @@ setArgumentForTag(NSMutableArray *arguments, NSDictionary *metadata, NSString *k
 	setArgumentForTag(arguments, self.metadata, kMetadataCommentKey, @"COMMENT");
 	setArgumentForTag(arguments, self.metadata, kMetadataISRCKey, @"ISRC");
 	setArgumentForTag(arguments, self.metadata, kMetadataMCNKey, @"MCN");
-	setArgumentForTag(arguments, self.metadata, kMetadataMusicBrainzIDKey, @"MUSICBRAINZ_ID");
+	setArgumentForTag(arguments, self.metadata, kMetadataMusicBrainzAlbumIDKey, @"MUSICBRAINZ_ALBUMID");
+	setArgumentForTag(arguments, self.metadata, kMetadataMusicBrainzTrackIDKey, @"MUSICBRAINZ_TRACKID");
 
 	// Application version
 	NSString *appName = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleName"];

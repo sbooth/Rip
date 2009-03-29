@@ -60,6 +60,8 @@ metadataForTrackExtractionRecord(TrackExtractionRecord *trackExtractionRecord)
 		[metadata setObject:albumMetadata.isCompilation forKey:kMetadataCompilationKey];
 	if(albumMetadata.MCN)
 		[metadata setObject:albumMetadata.MCN forKey:kMetadataMCNKey];
+	if(albumMetadata.musicBrainzID)
+		[metadata setObject:albumMetadata.musicBrainzID forKey:kMetadataMusicBrainzAlbumIDKey];
 	if(albumMetadata.title)
 		[metadata setObject:albumMetadata.title forKey:kMetadataAlbumTitleKey];
 
@@ -83,6 +85,8 @@ metadataForTrackExtractionRecord(TrackExtractionRecord *trackExtractionRecord)
 		[metadata setObject:trackMetadata.genre forKey:kMetadataGenreKey];
 	if(trackMetadata.ISRC)
 		[metadata setObject:trackMetadata.ISRC forKey:kMetadataISRCKey];
+	if(trackMetadata.musicBrainzID)
+		[metadata setObject:trackMetadata.musicBrainzID forKey:kMetadataMusicBrainzTrackIDKey];
 	if(trackMetadata.title)
 		[metadata setObject:trackMetadata.title forKey:kMetadataTitleKey];
 
