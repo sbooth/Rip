@@ -360,6 +360,7 @@ typedef enum {
 @property (readonly) BOOL podcast;  // is this track a podcast episode?
 @property NSInteger rating;  // the rating of this track (0 to 100)
 @property (readonly) iTunesERtK ratingKind;  // the rating kind of this track
+@property (copy, readonly) NSDate *releaseDate;  // the release date of this track
 @property (readonly) NSInteger sampleRate;  // the sample rate of the track (in Hz)
 @property NSInteger seasonNumber;  // the season number of the track
 @property BOOL shufflable;  // is this track included when shuffling?
@@ -402,7 +403,7 @@ typedef enum {
 // a track representing an audio file (MP3, AIFF, etc.)
 @interface iTunesFileTrack : iTunesTrack
 
-@property (copy, readonly) NSURL *location;  // the location of the file represented by this track
+@property (copy) NSURL *location;  // the location of the file represented by this track
 
 - (void) refresh;  // update file track information from the current information in the track’s file
 
