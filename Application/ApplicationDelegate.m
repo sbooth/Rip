@@ -426,7 +426,7 @@ diskDisappearedCallback(DADiskRef disk, void *context)
 		[compactDiscWindow showWindow:self];
 
 	// If the read offset for the drive isn't configured, give the user the opportunity to configure it now
-	if(!compactDiscWindow.driveInformation.readOffset && [compactDiscWindow.compactDisc.accurateRipDiscs count]) {
+	if(!compactDiscWindow.driveInformation.readOffset) {
 		// Check and see if this drive has a known read offset
 		NSString *driveOffsetsPath = [[NSBundle mainBundle] pathForResource:@"DriveOffsets" ofType:@"plist" inDirectory:nil];
 		NSDictionary *driveOffsets = [NSDictionary dictionaryWithContentsOfFile:driveOffsetsPath];
