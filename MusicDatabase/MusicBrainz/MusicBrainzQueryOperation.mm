@@ -137,8 +137,10 @@
 		NSMutableDictionary *releaseDictionary = [NSMutableDictionary dictionary];
 		
 		// ID
-		if(!release->getId().empty())
-			[releaseDictionary setObject:[NSString stringWithCString:release->getId().c_str() encoding:NSUTF8StringEncoding] forKey:kMetadataMusicBrainzIDKey];
+		if(!release->getId().empty()) {
+			NSURL *albumURI = [NSURL URLWithString:[NSString stringWithCString:release->getId().c_str() encoding:NSUTF8StringEncoding]];
+			[releaseDictionary setObject:[[albumURI path] lastPathComponent] forKey:kMetadataMusicBrainzIDKey];
+		}
 		
 		// Title
 		if(!release->getTitle().empty())
@@ -185,8 +187,10 @@
 			[trackDictionary setObject:[NSNumber numberWithInteger:trackno] forKey:kMetadataTrackNumberKey];
 			
 			// ID
-			if(!track->getId().empty())
-				[trackDictionary setObject:[NSString stringWithCString:track->getId().c_str() encoding:NSUTF8StringEncoding] forKey:kMetadataMusicBrainzIDKey];
+			if(!track->getId().empty()) {
+				NSURL *trackURI = [NSURL URLWithString:[NSString stringWithCString:track->getId().c_str() encoding:NSUTF8StringEncoding]];
+				[trackDictionary setObject:[[trackURI path] lastPathComponent] forKey:kMetadataMusicBrainzIDKey];
+			}
 			
 			// Track title
 			[trackDictionary setObject:[NSString stringWithCString:track->getTitle().c_str() encoding:NSUTF8StringEncoding] forKey:kMetadataTitleKey];
