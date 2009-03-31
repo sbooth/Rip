@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2008 Stephen F. Booth <me@sbooth.org>
+ *  Copyright (C) 2008 - 2009 Stephen F. Booth <me@sbooth.org>
  *  All Rights Reserved
  */
 
@@ -99,7 +99,7 @@ static PlugInManager *sSharedPlugInManager						= nil;
 //		[plugIn unload];
 	}
 	
-	return conformingPlugIns;
+	return [conformingPlugIns copy];
 }
 
 - (NSArray *) plugInsMatchingClass:(Class)class error:(NSError **)error
@@ -114,17 +114,14 @@ static PlugInManager *sSharedPlugInManager						= nil;
 		if(![plugIn loadAndReturnError:error])
 			continue;
 		
-		id plugInObject = [[[plugIn principalClass] alloc] init];
-		if([plugInObject isKindOfClass:class])
+		if([plugIn principalClass] == class)
 			[matchingPlugIns addObject:plugIn];
 
 		// Clean up
-		plugInObject = nil;
 //		[plugIn unload];
 	}
 	
-	return matchingPlugIns;
-	
+	return [matchingPlugIns copy];
 }
 
 - (NSBundle *) plugInForIdentifier:(NSString *)identifier
@@ -142,13 +139,13 @@ static PlugInManager *sSharedPlugInManager						= nil;
 	[_plugIns removeAllObjects];
 	
 	// Scan these folders installed plug-ins
-	NSArray *plugInsFolderURLS = [NSArray arrayWithObjects:
+	NSArray *plugInsFolderURLs = [NSArray arrayWithObjects:
 								  self.builtInPlugInsFolderURL,
 								  self.userPlugInsFolderURL,
 								  self.localPlugInsFolderURL, nil];
 	
 	// Iterate through each PlugIns folder
-	for(NSURL *plugInsFolderURL in plugInsFolderURLS) {
+	for(NSURL *plugInsFolderURL in plugInsFolderURLs) {
 		
 		// Skip folders that don't exist
 		NSString *plugInsFolderPath = [plugInsFolderURL path];
