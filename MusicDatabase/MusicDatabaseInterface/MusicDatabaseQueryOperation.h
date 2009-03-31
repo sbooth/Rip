@@ -30,11 +30,10 @@ extern NSString * const		kMetadataAdditionalMetadataKey;
 
 extern NSString * const		kAlbumArtFrontCoverKey;
 
-
 // ========================================
 // KVC key names for the query results
 // ========================================
-extern NSString * const		kMusicDatabaseTracksKey;		// NSArray * of NSDictionary *
+extern NSString * const		kTrackMetadataArrayKey;		// NSArray * of NSDictionary *
 
 // ========================================
 // NSOperation subclass providing a generic interface to an online music database

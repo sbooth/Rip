@@ -31,7 +31,7 @@ NSString * const	kAlbumArtFrontCoverKey					= @"albumArtFrontCover";
 // ========================================
 // KVC key names for the query results
 // ========================================
-NSString * const	kMusicDatabaseTracksKey					= @"tracks";
+NSString * const	kTrackMetadataArrayKey					= @"tracks";
 
 @interface MusicDatabaseQueryOperation ()
 @property (assign) NSArray * queryResults;

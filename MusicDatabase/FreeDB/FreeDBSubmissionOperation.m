@@ -4,6 +4,7 @@
  */
 
 #import "FreeDBSubmissionOperation.h"
+#import <MusicDatabaseInterface/MusicDatabaseQueryOperation.h>
 #import <IOKit/storage/IOCDTypes.h>
 
 #include <cddb/cddb.h>
@@ -66,7 +67,7 @@
 		cddb_disc_set_artist(disc, [[self.metadata objectForKey:kMetadataAlbumArtistKey] UTF8String]);
 
 	// Tracks in FreeDB only contain title and artist
-	NSArray *tracks = [self.metadata objectForKey:kMusicDatabaseTracksKey];
+	NSArray *tracks = [self.metadata objectForKey:kTrackMetadataArrayKey];
 	for(NSDictionary *trackMetadata in tracks) {
 		NSNumber *trackNumber = [trackMetadata objectForKey:kMetadataTrackNumberKey];
 

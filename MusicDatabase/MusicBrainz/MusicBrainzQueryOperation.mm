@@ -272,7 +272,7 @@
 			delete track;
 		}
 		
-		[releaseMetadata setObject:tracksDictionary forKey:kMusicDatabaseTracksKey];
+		[releaseMetadata setObject:tracksDictionary forKey:kTrackMetadataArrayKey];
 		[matchingReleases addObject:releaseMetadata];
 
 		delete result;

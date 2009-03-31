@@ -135,7 +135,7 @@
 			track = cddb_disc_get_track_next(disc);
 		}
 
-		[discInformation setObject:discTracks forKey:kMusicDatabaseTracksKey];		
+		[discInformation setObject:discTracks forKey:kTrackMetadataArrayKey];		
 		[matchingDiscs addObject:discInformation];
 		
 		// Housekeeping

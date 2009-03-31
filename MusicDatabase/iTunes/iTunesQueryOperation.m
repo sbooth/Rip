@@ -155,7 +155,7 @@
 			[discTracks addObject:trackInformation];
 		}
 		
-		[discInformation setObject:discTracks forKey:kMusicDatabaseTracksKey];
+		[discInformation setObject:discTracks forKey:kTrackMetadataArrayKey];
 		[matchingDiscs addObject:discInformation];
 	}
 
