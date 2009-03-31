@@ -3,15 +3,13 @@
  *  All Rights Reserved
  */
 
-#import "MetadataSourceViewController.h"
+#import "MetadataSourceData.h"
 
 // ========================================
 // KVC key names for the metadata dictionaries
 // ========================================
 NSString * const	kMetadataTitleKey						= @"title";
-NSString * const	kMetadataAlbumTitleKey					= @"albumTitle";
 NSString * const	kMetadataArtistKey						= @"artist";
-NSString * const	kMetadataAlbumArtistKey					= @"albumArtist";
 NSString * const	kMetadataGenreKey						= @"genre";
 NSString * const	kMetadataComposerKey					= @"composer";
 NSString * const	kMetadataReleaseDateKey					= @"date";
@@ -27,9 +25,9 @@ NSString * const	kMetadataMCNKey							= @"MCN";
 NSString * const	kMetadataMusicBrainzIDKey				= @"MusicBrainzID";
 NSString * const	kMetadataAdditionalMetadataKey			= @"additionalMetadata";
 NSString * const	kAlbumArtFrontCoverKey					= @"albumArtFrontCover";
-NSString * const	kMetadataSourceTracksKey				= @"tracks";
+NSString * const	kTrackMetadataArrayKey					= @"tracks";
 
-@implementation MetadataSourceViewController
+@implementation MetadataSourceData
 
 // ========================================
 // Properties
@@ -38,13 +36,5 @@ NSString * const	kMetadataSourceTracksKey				= @"tracks";
 @synthesize musicBrainzDiscID = _musicBrainzDiscID;
 @synthesize settings = _settings;
 @synthesize metadata = _metadata;
-
-// ========================================
-// Subclasses MUST override this method
-- (id) init
-{
-	[self doesNotRecognizeSelector:_cmd];
-	return nil;
-}
 
 @end

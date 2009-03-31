@@ -18,7 +18,7 @@
 - (NSViewController *) configurationViewController;
 
 // Create an instance of NSViewController allowing users to edit the metadata source's configuration
-// The controller's representedObject will be set to XXX
+// The controller's representedObject will be set to an instance of MetadataSourceData
 - (NSViewController *) metadataSourceViewController;
 
 @end

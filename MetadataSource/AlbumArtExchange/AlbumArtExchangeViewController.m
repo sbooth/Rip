@@ -7,6 +7,7 @@
 #import "AlbumArtExchangeInterface.h"
 #import "AlbumArtExchangeImage.h"
 
+#import <MetadataSourceInterface/MetadataSourceData.h>
 #import <Quartz/Quartz.h>
 
 @implementation AlbumArtExchangeViewController
@@ -20,11 +21,21 @@
 
 - (void) awakeFromNib
 {
-	// The desired search term
-	self.query = @"Slippery When Wet";
+	// Set the initial search term
+	MetadataSourceData *data = [self representedObject];
+	NSString *albumTitle = [data.metadata objectForKey:kMetadataTitleKey];
+	NSString *albumArtist = [data.metadata objectForKey:kMetadataArtistKey];
+
+	if(albumTitle && albumArtist)
+		self.query = [NSString stringWithFormat:@"%@ %@", albumArtist, albumTitle];
+	else if(albumTitle)
+		self.query = albumTitle;
+	else if(albumArtist)
+		self.query = albumArtist;
 
 	// Automatically start searching
-	[self search:self];
+	if([self.query length])
+		[self search:self];
 }
 
 - (IBAction) setZoom:(id)sender
@@ -37,8 +48,6 @@
 
 - (IBAction) search:(id)sender
 {
-	NSLog(@"SEARCH:%@",sender);
-	
 	[_images removeAllObjects];
 	[_imageBrowser reloadData];
 	
@@ -46,6 +55,11 @@
 	if(_urlConnection) {
 		[_urlConnection cancel], _urlConnection = nil;
 		[_progressIndicator stopAnimation:sender];
+	}
+
+	if(![self.query length]) {
+		NSBeep();
+		return;
 	}
 
 	// All searches start at this URL
@@ -100,7 +114,7 @@
 {
 
 #pragma unused(aBrowser)
-	NSLog(@"imageBrowser:objectAtIndex:%i [count = %i]",index,_images.count);
+
 	return [_images objectAtIndex:index];
 }
 

@@ -7,9 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		328AB2660F8077F1001F1C78 /* MetadataSourceViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 328AB2640F8077F1001F1C78 /* MetadataSourceViewController.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		328AB2670F8077F1001F1C78 /* MetadataSourceViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 328AB2650F8077F1001F1C78 /* MetadataSourceViewController.m */; };
 		328DE29E0E5F849F00F5BD13 /* MetadataSourceInterface.h in Headers */ = {isa = PBXBuildFile; fileRef = 328DE29C0E5F849F00F5BD13 /* MetadataSourceInterface.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		32F0D2A70F82ABA000643A32 /* MetadataSourceData.h in Headers */ = {isa = PBXBuildFile; fileRef = 32F0D2A50F82ABA000643A32 /* MetadataSourceData.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		32F0D2A80F82ABA000643A32 /* MetadataSourceData.m in Sources */ = {isa = PBXBuildFile; fileRef = 32F0D2A60F82ABA000643A32 /* MetadataSourceData.m */; };
 		8DC2EF530486A6940098B216 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C1666FE841158C02AAC07 /* InfoPlist.strings */; };
 		8DC2EF570486A6940098B216 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7B1FEA5585E11CA2CBB /* Cocoa.framework */; };
 /* End PBXBuildFile section */
@@ -19,10 +19,10 @@
 		0867D6A5FE840307C02AAC07 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		089C1667FE841158C02AAC07 /* English */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		1058C7B1FEA5585E11CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
-		328AB2640F8077F1001F1C78 /* MetadataSourceViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MetadataSourceViewController.h; sourceTree = "<group>"; };
-		328AB2650F8077F1001F1C78 /* MetadataSourceViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MetadataSourceViewController.m; sourceTree = "<group>"; };
 		328DE29C0E5F849F00F5BD13 /* MetadataSourceInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MetadataSourceInterface.h; sourceTree = "<group>"; };
 		32DBCF5E0370ADEE00C91783 /* MusicDatabaseInterface_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MusicDatabaseInterface_Prefix.pch; sourceTree = "<group>"; };
+		32F0D2A50F82ABA000643A32 /* MetadataSourceData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MetadataSourceData.h; sourceTree = "<group>"; };
+		32F0D2A60F82ABA000643A32 /* MetadataSourceData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MetadataSourceData.m; sourceTree = "<group>"; };
 		8DC2EF5A0486A6940098B216 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8DC2EF5B0486A6940098B216 /* MetadataSourceInterface.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = MetadataSourceInterface.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D2F7E79907B2D74100F64583 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = /System/Library/Frameworks/CoreData.framework; sourceTree = "<absolute>"; };
@@ -82,8 +82,8 @@
 			isa = PBXGroup;
 			children = (
 				328DE29C0E5F849F00F5BD13 /* MetadataSourceInterface.h */,
-				328AB2640F8077F1001F1C78 /* MetadataSourceViewController.h */,
-				328AB2650F8077F1001F1C78 /* MetadataSourceViewController.m */,
+				32F0D2A50F82ABA000643A32 /* MetadataSourceData.h */,
+				32F0D2A60F82ABA000643A32 /* MetadataSourceData.m */,
 			);
 			name = Classes;
 			sourceTree = "<group>";
@@ -122,7 +122,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				328DE29E0E5F849F00F5BD13 /* MetadataSourceInterface.h in Headers */,
-				328AB2660F8077F1001F1C78 /* MetadataSourceViewController.h in Headers */,
+				32F0D2A70F82ABA000643A32 /* MetadataSourceData.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -182,7 +182,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				328AB2670F8077F1001F1C78 /* MetadataSourceViewController.m in Sources */,
+				32F0D2A80F82ABA000643A32 /* MetadataSourceData.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

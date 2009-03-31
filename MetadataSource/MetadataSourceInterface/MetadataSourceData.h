@@ -9,9 +9,7 @@
 // KVC key names for the metadata dictionaries
 // ========================================
 extern NSString * const		kMetadataTitleKey;
-extern NSString * const		kMetadataAlbumTitleKey;
 extern NSString * const		kMetadataArtistKey;
-extern NSString * const		kMetadataAlbumArtistKey;
 extern NSString * const		kMetadataGenreKey;
 extern NSString * const		kMetadataComposerKey;
 extern NSString * const		kMetadataReleaseDateKey;
@@ -30,14 +28,14 @@ extern NSString * const		kMetadataAdditionalMetadataKey;
 
 extern NSString * const		kAlbumArtFrontCoverKey;
 
-extern NSString * const		kMetadataSourceTracksKey;		// NSArray * of NSDictionary *
+extern NSString * const		kTrackMetadataArrayKey;		// NSArray * of NSDictionary *
 
 // ========================================
-//
+// A class encapsulating data about a compact disc passed to a MetadataSource
 // ========================================
-@interface MetadataSourceViewController : NSViewController
+@interface MetadataSourceData : NSObject
 {
-@protected
+@private
 	NSData *_discTOC;					// Contains a CDTOC * as defined in <IOKit/storage/IOCDTypes.h>
 	NSUInteger _freeDBDiscID;			// This disc's FreeDB disc ID
 	NSString * _musicBrainzDiscID;		// This disc's MusicBrainz disc ID
