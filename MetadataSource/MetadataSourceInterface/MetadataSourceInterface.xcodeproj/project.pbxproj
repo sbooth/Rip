@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		327EA9900F82CEC600E744EC /* MetadataSourceDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 327EA9730F82CE0700E744EC /* MetadataSourceDelegate.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		328DE29E0E5F849F00F5BD13 /* MetadataSourceInterface.h in Headers */ = {isa = PBXBuildFile; fileRef = 328DE29C0E5F849F00F5BD13 /* MetadataSourceInterface.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		32F0D2A70F82ABA000643A32 /* MetadataSourceData.h in Headers */ = {isa = PBXBuildFile; fileRef = 32F0D2A50F82ABA000643A32 /* MetadataSourceData.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		32F0D2A80F82ABA000643A32 /* MetadataSourceData.m in Sources */ = {isa = PBXBuildFile; fileRef = 32F0D2A60F82ABA000643A32 /* MetadataSourceData.m */; };
@@ -19,6 +20,7 @@
 		0867D6A5FE840307C02AAC07 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		089C1667FE841158C02AAC07 /* English */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		1058C7B1FEA5585E11CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
+		327EA9730F82CE0700E744EC /* MetadataSourceDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MetadataSourceDelegate.h; sourceTree = "<group>"; };
 		328DE29C0E5F849F00F5BD13 /* MetadataSourceInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MetadataSourceInterface.h; sourceTree = "<group>"; };
 		32DBCF5E0370ADEE00C91783 /* MusicDatabaseInterface_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MusicDatabaseInterface_Prefix.pch; sourceTree = "<group>"; };
 		32F0D2A50F82ABA000643A32 /* MetadataSourceData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MetadataSourceData.h; sourceTree = "<group>"; };
@@ -81,6 +83,7 @@
 		08FB77AEFE84172EC02AAC07 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				327EA9730F82CE0700E744EC /* MetadataSourceDelegate.h */,
 				328DE29C0E5F849F00F5BD13 /* MetadataSourceInterface.h */,
 				32F0D2A50F82ABA000643A32 /* MetadataSourceData.h */,
 				32F0D2A60F82ABA000643A32 /* MetadataSourceData.m */,
@@ -121,6 +124,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				327EA9900F82CEC600E744EC /* MetadataSourceDelegate.h in Headers */,
 				328DE29E0E5F849F00F5BD13 /* MetadataSourceInterface.h in Headers */,
 				32F0D2A70F82ABA000643A32 /* MetadataSourceData.h in Headers */,
 			);

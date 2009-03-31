@@ -5,6 +5,8 @@
 
 #import <Cocoa/Cocoa.h>
 
+@protocol MetadataSourceDelegate;
+
 // ========================================
 // KVC key names for the metadata dictionaries
 // ========================================
@@ -41,6 +43,8 @@ extern NSString * const		kTrackMetadataArrayKey;		// NSArray * of NSDictionary *
 	NSString * _musicBrainzDiscID;		// This disc's MusicBrainz disc ID
 	NSDictionary *_settings;			// A dictionary containing any settings configured by the user
 	NSDictionary *_metadata;			// A dictionary containing the disc's metadata
+	
+	id <MetadataSourceDelegate> _delegate;
 }
 
 // ========================================
@@ -50,5 +54,5 @@ extern NSString * const		kTrackMetadataArrayKey;		// NSArray * of NSDictionary *
 @property (copy) NSString * musicBrainzDiscID;
 @property (copy) NSDictionary * settings;
 @property (copy) NSDictionary * metadata;
-
+@property (assign) id <MetadataSourceDelegate> delegate;
 @end

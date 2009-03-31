@@ -36,5 +36,5 @@ NSString * const	kTrackMetadataArrayKey					= @"tracks";
 @synthesize musicBrainzDiscID = _musicBrainzDiscID;
 @synthesize settings = _settings;
 @synthesize metadata = _metadata;
-
+@synthesize delegate = _delegate;
 @end

@@ -8,7 +8,12 @@
 #import "AlbumArtExchangeImage.h"
 
 #import <MetadataSourceInterface/MetadataSourceData.h>
+#import <MetadataSourceInterface/MetadataSourceDelegate.h>
 #import <Quartz/Quartz.h>
+
+@interface AlbumArtExchangeViewController (Private)
+- (MetadataSourceData *) metadataSourceData;
+@end
 
 @implementation AlbumArtExchangeViewController
 
@@ -22,7 +27,7 @@
 - (void) awakeFromNib
 {
 	// Set the initial search term
-	MetadataSourceData *data = [self representedObject];
+	MetadataSourceData *data = [self metadataSourceData];
 	NSString *albumTitle = [data.metadata objectForKey:kMetadataTitleKey];
 	NSString *albumArtist = [data.metadata objectForKey:kMetadataArtistKey];
 
@@ -86,7 +91,7 @@
 
 #pragma unused(sender)
 	
-	NSLog(@"useSelected");
+	[[[self metadataSourceData] delegate] metadataSourceViewController:self finishedWithReturnCode:NSOKButton];
 }
 
 - (IBAction) cancel:(id)sender
@@ -97,7 +102,7 @@
 		[_progressIndicator stopAnimation:sender];
 	}
 	
-	NSLog(@"cancel");
+	[[[self metadataSourceData] delegate] metadataSourceViewController:self finishedWithReturnCode:NSCancelButton];
 }
 
 #pragma mark IKImageBrowserDataSource Protocol Methods
@@ -283,6 +288,15 @@
 #pragma unused(parser)
 	
 	[self.view.window presentError:parseError modalForWindow:self.view.window delegate:nil didPresentSelector:NULL contextInfo:NULL];
+}
+
+@end
+
+@implementation AlbumArtExchangeViewController (Private)
+
+- (MetadataSourceData *) metadataSourceData
+{
+	return (MetadataSourceData *)[self representedObject];
 }
 
 @end
