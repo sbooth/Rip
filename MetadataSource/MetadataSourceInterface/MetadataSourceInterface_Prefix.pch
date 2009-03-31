@@ -1,0 +1,7 @@
+//
+// Prefix header for all source files of the 'MusicDatabaseInterface' target in the 'MusicDatabaseInterface' project.
+//
+
+#ifdef __OBJC__
+    #import <Cocoa/Cocoa.h>
+#endif
