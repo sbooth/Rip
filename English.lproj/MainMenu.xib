@@ -457,7 +457,7 @@
 										</object>
 									</object>
 								</object>
-								<object class="NSMenuItem" id="576250479">
+								<object class="NSMenuItem" id="44420918">
 									<reference key="NSMenu" ref="466310130"/>
 									<bool key="NSIsDisabled">YES</bool>
 									<bool key="NSIsSeparator">YES</bool>
@@ -500,6 +500,32 @@
 									</object>
 								</object>
 								<object class="NSMenuItem" id="399379956">
+									<reference key="NSMenu" ref="466310130"/>
+									<bool key="NSIsDisabled">YES</bool>
+									<bool key="NSIsSeparator">YES</bool>
+									<string key="NSTitle"/>
+									<string key="NSKeyEquiv"/>
+									<int key="NSMnemonicLoc">2147483647</int>
+									<reference key="NSOnImage" ref="314800402"/>
+									<reference key="NSMixedImage" ref="940492740"/>
+								</object>
+								<object class="NSMenuItem" id="962552172">
+									<reference key="NSMenu" ref="466310130"/>
+									<string key="NSTitle">Search For Metadata Using</string>
+									<string key="NSKeyEquiv"/>
+									<int key="NSMnemonicLoc">2147483647</int>
+									<reference key="NSOnImage" ref="314800402"/>
+									<reference key="NSMixedImage" ref="940492740"/>
+									<string key="NSAction">submenuAction:</string>
+									<int key="NSTag">3</int>
+									<object class="NSMenu" key="NSSubmenu" id="423813949">
+										<string key="NSTitle">Search For Metadata Using</string>
+										<object class="NSMutableArray" key="NSMenuItems">
+											<bool key="EncodedWithXMLCoder">YES</bool>
+										</object>
+									</object>
+								</object>
+								<object class="NSMenuItem" id="576250479">
 									<reference key="NSMenu" ref="466310130"/>
 									<bool key="NSIsDisabled">YES</bool>
 									<bool key="NSIsSeparator">YES</bool>
@@ -1470,7 +1496,6 @@
 							<reference ref="307479599"/>
 							<reference ref="599611094"/>
 							<reference ref="877104839"/>
-							<reference ref="576250479"/>
 							<reference ref="757568367"/>
 							<reference ref="912471434"/>
 							<reference ref="65323759"/>
@@ -1483,6 +1508,9 @@
 							<reference ref="399379956"/>
 							<reference ref="840554121"/>
 							<reference ref="897816561"/>
+							<reference ref="44420918"/>
+							<reference ref="962552172"/>
+							<reference ref="576250479"/>
 						</object>
 						<reference key="parent" ref="586577488"/>
 					</object>
@@ -1756,6 +1784,28 @@
 						<reference key="object" ref="132039870"/>
 						<reference key="parent" ref="103529515"/>
 					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">468</int>
+						<reference key="object" ref="962552172"/>
+						<object class="NSMutableArray" key="children">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<reference ref="423813949"/>
+						</object>
+						<reference key="parent" ref="466310130"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">469</int>
+						<reference key="object" ref="423813949"/>
+						<object class="NSMutableArray" key="children">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+						</object>
+						<reference key="parent" ref="962552172"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">471</int>
+						<reference key="object" ref="44420918"/>
+						<reference key="parent" ref="466310130"/>
+					</object>
 				</object>
 			</object>
 			<object class="NSMutableDictionary" key="flattenedProperties">
@@ -1897,6 +1947,10 @@
 					<string>465.IBEditorWindowLastContentRect</string>
 					<string>465.IBPluginDependency</string>
 					<string>466.IBPluginDependency</string>
+					<string>468.IBPluginDependency</string>
+					<string>469.IBEditorWindowLastContentRect</string>
+					<string>469.IBPluginDependency</string>
+					<string>471.IBPluginDependency</string>
 					<string>5.IBPluginDependency</string>
 					<string>5.ImportedFromIB2</string>
 					<string>56.IBPluginDependency</string>
@@ -1996,7 +2050,7 @@
 					<string>{74, 862}</string>
 					<string>{{494, 877}, {388, 20}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{249, 432}, {245, 273}}</string>
+					<string>{{249, 402}, {266, 303}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>{{217, 747}, {234, 43}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -2034,7 +2088,7 @@
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="9"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{494, 592}, {105, 23}}</string>
+					<string>{{515, 612}, {105, 23}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -2056,7 +2110,11 @@
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{494, 642}, {105, 23}}</string>
+					<string>{{494, 562}, {105, 23}}</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>{{515, 519}, {64, 6}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -2105,7 +2163,7 @@
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">467</int>
+			<int key="maxID">471</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -2156,6 +2214,7 @@
 							<string>queryMusicDatabase:</string>
 							<string>readISRCs:</string>
 							<string>readMCN:</string>
+							<string>searchForMetadata:</string>
 							<string>selectAllTracks:</string>
 							<string>submitToDefaultMusicDatabase:</string>
 							<string>submitToMusicDatabase:</string>
@@ -2177,24 +2236,12 @@
 							<string>id</string>
 							<string>id</string>
 							<string>id</string>
+							<string>id</string>
 						</object>
 					</object>
 					<object class="NSMutableDictionary" key="outlets">
-						<bool key="EncodedWithXMLCoder">YES</bool>
-						<object class="NSMutableArray" key="dict.sortedKeys">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>_compactDiscController</string>
-							<string>_driveInformationController</string>
-							<string>_mainView</string>
-							<string>_trackController</string>
-						</object>
-						<object class="NSMutableArray" key="dict.values">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>NSObjectController</string>
-							<string>NSObjectController</string>
-							<string>NSView</string>
-							<string>NSArrayController</string>
-						</object>
+						<string key="NS.key.0">_mainView</string>
+						<string key="NS.object.0">NSView</string>
 					</object>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
@@ -2208,10 +2255,6 @@
 						<string key="NS.key.0">toggleDiscInspectorPanel:</string>
 						<string key="NS.object.0">id</string>
 					</object>
-					<object class="NSMutableDictionary" key="outlets">
-						<string key="NS.key.0">_documentObjectController</string>
-						<string key="NS.object.0">NSObjectController</string>
-					</object>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
 						<string key="minorKey">InspectorPanels/DiscInspectorPanelController.h</string>
@@ -2223,10 +2266,6 @@
 					<object class="NSMutableDictionary" key="actions">
 						<string key="NS.key.0">toggleDriveInspectorPanel:</string>
 						<string key="NS.object.0">id</string>
-					</object>
-					<object class="NSMutableDictionary" key="outlets">
-						<string key="NS.key.0">_documentObjectController</string>
-						<string key="NS.object.0">NSObjectController</string>
 					</object>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
@@ -2310,10 +2349,6 @@
 						<string key="NS.key.0">toggleMetadataEditorPanel:</string>
 						<string key="NS.object.0">id</string>
 					</object>
-					<object class="NSMutableDictionary" key="outlets">
-						<string key="NS.key.0">_documentObjectController</string>
-						<string key="NS.object.0">NSObjectController</string>
-					</object>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
 						<string key="minorKey">InspectorPanels/MetadataEditorPanelController.h</string>
@@ -2337,10 +2372,6 @@
 					<object class="NSMutableDictionary" key="actions">
 						<string key="NS.key.0">toggleTrackInspectorPanel:</string>
 						<string key="NS.object.0">id</string>
-					</object>
-					<object class="NSMutableDictionary" key="outlets">
-						<string key="NS.key.0">_documentObjectController</string>
-						<string key="NS.object.0">NSObjectController</string>
 					</object>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>

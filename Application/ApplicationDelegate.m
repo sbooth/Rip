@@ -9,6 +9,7 @@
 #import "DriveInformation.h"
 #import "EncoderManager.h"
 #import "MusicDatabaseManager.h"
+#import "MetadataSourceManager.h"
 #import "ReadOffsetCalculatorSheetController.h"
 #import "Logger.h"
 
@@ -18,6 +19,8 @@
 #import "MusicDatabaseInterface/MusicDatabaseInterface.h"
 #import "MusicDatabaseInterface/MusicDatabaseQueryOperation.h"
 #import "MusicDatabaseInterface/MusicDatabaseSubmissionOperation.h"
+
+#import "MetadataSourceInterface/MetadataSourceInterface.h"
 
 #include <CoreFoundation/CoreFoundation.h>
 #include <DiskArbitration/DiskArbitration.h>
@@ -194,6 +197,27 @@ diskDisappearedCallback(DADiskRef disk, void *context)
 	NSMenuItem *submitTagsUsingMenuItem = [compactDiscMenuItemSubmenu itemWithTag:2];
 	[lookupTagsUsingMenuItem setSubmenu:lookupMetadataUsingMenu];
 	[submitTagsUsingMenuItem setSubmenu:submitMetadataUsingMenu];
+	
+	// Build the "Search For Metadata Using" menu so it includes all the loaded MetadataSources
+	NSMenu *searchForMetadataUsingMenu = [[NSMenu alloc] initWithTitle:@"Search For Metadata Using Menu"];
+	
+	MetadataSourceManager *metadataSourceManager = [MetadataSourceManager sharedMetadataSourceManager];
+	for(NSBundle *metadataSourceBundle in metadataSourceManager.availableMetadataSources) {
+		id <MetadataSourceInterface> metadataSourceInterface = [[[metadataSourceBundle principalClass] alloc] init];
+		
+		if(metadataSourceInterface) {
+			NSMenuItem *menuItem = [[NSMenuItem alloc] initWithTitle:[metadataSourceBundle objectForInfoDictionaryKey:@"MetadataSourceName"]
+															  action:@selector(searchForMetadata:)
+													   keyEquivalent:@""];
+			
+			[menuItem setRepresentedObject:metadataSourceBundle];			
+			[searchForMetadataUsingMenu addItem:menuItem];
+		}
+	}
+	
+	// Add the menu
+	NSMenuItem *searchForMetadataUsingMenuItem = [compactDiscMenuItemSubmenu itemWithTag:3];
+	[searchForMetadataUsingMenuItem setSubmenu:searchForMetadataUsingMenu];
 	
 	// Use DiskArbitration to request mount/unmount information for audio CDs
 	// Create a dictionary which will match IOMedia objects of type kIOCDMediaClass

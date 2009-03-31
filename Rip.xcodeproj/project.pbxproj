@@ -29,6 +29,11 @@
 		328374620EAA6B580011EB44 /* ImageExtractionRecord.m in Sources */ = {isa = PBXBuildFile; fileRef = 328374610EAA6B580011EB44 /* ImageExtractionRecord.m */; };
 		328374FB0EAB07340011EB44 /* CompactDiscWindowController+LogFileGeneration.m in Sources */ = {isa = PBXBuildFile; fileRef = 328374FA0EAB07340011EB44 /* CompactDiscWindowController+LogFileGeneration.m */; };
 		3284CFA50EE1CF5600FEC9A1 /* CompactDisc+CueSheetGeneration.m in Sources */ = {isa = PBXBuildFile; fileRef = 3284CFA40EE1CF5600FEC9A1 /* CompactDisc+CueSheetGeneration.m */; };
+		328AB11D0F8071C4001F1C78 /* MetadataSourceManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 328AB11C0F8071C4001F1C78 /* MetadataSourceManager.m */; };
+		328AB1DB0F8074E4001F1C78 /* MetadataSourceInterface.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 328AB1D50F8074D9001F1C78 /* MetadataSourceInterface.framework */; };
+		328AB1DE0F807539001F1C78 /* MetadataSourceInterface.framework in Copy Embedded Frameworks */ = {isa = PBXBuildFile; fileRef = 328AB1D50F8074D9001F1C78 /* MetadataSourceInterface.framework */; };
+		328AB30F0F8084EE001F1C78 /* AlbumArtExchange.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 328AB30E0F8084E9001F1C78 /* AlbumArtExchange.bundle */; };
+		328AB3100F80850C001F1C78 /* AlbumArtExchange.bundle in Copy PlugIns */ = {isa = PBXBuildFile; fileRef = 328AB30E0F8084E9001F1C78 /* AlbumArtExchange.bundle */; };
 		328DE21C0E5E628700F5BD13 /* PregapFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = 328DE21B0E5E628700F5BD13 /* PregapFormatter.m */; };
 		328DE4C20E5FBFE500F5BD13 /* MusicBrainz.bundle in Copy PlugIns */ = {isa = PBXBuildFile; fileRef = 328DE4C00E5FBFBF00F5BD13 /* MusicBrainz.bundle */; };
 		328DE4CE0E5FC08500F5BD13 /* MusicDatabaseManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 328DE4CD0E5FC08500F5BD13 /* MusicDatabaseManager.m */; };
@@ -155,6 +160,34 @@
 			remoteGlobalIDString = 8D5B49AC048680CD000E48DA;
 			remoteInfo = FLAC;
 		};
+		328AB1D40F8074D9001F1C78 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 328AB1D00F8074D9001F1C78 /* MetadataSourceInterface.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 8DC2EF5B0486A6940098B216;
+			remoteInfo = MetadataSourceInterface;
+		};
+		328AB1DC0F807513001F1C78 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 328AB1D00F8074D9001F1C78 /* MetadataSourceInterface.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 8DC2EF4F0486A6940098B216;
+			remoteInfo = MetadataSourceInterface;
+		};
+		328AB30D0F8084E9001F1C78 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 328AB3050F8084E9001F1C78 /* AlbumArtExchange.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 8D5B49B6048680CD000E48DA;
+			remoteInfo = AlbumArtExchange;
+		};
+		328AB4130F808DDB001F1C78 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 328AB3050F8084E9001F1C78 /* AlbumArtExchange.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 8D5B49AC048680CD000E48DA;
+			remoteInfo = AlbumArtExchange;
+		};
 		328DE28A0E5F831600F5BD13 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 328DE2860E5F831600F5BD13 /* MusicDatabaseInterface.xcodeproj */;
@@ -276,6 +309,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
+				328AB3100F80850C001F1C78 /* AlbumArtExchange.bundle in Copy PlugIns */,
 				32CE93870F5657E900AB328A /* WavPack.bundle in Copy PlugIns */,
 				32C5ACA50E6D220D007C1E7A /* WAVE.bundle in Copy PlugIns */,
 				32C5ABF90E6D1B36007C1E7A /* AppleLossless.bundle in Copy PlugIns */,
@@ -293,11 +327,12 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				32A2C1100F0A8EF100CA8DDE /* BGHUDAppKit.framework in Copy Embedded Frameworks */,
-				328DE5150E5FC69600F5BD13 /* MusicDatabaseInterface.framework in Copy Embedded Frameworks */,
-				32C793F60E291B4B0079706C /* Sparkle.framework in Copy Embedded Frameworks */,
 				8C3C194A0D73EA35001BAC88 /* EncoderInterface.framework in Copy Embedded Frameworks */,
+				328DE5150E5FC69600F5BD13 /* MusicDatabaseInterface.framework in Copy Embedded Frameworks */,
+				328AB1DE0F807539001F1C78 /* MetadataSourceInterface.framework in Copy Embedded Frameworks */,
 				8CA35F950D2F42B300F89E3B /* discid.framework in Copy Embedded Frameworks */,
+				32C793F60E291B4B0079706C /* Sparkle.framework in Copy Embedded Frameworks */,
+				32A2C1100F0A8EF100CA8DDE /* BGHUDAppKit.framework in Copy Embedded Frameworks */,
 			);
 			name = "Copy Embedded Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -348,6 +383,10 @@
 		328374FA0EAB07340011EB44 /* CompactDiscWindowController+LogFileGeneration.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "CompactDiscWindowController+LogFileGeneration.m"; sourceTree = "<group>"; };
 		3284CFA30EE1CF5600FEC9A1 /* CompactDisc+CueSheetGeneration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "CompactDisc+CueSheetGeneration.h"; sourceTree = "<group>"; };
 		3284CFA40EE1CF5600FEC9A1 /* CompactDisc+CueSheetGeneration.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "CompactDisc+CueSheetGeneration.m"; sourceTree = "<group>"; };
+		328AB11B0F8071C4001F1C78 /* MetadataSourceManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MetadataSourceManager.h; sourceTree = "<group>"; };
+		328AB11C0F8071C4001F1C78 /* MetadataSourceManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MetadataSourceManager.m; sourceTree = "<group>"; };
+		328AB1D00F8074D9001F1C78 /* MetadataSourceInterface.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = MetadataSourceInterface.xcodeproj; path = MetadataSourceInterface/MetadataSourceInterface.xcodeproj; sourceTree = "<group>"; };
+		328AB3050F8084E9001F1C78 /* AlbumArtExchange.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = AlbumArtExchange.xcodeproj; path = AlbumArtExchange/AlbumArtExchange.xcodeproj; sourceTree = "<group>"; };
 		328DE21A0E5E628700F5BD13 /* PregapFormatter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PregapFormatter.h; sourceTree = "<group>"; };
 		328DE21B0E5E628700F5BD13 /* PregapFormatter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PregapFormatter.m; sourceTree = "<group>"; };
 		328DE2860E5F831600F5BD13 /* MusicDatabaseInterface.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = MusicDatabaseInterface.xcodeproj; path = MusicDatabaseInterface/MusicDatabaseInterface.xcodeproj; sourceTree = "<group>"; };
@@ -537,6 +576,7 @@
 				328DE5130E5FC67500F5BD13 /* MusicDatabaseInterface.framework in Frameworks */,
 				32AB63A60E68B45800EA423A /* SystemConfiguration.framework in Frameworks */,
 				32A2C10D0F0A8EE000CA8DDE /* BGHUDAppKit.framework in Frameworks */,
+				328AB1DB0F8074E4001F1C78 /* MetadataSourceInterface.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -591,6 +631,7 @@
 				8C8AC5680D099D4B00A90C21 /* InspectorPanels */,
 				8C3EF83D0CFFC5880086181E /* AccurateRip */,
 				8CA35CC80D2E707800F89E3B /* MusicDatabase */,
+				328AB11A0F807148001F1C78 /* MetadataSource */,
 				8CDBEE630CFA092E000EC553 /* Application */,
 				8C46E3EC0D775E4700AE4470 /* Preferences */,
 				8C3EFB370D02841B0086181E /* Formatters */,
@@ -720,6 +761,33 @@
 				32BBEFD00EC63B4200EC2FBE /* CDDAUtilitiesTest.m */,
 			);
 			name = "Test Cases";
+			sourceTree = "<group>";
+		};
+		328AB11A0F807148001F1C78 /* MetadataSource */ = {
+			isa = PBXGroup;
+			children = (
+				328AB3050F8084E9001F1C78 /* AlbumArtExchange.xcodeproj */,
+				328AB1D00F8074D9001F1C78 /* MetadataSourceInterface.xcodeproj */,
+				328AB11B0F8071C4001F1C78 /* MetadataSourceManager.h */,
+				328AB11C0F8071C4001F1C78 /* MetadataSourceManager.m */,
+			);
+			path = MetadataSource;
+			sourceTree = "<group>";
+		};
+		328AB1D10F8074D9001F1C78 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				328AB1D50F8074D9001F1C78 /* MetadataSourceInterface.framework */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		328AB3060F8084E9001F1C78 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				328AB30E0F8084E9001F1C78 /* AlbumArtExchange.bundle */,
+			);
+			name = Products;
 			sourceTree = "<group>";
 		};
 		328DE2870E5F831600F5BD13 /* Products */ = {
@@ -1090,6 +1158,7 @@
 			dependencies = (
 				8C3C19490D73EA21001BAC88 /* PBXTargetDependency */,
 				328DE3400E5F8B5100F5BD13 /* PBXTargetDependency */,
+				328AB1DD0F807513001F1C78 /* PBXTargetDependency */,
 				328DE7350E5FE47700F5BD13 /* PBXTargetDependency */,
 				328DE7370E5FE47700F5BD13 /* PBXTargetDependency */,
 				328DE7390E5FE47700F5BD13 /* PBXTargetDependency */,
@@ -1097,6 +1166,7 @@
 				32C5ABF80E6D1B0E007C1E7A /* PBXTargetDependency */,
 				32C5ACA40E6D21FE007C1E7A /* PBXTargetDependency */,
 				32CE93820F5657B300AB328A /* PBXTargetDependency */,
+				328AB4140F808DDB001F1C78 /* PBXTargetDependency */,
 			);
 			name = Rip;
 			productInstallPath = "$(HOME)/Applications";
@@ -1116,6 +1186,10 @@
 			projectDirPath = "";
 			projectReferences = (
 				{
+					ProductGroup = 328AB3060F8084E9001F1C78 /* Products */;
+					ProjectRef = 328AB3050F8084E9001F1C78 /* AlbumArtExchange.xcodeproj */;
+				},
+				{
 					ProductGroup = 32C5ABE30E6D1AF5007C1E7A /* Products */;
 					ProjectRef = 32C5ABE20E6D1AF5007C1E7A /* AppleLossless.xcodeproj */;
 				},
@@ -1134,6 +1208,10 @@
 				{
 					ProductGroup = 328DE6230E5FD8E000F5BD13 /* Products */;
 					ProjectRef = 328DE6220E5FD8E000F5BD13 /* iTunes.xcodeproj */;
+				},
+				{
+					ProductGroup = 328AB1D10F8074D9001F1C78 /* Products */;
+					ProjectRef = 328AB1D00F8074D9001F1C78 /* MetadataSourceInterface.xcodeproj */;
 				},
 				{
 					ProductGroup = 328DE4B80E5FBFBF00F5BD13 /* Products */;
@@ -1166,6 +1244,20 @@
 			fileType = wrapper.cfbundle;
 			path = FLAC.bundle;
 			remoteRef = 3252C1810DD237C500856BFE /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		328AB1D50F8074D9001F1C78 /* MetadataSourceInterface.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = MetadataSourceInterface.framework;
+			remoteRef = 328AB1D40F8074D9001F1C78 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		328AB30E0F8084E9001F1C78 /* AlbumArtExchange.bundle */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = AlbumArtExchange.bundle;
+			remoteRef = 328AB30D0F8084E9001F1C78 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		328DE28B0E5F831600F5BD13 /* MusicDatabaseInterface.framework */ = {
@@ -1276,6 +1368,7 @@
 				32C9F2C70F7B1B940050F4B2 /* MetadataView.xib in Resources */,
 				3295B4930F7F267100AF55EF /* Green Check.png in Resources */,
 				3295B4B30F7F2F0200AF55EF /* Red X.png in Resources */,
+				328AB30F0F8084EE001F1C78 /* AlbumArtExchange.bundle in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1393,6 +1486,7 @@
 				3295B3B40F7F09C900AF55EF /* SecondsFormatter.m in Sources */,
 				3295B4250F7F13E800AF55EF /* ETAFormatter.m in Sources */,
 				3295B4690F7F232A00AF55EF /* ImageAndTextCell.m in Sources */,
+				328AB11D0F8071C4001F1C78 /* MetadataSourceManager.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1403,6 +1497,16 @@
 			isa = PBXTargetDependency;
 			name = FLAC;
 			targetProxy = 3252C1C80DD2387500856BFE /* PBXContainerItemProxy */;
+		};
+		328AB1DD0F807513001F1C78 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = MetadataSourceInterface;
+			targetProxy = 328AB1DC0F807513001F1C78 /* PBXContainerItemProxy */;
+		};
+		328AB4140F808DDB001F1C78 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = AlbumArtExchange;
+			targetProxy = 328AB4130F808DDB001F1C78 /* PBXContainerItemProxy */;
 		};
 		328DE3400E5F8B5100F5BD13 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;

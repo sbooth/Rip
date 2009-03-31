@@ -5,6 +5,7 @@
 
 #import <Cocoa/Cocoa.h>
 #include <DiskArbitration/DiskArbitration.h>
+#import <MetadataSourceInterface/MetadataSourceDelegate.h>
 
 @class CompactDisc, DriveInformation;
 @class MetadataViewController, ExtractionViewController;
@@ -12,7 +13,7 @@
 // ========================================
 // The main window representing a single compact disc
 // ========================================
-@interface CompactDiscWindowController : NSWindowController
+@interface CompactDiscWindowController : NSWindowController <MetadataSourceDelegate>
 {
 	IBOutlet NSView *_mainView;
 	
@@ -63,6 +64,8 @@
 
 - (IBAction) submitToDefaultMusicDatabase:(id)sender;
 - (IBAction) submitToMusicDatabase:(id)sender;
+
+- (IBAction) searchForMetadata:(id)sender;
 
 - (IBAction) queryAccurateRip:(id)sender;
 
