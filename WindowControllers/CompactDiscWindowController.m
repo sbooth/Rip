@@ -11,6 +11,7 @@
 #import "SessionDescriptor.h"
 #import "TrackDescriptor.h"
 #import "AlbumMetadata.h"
+#import "AlbumArtwork.h"
 #import "TrackMetadata.h"
 
 #import "MetadataViewController.h"
@@ -42,8 +43,90 @@
 #import "AccurateRipTrackRecord.h"
 
 #import "NSString+PathSanitizationMethods.h"
+#import "NSImage+BitmapRepresentationMethods.h"
 
 #define WINDOW_BORDER_THICKNESS ((CGFloat)20)
+
+// ========================================
+// Extract the metadata from a disc into a dictionary
+// ========================================
+static NSDictionary * metadataForTrack(TrackDescriptor *track)
+{
+	NSCParameterAssert(nil != track);
+	
+	TrackMetadata *trackMetadata = track.metadata;
+	NSMutableDictionary *metadata = [NSMutableDictionary dictionary];
+	
+	// Track number
+	[metadata setObject:track.number forKey:kMetadataTrackNumberKey];
+	
+	// Track metadata
+	if(trackMetadata.additionalMetadata)
+		[metadata setObject:trackMetadata.additionalMetadata forKey:kMetadataAdditionalMetadataKey];
+	if(trackMetadata.artist)
+		[metadata setObject:trackMetadata.artist forKey:kMetadataArtistKey];
+	if(trackMetadata.composer)
+		[metadata setObject:trackMetadata.composer forKey:kMetadataComposerKey];
+	if(trackMetadata.date)
+		[metadata setObject:trackMetadata.artist forKey:kMetadataReleaseDateKey];
+	if(trackMetadata.genre)
+		[metadata setObject:trackMetadata.genre forKey:kMetadataGenreKey];
+	if(trackMetadata.ISRC)
+		[metadata setObject:trackMetadata.ISRC forKey:kMetadataISRCKey];
+	if(trackMetadata.lyrics)
+		[metadata setObject:trackMetadata.lyrics forKey:kMetadataLyricsKey];
+	if(trackMetadata.musicBrainzID)
+		[metadata setObject:trackMetadata.artist forKey:kMetadataMusicBrainzIDKey];
+	if(trackMetadata.title)
+		[metadata setObject:trackMetadata.title forKey:kMetadataTitleKey];
+
+	return [metadata copy];
+}
+
+static NSDictionary * metadataForCompactDisc(CompactDisc *disc)
+{
+	NSCParameterAssert(nil != disc);
+
+	AlbumMetadata *albumMetadata = disc.metadata;
+	NSMutableDictionary *metadata = [NSMutableDictionary dictionary];
+	
+	// Track total
+	[metadata setObject:[NSNumber numberWithUnsignedInteger:disc.firstSession.tracks.count] forKey:kMetadataTrackTotalKey];
+	
+	// Album metadata
+	if(albumMetadata.additionalMetadata)
+		[metadata setObject:albumMetadata.additionalMetadata forKey:kMetadataAdditionalMetadataKey];
+	if(albumMetadata.artist)
+		[metadata setObject:albumMetadata.artist forKey:kMetadataArtistKey];
+	if(albumMetadata.date)
+		[metadata setObject:albumMetadata.date forKey:kMetadataReleaseDateKey];
+	if(albumMetadata.discNumber)
+		[metadata setObject:albumMetadata.discNumber forKey:kMetadataDiscNumberKey];
+	if(albumMetadata.discTotal)
+		[metadata setObject:albumMetadata.discTotal forKey:kMetadataDiscTotalKey];
+	if(albumMetadata.isCompilation)
+		[metadata setObject:albumMetadata.isCompilation forKey:kMetadataCompilationKey];
+	if(albumMetadata.MCN)
+		[metadata setObject:albumMetadata.MCN forKey:kMetadataMCNKey];
+	if(albumMetadata.musicBrainzID)
+		[metadata setObject:albumMetadata.musicBrainzID forKey:kMetadataMusicBrainzIDKey];
+	if(albumMetadata.title)
+		[metadata setObject:albumMetadata.title forKey:kMetadataTitleKey];
+	
+	// Album artwork
+	NSImage *frontCoverImage = albumMetadata.artwork.frontCoverImage;
+	if(frontCoverImage)
+		[metadata setObject:frontCoverImage forKey:kAlbumArtFrontCoverKey];
+	
+	// Individual track metadata
+	NSMutableArray *trackMetadataArray = [NSMutableArray array];
+	for(TrackDescriptor *track in disc.firstSession.tracks)
+		[trackMetadataArray addObject:metadataForTrack(track)];
+	
+	[metadata setObject:trackMetadataArray forKey:kTrackMetadataArrayKey];
+	
+	return [metadata copy];
+}
 
 // ========================================
 // Context objects for observeValueForKeyPath:ofObject:change:context:
@@ -393,6 +476,103 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 	
 	if(NSCancelButton == returnCode)
 		return;
+
+	NSDictionary *metadataDictionary = [(MetadataSourceData *)[viewController representedObject] metadata];
+	
+	// Iterate over the metadata and save any changes that were made (to user-editable metadata only)
+	
+	// Album metadata
+	AlbumMetadata *albumMetadata = self.compactDisc.metadata;
+
+	NSDictionary *additionalMetadata = [metadataDictionary objectForKey:kMetadataAdditionalMetadataKey];
+	if(additionalMetadata && ![albumMetadata.additionalMetadata isEqualToDictionary:additionalMetadata])
+	   albumMetadata.additionalMetadata = additionalMetadata;
+	
+	NSString *artist = [metadataDictionary objectForKey:kMetadataArtistKey];
+	if(artist && ![albumMetadata.artist isEqualToString:artist])
+		albumMetadata.artist = artist;
+	
+	NSString *date = [metadataDictionary objectForKey:kMetadataReleaseDateKey];
+	if(date && ![albumMetadata.date isEqualToString:date])
+		albumMetadata.date = date;
+	
+	NSNumber *discNumber = [metadataDictionary objectForKey:kMetadataDiscNumberKey];
+	if(discNumber && ![albumMetadata.discNumber isEqualToNumber:discNumber])
+		albumMetadata.discNumber = discNumber;
+	
+	NSNumber *discTotal = [metadataDictionary objectForKey:kMetadataDiscTotalKey];
+	if(discTotal && ![albumMetadata.discTotal isEqualToNumber:discTotal])
+		albumMetadata.discTotal = discTotal;
+	
+	NSNumber *isCompilation = [metadataDictionary objectForKey:kMetadataCompilationKey];
+	if(isCompilation && ![albumMetadata.isCompilation isEqualToNumber:isCompilation])
+		albumMetadata.isCompilation = isCompilation;
+	
+	NSString *MCN = [metadataDictionary objectForKey:kMetadataMCNKey];
+	if(MCN && ![albumMetadata.MCN isEqualToString:MCN])
+		albumMetadata.MCN = MCN;
+	
+	NSString *musicBrainzID = [metadataDictionary objectForKey:kMetadataMusicBrainzIDKey];
+	if(musicBrainzID && ![albumMetadata.musicBrainzID isEqualToString:musicBrainzID])
+		albumMetadata.musicBrainzID = musicBrainzID;
+	
+	NSString *title = [metadataDictionary objectForKey:kMetadataTitleKey];
+	if(title && ![albumMetadata.title isEqualToString:title])
+		albumMetadata.title = title;
+	
+	// Album art
+	NSImage *frontCoverImage = [metadataDictionary objectForKey:kAlbumArtFrontCoverKey];
+	NSData *imageData = [frontCoverImage TIFFRepresentation];
+	NSData *imageArchive = [NSArchiver archivedDataWithRootObject:imageData];
+	if(imageArchive && ![albumMetadata.artwork.frontCover isEqual:imageArchive])
+		albumMetadata.artwork.frontCover = imageArchive;
+	
+	// Track metadata
+	NSArray *tracks = [metadataDictionary objectForKey:kTrackMetadataArrayKey];
+	for(metadataDictionary in tracks) {
+		NSNumber *trackNumber = [metadataDictionary objectForKey:kMetadataTrackNumberKey];
+		TrackDescriptor *track = [self.compactDisc trackNumber:[trackNumber unsignedIntegerValue]];
+		TrackMetadata *trackMetadata = track.metadata;
+		
+		if(!trackMetadata)
+			continue;
+		
+		additionalMetadata = [metadataDictionary objectForKey:kMetadataAdditionalMetadataKey];
+		if(additionalMetadata && ![trackMetadata.additionalMetadata isEqualToDictionary:additionalMetadata])
+			trackMetadata.additionalMetadata = additionalMetadata;
+		
+		artist = [metadataDictionary objectForKey:kMetadataArtistKey];
+		if(artist && ![trackMetadata.artist isEqualToString:artist])
+			trackMetadata.artist = artist;
+
+		NSString *composer = [metadataDictionary objectForKey:kMetadataComposerKey];
+		if(composer && ![trackMetadata.composer isEqualToString:composer])
+			trackMetadata.composer = composer;
+		
+		date = [metadataDictionary objectForKey:kMetadataReleaseDateKey];
+		if(date && ![trackMetadata.date isEqualToString:date])
+			trackMetadata.date = date;
+		
+		NSString *genre = [metadataDictionary objectForKey:kMetadataGenreKey];
+		if(genre && ![trackMetadata.genre isEqualToString:genre])
+			trackMetadata.genre = genre;
+		
+		NSString *ISRC = [metadataDictionary objectForKey:kMetadataISRCKey];
+		if(ISRC && ![trackMetadata.ISRC isEqualToString:ISRC])
+			trackMetadata.ISRC = ISRC;
+		
+		NSString *lyrics = [metadataDictionary objectForKey:kMetadataLyricsKey];
+		if(lyrics && ![trackMetadata.lyrics isEqualToString:lyrics])
+			trackMetadata.lyrics = lyrics;
+		
+		musicBrainzID = [metadataDictionary objectForKey:kMetadataMusicBrainzIDKey];
+		if(musicBrainzID && ![trackMetadata.musicBrainzID isEqualToString:musicBrainzID])
+			trackMetadata.musicBrainzID = musicBrainzID;
+		
+		title = [metadataDictionary objectForKey:kMetadataTitleKey];
+		if(title && ![trackMetadata.title isEqualToString:title])
+			trackMetadata.title = title;
+	}
 }
 
 #pragma mark Action Methods
@@ -676,81 +856,13 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 	if(!viewController)
 		return;
 
-	// Flatten the metadata
-	NSMutableDictionary *flattenedMetadata = [NSMutableDictionary dictionary];
-	
-	// Track total
-	[flattenedMetadata setObject:[NSNumber numberWithUnsignedInteger:self.compactDisc.firstSession.tracks.count] forKey:kMetadataTrackTotalKey];
-	
-	// Album metadata
-	AlbumMetadata *albumMetadata = self.compactDisc.metadata;
-	if(albumMetadata.additionalMetadata)
-		[flattenedMetadata setObject:albumMetadata.additionalMetadata forKey:kMetadataAdditionalMetadataKey];
-	if(albumMetadata.artist)
-		[flattenedMetadata setObject:albumMetadata.artist forKey:kMetadataArtistKey];
-	if(albumMetadata.date)
-		[flattenedMetadata setObject:albumMetadata.date forKey:kMetadataReleaseDateKey];
-	if(albumMetadata.discNumber)
-		[flattenedMetadata setObject:albumMetadata.discNumber forKey:kMetadataDiscNumberKey];
-	if(albumMetadata.discTotal)
-		[flattenedMetadata setObject:albumMetadata.discTotal forKey:kMetadataDiscTotalKey];
-	if(albumMetadata.isCompilation)
-		[flattenedMetadata setObject:albumMetadata.isCompilation forKey:kMetadataCompilationKey];
-	if(albumMetadata.MCN)
-		[flattenedMetadata setObject:albumMetadata.MCN forKey:kMetadataMCNKey];
-	if(albumMetadata.musicBrainzID)
-		[flattenedMetadata setObject:albumMetadata.musicBrainzID forKey:kMetadataMusicBrainzIDKey];
-	if(albumMetadata.title)
-		[flattenedMetadata setObject:albumMetadata.title forKey:kMetadataTitleKey];
-	
-	// Album artwork
-//	NSImage *frontCoverImage = albumMetadata.artwork.frontCoverImage;
-//	if(frontCoverImage) {
-//		NSURL *frontCoverURL = temporaryURLWithExtension(@"png");
-//		NSData *frontCoverPNGData = [frontCoverImage PNGData];
-//		[frontCoverPNGData writeToURL:frontCoverURL atomically:NO];
-//		[metadata setObject:frontCoverURL forKey:kAlbumArtFrontCoverKey];
-//	}
-	
-	// Individual track metadata
-	NSMutableArray *trackMetadataArray = [NSMutableArray array];
-	for(TrackDescriptor *track in self.compactDisc.firstSession.tracks) {
-		TrackMetadata *trackMetadataObject = track.metadata;
-		NSMutableDictionary *trackMetadata = [NSMutableDictionary dictionary];
-		
-		// Track number
-		[trackMetadata setObject:track.number forKey:kMetadataTrackNumberKey];
-		
-		// Track metadata
-		if(trackMetadataObject.additionalMetadata)
-			[trackMetadata setObject:trackMetadataObject.additionalMetadata forKey:kMetadataAdditionalMetadataKey];
-		if(trackMetadataObject.artist)
-			[trackMetadata setObject:trackMetadataObject.artist forKey:kMetadataArtistKey];
-		if(trackMetadataObject.composer)
-			[trackMetadata setObject:trackMetadataObject.composer forKey:kMetadataComposerKey];
-		if(trackMetadataObject.date)
-			[trackMetadata setObject:trackMetadataObject.artist forKey:kMetadataReleaseDateKey];
-		if(trackMetadataObject.genre)
-			[trackMetadata setObject:trackMetadataObject.genre forKey:kMetadataGenreKey];
-		if(trackMetadataObject.ISRC)
-			[trackMetadata setObject:trackMetadataObject.ISRC forKey:kMetadataISRCKey];
-		if(trackMetadataObject.lyrics)
-			[trackMetadata setObject:trackMetadataObject.lyrics forKey:kMetadataLyricsKey];
-		if(trackMetadataObject.musicBrainzID)
-			[trackMetadata setObject:trackMetadataObject.artist forKey:kMetadataMusicBrainzIDKey];
-		if(trackMetadataObject.title)
-			[trackMetadata setObject:trackMetadataObject.title forKey:kMetadataTitleKey];
-
-		[trackMetadataArray addObject:trackMetadata];
-	}
-	[flattenedMetadata setObject:trackMetadataArray forKey:kTrackMetadataArrayKey];
-
 	MetadataSourceData *metadataSourceData = [[MetadataSourceData alloc] init];
+	
 	metadataSourceData.discTOC = self.compactDisc.discTOC;
 	metadataSourceData.freeDBDiscID = self.compactDisc.freeDBDiscID;
 	metadataSourceData.musicBrainzDiscID = self.compactDisc.musicBrainzDiscID;
 	metadataSourceData.settings = metadataSourceSettings;
-	metadataSourceData.metadata = [flattenedMetadata copy];
+	metadataSourceData.metadata = metadataForCompactDisc(self.compactDisc);
 	metadataSourceData.delegate = self;
 	
 	[viewController setRepresentedObject:metadataSourceData];
@@ -990,7 +1102,7 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 		track.metadata.composer = [trackMetadata valueForKey:kMetadataComposerKey];
 		track.metadata.date = [trackMetadata valueForKey:kMetadataReleaseDateKey];
 		track.metadata.genre = [trackMetadata valueForKey:kMetadataGenreKey];
-//		track.metadata.ISRC = [musicDatabaseEntry valueForKey:kMetadataISRCKey];
+		track.metadata.ISRC = [musicDatabaseEntry valueForKey:kMetadataISRCKey];
 		track.metadata.lyrics = [trackMetadata valueForKey:kMetadataLyricsKey];
 		track.metadata.musicBrainzID = [trackMetadata valueForKey:kMetadataMusicBrainzIDKey];
 		track.metadata.title = [trackMetadata valueForKey:kMetadataTitleKey];
