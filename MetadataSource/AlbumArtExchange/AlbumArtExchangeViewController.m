@@ -26,6 +26,9 @@
 
 - (void) awakeFromNib
 {
+	// For some reason this flag doesn't stick in IB
+	[_imageBrowser setAllowsMultipleSelection:NO];
+	
 	// Set the initial search term
 	MetadataSourceData *data = [self metadataSourceData];
 	NSString *albumTitle = [data.metadata objectForKey:kMetadataTitleKey];
@@ -79,7 +82,7 @@
 	// Go get 'em!
 	_urlConnection = [[NSURLConnection alloc] initWithRequest:request delegate:self];
 	if(!_urlConnection) {
-		NSLog(@"fnord!!");
+		NSLog(@"Unable to create NSURLConnection");
 		return;
 	}
 	
@@ -90,6 +93,20 @@
 {
 
 #pragma unused(sender)
+	
+	// Save the selected image, if there is a selection
+	NSIndexSet *selectionIndexes = [_imageBrowser selectionIndexes];
+	if([selectionIndexes count]) {
+		NSUInteger selectedIndex = [selectionIndexes firstIndex];	
+		AlbumArtExchangeImage *image = [_images objectAtIndex:selectedIndex];
+		// Load the full size image
+		NSImage *selectedImage = [[NSImage alloc] initWithContentsOfURL:image.imageURL];
+		if(selectedImage) {
+			NSMutableDictionary *metadata = [[[self metadataSourceData] metadata] mutableCopy];
+			[metadata setObject:selectedImage forKey:kAlbumArtFrontCoverKey];
+			[[self metadataSourceData] setMetadata:metadata];
+		}		
+	}
 	
 	[[[self metadataSourceData] delegate] metadataSourceViewController:self finishedWithReturnCode:NSOKButton];
 }
@@ -127,9 +144,8 @@
 
 - (void) imageBrowserSelectionDidChange:(IKImageBrowserView *)aBrowser
 {
-	NSUInteger selectedIndex = [[aBrowser selectionIndexes] firstIndex];
-	
-	AlbumArtExchangeImage *image = [_images objectAtIndex:selectedIndex];
+	NSIndexSet *selectionIndexes = [aBrowser selectionIndexes];
+	[_useSelectedButton setEnabled:(0 != [selectionIndexes count])];
 }
 
 - (void) imageBrowser:(IKImageBrowserView *)aBrowser cellWasDoubleClickedAtIndex:(NSUInteger)index

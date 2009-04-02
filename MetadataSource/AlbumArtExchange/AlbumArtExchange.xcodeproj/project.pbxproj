@@ -85,7 +85,6 @@
 				089C167CFE841241C02AAC07 /* Resources */,
 				089C1671FE841209C02AAC07 /* Frameworks and Libraries */,
 				19C28FB8FE9D52D311CA2CBB /* Products */,
-				328AB4440F808F23001F1C78 /* QuartzCore.framework */,
 			);
 			name = MusicBrainz;
 			sourceTree = "<group>";
@@ -125,6 +124,7 @@
 		1058C7ACFEA557BF11CA2CBB /* Linked Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				328AB4440F808F23001F1C78 /* QuartzCore.framework */,
 				328AB3670F808AED001F1C78 /* Quartz.framework */,
 				1058C7ADFEA557BF11CA2CBB /* Cocoa.framework */,
 			);

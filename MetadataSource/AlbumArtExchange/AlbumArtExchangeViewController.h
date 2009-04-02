@@ -17,6 +17,7 @@
 {
 	IBOutlet IKImageBrowserView *_imageBrowser;
 	IBOutlet NSProgressIndicator *_progressIndicator;
+	IBOutlet NSButton *_useSelectedButton;
 
 @private
 	NSMutableArray *_images;
