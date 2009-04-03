@@ -4,6 +4,7 @@
  */
 
 #import "AdvancedPreferencesViewController.h"
+#import "ApplicationDelegate.h"
 
 @implementation AdvancedPreferencesViewController
 
@@ -26,7 +27,7 @@
 
 - (IBAction) savePreferences:(id)sender
 {
-	[[[NSApplication sharedApplication] delegate] saveAction:sender];
+	[(ApplicationDelegate *)[[NSApplication sharedApplication] delegate] saveAction:sender];
 }
 
 @end
