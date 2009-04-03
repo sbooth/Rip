@@ -44,12 +44,13 @@
 
 - (NSString *) imageTitle
 {
-	return [NSString stringWithFormat:@"%@ %@", self.title, self.artist];
+	return [NSString stringWithFormat:NSLocalizedString(@"%@ - %@", @""), self.title, self.artist];
 }
 
 - (NSString *) imageSubtitle
 {
-	return [NSString stringWithFormat:@"%@ %@", self.imageFormat, NSStringFromSize(self.imageDimensions)];
+	NSString *sizeString = [NSString stringWithFormat:NSLocalizedString(@"%ld x %ld", @""), (NSUInteger)self.imageDimensions.width, (NSUInteger)self.imageDimensions.height];
+	return [NSString stringWithFormat:NSLocalizedString(@"%@,  %@", @""), sizeString, self.imageFormat];
 }
 
 @end
