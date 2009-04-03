@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		3253B4CA0F81D7FE00A0EADF /* AlbumArtExchangeImage.m in Sources */ = {isa = PBXBuildFile; fileRef = 3253B4C90F81D7FE00A0EADF /* AlbumArtExchangeImage.m */; };
+		325E2D5A0F85CF87001E7495 /* IncreaseThumbnailSize.png in Resources */ = {isa = PBXBuildFile; fileRef = 325E2D580F85CF87001E7495 /* IncreaseThumbnailSize.png */; };
+		325E2D5B0F85CF87001E7495 /* DecreaseThumbnailSize.png in Resources */ = {isa = PBXBuildFile; fileRef = 325E2D590F85CF87001E7495 /* DecreaseThumbnailSize.png */; };
 		328AB31D0F80859D001F1C78 /* AlbumArtExchangeView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 328AB31B0F80859D001F1C78 /* AlbumArtExchangeView.xib */; };
 		328AB3270F8085EF001F1C78 /* MetadataSourceInterface.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 328AB2E50F808396001F1C78 /* MetadataSourceInterface.framework */; };
 		328AB3680F808AED001F1C78 /* Quartz.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 328AB3670F808AED001F1C78 /* Quartz.framework */; };
@@ -48,6 +50,8 @@
 		1058C7ADFEA557BF11CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
 		3253B4C80F81D7FE00A0EADF /* AlbumArtExchangeImage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AlbumArtExchangeImage.h; sourceTree = "<group>"; };
 		3253B4C90F81D7FE00A0EADF /* AlbumArtExchangeImage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AlbumArtExchangeImage.m; sourceTree = "<group>"; };
+		325E2D580F85CF87001E7495 /* IncreaseThumbnailSize.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = IncreaseThumbnailSize.png; sourceTree = "<group>"; };
+		325E2D590F85CF87001E7495 /* DecreaseThumbnailSize.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = DecreaseThumbnailSize.png; sourceTree = "<group>"; };
 		328AB2E00F808396001F1C78 /* MetadataSourceInterface.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = MetadataSourceInterface.xcodeproj; path = ../MetadataSourceInterface/MetadataSourceInterface.xcodeproj; sourceTree = SOURCE_ROOT; };
 		328AB31C0F80859D001F1C78 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/AlbumArtExchangeView.xib; sourceTree = "<group>"; };
 		328AB3670F808AED001F1C78 /* Quartz.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Quartz.framework; path = System/Library/Frameworks/Quartz.framework; sourceTree = SDKROOT; };
@@ -101,6 +105,8 @@
 		089C167CFE841241C02AAC07 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				325E2D580F85CF87001E7495 /* IncreaseThumbnailSize.png */,
+				325E2D590F85CF87001E7495 /* DecreaseThumbnailSize.png */,
 				8D5B49B7048680CD000E48DA /* Info.plist */,
 				089C167DFE841241C02AAC07 /* InfoPlist.strings */,
 				328AB31B0F80859D001F1C78 /* AlbumArtExchangeView.xib */,
@@ -228,6 +234,8 @@
 			files = (
 				8D5B49B0048680CD000E48DA /* InfoPlist.strings in Resources */,
 				328AB31D0F80859D001F1C78 /* AlbumArtExchangeView.xib in Resources */,
+				325E2D5A0F85CF87001E7495 /* IncreaseThumbnailSize.png in Resources */,
+				325E2D5B0F85CF87001E7495 /* DecreaseThumbnailSize.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
