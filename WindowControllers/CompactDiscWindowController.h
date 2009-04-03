@@ -23,9 +23,7 @@
 	DriveInformation *_driveInformation;
 	
 	NSOperationQueue *_operationQueue;
-	
-	BOOL _extracting;
-	
+
 	MetadataViewController *_metadataViewController;
 	ExtractionViewController *_extractionViewController;
 }

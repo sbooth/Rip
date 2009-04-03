@@ -144,8 +144,6 @@ static NSString * const kMusicDatabaseQueryKVOContext	= @"org.sbooth.Rip.Compact
 
 @property (readonly) NSOperationQueue * operationQueue;
 
-@property (assign) BOOL extracting;
-
 @property (readonly) NSManagedObjectContext * managedObjectContext;
 @property (readonly) id managedObjectModel;
 @end
@@ -223,8 +221,6 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 @synthesize compactDisc = _compactDisc;
 @synthesize driveInformation = _driveInformation;
 
-@synthesize extracting = _extracting;
-
 @synthesize metadataViewController = _metadataViewController;
 @synthesize extractionViewController = _extractionViewController;
 
@@ -265,7 +261,8 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 
 - (BOOL) validateMenuItem:(NSMenuItem *)anItem
 {
-	if(self.isExtracting)
+	// Only allow disc-related actions if the main metadata view is diplayed
+	if(![_metadataViewController.view isDescendantOf:_mainView])
 		return NO;
 	else if([anItem action] == @selector(copySelectedTracks:)) {
 		NSUInteger countOfSelectedTracks = self.compactDisc.firstSession.selectedTracks.count;
@@ -333,7 +330,7 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 
 - (BOOL) validateToolbarItem:(NSToolbarItem *)theItem
 {
-	if(self.isExtracting)
+	if(![_metadataViewController.view isDescendantOf:_mainView])
 		return NO;
 	else if([theItem action] == @selector(copySelectedTracks:))
 		return (0 != self.compactDisc.firstSession.selectedTracks.count);
@@ -950,8 +947,6 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 
 - (void) extractionFinishedWithReturnCode:(int)returnCode
 {
-	self.extracting = NO;
-	
 	// Replace the extraction view with the metadata view
 	_metadataViewController.view.frame = _extractionViewController.view.frame;
 	[_mainView replaceSubview:_extractionViewController.view with:_metadataViewController.view];
@@ -1193,8 +1188,6 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 	NSError *error = nil;
 	if([self.managedObjectContext hasChanges] && ![self.managedObjectContext save:&error])
 		[self presentError:error modalForWindow:self.window delegate:nil didPresentSelector:NULL contextInfo:NULL];
-	
-	self.extracting = YES;
 	
 	// Set the view's frame, so when added it will have the correct size (views are not auto-sized when added)
 	_extractionViewController.view.frame = _metadataViewController.view.frame;
