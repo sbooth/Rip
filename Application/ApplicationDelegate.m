@@ -13,6 +13,8 @@
 #import "ReadOffsetCalculatorSheetController.h"
 #import "Logger.h"
 
+#import "AquaticPrime.h"
+
 #import "ByteSizeValueTransformer.h"
 #import "DurationValueTransformer.h"
 
@@ -48,6 +50,9 @@
 @interface ApplicationDelegate (Private)
 - (void) diskAppeared:(DADiskRef)disk;
 - (void) diskDisappeared:(DADiskRef)disk;
+- (NSURL *) locateLicenseURL;
+- (BOOL) validateLicenseURL:(NSURL *)licenseURL error:(NSError **)error;
+- (void) displayNagDialog;
 - (void) handleGetURLAppleEvent:(NSAppleEventDescriptor *)event withReplyEvent:(NSAppleEventDescriptor *)replyEvent;
 - (void) readOffsetKnownSheetDidEnd:(NSWindow *)sheet returnCode:(NSInteger)returnCode contextInfo:(void *)contextInfo;
 - (void) readOffsetNotConfiguredSheetDidEnd:(NSWindow *)sheet returnCode:(NSInteger)returnCode contextInfo:(void *)contextInfo;
@@ -145,6 +150,20 @@ diskDisappearedCallback(DADiskRef disk, void *context)
 
 #pragma unused(aNotification)
 	
+#if ENABLE_LICENSING_CODE
+	// Determine if this application is registered, and if not, display a nag dialog
+	NSURL *licenseURL = [self locateLicenseURL];
+	if(licenseURL) {
+		NSError *error = nil;
+		if(![self validateLicenseURL:licenseURL error:&error]) {
+			[[NSApplication sharedApplication] presentError:error];
+			[[NSApplication sharedApplication] terminate:self];
+		}
+	}
+	else
+		[self displayNagDialog];
+#endif
+
 	// Seed the random number generator
 	srandom(time(NULL));
 	
@@ -312,14 +331,26 @@ diskDisappearedCallback(DADiskRef disk, void *context)
 
 - (BOOL) application:(NSApplication *)theApplication openFile:(NSString *)filename
 {
-
-#pragma unused(theApplication)
-	
 	NSParameterAssert(nil != filename);
-
+	
+	NSString *pathExtension = [filename pathExtension];
+	
 //	CFStringRef myUTI = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, (CFStringRef)pathExtension, kUTTypePlainText);
-
-	return NO;
+	
+	if([pathExtension isEqualToString:@"rip-license"]) {
+		NSError *error = nil;
+		if([self validateLicenseURL:[NSURL fileURLWithPath:filename] error:&error]) {
+			NSString *licenseCopyPath = [self.applicationSupportFolderURL.path stringByAppendingPathComponent:filename.lastPathComponent];
+			if(![[NSFileManager defaultManager] copyItemAtPath:filename toPath:licenseCopyPath error:&error])
+				[theApplication presentError:error];
+		}
+		else
+			[theApplication presentError:error];
+		
+		return YES;
+	}
+	else
+		return NO;
 }
 
 - (NSURL *) applicationSupportFolderURL
@@ -503,12 +534,133 @@ diskDisappearedCallback(DADiskRef disk, void *context)
 	}
 }
 
+- (NSURL *) locateLicenseURL
+{
+	// Search for a license file in the Application Support folder
+	NSString *applicationSupportFolderPath = self.applicationSupportFolderURL.path;
+	NSDirectoryEnumerator *directoryEnumerator = [[NSFileManager defaultManager] enumeratorAtPath:applicationSupportFolderPath];
+	
+	NSString *path = nil;
+	while((path = [directoryEnumerator nextObject])) {
+		// Just return the first one found
+		if([path.pathExtension isEqualToString:@"rip-license"])
+			return [NSURL fileURLWithPath:[applicationSupportFolderPath stringByAppendingPathComponent:path]];			
+	}
+	
+	return nil;
+}
+
+- (BOOL) validateLicenseURL:(NSURL *)licenseURL error:(NSError **)error
+{
+	NSParameterAssert(nil != licenseURL);
+	
+	// This string is specially constructed to prevent key replacement
+	NSMutableString *publicKey = [NSMutableString string];
+	[publicKey appendString:@"0xB41079DB7"];
+	[publicKey appendString:@"B"];
+	[publicKey appendString:@"B"];
+	[publicKey appendString:@"B3FA82DEFD95ABC7E"];
+	[publicKey appendString:@"D923F96C0C"];
+	[publicKey appendString:@"2"];
+	[publicKey appendString:@"2"];
+	[publicKey appendString:@"174947E10FAC0BAD48"];
+	[publicKey appendString:@"4"];
+	[publicKey appendString:@"E"];
+	[publicKey appendString:@"E"];
+	[publicKey appendString:@"37F5672F71C0D5DE95B9D8BECE2"];
+	[publicKey appendString:@"6D4A2076E149E4C35"];
+	[publicKey appendString:@"0"];
+	[publicKey appendString:@"0"];
+	[publicKey appendString:@"16662D0E41D"];
+	[publicKey appendString:@"6231FB7ED6E9"];
+	[publicKey appendString:@"5"];
+	[publicKey appendString:@"5"];
+	[publicKey appendString:@"A56E975ECCB6566E"];
+	[publicKey appendString:@"4C701DEA7A62B620878E1B534C19B4"];
+	[publicKey appendString:@"9C9A95D9E52"];
+	[publicKey appendString:@"3"];
+	[publicKey appendString:@"3"];
+	[publicKey appendString:@"1D8708BA81E325AB6"];
+	[publicKey appendString:@"54F"];
+	[publicKey appendString:@"C"];
+	[publicKey appendString:@"C"];
+	[publicKey appendString:@"89B2FF1CC1026247D6B2BB1C3"];
+	[publicKey appendString:@"DCC8564BED5E2E46F1"];
+	
+	AquaticPrime *licenseValidator = [AquaticPrime aquaticPrimeWithKey:publicKey];
+	NSDictionary *licenseDictionary = [licenseValidator dictionaryForLicenseURL:licenseURL];
+	
+	// This is an invalid license
+	if(!licenseDictionary) {
+		if(error) {
+			NSMutableDictionary *userInfo = [NSMutableDictionary dictionary];
+			[userInfo setObject:licenseURL.path forKey:NSFilePathErrorKey];
+			[userInfo setObject:NSLocalizedString(@"Your license is invalid or corrupted.", @"") forKey:NSLocalizedDescriptionKey];
+			[userInfo setObject:NSLocalizedString(@"The license file could be incomplete or might contain an invalid key.", @"") forKey:NSLocalizedRecoverySuggestionErrorKey];
+			
+			*error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadCorruptFileError userInfo:userInfo];
+		}
+		
+		return NO;		
+	}
+	
+	// TODO: Make sure the license is sane
+	return YES;
+}
+
+- (void) displayNagDialog
+{
+	// Create the nag dialog
+	NSPanel *panel = NSGetAlertPanel(NSLocalizedString(@"This copy of Rip is unregistered.", @""),
+									 NSLocalizedString(@"You may purchase a license at http://sbooth.org/Rip/.", @""),
+									 NSLocalizedString(@"OK", @"Button"),
+									 nil,
+									 nil);
+	
+	// Locate the OK button
+	NSButton *okButton = nil;
+	for(NSView *view in [[panel contentView] subviews]) {
+		if([view isKindOfClass:[NSButton class]] && [[(NSButton *)view title] isEqualToString:NSLocalizedString(@"OK", @"Button")]) {
+			okButton = (NSButton *)view;
+			break;
+		}
+	}
+	
+	// Sanity check
+	if(!okButton)
+		NSLog(@"fnord");
+	
+	// And disable it
+	[okButton setEnabled:NO];
+	
+	// Display the nag dialog for 5 seconds
+	NSDate *stopTime = [NSDate dateWithTimeIntervalSinceNow:5.0];
+	
+	// Run the window in a modal session, to prevent any background events from posting
+	NSModalSession session = [[NSApplication sharedApplication] beginModalSessionForWindow:panel];
+	for(;;) {
+		// Stop the modal session as required
+		if(NSRunContinuesResponse != [[NSApplication sharedApplication] runModalSession:session])
+			break;
+		
+		// Check and see if the time is up; if so, enable the OK button
+		if(0 > [stopTime timeIntervalSinceNow])
+			[okButton setEnabled:YES];
+	}
+	[[NSApplication sharedApplication] endModalSession:session];
+	
+	[panel orderOut:self];
+		
+	NSReleaseAlertPanel(panel);	
+}
+
 - (void) handleGetURLAppleEvent:(NSAppleEventDescriptor *)event withReplyEvent:(NSAppleEventDescriptor *)replyEvent
 {
 	
 #pragma unused(replyEvent)
 	
 	NSURL *url = [NSURL URLWithString:[[event paramDescriptorForKeyword:keyDirectObject] stringValue]];
+	NSLog(@"%@", url);
 }
 
 - (void) readOffsetKnownSheetDidEnd:(NSWindow *)sheet returnCode:(NSInteger)returnCode contextInfo:(void *)contextInfo

@@ -20,6 +20,7 @@
 		324F325D0E870269000E4E4E /* PregapDetectionOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 324F325C0E870269000E4E4E /* PregapDetectionOperation.m */; };
 		3252C1E50DD239C500856BFE /* FLAC.bundle in Copy PlugIns */ = {isa = PBXBuildFile; fileRef = 3252C1820DD237C500856BFE /* FLAC.bundle */; };
 		325B2FDD0E7B6B4300696A1A /* ReadOffsetCalculatorSheet.xib in Resources */ = {isa = PBXBuildFile; fileRef = 325B2FDB0E7B6B4300696A1A /* ReadOffsetCalculatorSheet.xib */; };
+		3263A80F0F86659A008073DE /* AquaticPrime.m in Sources */ = {isa = PBXBuildFile; fileRef = 3263A80E0F86659A008073DE /* AquaticPrime.m */; };
 		3268C3760EB04CC500FF62F8 /* BitArrayTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 3268C3750EB04CC500FF62F8 /* BitArrayTest.m */; };
 		3268C3830EB04D3B00FF62F8 /* BitArray.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C4C8DFF0D5E2A0600DC0279 /* BitArray.m */; };
 		3274C2DA0F171827005B28BB /* Version.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 3274C2D90F171827005B28BB /* Version.xcconfig */; };
@@ -367,6 +368,8 @@
 		324F325C0E870269000E4E4E /* PregapDetectionOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PregapDetectionOperation.m; sourceTree = "<group>"; };
 		3252C1790DD237C500856BFE /* FLAC.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = FLAC.xcodeproj; path = FLAC/FLAC.xcodeproj; sourceTree = "<group>"; };
 		325B2FDC0E7B6B4300696A1A /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/ReadOffsetCalculatorSheet.xib; sourceTree = "<group>"; };
+		3263A7DD0F86600C008073DE /* AquaticPrime.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AquaticPrime.h; path = AquaticPrime/AquaticPrime.h; sourceTree = "<group>"; };
+		3263A80E0F86659A008073DE /* AquaticPrime.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AquaticPrime.m; path = AquaticPrime/AquaticPrime.m; sourceTree = "<group>"; };
 		3268C35A0EB04C2300FF62F8 /* Tests.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Tests.octest; sourceTree = BUILT_PRODUCTS_DIR; };
 		3268C35B0EB04C2300FF62F8 /* Tests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Tests-Info.plist"; sourceTree = "<group>"; };
 		3268C3740EB04CC500FF62F8 /* BitArrayTest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BitArrayTest.h; path = Tests/BitArrayTest.h; sourceTree = "<group>"; };
@@ -586,6 +589,9 @@
 		1058C7A6FEA54F5311CA2CBB /* Linked Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				32C9F23A0F7973790050F4B2 /* QuartzCore.framework */,
+				32A2C10C0F0A8EE000CA8DDE /* BGHUDAppKit.framework */,
+				32C793F20E291B3D0079706C /* Sparkle.framework */,
 				8CA35F910D2F42A800F89E3B /* discid.framework */,
 				32AB63A50E68B45800EA423A /* SystemConfiguration.framework */,
 				8C4C8D680D5D8BAE00DC0279 /* Quartz.framework */,
@@ -717,9 +723,6 @@
 		2A37F4C3FDCFA73011CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				32C9F23A0F7973790050F4B2 /* QuartzCore.framework */,
-				32A2C10C0F0A8EE000CA8DDE /* BGHUDAppKit.framework */,
-				32C793F20E291B3D0079706C /* Sparkle.framework */,
 				1058C7A6FEA54F5311CA2CBB /* Linked Frameworks */,
 				1058C7A8FEA54F5311CA2CBB /* Other Frameworks */,
 			);
@@ -825,6 +828,8 @@
 		3295B4660F7F231100AF55EF /* ThirdParty */ = {
 			isa = PBXGroup;
 			children = (
+				3263A80E0F86659A008073DE /* AquaticPrime.m */,
+				3263A7DD0F86600C008073DE /* AquaticPrime.h */,
 				3295B4670F7F232A00AF55EF /* ImageAndTextCell.h */,
 				3295B4680F7F232A00AF55EF /* ImageAndTextCell.m */,
 			);
@@ -1487,6 +1492,7 @@
 				3295B4250F7F13E800AF55EF /* ETAFormatter.m in Sources */,
 				3295B4690F7F232A00AF55EF /* ImageAndTextCell.m in Sources */,
 				328AB11D0F8071C4001F1C78 /* MetadataSourceManager.m in Sources */,
+				3263A80F0F86659A008073DE /* AquaticPrime.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

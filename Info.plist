@@ -60,6 +60,22 @@
 			<key>NSPersistentStoreTypeKey</key>
 			<string>SQLite</string>
 		</dict>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>rip-license</string>
+			</array>
+			<key>CFBundleTypeMIMETypes</key>
+			<array>
+				<string>text/xml</string>
+			</array>
+			<key>CFBundleTypeName</key>
+			<string>Rip License</string>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+			<key>LSTypeIsPackage</key>
+			<false/>
+		</dict>
 	</array>
 	<key>CFBundleExecutable</key>
 	<string>${EXECUTABLE_NAME}</string>
