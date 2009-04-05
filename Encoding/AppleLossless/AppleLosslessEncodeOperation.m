@@ -70,13 +70,17 @@
 		[arguments addObject:@"--composer"];
 		[arguments addObject:[self.metadata objectForKey:kMetadataComposerKey]];
 	}
-#if 0
-	// FIXME: Determine if release date should be NSDate
 	if([self.metadata objectForKey:kMetadataReleaseDateKey]) {
-		[arguments addObject:@"--year"];
-		[arguments addObject:[self.metadata objectForKey:kMetadataReleaseDateKey]];
+		// Attempt to parse the release date
+		NSDate *releaseDate = [NSDate dateWithNaturalLanguageString:[self.metadata objectForKey:kMetadataReleaseDateKey]];
+		if(releaseDate) {
+			NSCalendar *gregorianCalendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
+			NSDateComponents *releaseDateComponents = [gregorianCalendar components:NSYearCalendarUnit fromDate:releaseDate];
+
+			[arguments addObject:@"--year"];
+			[arguments addObject:[NSNumber numberWithInt:[releaseDateComponents year]]];
+		}		
 	}
-#endif
 	if([self.metadata objectForKey:kMetadataCompilationKey]) {
 		[arguments addObject:@"--compilation"];
 		if([[self.metadata objectForKey:kMetadataCompilationKey] boolValue])
