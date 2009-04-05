@@ -1,10 +1,10 @@
 /*
- *  Copyright (C) 2008 Stephen F. Booth <me@sbooth.org>
+ *  Copyright (C) 2008 - 2009 Stephen F. Booth <me@sbooth.org>
  *  All Rights Reserved
  */
 
 #import "WAVEEncoderInterface.h"
-#import "CoreAudioEncodeOperation.h"
+#import "WAVEEncodeOperation.h"
 #import "WAVESettingsViewController.h"
 
 #import "EncoderInterface/EncodingPostProcessingOperation.h"
@@ -47,7 +47,7 @@
 
 - (EncodingOperation *) encodingOperation
 {
-	return [[CoreAudioEncodeOperation alloc] init];
+	return [[WAVEEncodeOperation alloc] init];
 }
 
 - (EncodingPostProcessingOperation *) encodingPostProcessingOperation

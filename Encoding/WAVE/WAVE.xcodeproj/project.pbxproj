@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		325B5C710F89207B00E9CE97 /* WAVEEncodeOperation.mm in Sources */ = {isa = PBXBuildFile; fileRef = 325B5C700F89207B00E9CE97 /* WAVEEncodeOperation.mm */; };
+		325B5C7F0F8920CB00E9CE97 /* taglib.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 325B5C7E0F8920CB00E9CE97 /* taglib.framework */; };
+		325B5CCF0F8920EF00E9CE97 /* taglib.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 325B5C7E0F8920CB00E9CE97 /* taglib.framework */; };
+		325B5CD20F89210B00E9CE97 /* NSImage+BitmapRepresentationMethods.m in Sources */ = {isa = PBXBuildFile; fileRef = 325B5CD10F89210B00E9CE97 /* NSImage+BitmapRepresentationMethods.m */; };
 		32C5ABD00E6D1A9B007C1E7A /* CoreAudioEncodeOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 32C5ABCF0E6D1A9B007C1E7A /* CoreAudioEncodeOperation.m */; };
 		32C5AC7C0E6D2111007C1E7A /* WAVESettings.xib in Resources */ = {isa = PBXBuildFile; fileRef = 32C5AC7A0E6D2111007C1E7A /* WAVESettings.xib */; };
 		32E9F8F90DD7584500E8ACCA /* WAVESettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 32E9F8F80DD7584500E8ACCA /* WAVESettingsViewController.m */; };
@@ -34,11 +38,29 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		325B5CD30F89210B00E9CE97 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				325B5CCF0F8920EF00E9CE97 /* taglib.framework in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		089C1672FE841209C02AAC07 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		089C167EFE841241C02AAC07 /* English */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		089C167FFE841241C02AAC07 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		1058C7ADFEA557BF11CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
+		325B5C6F0F89207B00E9CE97 /* WAVEEncodeOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WAVEEncodeOperation.h; sourceTree = "<group>"; };
+		325B5C700F89207B00E9CE97 /* WAVEEncodeOperation.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = WAVEEncodeOperation.mm; sourceTree = "<group>"; };
+		325B5C7E0F8920CB00E9CE97 /* taglib.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = taglib.framework; path = ../../Frameworks/taglib.framework; sourceTree = SOURCE_ROOT; };
+		325B5CD00F89210B00E9CE97 /* NSImage+BitmapRepresentationMethods.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSImage+BitmapRepresentationMethods.h"; path = "../../Utilities/NSImage+BitmapRepresentationMethods.h"; sourceTree = SOURCE_ROOT; };
+		325B5CD10F89210B00E9CE97 /* NSImage+BitmapRepresentationMethods.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSImage+BitmapRepresentationMethods.m"; path = "../../Utilities/NSImage+BitmapRepresentationMethods.m"; sourceTree = SOURCE_ROOT; };
 		32C5ABCE0E6D1A9B007C1E7A /* CoreAudioEncodeOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CoreAudioEncodeOperation.h; path = ../CoreAudio/CoreAudioEncodeOperation.h; sourceTree = SOURCE_ROOT; };
 		32C5ABCF0E6D1A9B007C1E7A /* CoreAudioEncodeOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CoreAudioEncodeOperation.m; path = ../CoreAudio/CoreAudioEncodeOperation.m; sourceTree = SOURCE_ROOT; };
 		32C5AC780E6D20EA007C1E7A /* WAVEEncoderInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WAVEEncoderInterface.h; sourceTree = "<group>"; };
@@ -59,6 +81,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				325B5C7F0F8920CB00E9CE97 /* taglib.framework in Frameworks */,
 				8D5B49B4048680CD000E48DA /* Cocoa.framework in Frameworks */,
 				8C3C19970D73EC72001BAC88 /* AudioToolbox.framework in Frameworks */,
 				8C3C19A70D73ECE9001BAC88 /* EncoderInterface.framework in Frameworks */,
@@ -102,6 +125,8 @@
 		08FB77AFFE84173DC02AAC07 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				325B5C6F0F89207B00E9CE97 /* WAVEEncodeOperation.h */,
+				325B5C700F89207B00E9CE97 /* WAVEEncodeOperation.mm */,
 				32C5AC780E6D20EA007C1E7A /* WAVEEncoderInterface.h */,
 				32C5ABCE0E6D1A9B007C1E7A /* CoreAudioEncodeOperation.h */,
 				32C5ABCF0E6D1A9B007C1E7A /* CoreAudioEncodeOperation.m */,
@@ -115,6 +140,7 @@
 		1058C7ACFEA557BF11CA2CBB /* Linked Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				325B5C7E0F8920CB00E9CE97 /* taglib.framework */,
 				8C3C19960D73EC72001BAC88 /* AudioToolbox.framework */,
 				1058C7ADFEA557BF11CA2CBB /* Cocoa.framework */,
 			);
@@ -142,6 +168,8 @@
 		32C88E010371C26100C91783 /* Other Sources */ = {
 			isa = PBXGroup;
 			children = (
+				325B5CD00F89210B00E9CE97 /* NSImage+BitmapRepresentationMethods.h */,
+				325B5CD10F89210B00E9CE97 /* NSImage+BitmapRepresentationMethods.m */,
 				32C5AC790E6D20F6007C1E7A /* WAVE_Prefix.pch */,
 				8C3C19610D73EAB7001BAC88 /* EncoderInterface.xcodeproj */,
 			);
@@ -166,6 +194,7 @@
 				8D5B49AF048680CD000E48DA /* Resources */,
 				8D5B49B1048680CD000E48DA /* Sources */,
 				8D5B49B3048680CD000E48DA /* Frameworks */,
+				325B5CD30F89210B00E9CE97 /* CopyFiles */,
 			);
 			buildRules = (
 			);
@@ -231,6 +260,8 @@
 				8C3C195E0D73EAAB001BAC88 /* WAVEEncoderInterface.m in Sources */,
 				32E9F8F90DD7584500E8ACCA /* WAVESettingsViewController.m in Sources */,
 				32C5ABD00E6D1A9B007C1E7A /* CoreAudioEncodeOperation.m in Sources */,
+				325B5C710F89207B00E9CE97 /* WAVEEncodeOperation.mm in Sources */,
+				325B5CD20F89210B00E9CE97 /* NSImage+BitmapRepresentationMethods.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -268,12 +299,17 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COPY_PHASE_STRIP = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../../Frameworks\"",
+				);
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = WAVE_Prefix.pch;
 				GCC_WARN_UNINITIALIZED_AUTOS = NO;
+				HEADER_SEARCH_PATHS = ../../Frameworks/taglib.framework/Headers;
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "$(HOME)/Library/Bundles";
 				PRODUCT_NAME = WAVE;
@@ -286,9 +322,14 @@
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../../Frameworks\"",
+				);
 				GCC_MODEL_TUNING = G5;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = WAVE_Prefix.pch;
+				HEADER_SEARCH_PATHS = ../../Frameworks/taglib.framework/Headers;
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "$(HOME)/Library/Bundles";
 				PRODUCT_NAME = WAVE;
@@ -400,12 +441,17 @@
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../../Frameworks\"",
+				);
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = WAVE_Prefix.pch;
 				GCC_WARN_UNINITIALIZED_AUTOS = NO;
+				HEADER_SEARCH_PATHS = ../../Frameworks/taglib.framework/Headers;
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "$(HOME)/Library/Bundles";
 				PRODUCT_NAME = WAVE;
@@ -451,9 +497,14 @@
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../../Frameworks\"",
+				);
 				GCC_MODEL_TUNING = G5;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = WAVE_Prefix.pch;
+				HEADER_SEARCH_PATHS = ../../Frameworks/taglib.framework/Headers;
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "$(HOME)/Library/Bundles";
 				PRODUCT_NAME = WAVE;
