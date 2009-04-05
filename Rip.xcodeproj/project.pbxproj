@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3215E80A0F884A5000F84429 /* WAVE.bundle in Copy PlugIns */ = {isa = PBXBuildFile; fileRef = 3215E7D90F8848F600F84429 /* WAVE.bundle */; };
 		324EC6740DA2D411002A3CA7 /* Rip.icns in Resources */ = {isa = PBXBuildFile; fileRef = 324EC6730DA2D411002A3CA7 /* Rip.icns */; };
 		324F30C90E85CF47000E4E4E /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = 324F30C80E85CF47000E4E4E /* dsa_pub.pem */; };
 		324F31320E86B3E2000E4E4E /* ReadMCNSheet.xib in Resources */ = {isa = PBXBuildFile; fileRef = 324F31300E86B3E2000E4E4E /* ReadMCNSheet.xib */; };
@@ -147,6 +148,20 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		3215E7D80F8848F600F84429 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3215E7D00F8848F600F84429 /* AIFF.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 8D5B49B6048680CD000E48DA /* WAVE.bundle */;
+			remoteInfo = WAVE;
+		};
+		3215E8080F884A1900F84429 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3215E7D00F8848F600F84429 /* AIFF.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 8D5B49AC048680CD000E48DA /* AIFF */;
+			remoteInfo = AIFF;
+		};
 		3252C1810DD237C500856BFE /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 3252C1790DD237C500856BFE /* FLAC.xcodeproj */;
@@ -313,6 +328,7 @@
 				328AB3100F80850C001F1C78 /* AlbumArtExchange.bundle in Copy PlugIns */,
 				32CE93870F5657E900AB328A /* WavPack.bundle in Copy PlugIns */,
 				32C5ACA50E6D220D007C1E7A /* WAVE.bundle in Copy PlugIns */,
+				3215E80A0F884A5000F84429 /* WAVE.bundle in Copy PlugIns */,
 				32C5ABF90E6D1B36007C1E7A /* AppleLossless.bundle in Copy PlugIns */,
 				328DE6FD0E5FE07000F5BD13 /* iTunes.bundle in Copy PlugIns */,
 				328DE6C20E5FDE6600F5BD13 /* FreeDB.bundle in Copy PlugIns */,
@@ -348,6 +364,7 @@
 		2A37F4BAFDCFA73011CA2CEA /* English */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = English; path = English.lproj/Credits.rtf; sourceTree = "<group>"; };
 		2A37F4C4FDCFA73011CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		2A37F4C5FDCFA73011CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
+		3215E7D00F8848F600F84429 /* AIFF.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = AIFF.xcodeproj; path = AIFF/AIFF.xcodeproj; sourceTree = "<group>"; };
 		32362B810EE4EC1C00001E58 /* Base.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Base.xcconfig; sourceTree = "<group>"; };
 		324EC6730DA2D411002A3CA7 /* Rip.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = Rip.icns; sourceTree = "<group>"; };
 		324F30C80E85CF47000E4E4E /* dsa_pub.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = dsa_pub.pem; sourceTree = "<group>"; };
@@ -729,6 +746,14 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		3215E7D10F8848F600F84429 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				3215E7D90F8848F600F84429 /* WAVE.bundle */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		3227175C0D9F140600A421F0 /* Icons */ = {
 			isa = PBXGroup;
 			children = (
@@ -883,6 +908,7 @@
 		8C19B2EA0D729637002BE7BF /* Encoding */ = {
 			isa = PBXGroup;
 			children = (
+				3215E7D00F8848F600F84429 /* AIFF.xcodeproj */,
 				32CE93640F56579900AB328A /* WavPack.xcodeproj */,
 				32C5AC980E6D21EA007C1E7A /* WAVE.xcodeproj */,
 				32C5ABE20E6D1AF5007C1E7A /* AppleLossless.xcodeproj */,
@@ -1169,6 +1195,7 @@
 				328DE7390E5FE47700F5BD13 /* PBXTargetDependency */,
 				3252C1C90DD2387500856BFE /* PBXTargetDependency */,
 				32C5ABF80E6D1B0E007C1E7A /* PBXTargetDependency */,
+				3215E8090F884A1900F84429 /* PBXTargetDependency */,
 				32C5ACA40E6D21FE007C1E7A /* PBXTargetDependency */,
 				32CE93820F5657B300AB328A /* PBXTargetDependency */,
 				328AB4140F808DDB001F1C78 /* PBXTargetDependency */,
@@ -1190,6 +1217,10 @@
 			mainGroup = 2A37F4AAFDCFA73011CA2CEA /* Rip */;
 			projectDirPath = "";
 			projectReferences = (
+				{
+					ProductGroup = 3215E7D10F8848F600F84429 /* Products */;
+					ProjectRef = 3215E7D00F8848F600F84429 /* AIFF.xcodeproj */;
+				},
 				{
 					ProductGroup = 328AB3060F8084E9001F1C78 /* Products */;
 					ProjectRef = 328AB3050F8084E9001F1C78 /* AlbumArtExchange.xcodeproj */;
@@ -1244,6 +1275,13 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
+		3215E7D90F8848F600F84429 /* WAVE.bundle */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = WAVE.bundle;
+			remoteRef = 3215E7D80F8848F600F84429 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 		3252C1820DD237C500856BFE /* FLAC.bundle */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.cfbundle;
@@ -1499,6 +1537,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		3215E8090F884A1900F84429 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = AIFF;
+			targetProxy = 3215E8080F884A1900F84429 /* PBXContainerItemProxy */;
+		};
 		3252C1C90DD2387500856BFE /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = FLAC;
