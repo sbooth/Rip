@@ -4,7 +4,7 @@
  */
 
 #import "AIFFEncoderInterface.h"
-#import "CoreAudioEncodeOperation.h"
+#import "AIFFEncodeOperation.h"
 #import "AIFFSettingsViewController.h"
 
 #import "EncoderInterface/EncodingPostProcessingOperation.h"
@@ -47,7 +47,7 @@
 
 - (EncodingOperation *) encodingOperation
 {
-	return [[CoreAudioEncodeOperation alloc] init];
+	return [[AIFFEncodeOperation alloc] init];
 }
 
 - (EncodingPostProcessingOperation *) encodingPostProcessingOperation

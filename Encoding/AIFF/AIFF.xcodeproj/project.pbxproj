@@ -10,6 +10,10 @@
 		3215E7E00F88491800F84429 /* AIFFSettings.xib in Resources */ = {isa = PBXBuildFile; fileRef = 3215E7DE0F88491800F84429 /* AIFFSettings.xib */; };
 		3215E7E50F88493700F84429 /* AIFFEncoderInterface.m in Sources */ = {isa = PBXBuildFile; fileRef = 3215E7E20F88493700F84429 /* AIFFEncoderInterface.m */; };
 		3215E7E60F88493700F84429 /* AIFFSettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3215E7E40F88493700F84429 /* AIFFSettingsViewController.m */; };
+		3215E8270F88616400F84429 /* AIFFEncodeOperation.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3215E8260F88616400F84429 /* AIFFEncodeOperation.mm */; };
+		3215E82E0F8861C800F84429 /* taglib.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3215E82D0F8861C800F84429 /* taglib.framework */; };
+		3215E8390F88621700F84429 /* taglib.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 3215E82D0F8861C800F84429 /* taglib.framework */; };
+		3215E9F50F88778A00F84429 /* NSImage+BitmapRepresentationMethods.m in Sources */ = {isa = PBXBuildFile; fileRef = 3215E9F40F88778A00F84429 /* NSImage+BitmapRepresentationMethods.m */; };
 		32C5ABD00E6D1A9B007C1E7A /* CoreAudioEncodeOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 32C5ABCF0E6D1A9B007C1E7A /* CoreAudioEncodeOperation.m */; };
 		8C3C19970D73EC72001BAC88 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8C3C19960D73EC72001BAC88 /* AudioToolbox.framework */; };
 		8C3C19A70D73ECE9001BAC88 /* EncoderInterface.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8C3C19660D73EAB7001BAC88 /* EncoderInterface.framework */; };
@@ -34,6 +38,20 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		3215E8950F88623A00F84429 /* Copy Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				3215E8390F88621700F84429 /* taglib.framework in Copy Frameworks */,
+			);
+			name = "Copy Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		089C1672FE841209C02AAC07 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		089C167EFE841241C02AAC07 /* English */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -45,6 +63,11 @@
 		3215E7E30F88493700F84429 /* AIFFSettingsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AIFFSettingsViewController.h; sourceTree = "<group>"; };
 		3215E7E40F88493700F84429 /* AIFFSettingsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AIFFSettingsViewController.m; sourceTree = "<group>"; };
 		3215E7F50F8849F300F84429 /* AIFF_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AIFF_Prefix.pch; sourceTree = "<group>"; };
+		3215E8250F88616400F84429 /* AIFFEncodeOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AIFFEncodeOperation.h; sourceTree = "<group>"; };
+		3215E8260F88616400F84429 /* AIFFEncodeOperation.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = AIFFEncodeOperation.mm; sourceTree = "<group>"; };
+		3215E82D0F8861C800F84429 /* taglib.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = taglib.framework; path = ../../Frameworks/taglib.framework; sourceTree = SOURCE_ROOT; };
+		3215E9F30F88778A00F84429 /* NSImage+BitmapRepresentationMethods.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSImage+BitmapRepresentationMethods.h"; path = "../../Utilities/NSImage+BitmapRepresentationMethods.h"; sourceTree = SOURCE_ROOT; };
+		3215E9F40F88778A00F84429 /* NSImage+BitmapRepresentationMethods.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSImage+BitmapRepresentationMethods.m"; path = "../../Utilities/NSImage+BitmapRepresentationMethods.m"; sourceTree = SOURCE_ROOT; };
 		32C5ABCE0E6D1A9B007C1E7A /* CoreAudioEncodeOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CoreAudioEncodeOperation.h; path = ../CoreAudio/CoreAudioEncodeOperation.h; sourceTree = SOURCE_ROOT; };
 		32C5ABCF0E6D1A9B007C1E7A /* CoreAudioEncodeOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CoreAudioEncodeOperation.m; path = ../CoreAudio/CoreAudioEncodeOperation.m; sourceTree = SOURCE_ROOT; };
 		8C3C19610D73EAB7001BAC88 /* EncoderInterface.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = EncoderInterface.xcodeproj; path = ../EncoderInterface/EncoderInterface.xcodeproj; sourceTree = SOURCE_ROOT; };
@@ -62,6 +85,7 @@
 				8D5B49B4048680CD000E48DA /* Cocoa.framework in Frameworks */,
 				8C3C19970D73EC72001BAC88 /* AudioToolbox.framework in Frameworks */,
 				8C3C19A70D73ECE9001BAC88 /* EncoderInterface.framework in Frameworks */,
+				3215E82E0F8861C800F84429 /* taglib.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -102,6 +126,10 @@
 		08FB77AFFE84173DC02AAC07 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				3215E9F30F88778A00F84429 /* NSImage+BitmapRepresentationMethods.h */,
+				3215E9F40F88778A00F84429 /* NSImage+BitmapRepresentationMethods.m */,
+				3215E8250F88616400F84429 /* AIFFEncodeOperation.h */,
+				3215E8260F88616400F84429 /* AIFFEncodeOperation.mm */,
 				3215E7E10F88493700F84429 /* AIFFEncoderInterface.h */,
 				3215E7E20F88493700F84429 /* AIFFEncoderInterface.m */,
 				3215E7E30F88493700F84429 /* AIFFSettingsViewController.h */,
@@ -115,6 +143,7 @@
 		1058C7ACFEA557BF11CA2CBB /* Linked Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				3215E82D0F8861C800F84429 /* taglib.framework */,
 				8C3C19960D73EC72001BAC88 /* AudioToolbox.framework */,
 				1058C7ADFEA557BF11CA2CBB /* Cocoa.framework */,
 			);
@@ -166,6 +195,7 @@
 				8D5B49AF048680CD000E48DA /* Resources */,
 				8D5B49B1048680CD000E48DA /* Sources */,
 				8D5B49B3048680CD000E48DA /* Frameworks */,
+				3215E8950F88623A00F84429 /* Copy Frameworks */,
 			);
 			buildRules = (
 			);
@@ -231,6 +261,8 @@
 				32C5ABD00E6D1A9B007C1E7A /* CoreAudioEncodeOperation.m in Sources */,
 				3215E7E50F88493700F84429 /* AIFFEncoderInterface.m in Sources */,
 				3215E7E60F88493700F84429 /* AIFFSettingsViewController.m in Sources */,
+				3215E8270F88616400F84429 /* AIFFEncodeOperation.mm in Sources */,
+				3215E9F50F88778A00F84429 /* NSImage+BitmapRepresentationMethods.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -268,12 +300,17 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COPY_PHASE_STRIP = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../../Frameworks\"",
+				);
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = AIFF_Prefix.pch;
 				GCC_WARN_UNINITIALIZED_AUTOS = NO;
+				HEADER_SEARCH_PATHS = ../../Frameworks/taglib.framework/Headers;
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "$(HOME)/Library/Bundles";
 				PRODUCT_NAME = AIFF;
@@ -286,9 +323,14 @@
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../../Frameworks\"",
+				);
 				GCC_MODEL_TUNING = G5;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = AIFF_Prefix.pch;
+				HEADER_SEARCH_PATHS = ../../Frameworks/taglib.framework/Headers;
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "$(HOME)/Library/Bundles";
 				PRODUCT_NAME = AIFF;
@@ -400,12 +442,17 @@
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../../Frameworks\"",
+				);
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = AIFF_Prefix.pch;
 				GCC_WARN_UNINITIALIZED_AUTOS = NO;
+				HEADER_SEARCH_PATHS = ../../Frameworks/taglib.framework/Headers;
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "$(HOME)/Library/Bundles";
 				PRODUCT_NAME = AIFF;
@@ -451,9 +498,14 @@
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../../Frameworks\"",
+				);
 				GCC_MODEL_TUNING = G5;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = AIFF_Prefix.pch;
+				HEADER_SEARCH_PATHS = ../../Frameworks/taglib.framework/Headers;
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "$(HOME)/Library/Bundles";
 				PRODUCT_NAME = AIFF;
