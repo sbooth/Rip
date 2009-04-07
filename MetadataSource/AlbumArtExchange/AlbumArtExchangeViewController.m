@@ -21,7 +21,9 @@
 
 - (id) init
 {
-	return [super initWithNibName:@"AlbumArtExchangeView" bundle:[NSBundle bundleForClass:[AlbumArtExchangeInterface class]]];
+	if((self = [super initWithNibName:@"AlbumArtExchangeView" bundle:[NSBundle bundleForClass:[AlbumArtExchangeInterface class]]]))
+		_images = [[NSMutableArray alloc] init];
+	return self;
 }
 
 - (void) awakeFromNib
@@ -225,9 +227,7 @@
 
 	_currentStringValue = [NSMutableString string];
 
-	if([elementName isEqualToString:@"search-results"])
-		_images = [NSMutableArray array];
-	else if([elementName isEqualToString:@"image-info"])
+	if([elementName isEqualToString:@"image-info"])
 		_currentImage = [[AlbumArtExchangeImage alloc] init];
 }
 
