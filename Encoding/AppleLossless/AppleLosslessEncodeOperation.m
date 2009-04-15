@@ -78,7 +78,7 @@
 			NSDateComponents *releaseDateComponents = [gregorianCalendar components:NSYearCalendarUnit fromDate:releaseDate];
 
 			[arguments addObject:@"--year"];
-			[arguments addObject:[NSNumber numberWithInt:[releaseDateComponents year]]];
+			[arguments addObject:[[NSNumber numberWithInt:[releaseDateComponents year]] stringValue]];
 		}		
 	}
 	if([self.metadata objectForKey:kMetadataCompilationKey]) {
@@ -91,14 +91,14 @@
 	if([self.metadata objectForKey:kMetadataTrackNumberKey]) {
 		[arguments addObject:@"--tracknum"];
 		if([self.metadata objectForKey:kMetadataTrackTotalKey])
-			[arguments addObject:[NSString stringWithFormat:@"%@/%@", [self.metadata objectForKey:kMetadataTrackNumberKey], [self.metadata objectForKey:kMetadataTrackTotalKey]]];
+			[arguments addObject:[NSString stringWithFormat:@"%@/%@", [[self.metadata objectForKey:kMetadataTrackNumberKey] stringValue], [[self.metadata objectForKey:kMetadataTrackTotalKey] stringValue]]];
 		else
 			[arguments addObject:[[self.metadata objectForKey:kMetadataTrackNumberKey] stringValue]];
 	}
 	if([self.metadata objectForKey:kMetadataDiscNumberKey]) {
 		[arguments addObject:@"--disk"];
 		if([self.metadata objectForKey:kMetadataDiscTotalKey])
-			[arguments addObject:[NSString stringWithFormat:@"%@/%@", [self.metadata objectForKey:kMetadataDiscNumberKey], [self.metadata objectForKey:kMetadataDiscTotalKey]]];
+			[arguments addObject:[NSString stringWithFormat:@"%@/%@", [[self.metadata objectForKey:kMetadataDiscNumberKey] stringValue], [[self.metadata objectForKey:kMetadataDiscTotalKey] stringValue]]];
 		else
 			[arguments addObject:[[self.metadata objectForKey:kMetadataDiscNumberKey] stringValue]];
 	}			
