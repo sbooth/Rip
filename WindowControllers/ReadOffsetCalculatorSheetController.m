@@ -85,7 +85,7 @@ static NSString * const kCalculateOffsetsKVOContext		= @"org.sbooth.Rip.ReadOffs
 	[super finalize];
 }
 
-- (void) awakeFromNib
+- (void) windowDidLoad
 {
 	[self togglePossibleOffsetsShown:self];
 	

@@ -23,7 +23,7 @@ static NSString * const kEncoderOperationQueueKVOContext		= @"org.sbooth.Rip.Enc
 	return self;
 }
 
-- (void) awakeFromNib
+- (void) windowDidLoad
 {
 	NSPathCell *pathCell = [[NSPathCell alloc] init];
 	[pathCell setPathStyle:NSPathStylePopUp];

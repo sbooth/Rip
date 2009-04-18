@@ -244,7 +244,7 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 	[super finalize];
 }
 
-- (void) awakeFromNib
+- (void) windowDidLoad
 {
 	// Our window has a bottom border used to display the AccurateRip availability for this disc and total playing time
 	[self.window setAutorecalculatesContentBorderThickness:YES forEdge:NSMinYEdge];
@@ -620,7 +620,7 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 		NSBeep();
 		return;
 	}
-	
+
 	[self extractTracks:selectedTracks extractionMode:eExtractionModeIndividualTracks];
 }
 
