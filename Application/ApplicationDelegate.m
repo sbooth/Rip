@@ -24,11 +24,14 @@
 
 #import "MetadataSourceInterface/MetadataSourceInterface.h"
 
+#import <SFBCrashReporter/SFBCrashReporter.h>
+
 #include <CoreFoundation/CoreFoundation.h>
 #include <DiskArbitration/DiskArbitration.h>
 
 #include <IOKit/IOKitLib.h>
 #include <IOKit/storage/IOCDMedia.h>
+
 
 // ========================================
 // Class extensions
@@ -164,6 +167,9 @@ diskDisappearedCallback(DADiskRef disk, void *context)
 		[self displayNagDialog];
 #endif
 
+	// Check for and send crash reports
+	[SFBCrashReporter checkForNewCrashes];
+	
 	// Seed the random number generator
 	srandom(time(NULL));
 	

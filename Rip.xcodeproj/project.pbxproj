@@ -7,7 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		3215E80A0F884A5000F84429 /* WAVE.bundle in Copy PlugIns */ = {isa = PBXBuildFile; fileRef = 3215E7D90F8848F600F84429 /* WAVE.bundle */; };
+		3215E80A0F884A5000F84429 /* AIFF.bundle in Copy PlugIns */ = {isa = PBXBuildFile; fileRef = 3215E7D90F8848F600F84429 /* AIFF.bundle */; };
+		322EB43F0F8C30020081A563 /* AquaticPrime.m in Sources */ = {isa = PBXBuildFile; fileRef = 322EB43E0F8C30020081A563 /* AquaticPrime.m */; };
+		322EB4430F8C30210081A563 /* ImageAndTextCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 322EB4420F8C30210081A563 /* ImageAndTextCell.m */; };
 		324EC6740DA2D411002A3CA7 /* Rip.icns in Resources */ = {isa = PBXBuildFile; fileRef = 324EC6730DA2D411002A3CA7 /* Rip.icns */; };
 		324F30C90E85CF47000E4E4E /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = 324F30C80E85CF47000E4E4E /* dsa_pub.pem */; };
 		324F31320E86B3E2000E4E4E /* ReadMCNSheet.xib in Resources */ = {isa = PBXBuildFile; fileRef = 324F31300E86B3E2000E4E4E /* ReadMCNSheet.xib */; };
@@ -21,7 +23,9 @@
 		324F325D0E870269000E4E4E /* PregapDetectionOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 324F325C0E870269000E4E4E /* PregapDetectionOperation.m */; };
 		3252C1E50DD239C500856BFE /* FLAC.bundle in Copy PlugIns */ = {isa = PBXBuildFile; fileRef = 3252C1820DD237C500856BFE /* FLAC.bundle */; };
 		325B2FDD0E7B6B4300696A1A /* ReadOffsetCalculatorSheet.xib in Resources */ = {isa = PBXBuildFile; fileRef = 325B2FDB0E7B6B4300696A1A /* ReadOffsetCalculatorSheet.xib */; };
-		3263A80F0F86659A008073DE /* AquaticPrime.m in Sources */ = {isa = PBXBuildFile; fileRef = 3263A80E0F86659A008073DE /* AquaticPrime.m */; };
+		325B5D640F89437900E9CE97 /* Amazon.bundle in Copy PlugIns */ = {isa = PBXBuildFile; fileRef = 325B5D490F89434100E9CE97 /* Amazon.bundle */; };
+		326558E90F99550D00403217 /* SFBCrashReporter.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 326558E80F99550D00403217 /* SFBCrashReporter.framework */; };
+		326558EC0F99551900403217 /* SFBCrashReporter.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 326558E80F99550D00403217 /* SFBCrashReporter.framework */; };
 		3268C3760EB04CC500FF62F8 /* BitArrayTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 3268C3750EB04CC500FF62F8 /* BitArrayTest.m */; };
 		3268C3830EB04D3B00FF62F8 /* BitArray.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C4C8DFF0D5E2A0600DC0279 /* BitArray.m */; };
 		3274C2DA0F171827005B28BB /* Version.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 3274C2D90F171827005B28BB /* Version.xcconfig */; };
@@ -33,14 +37,14 @@
 		3284CFA50EE1CF5600FEC9A1 /* CompactDisc+CueSheetGeneration.m in Sources */ = {isa = PBXBuildFile; fileRef = 3284CFA40EE1CF5600FEC9A1 /* CompactDisc+CueSheetGeneration.m */; };
 		328AB11D0F8071C4001F1C78 /* MetadataSourceManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 328AB11C0F8071C4001F1C78 /* MetadataSourceManager.m */; };
 		328AB1DB0F8074E4001F1C78 /* MetadataSourceInterface.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 328AB1D50F8074D9001F1C78 /* MetadataSourceInterface.framework */; };
-		328AB1DE0F807539001F1C78 /* MetadataSourceInterface.framework in Copy Embedded Frameworks */ = {isa = PBXBuildFile; fileRef = 328AB1D50F8074D9001F1C78 /* MetadataSourceInterface.framework */; };
+		328AB1DE0F807539001F1C78 /* MetadataSourceInterface.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 328AB1D50F8074D9001F1C78 /* MetadataSourceInterface.framework */; };
 		328AB30F0F8084EE001F1C78 /* AlbumArtExchange.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 328AB30E0F8084E9001F1C78 /* AlbumArtExchange.bundle */; };
 		328AB3100F80850C001F1C78 /* AlbumArtExchange.bundle in Copy PlugIns */ = {isa = PBXBuildFile; fileRef = 328AB30E0F8084E9001F1C78 /* AlbumArtExchange.bundle */; };
 		328DE21C0E5E628700F5BD13 /* PregapFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = 328DE21B0E5E628700F5BD13 /* PregapFormatter.m */; };
 		328DE4C20E5FBFE500F5BD13 /* MusicBrainz.bundle in Copy PlugIns */ = {isa = PBXBuildFile; fileRef = 328DE4C00E5FBFBF00F5BD13 /* MusicBrainz.bundle */; };
 		328DE4CE0E5FC08500F5BD13 /* MusicDatabaseManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 328DE4CD0E5FC08500F5BD13 /* MusicDatabaseManager.m */; };
 		328DE5130E5FC67500F5BD13 /* MusicDatabaseInterface.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 328DE28B0E5F831600F5BD13 /* MusicDatabaseInterface.framework */; };
-		328DE5150E5FC69600F5BD13 /* MusicDatabaseInterface.framework in Copy Embedded Frameworks */ = {isa = PBXBuildFile; fileRef = 328DE28B0E5F831600F5BD13 /* MusicDatabaseInterface.framework */; };
+		328DE5150E5FC69600F5BD13 /* MusicDatabaseInterface.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 328DE28B0E5F831600F5BD13 /* MusicDatabaseInterface.framework */; };
 		328DE6C20E5FDE6600F5BD13 /* FreeDB.bundle in Copy PlugIns */ = {isa = PBXBuildFile; fileRef = 328DE6C00E5FDE5700F5BD13 /* FreeDB.bundle */; };
 		328DE6FD0E5FE07000F5BD13 /* iTunes.bundle in Copy PlugIns */ = {isa = PBXBuildFile; fileRef = 328DE6270E5FD8E000F5BD13 /* iTunes.bundle */; };
 		328DEDD60E6126E800F5BD13 /* MusicDatabasePreferencesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 328DEDD50E6126E800F5BD13 /* MusicDatabasePreferencesViewController.m */; };
@@ -60,11 +64,10 @@
 		3295B3810F7F001400AF55EF /* NSString+PathSanitizationMethods.m in Sources */ = {isa = PBXBuildFile; fileRef = 3295B3780F7F001400AF55EF /* NSString+PathSanitizationMethods.m */; };
 		3295B3B40F7F09C900AF55EF /* SecondsFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = 3295B35B0F7EFF1000AF55EF /* SecondsFormatter.m */; };
 		3295B4250F7F13E800AF55EF /* ETAFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = 3295B4240F7F13E800AF55EF /* ETAFormatter.m */; };
-		3295B4690F7F232A00AF55EF /* ImageAndTextCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 3295B4680F7F232A00AF55EF /* ImageAndTextCell.m */; };
 		3295B4930F7F267100AF55EF /* Green Check.png in Resources */ = {isa = PBXBuildFile; fileRef = 3295B4920F7F267100AF55EF /* Green Check.png */; };
 		3295B4B30F7F2F0200AF55EF /* Red X.png in Resources */ = {isa = PBXBuildFile; fileRef = 3295B4B20F7F2F0200AF55EF /* Red X.png */; };
 		32A2C10D0F0A8EE000CA8DDE /* BGHUDAppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A2C10C0F0A8EE000CA8DDE /* BGHUDAppKit.framework */; };
-		32A2C1100F0A8EF100CA8DDE /* BGHUDAppKit.framework in Copy Embedded Frameworks */ = {isa = PBXBuildFile; fileRef = 32A2C10C0F0A8EE000CA8DDE /* BGHUDAppKit.framework */; };
+		32A2C1100F0A8EF100CA8DDE /* BGHUDAppKit.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 32A2C10C0F0A8EE000CA8DDE /* BGHUDAppKit.framework */; };
 		32A2C1440F0A91A300CA8DDE /* HexadecimalNumberFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = 32A2C1430F0A91A300CA8DDE /* HexadecimalNumberFormatter.m */; };
 		32AB63A60E68B45800EA423A /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 32AB63A50E68B45800EA423A /* SystemConfiguration.framework */; };
 		32AC75640E7634A5009A5E1B /* ReadOffsetCalculationOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 32AC75630E7634A5009A5E1B /* ReadOffsetCalculationOperation.m */; };
@@ -84,7 +87,7 @@
 		32C5ABF90E6D1B36007C1E7A /* AppleLossless.bundle in Copy PlugIns */ = {isa = PBXBuildFile; fileRef = 32C5ABEB0E6D1AF5007C1E7A /* AppleLossless.bundle */; };
 		32C5ACA50E6D220D007C1E7A /* WAVE.bundle in Copy PlugIns */ = {isa = PBXBuildFile; fileRef = 32C5ACA10E6D21EA007C1E7A /* WAVE.bundle */; };
 		32C793F30E291B3D0079706C /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 32C793F20E291B3D0079706C /* Sparkle.framework */; };
-		32C793F60E291B4B0079706C /* Sparkle.framework in Copy Embedded Frameworks */ = {isa = PBXBuildFile; fileRef = 32C793F20E291B3D0079706C /* Sparkle.framework */; };
+		32C793F60E291B4B0079706C /* Sparkle.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 32C793F20E291B3D0079706C /* Sparkle.framework */; };
 		32C7B61E0EBD61AC00D1A722 /* AdvancedPreferencesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 32C7B61D0EBD61AC00D1A722 /* AdvancedPreferencesViewController.m */; };
 		32C7B6360EBD61E900D1A722 /* AdvancedPreferencesView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 32C7B6340EBD61E900D1A722 /* AdvancedPreferencesView.xib */; };
 		32C9F0470F7804AA0050F4B2 /* MetadataViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 32C9F0460F7804AA0050F4B2 /* MetadataViewController.m */; };
@@ -99,7 +102,7 @@
 		8C34BB0B0D761A99003F2953 /* ApplicationDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C34BB0A0D761A99003F2953 /* ApplicationDelegate.m */; };
 		8C34BB0E0D761AB7003F2953 /* PlugInManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C34BB0D0D761AB7003F2953 /* PlugInManager.m */; };
 		8C3C19470D73EA12001BAC88 /* EncoderInterface.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8C3C19460D73EA0B001BAC88 /* EncoderInterface.framework */; };
-		8C3C194A0D73EA35001BAC88 /* EncoderInterface.framework in Copy Embedded Frameworks */ = {isa = PBXBuildFile; fileRef = 8C3C19460D73EA0B001BAC88 /* EncoderInterface.framework */; };
+		8C3C194A0D73EA35001BAC88 /* EncoderInterface.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 8C3C19460D73EA0B001BAC88 /* EncoderInterface.framework */; };
 		8C3EF7690CFE663A0086181E /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8C3EF7680CFE663A0086181E /* IOKit.framework */; };
 		8C3EFC640D0357D10086181E /* TrackInspectorPanel.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8C3EFC620D0357D10086181E /* TrackInspectorPanel.xib */; };
 		8C46E3880D77550E00AE4470 /* EncoderManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C46E3870D77550E00AE4470 /* EncoderManager.m */; };
@@ -136,7 +139,7 @@
 		8C9817100CF7C6AB00F45B7F /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8C98170C0CF7C6AB00F45B7F /* MainMenu.xib */; };
 		8CA35EDF0D2F0AA100F89E3B /* MusicDatabaseMatchesSheet.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8CA35EDD0D2F0AA100F89E3B /* MusicDatabaseMatchesSheet.xib */; };
 		8CA35F920D2F42A800F89E3B /* discid.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8CA35F910D2F42A800F89E3B /* discid.framework */; };
-		8CA35F950D2F42B300F89E3B /* discid.framework in Copy Embedded Frameworks */ = {isa = PBXBuildFile; fileRef = 8CA35F910D2F42A800F89E3B /* discid.framework */; };
+		8CA35F950D2F42B300F89E3B /* discid.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 8CA35F910D2F42A800F89E3B /* discid.framework */; };
 		8CB2094E0D0507F5003A90A6 /* Drive.m in Sources */ = {isa = PBXBuildFile; fileRef = 8CB2094D0D0507F5003A90A6 /* Drive.m */; };
 		8CB209750D050EE9003A90A6 /* DriveInformation.m in Sources */ = {isa = PBXBuildFile; fileRef = 8CB209740D050EE9003A90A6 /* DriveInformation.m */; };
 		8CD9C1FE0D0F6C4E00C974C9 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8CD9C1FD0D0F6C4E00C974C9 /* AudioToolbox.framework */; };
@@ -152,14 +155,14 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = 3215E7D00F8848F600F84429 /* AIFF.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 8D5B49B6048680CD000E48DA /* WAVE.bundle */;
+			remoteGlobalIDString = 8D5B49B6048680CD000E48DA;
 			remoteInfo = WAVE;
 		};
 		3215E8080F884A1900F84429 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 3215E7D00F8848F600F84429 /* AIFF.xcodeproj */;
 			proxyType = 1;
-			remoteGlobalIDString = 8D5B49AC048680CD000E48DA /* AIFF */;
+			remoteGlobalIDString = 8D5B49AC048680CD000E48DA;
 			remoteInfo = AIFF;
 		};
 		3252C1810DD237C500856BFE /* PBXContainerItemProxy */ = {
@@ -175,6 +178,20 @@
 			proxyType = 1;
 			remoteGlobalIDString = 8D5B49AC048680CD000E48DA;
 			remoteInfo = FLAC;
+		};
+		325B5D480F89434100E9CE97 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 325B5D400F89434100E9CE97 /* Amazon.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 8D5B49B6048680CD000E48DA;
+			remoteInfo = AlbumArtExchange;
+		};
+		325B5D620F89436000E9CE97 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 325B5D400F89434100E9CE97 /* Amazon.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 8D5B49AC048680CD000E48DA;
+			remoteInfo = Amazon;
 		};
 		328AB1D40F8074D9001F1C78 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -325,10 +342,11 @@
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
+				325B5D640F89437900E9CE97 /* Amazon.bundle in Copy PlugIns */,
 				328AB3100F80850C001F1C78 /* AlbumArtExchange.bundle in Copy PlugIns */,
 				32CE93870F5657E900AB328A /* WavPack.bundle in Copy PlugIns */,
 				32C5ACA50E6D220D007C1E7A /* WAVE.bundle in Copy PlugIns */,
-				3215E80A0F884A5000F84429 /* WAVE.bundle in Copy PlugIns */,
+				3215E80A0F884A5000F84429 /* AIFF.bundle in Copy PlugIns */,
 				32C5ABF90E6D1B36007C1E7A /* AppleLossless.bundle in Copy PlugIns */,
 				328DE6FD0E5FE07000F5BD13 /* iTunes.bundle in Copy PlugIns */,
 				328DE6C20E5FDE6600F5BD13 /* FreeDB.bundle in Copy PlugIns */,
@@ -338,20 +356,21 @@
 			name = "Copy PlugIns";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		8CA35D6B0D2E7B1900F89E3B /* Copy Embedded Frameworks */ = {
+		8CA35D6B0D2E7B1900F89E3B /* Copy Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				8C3C194A0D73EA35001BAC88 /* EncoderInterface.framework in Copy Embedded Frameworks */,
-				328DE5150E5FC69600F5BD13 /* MusicDatabaseInterface.framework in Copy Embedded Frameworks */,
-				328AB1DE0F807539001F1C78 /* MetadataSourceInterface.framework in Copy Embedded Frameworks */,
-				8CA35F950D2F42B300F89E3B /* discid.framework in Copy Embedded Frameworks */,
-				32C793F60E291B4B0079706C /* Sparkle.framework in Copy Embedded Frameworks */,
-				32A2C1100F0A8EF100CA8DDE /* BGHUDAppKit.framework in Copy Embedded Frameworks */,
+				326558EC0F99551900403217 /* SFBCrashReporter.framework in Copy Frameworks */,
+				8C3C194A0D73EA35001BAC88 /* EncoderInterface.framework in Copy Frameworks */,
+				328DE5150E5FC69600F5BD13 /* MusicDatabaseInterface.framework in Copy Frameworks */,
+				328AB1DE0F807539001F1C78 /* MetadataSourceInterface.framework in Copy Frameworks */,
+				8CA35F950D2F42B300F89E3B /* discid.framework in Copy Frameworks */,
+				32C793F60E291B4B0079706C /* Sparkle.framework in Copy Frameworks */,
+				32A2C1100F0A8EF100CA8DDE /* BGHUDAppKit.framework in Copy Frameworks */,
 			);
-			name = "Copy Embedded Frameworks";
+			name = "Copy Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
@@ -365,6 +384,11 @@
 		2A37F4C4FDCFA73011CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		2A37F4C5FDCFA73011CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		3215E7D00F8848F600F84429 /* AIFF.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = AIFF.xcodeproj; path = AIFF/AIFF.xcodeproj; sourceTree = "<group>"; };
+		322EB43D0F8C30020081A563 /* AquaticPrime.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AquaticPrime.h; sourceTree = "<group>"; };
+		322EB43E0F8C30020081A563 /* AquaticPrime.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AquaticPrime.m; sourceTree = "<group>"; };
+		322EB4410F8C30210081A563 /* ImageAndTextCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImageAndTextCell.h; sourceTree = "<group>"; };
+		322EB4420F8C30210081A563 /* ImageAndTextCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ImageAndTextCell.m; sourceTree = "<group>"; };
+		322EB4640F8C325B0081A563 /* AddressBook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AddressBook.framework; path = System/Library/Frameworks/AddressBook.framework; sourceTree = SDKROOT; };
 		32362B810EE4EC1C00001E58 /* Base.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Base.xcconfig; sourceTree = "<group>"; };
 		324EC6730DA2D411002A3CA7 /* Rip.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = Rip.icns; sourceTree = "<group>"; };
 		324F30C80E85CF47000E4E4E /* dsa_pub.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = dsa_pub.pem; sourceTree = "<group>"; };
@@ -385,8 +409,8 @@
 		324F325C0E870269000E4E4E /* PregapDetectionOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PregapDetectionOperation.m; sourceTree = "<group>"; };
 		3252C1790DD237C500856BFE /* FLAC.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = FLAC.xcodeproj; path = FLAC/FLAC.xcodeproj; sourceTree = "<group>"; };
 		325B2FDC0E7B6B4300696A1A /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/ReadOffsetCalculatorSheet.xib; sourceTree = "<group>"; };
-		3263A7DD0F86600C008073DE /* AquaticPrime.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AquaticPrime.h; path = AquaticPrime/AquaticPrime.h; sourceTree = "<group>"; };
-		3263A80E0F86659A008073DE /* AquaticPrime.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AquaticPrime.m; path = AquaticPrime/AquaticPrime.m; sourceTree = "<group>"; };
+		325B5D400F89434100E9CE97 /* Amazon.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Amazon.xcodeproj; path = Amazon/Amazon.xcodeproj; sourceTree = "<group>"; };
+		326558E80F99550D00403217 /* SFBCrashReporter.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SFBCrashReporter.framework; path = Frameworks/SFBCrashReporter.framework; sourceTree = "<group>"; };
 		3268C35A0EB04C2300FF62F8 /* Tests.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Tests.octest; sourceTree = BUILT_PRODUCTS_DIR; };
 		3268C35B0EB04C2300FF62F8 /* Tests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Tests-Info.plist"; sourceTree = "<group>"; };
 		3268C3740EB04CC500FF62F8 /* BitArrayTest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BitArrayTest.h; path = Tests/BitArrayTest.h; sourceTree = "<group>"; };
@@ -445,8 +469,6 @@
 		3295B3780F7F001400AF55EF /* NSString+PathSanitizationMethods.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+PathSanitizationMethods.m"; sourceTree = "<group>"; };
 		3295B4230F7F13E800AF55EF /* ETAFormatter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ETAFormatter.h; sourceTree = "<group>"; };
 		3295B4240F7F13E800AF55EF /* ETAFormatter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ETAFormatter.m; sourceTree = "<group>"; };
-		3295B4670F7F232A00AF55EF /* ImageAndTextCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImageAndTextCell.h; sourceTree = "<group>"; };
-		3295B4680F7F232A00AF55EF /* ImageAndTextCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ImageAndTextCell.m; sourceTree = "<group>"; };
 		3295B4920F7F267100AF55EF /* Green Check.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Green Check.png"; sourceTree = "<group>"; };
 		3295B4B20F7F2F0200AF55EF /* Red X.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Red X.png"; sourceTree = "<group>"; };
 		32A2C10C0F0A8EE000CA8DDE /* BGHUDAppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = BGHUDAppKit.framework; path = Frameworks/BGHUDAppKit.framework; sourceTree = "<group>"; };
@@ -597,6 +619,7 @@
 				32AB63A60E68B45800EA423A /* SystemConfiguration.framework in Frameworks */,
 				32A2C10D0F0A8EE000CA8DDE /* BGHUDAppKit.framework in Frameworks */,
 				328AB1DB0F8074E4001F1C78 /* MetadataSourceInterface.framework in Frameworks */,
+				326558E90F99550D00403217 /* SFBCrashReporter.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -606,6 +629,8 @@
 		1058C7A6FEA54F5311CA2CBB /* Linked Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				326558E80F99550D00403217 /* SFBCrashReporter.framework */,
+				322EB4640F8C325B0081A563 /* AddressBook.framework */,
 				32C9F23A0F7973790050F4B2 /* QuartzCore.framework */,
 				32A2C10C0F0A8EE000CA8DDE /* BGHUDAppKit.framework */,
 				32C793F20E291B3D0079706C /* Sparkle.framework */,
@@ -749,7 +774,7 @@
 		3215E7D10F8848F600F84429 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				3215E7D90F8848F600F84429 /* WAVE.bundle */,
+				3215E7D90F8848F600F84429 /* AIFF.bundle */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -760,6 +785,24 @@
 				324EC6730DA2D411002A3CA7 /* Rip.icns */,
 			);
 			path = Icons;
+			sourceTree = "<group>";
+		};
+		322EB43C0F8C30020081A563 /* AquaticPrime */ = {
+			isa = PBXGroup;
+			children = (
+				322EB43D0F8C30020081A563 /* AquaticPrime.h */,
+				322EB43E0F8C30020081A563 /* AquaticPrime.m */,
+			);
+			path = AquaticPrime;
+			sourceTree = "<group>";
+		};
+		322EB4400F8C30210081A563 /* ImageAndTextCell */ = {
+			isa = PBXGroup;
+			children = (
+				322EB4410F8C30210081A563 /* ImageAndTextCell.h */,
+				322EB4420F8C30210081A563 /* ImageAndTextCell.m */,
+			);
+			path = ImageAndTextCell;
 			sourceTree = "<group>";
 		};
 		32362B800EE4EBFC00001E58 /* Configs */ = {
@@ -779,6 +822,14 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		325B5D410F89434100E9CE97 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				325B5D490F89434100E9CE97 /* Amazon.bundle */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		3268C3720EB04C9800FF62F8 /* Test Cases */ = {
 			isa = PBXGroup;
 			children = (
@@ -794,6 +845,7 @@
 		328AB11A0F807148001F1C78 /* MetadataSource */ = {
 			isa = PBXGroup;
 			children = (
+				325B5D400F89434100E9CE97 /* Amazon.xcodeproj */,
 				328AB3050F8084E9001F1C78 /* AlbumArtExchange.xcodeproj */,
 				328AB1D00F8074D9001F1C78 /* MetadataSourceInterface.xcodeproj */,
 				328AB11B0F8071C4001F1C78 /* MetadataSourceManager.h */,
@@ -853,10 +905,8 @@
 		3295B4660F7F231100AF55EF /* ThirdParty */ = {
 			isa = PBXGroup;
 			children = (
-				3263A80E0F86659A008073DE /* AquaticPrime.m */,
-				3263A7DD0F86600C008073DE /* AquaticPrime.h */,
-				3295B4670F7F232A00AF55EF /* ImageAndTextCell.h */,
-				3295B4680F7F232A00AF55EF /* ImageAndTextCell.m */,
+				322EB43C0F8C30020081A563 /* AquaticPrime */,
+				322EB4400F8C30210081A563 /* ImageAndTextCell */,
 			);
 			path = ThirdParty;
 			sourceTree = "<group>";
@@ -1180,7 +1230,7 @@
 				8D15AC2B0486D014006FF6A4 /* Resources */,
 				8D15AC300486D014006FF6A4 /* Sources */,
 				8D15AC330486D014006FF6A4 /* Frameworks */,
-				8CA35D6B0D2E7B1900F89E3B /* Copy Embedded Frameworks */,
+				8CA35D6B0D2E7B1900F89E3B /* Copy Frameworks */,
 				8C3C17F80D73981A001BAC88 /* Copy PlugIns */,
 				32C9F1180F782C4F0050F4B2 /* Delete BGHudAppKit Resources */,
 			);
@@ -1199,6 +1249,7 @@
 				32C5ACA40E6D21FE007C1E7A /* PBXTargetDependency */,
 				32CE93820F5657B300AB328A /* PBXTargetDependency */,
 				328AB4140F808DDB001F1C78 /* PBXTargetDependency */,
+				325B5D630F89436000E9CE97 /* PBXTargetDependency */,
 			);
 			name = Rip;
 			productInstallPath = "$(HOME)/Applications";
@@ -1224,6 +1275,10 @@
 				{
 					ProductGroup = 328AB3060F8084E9001F1C78 /* Products */;
 					ProjectRef = 328AB3050F8084E9001F1C78 /* AlbumArtExchange.xcodeproj */;
+				},
+				{
+					ProductGroup = 325B5D410F89434100E9CE97 /* Products */;
+					ProjectRef = 325B5D400F89434100E9CE97 /* Amazon.xcodeproj */;
 				},
 				{
 					ProductGroup = 32C5ABE30E6D1AF5007C1E7A /* Products */;
@@ -1275,10 +1330,10 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
-		3215E7D90F8848F600F84429 /* WAVE.bundle */ = {
+		3215E7D90F8848F600F84429 /* AIFF.bundle */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.cfbundle;
-			path = WAVE.bundle;
+			path = AIFF.bundle;
 			remoteRef = 3215E7D80F8848F600F84429 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
@@ -1287,6 +1342,13 @@
 			fileType = wrapper.cfbundle;
 			path = FLAC.bundle;
 			remoteRef = 3252C1810DD237C500856BFE /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		325B5D490F89434100E9CE97 /* Amazon.bundle */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = Amazon.bundle;
+			remoteRef = 325B5D480F89434100E9CE97 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		328AB1D50F8074D9001F1C78 /* MetadataSourceInterface.framework */ = {
@@ -1528,9 +1590,9 @@
 				3295B3810F7F001400AF55EF /* NSString+PathSanitizationMethods.m in Sources */,
 				3295B3B40F7F09C900AF55EF /* SecondsFormatter.m in Sources */,
 				3295B4250F7F13E800AF55EF /* ETAFormatter.m in Sources */,
-				3295B4690F7F232A00AF55EF /* ImageAndTextCell.m in Sources */,
 				328AB11D0F8071C4001F1C78 /* MetadataSourceManager.m in Sources */,
-				3263A80F0F86659A008073DE /* AquaticPrime.m in Sources */,
+				322EB43F0F8C30020081A563 /* AquaticPrime.m in Sources */,
+				322EB4430F8C30210081A563 /* ImageAndTextCell.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1546,6 +1608,11 @@
 			isa = PBXTargetDependency;
 			name = FLAC;
 			targetProxy = 3252C1C80DD2387500856BFE /* PBXContainerItemProxy */;
+		};
+		325B5D630F89436000E9CE97 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = Amazon;
+			targetProxy = 325B5D620F89436000E9CE97 /* PBXContainerItemProxy */;
 		};
 		328AB1DD0F807513001F1C78 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
