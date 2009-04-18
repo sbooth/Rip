@@ -110,6 +110,9 @@
 		NSLog(@"MusicBrainz error: %s", e.what());
 #endif
 
+		// Clean up
+		delete ws;
+
 		self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:ENOMEM userInfo:nil];
 		return;
 	}
@@ -277,6 +280,8 @@
 
 		delete result;
 	}
+	
+	delete ws;
 	
 	// Set the query results
 	self.queryResults = matchingReleases;
