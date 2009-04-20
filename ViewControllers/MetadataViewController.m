@@ -39,13 +39,13 @@
 
 #pragma mark NSTableView Delegate Methods
 
-- (void) tableView:(NSTableView *)aTableView willDisplayCell:(id)aCell forTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex
+- (void)tableView:(NSTableView *)tableView willDisplayCell:(id)cell forTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
 {
 	
-#pragma unused(aTableView)
+#pragma unused(tableView)
 	
-	if([aTableColumn.identifier isEqualToString:@"isSelected"])
-		[aCell setTitle:[[[[_trackController arrangedObjects] objectAtIndex:rowIndex] valueForKey:@"number"] stringValue]];
+	if([tableColumn.identifier isEqualToString:@"isSelected"])
+		[cell setTitle:[[[[_trackController arrangedObjects] objectAtIndex:row] valueForKey:@"number"] stringValue]];
 }
 
 @end
