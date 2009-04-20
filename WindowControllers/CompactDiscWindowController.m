@@ -257,72 +257,73 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 	_extractionViewController = [[ExtractionViewController alloc] init];
 
 	[_mainView addSubview:_metadataViewController.view];
+	[self setNextResponder:_metadataViewController];
 }
 
-- (BOOL) validateMenuItem:(NSMenuItem *)anItem
+- (BOOL) validateMenuItem:(NSMenuItem *)menuItem
 {
 	// Only allow disc-related actions if the main metadata view is diplayed
 	if(![_metadataViewController.view isDescendantOf:_mainView])
 		return NO;
-	else if([anItem action] == @selector(copySelectedTracks:)) {
+	else if([menuItem action] == @selector(copySelectedTracks:)) {
 		NSUInteger countOfSelectedTracks = self.compactDisc.firstSession.selectedTracks.count;
 		
 		if(1 == countOfSelectedTracks)
-			[anItem setTitle:NSLocalizedString(@"Copy Track", @"")];
+			[menuItem setTitle:NSLocalizedString(@"Copy Track", @"")];
 		else
-			[anItem setTitle:NSLocalizedString(@"Copy Tracks", @"")];
+			[menuItem setTitle:NSLocalizedString(@"Copy Tracks", @"")];
 		
 		return (0 != countOfSelectedTracks);
 	}
-	else if([anItem action] == @selector(detectPregaps:)) {
+	else if([menuItem action] == @selector(detectPregaps:)) {
 		NSUInteger countOfSelectedTracks = self.compactDisc.firstSession.selectedTracks.count;
 		
 		if(1 == countOfSelectedTracks)
-			[anItem setTitle:NSLocalizedString(@"Detect Pregap", @"")];
+			[menuItem setTitle:NSLocalizedString(@"Detect Pregap", @"")];
 		else
-			[anItem setTitle:NSLocalizedString(@"Detect Pregaps", @"")];
+			[menuItem setTitle:NSLocalizedString(@"Detect Pregaps", @"")];
 
 		return (0 != countOfSelectedTracks);		
 	}
-	else if([anItem action] == @selector(readISRCs:)) {
+	else if([menuItem action] == @selector(readISRCs:)) {
 		NSUInteger countOfSelectedTracks = self.compactDisc.firstSession.selectedTracks.count;
 		
 		if(1 == countOfSelectedTracks)
-			[anItem setTitle:NSLocalizedString(@"Read ISRC", @"")];
+			[menuItem setTitle:NSLocalizedString(@"Read ISRC", @"")];
 		else
-			[anItem setTitle:NSLocalizedString(@"Read ISRCs", @"")];
+			[menuItem setTitle:NSLocalizedString(@"Read ISRCs", @"")];
 			
 		return (0 != countOfSelectedTracks);
 	}
-//	else if([anItem action] == @selector(determineDriveReadOffset:)) {
+//	else if([menuItem action] == @selector(determineDriveReadOffset:)) {
 //		if(self.driveInformation.productName)
-//			[anItem setTitle:[NSString stringWithFormat:NSLocalizedString(@"Determine Read Offset for \u201c%@ %@\u201d", @""), self.driveInformation.vendorName, self.driveInformation.productName]];
+//			[menuItem setTitle:[NSString stringWithFormat:NSLocalizedString(@"Determine Read Offset for \u201c%@ %@\u201d", @""), self.driveInformation.vendorName, self.driveInformation.productName]];
 //		else
-//			[anItem setTitle:NSLocalizedString(@"Determine Read Offset", @"")];
+//			[menuItem setTitle:NSLocalizedString(@"Determine Read Offset", @"")];
 //			
 //		return YES;
 //	}
-	else if([anItem action] == @selector(queryDefaultMusicDatabase:)) {
+	else if([menuItem action] == @selector(queryDefaultMusicDatabase:)) {
 		NSBundle *defaultMusicDatabaseBundle = [[MusicDatabaseManager sharedMusicDatabaseManager] defaultMusicDatabase];
 		id <MusicDatabaseInterface> musicDatabaseInterface = [[[defaultMusicDatabaseBundle principalClass] alloc] init];
 		
 		MusicDatabaseQueryOperation *queryOperation = [musicDatabaseInterface musicDatabaseQueryOperation];
 //		if(queryOperation)
-//			[anItem setTitle:[NSString stringWithFormat:NSLocalizedString(@"Lookup Metadata Using %@", @""), [defaultMusicDatabaseBundle objectForInfoDictionaryKey:@"MusicDatabaseName"]]];
+//			[menuItem setTitle:[NSString stringWithFormat:NSLocalizedString(@"Lookup Metadata Using %@", @""), [defaultMusicDatabaseBundle objectForInfoDictionaryKey:@"MusicDatabaseName"]]];
 
 		return (nil != queryOperation);
 	}
-	else if([anItem action] == @selector(submitToDefaultMusicDatabase:)) {
+	else if([menuItem action] == @selector(submitToDefaultMusicDatabase:)) {
 		NSBundle *defaultMusicDatabaseBundle = [[MusicDatabaseManager sharedMusicDatabaseManager] defaultMusicDatabase];
 		id <MusicDatabaseInterface> musicDatabaseInterface = [[[defaultMusicDatabaseBundle principalClass] alloc] init];
 		
 		MusicDatabaseSubmissionOperation *submissionOperation = [musicDatabaseInterface musicDatabaseSubmissionOperation];
 //		if(submissionOperation)
-//			[anItem setTitle:[NSString stringWithFormat:NSLocalizedString(@"Submit Metadata to %@ ", @""), [defaultMusicDatabaseBundle objectForInfoDictionaryKey:@"MusicDatabaseName"]]];
+//			[menuItem setTitle:[NSString stringWithFormat:NSLocalizedString(@"Submit Metadata to %@ ", @""), [defaultMusicDatabaseBundle objectForInfoDictionaryKey:@"MusicDatabaseName"]]];
 		
 		return (nil != submissionOperation);
 	}
-	else if([self respondsToSelector:[anItem action]])
+	else if([self respondsToSelector:[menuItem action]])
 		return YES;
 	else
 		return NO;
@@ -470,7 +471,8 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 	// Replace the metadata source view with the metadata view
 	_metadataViewController.view.frame = viewController.view.frame;
 	[_mainView replaceSubview:viewController.view with:_metadataViewController.view];
-	
+	[self setNextResponder:_metadataViewController];
+
 	if(NSCancelButton == returnCode)
 		return;
 
@@ -866,6 +868,7 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 	[viewController.view setFrame:_metadataViewController.view.frame];
 	
 	[_mainView replaceSubview:_metadataViewController.view with:viewController.view];
+	[self setNextResponder:_metadataViewController];
 }
 
 - (IBAction) queryAccurateRip:(id)sender
@@ -950,6 +953,7 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 	// Replace the extraction view with the metadata view
 	_metadataViewController.view.frame = _extractionViewController.view.frame;
 	[_mainView replaceSubview:_extractionViewController.view with:_metadataViewController.view];
+	[self setNextResponder:_metadataViewController];
 	
 	if(NSCancelButton == returnCode)
 		return;
@@ -1194,6 +1198,7 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 	
 	// Swap it in
 	[_mainView replaceSubview:_metadataViewController.view with:_extractionViewController.view];
+	[self setNextResponder:_extractionViewController];
 	
 	// Set up the audio extraction parameters
 	_extractionViewController.disk = self.disk;
