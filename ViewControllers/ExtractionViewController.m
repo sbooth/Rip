@@ -167,6 +167,9 @@ static NSString * const kkAudioExtractionKVOContext		= @"org.sbooth.Rip.Extracti
 		self.managedObjectContext = [[NSManagedObjectContext alloc] init];
 		[self.managedObjectContext setPersistentStoreCoordinator:[[[NSApplication sharedApplication] delegate] persistentStoreCoordinator]];
 		
+		// Register to receive NSManagedObjectContextDidSaveNotification to keep our MOC in sync
+		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(managedObjectContextDidSave:) name:NSManagedObjectContextDidSaveNotification object:nil];
+
 		self.operationQueue = [[NSOperationQueue alloc] init];
 		[self.operationQueue setMaxConcurrentOperationCount:1];
 		
@@ -186,8 +189,7 @@ static NSString * const kkAudioExtractionKVOContext		= @"org.sbooth.Rip.Extracti
 - (void) awakeFromNib
 {
 	NSSortDescriptor *trackNumberSortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"number" ascending:YES];
-	[_tracksRemainingArrayController setSortDescriptors:[NSArray arrayWithObject:trackNumberSortDescriptor]];
-	[_tracksCompletedArrayController setSortDescriptors:[NSArray arrayWithObject:trackNumberSortDescriptor]];
+	[_tracksArrayController setSortDescriptors:[NSArray arrayWithObject:trackNumberSortDescriptor]];
 }
 
 - (void) observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
@@ -280,6 +282,28 @@ static NSString * const kkAudioExtractionKVOContext		= @"org.sbooth.Rip.Extracti
 		[super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
 }
 
+- (BOOL) validateMenuItem:(NSMenuItem *)menuItem
+{
+	if([menuItem action] == @selector(cancel:)) {
+		[menuItem setTitle:NSLocalizedString(@"Cancel Extraction", @"")];
+		return (0 != [[_operationQueue operations] count]);
+	}
+	else if([self respondsToSelector:[menuItem action]])
+		return YES;
+	else
+		return NO;
+}
+
+- (void) managedObjectContextDidSave:(NSNotification *)notification
+{
+	NSParameterAssert(nil != notification);
+	
+	// "Auto-refresh" objects changed in another MOC
+	NSManagedObjectContext *managedObjectContext = [notification object];
+	if(managedObjectContext != self.managedObjectContext)
+		[self.managedObjectContext mergeChangesFromContextDidSaveNotification:notification];
+}
+
 - (void) setDisk:(DADiskRef)disk
 {
 	if(disk != _disk) {
@@ -311,13 +335,9 @@ static NSString * const kkAudioExtractionKVOContext		= @"org.sbooth.Rip.Extracti
 	_failedTrackIDs = [NSMutableSet set];
 	_encodingOperations =  [NSMutableArray array];
 	
-	[self willChangeValueForKey:@"tracksRemaining"];
-	_tracksRemaining = [NSMutableSet setWithArray:self.orderedTracksRemaining];
-	[self didChangeValueForKey:@"tracksRemaining"];
-
-	[self willChangeValueForKey:@"tracksCompleted"];
-	_tracksCompleted = [NSMutableSet set];
-	[self didChangeValueForKey:@"tracksCompleted"];
+	[self willChangeValueForKey:@"tracks"];
+	_tracks = [NSSet setWithArray:self.orderedTracks];
+	[self didChangeValueForKey:@"tracks"];
 	
 	// Before starting extraction, ensure the disc's MCN has been read
 	if(!self.compactDisc.metadata.MCN) {
@@ -412,15 +432,60 @@ static NSString * const kkAudioExtractionKVOContext		= @"org.sbooth.Rip.Extracti
 
 #pragma mark NSTableView Delegate Methods
 
-- (void) tableView:(NSTableView *)aTableView willDisplayCell:(id)aCell forTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex
+- (void)tableView:(NSTableView *)tableView willDisplayCell:(id)cell forTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
 {
-	if(aTableView == _tracksCompletedTable) {
-		if([aTableColumn.identifier isEqualToString:@"title"]) {
-			TrackDescriptor *track = [[_tracksCompletedArrayController arrangedObjects] objectAtIndex:rowIndex];
-			if([_failedTrackIDs containsObject:track.objectID])
-				[aCell setImage:[NSImage imageNamed:@"Red X"]];
-			else
-				[aCell setImage:[NSImage imageNamed:@"Green Check"]];
+	if(tableView == _tracksTable) {
+		NSString *columnIdentifier = tableColumn.identifier;
+		
+		TrackDescriptor *track = [[_tracksArrayController arrangedObjects] objectAtIndex:row];
+		NSManagedObjectID *trackID = track.objectID;
+
+		if([columnIdentifier isEqualToString:@"status"]) {
+			// Tracks which have failed should be highlighted in red
+			if([_failedTrackIDs containsObject:trackID]) {
+//				NSColor *failureColor = [NSColor redColor];
+//				NSDictionary *attributes = [NSDictionary dictionaryWithObject:failureColor forKey:NSForegroundColorAttributeName];
+//				NSAttributedString *attributedString = [[NSAttributedString alloc] initWithString:NSLocalizedString(@"Extraction failed", @"") attributes:attributes];
+//				[cell setAttributedStringValue:attributedString];
+
+				[cell setStringValue:NSLocalizedString(@"Extraction failed", @"")];
+				[cell setImage:[NSImage imageNamed:@"Red X"]];
+			}
+			// Success will be in green
+			else if([[_trackExtractionRecords valueForKeyPath:@"track.objectID"] containsObject:trackID]) {
+				NSSet *matchingTrackExtractionRecords = [_trackExtractionRecords filteredSetUsingPredicate:[NSPredicate predicateWithFormat:@"track.objectID == %@", trackID]];
+				if(![matchingTrackExtractionRecords count])
+					return;
+				TrackExtractionRecord *extractionRecord = [matchingTrackExtractionRecords anyObject];
+				NSNumber *accurateRipConfidenceLevel = extractionRecord.accurateRipConfidenceLevel;
+				NSString *description = nil;
+				if([accurateRipConfidenceLevel unsignedIntegerValue])
+					description = [NSString stringWithFormat:NSLocalizedString(@"Accurate (%@)", @""), accurateRipConfidenceLevel];
+				else
+					description = NSLocalizedString(@"Copy OK", @"");
+
+//				NSColor *successColor = [NSColor colorWithDeviceRed:0 green:(116.0f / 255.0f) blue:0 alpha:1.0f];
+//				NSDictionary *attributes = [NSDictionary dictionaryWithObject:successColor forKey:NSForegroundColorAttributeName];
+//				NSAttributedString *attributedString = [[NSAttributedString alloc] initWithString:description attributes:attributes];
+//				[cell setAttributedStringValue:attributedString];
+				
+				[cell setStringValue:description];
+				[cell setImage:[NSImage imageNamed:@"Green Check"]];
+			}
+			// Processing will be the standard color
+			else if([[_currentTrack objectID] isEqual:trackID]) {
+				[cell setStringValue:@"Extracting"];
+				[cell setImage:nil];
+			}
+			// And queued should be in black with one-third alpha
+			else {
+				NSColor *queuedColor = [[NSColor blackColor] colorWithAlphaComponent:(1.0f / 3.0f)];
+				NSDictionary *attributes = [NSDictionary dictionaryWithObject:queuedColor forKey:NSForegroundColorAttributeName];
+				NSAttributedString *attributedString = [[NSAttributedString alloc] initWithString:NSLocalizedString(@"Queued", @"") attributes:attributes];
+				
+				[cell setAttributedStringValue:attributedString];
+				[cell setImage:nil];
+			}
 		}
 	}
 }
@@ -495,6 +560,8 @@ static NSString * const kkAudioExtractionKVOContext		= @"org.sbooth.Rip.Extracti
 
 - (void) startExtractingNextTrack
 {
+	_currentTrack = nil;
+	
 	NSArray *tracks = self.orderedTracksRemaining;
 	
 	if(![tracks count])
@@ -503,10 +570,8 @@ static NSString * const kkAudioExtractionKVOContext		= @"org.sbooth.Rip.Extracti
 	TrackDescriptor *track = [tracks objectAtIndex:0];
 	[_trackIDsRemaining removeObject:[track objectID]];
 	
-	[self willChangeValueForKey:@"tracksRemaining"];
-	[_tracksRemaining removeObject:track];
-	[self didChangeValueForKey:@"tracksRemaining"];
-	
+	_currentTrack = track;
+
 	[self removeTemporaryFiles];
 	[self resetExtractionState];
 	
@@ -547,9 +612,6 @@ static NSString * const kkAudioExtractionKVOContext		= @"org.sbooth.Rip.Extracti
 		
 		[self.operationQueue addOperation:operation];
 	}	
-	
-	// Remove from the list of pending tracks
-//	[_tracksRemainingArrayController removeObject:track];
 	
 	[self extractWholeTrack:track];
 }
@@ -1286,11 +1348,9 @@ static NSString * const kkAudioExtractionKVOContext		= @"org.sbooth.Rip.Extracti
 			[[Logger sharedLogger] logMessage:@"Extraction failed for track %@: maximum retry count exceeded", track.number];
 			
 			[_failedTrackIDs addObject:[track objectID]];
-			
-			[self willChangeValueForKey:@"tracksCompleted"];
-			[_tracksCompleted addObject:track];
-			[self didChangeValueForKey:@"tracksCompleted"];
-			
+
+			[_tracksTable reloadData];
+
 			// A failure for a single track still allows individual tracks to be extracted
 			if(eExtractionModeIndividualTracks == self.extractionMode)
 				[self startExtractingNextTrack];
@@ -1587,10 +1647,8 @@ static NSString * const kkAudioExtractionKVOContext		= @"org.sbooth.Rip.Extracti
 	
 	[_trackExtractionRecords addObject:extractionRecord];
 	[_encodingOperations addObject:encodingOperation];
-	
-	[self willChangeValueForKey:@"tracksCompleted"];
-	[_tracksCompleted addObject:track];
-	[self didChangeValueForKey:@"tracksCompleted"];
+
+	[_tracksTable reloadData];
 	
 	return YES;
 }

@@ -8,6 +8,7 @@
 
 @class CompactDisc, DriveInformation, AccurateRipDiscRecord;
 @class ExtractionOperation, ExtractedAudioFile;
+@class TrackDescriptor;
 @class ImageExtractionRecord;
 
 // ========================================
@@ -33,10 +34,8 @@ typedef enum _eExtractionMode eExtractionMode;
 	IBOutlet NSTextField *_statusTextField;
 	IBOutlet NSTextField *_detailedStatusTextField;
 	
-	IBOutlet NSArrayController *_tracksRemainingArrayController;
-	IBOutlet NSArrayController *_tracksCompletedArrayController;
-	IBOutlet NSTableView *_tracksRemainingTable;
-	IBOutlet NSTableView *_tracksCompletedTable;
+	IBOutlet NSArrayController *_tracksArrayController;
+	IBOutlet NSTableView *_tracksTable;
 
 @private
 	__strong DADiskRef _disk;
@@ -73,8 +72,8 @@ typedef enum _eExtractionMode eExtractionMode;
 	NSMutableSet *_failedTrackIDs;
 	
 	// Properties maintained for UI
-	NSMutableSet *_tracksRemaining;
-	NSMutableSet *_tracksCompleted;
+	TrackDescriptor *_currentTrack;
+	NSMutableSet *_tracks;
 	NSTimeInterval _secondsElapsed;
 	NSTimeInterval _estimatedSecondsRemaining;
 	NSUInteger _c2ErrorCount;

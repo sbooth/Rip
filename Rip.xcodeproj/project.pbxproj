@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		3215E80A0F884A5000F84429 /* AIFF.bundle in Copy PlugIns */ = {isa = PBXBuildFile; fileRef = 3215E7D90F8848F600F84429 /* AIFF.bundle */; };
+		3221770B0F9BA68D00E4424B /* NSColor+HexadecimalColorMethods.m in Sources */ = {isa = PBXBuildFile; fileRef = 3221770A0F9BA68D00E4424B /* NSColor+HexadecimalColorMethods.m */; };
 		322EB43F0F8C30020081A563 /* AquaticPrime.m in Sources */ = {isa = PBXBuildFile; fileRef = 322EB43E0F8C30020081A563 /* AquaticPrime.m */; };
 		322EB4430F8C30210081A563 /* ImageAndTextCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 322EB4420F8C30210081A563 /* ImageAndTextCell.m */; };
 		324EC6740DA2D411002A3CA7 /* Rip.icns in Resources */ = {isa = PBXBuildFile; fileRef = 324EC6730DA2D411002A3CA7 /* Rip.icns */; };
@@ -384,6 +385,8 @@
 		2A37F4C4FDCFA73011CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		2A37F4C5FDCFA73011CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		3215E7D00F8848F600F84429 /* AIFF.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = AIFF.xcodeproj; path = AIFF/AIFF.xcodeproj; sourceTree = "<group>"; };
+		322177090F9BA68D00E4424B /* NSColor+HexadecimalColorMethods.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSColor+HexadecimalColorMethods.h"; sourceTree = "<group>"; };
+		3221770A0F9BA68D00E4424B /* NSColor+HexadecimalColorMethods.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSColor+HexadecimalColorMethods.m"; sourceTree = "<group>"; };
 		322EB43D0F8C30020081A563 /* AquaticPrime.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AquaticPrime.h; sourceTree = "<group>"; };
 		322EB43E0F8C30020081A563 /* AquaticPrime.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AquaticPrime.m; sourceTree = "<group>"; };
 		322EB4410F8C30210081A563 /* ImageAndTextCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImageAndTextCell.h; sourceTree = "<group>"; };
@@ -989,6 +992,8 @@
 				3295B3740F7F001400AF55EF /* NSIndexSet+SetMethods.m */,
 				3295B3770F7F001400AF55EF /* NSString+PathSanitizationMethods.h */,
 				3295B3780F7F001400AF55EF /* NSString+PathSanitizationMethods.m */,
+				322177090F9BA68D00E4424B /* NSColor+HexadecimalColorMethods.h */,
+				3221770A0F9BA68D00E4424B /* NSColor+HexadecimalColorMethods.m */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -1593,6 +1598,7 @@
 				328AB11D0F8071C4001F1C78 /* MetadataSourceManager.m in Sources */,
 				322EB43F0F8C30020081A563 /* AquaticPrime.m in Sources */,
 				322EB4430F8C30210081A563 /* ImageAndTextCell.m in Sources */,
+				3221770B0F9BA68D00E4424B /* NSColor+HexadecimalColorMethods.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
