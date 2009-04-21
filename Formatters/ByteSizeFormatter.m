@@ -36,14 +36,14 @@
 	
 	switch(divisions) {
 		case 1:		[_numberFormatter setPositiveSuffix:NSLocalizedString(@" bytes", @"")];				break;
-		case 2:		[_numberFormatter setPositiveSuffix:NSLocalizedString(@" KB", @"kilobytes")];		break;
-		case 3:		[_numberFormatter setPositiveSuffix:NSLocalizedString(@" MB", @"megabytes")];		break;
-		case 4:		[_numberFormatter setPositiveSuffix:NSLocalizedString(@" GB", @"gigabytes")];		break;
-		case 5:		[_numberFormatter setPositiveSuffix:NSLocalizedString(@" TB", @"terabytes")];		break;
-		case 6:		[_numberFormatter setPositiveSuffix:NSLocalizedString(@" PB", @"petabytes")];		break;
-		case 7:		[_numberFormatter setPositiveSuffix:NSLocalizedString(@" EB", @"exabytes")];		break;
-		case 8:		[_numberFormatter setPositiveSuffix:NSLocalizedString(@" ZB", @"zettabytes")];		break;
-		case 9:		[_numberFormatter setPositiveSuffix:NSLocalizedString(@" YB", @"yottabytes")];		break;
+		case 2:		[_numberFormatter setPositiveSuffix:NSLocalizedString(@" KiB", @"kibibytes")];		break;
+		case 3:		[_numberFormatter setPositiveSuffix:NSLocalizedString(@" MiB", @"mebibytes")];		break;
+		case 4:		[_numberFormatter setPositiveSuffix:NSLocalizedString(@" GiB", @"gibibytes")];		break;
+		case 5:		[_numberFormatter setPositiveSuffix:NSLocalizedString(@" TiB", @"tebibytes")];		break;
+		case 6:		[_numberFormatter setPositiveSuffix:NSLocalizedString(@" PiB", @"pebibytes")];		break;
+		case 7:		[_numberFormatter setPositiveSuffix:NSLocalizedString(@" EiB", @"exbibytes")];		break;
+		case 8:		[_numberFormatter setPositiveSuffix:NSLocalizedString(@" ZiB", @"zebibytes")];		break;
+		case 9:		[_numberFormatter setPositiveSuffix:NSLocalizedString(@" YiB", @"yobibytes")];		break;
 	}
 	
 	return [_numberFormatter stringForObjectValue:[NSNumber numberWithFloat:size]];
