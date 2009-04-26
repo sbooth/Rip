@@ -104,6 +104,9 @@
 
 float ReplayGainReferenceLoudness = 89.0f; /* in dB SPL */
 
+#define LOCAL_MAX(a, b)		((a) > (b) ? (a) : (b))
+#define LOCAL_MIN(a, b)		((a) < (b) ? (a) : (b))
+
 static const float  AYule [9] [11] = {
     { 1.f, -3.84664617118067f,  7.81501653005538f,-11.34170355132042f, 13.05504219327545f,-12.28759895145294f,  9.48293806319790f, -5.87257861775999f,  2.75465861874613f, -0.86984376593551f, 0.13919314567432f },
     { 1.f, -3.47845948550071f,  6.36317777566148f, -8.54751527471874f,  9.47693607801280f, -8.81498681370155f,  6.85401540936998f, -4.39470996079559f,  2.19611684890774f, -0.75104302451432f, 0.13149317958808f },
@@ -223,6 +226,8 @@ replaygain_analysis_init ( struct replaygain_t *rg, long samplefreq )
     rg->rout         = rg->routbuf   + MAX_ORDER;
 
     memset ( rg->B, 0, sizeof(rg->B) );
+	
+	rg->title_peak = rg->album_peak = 0.f;
 
     return INIT_GAIN_ANALYSIS_OK;
 }
@@ -244,6 +249,14 @@ replaygain_analysis_analyze_samples ( struct replaygain_t *rg, const float* left
     if ( num_samples == 0 )
         return GAIN_ANALYSIS_OK;
 
+	size_t idx;
+	for(idx = 0; idx < num_samples; ++idx) {
+		rg->title_peak = LOCAL_MAX(rg->title_peak, fabsf(left_samples[idx]));
+		if(2 == num_channels)
+			rg->title_peak = LOCAL_MAX(rg->title_peak, fabsf(right_samples[idx]));
+		rg->album_peak = LOCAL_MAX(rg->title_peak, rg->album_peak);
+	}
+	
     cursamplepos = 0;
     batchsamples = num_samples;
 
@@ -372,6 +385,22 @@ replaygain_analysis_get_album_gain ( struct replaygain_t *rg )
 {
 	assert(NULL != rg);
     return analyzeResult ( rg->B, sizeof(rg->B)/sizeof(*(rg->B)) );
+}
+
+float
+replaygain_analysis_get_title_peak ( struct replaygain_t *rg )
+{
+	assert(NULL != rg);
+	float retval = rg->title_peak / 32768.f;
+	rg->title_peak = 0.f;
+	return retval;
+}
+
+float
+replaygain_analysis_get_album_peak ( struct replaygain_t *rg )
+{
+	assert(NULL != rg);
+    return rg->album_peak / 32768.f;
 }
 
 /* end of replaygain_analysis.c */

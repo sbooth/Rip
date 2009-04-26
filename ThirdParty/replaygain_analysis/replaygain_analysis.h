@@ -84,6 +84,8 @@ struct replaygain_t {
 	int				freqindex;
 	uint32_t		A [(size_t)(STEPS_per_dB * MAX_dB)];
 	uint32_t		B [(size_t)(STEPS_per_dB * MAX_dB)];
+	float			title_peak;
+	float			album_peak;
 };
 	
 int replaygain_analysis_init ( struct replaygain_t *rg, long samplefreq );
@@ -92,6 +94,9 @@ int replaygain_analysis_reset_sample_frequency ( struct replaygain_t *rg, long s
 
 float replaygain_analysis_get_title_gain     ( struct replaygain_t *rg );
 float replaygain_analysis_get_album_gain     ( struct replaygain_t *rg );
+
+float replaygain_analysis_get_title_peak     ( struct replaygain_t *rg );
+float replaygain_analysis_get_album_peak     ( struct replaygain_t *rg );
 
 #ifdef __cplusplus
 }
