@@ -200,7 +200,7 @@ cleanup:
 /*	if(noErr != status)
 	 return 0;*/
 	
-return checksum;
+	return checksum;
 }
 
 // ========================================
