@@ -103,51 +103,6 @@
 
 float ReplayGainReferenceLoudness = 89.0f; /* in dB SPL */
 
-#define YULE_ORDER         10
-#define BUTTER_ORDER        2
-#define RMS_PERCENTILE      0.95        /* percentile which is louder than the proposed level */
-#define MAX_SAMP_FREQ   48000.          /* maximum allowed sample frequency [Hz] */
-#define RMS_WINDOW_TIME     0.050       /* Time slice size [s] */
-#define STEPS_per_dB      100.          /* Table entries per dB */
-#define MAX_dB            120.          /* Table entries for 0...MAX_dB (normal max. values are 70...80 dB) */
-
-#define MAX_ORDER               (BUTTER_ORDER > YULE_ORDER ? BUTTER_ORDER : YULE_ORDER)
-/* [JEC] the following was originally #defined as:
- *   (size_t) (MAX_SAMP_FREQ * RMS_WINDOW_TIME)
- * but that seemed to fail to take into account the ceil() part of the
- * sampleWindow calculation in ResetSampleFrequency(), and was causing
- * buffer overflows for 48kHz analysis, hence the +1.
- */
-#define MAX_SAMPLES_PER_WINDOW  (size_t) (MAX_SAMP_FREQ * RMS_WINDOW_TIME + 1.)   /* max. Samples per Time slice */
-#define PINK_REF                64.82 /* 298640883795 */                          /* calibration value */
-
-static float          linprebuf [MAX_ORDER * 2];
-static float*         linpre;                                          /* left input samples, with pre-buffer */
-static float          lstepbuf  [MAX_SAMPLES_PER_WINDOW + MAX_ORDER];
-static float*         lstep;                                           /* left "first step" (i.e. post first filter) samples */
-static float          loutbuf   [MAX_SAMPLES_PER_WINDOW + MAX_ORDER];
-static float*         lout;                                            /* left "out" (i.e. post second filter) samples */
-static float          rinprebuf [MAX_ORDER * 2];
-static float*         rinpre;                                          /* right input samples ... */
-static float          rstepbuf  [MAX_SAMPLES_PER_WINDOW + MAX_ORDER];
-static float*         rstep;
-static float          routbuf   [MAX_SAMPLES_PER_WINDOW + MAX_ORDER];
-static float*         rout;
-static unsigned int              sampleWindow;                           /* number of samples required to reach number of milliseconds required for RMS window */
-static unsigned long    totsamp;
-static double           lsum;
-static double           rsum;
-static int              freqindex;
-static uint32_t  A [(size_t)(STEPS_per_dB * MAX_dB)];
-static uint32_t  B [(size_t)(STEPS_per_dB * MAX_dB)];
-
-/* for each filter:
-   [0] 48 kHz, [1] 44.1 kHz, [2] 32 kHz, [3] 24 kHz, [4] 22050 Hz, [5] 16 kHz, [6] 12 kHz, [7] is 11025 Hz, [8] 8 kHz */
-
-#ifdef WIN32
-#pragma warning ( disable : 4305 )
-#endif
-
 static const float  AYule [9] [11] = {
     { 1.f, -3.84664617118067f,  7.81501653005538f,-11.34170355132042f, 13.05504219327545f,-12.28759895145294f,  9.48293806319790f, -5.87257861775999f,  2.75465861874613f, -0.86984376593551f, 0.13919314567432f },
     { 1.f, -3.47845948550071f,  6.36317777566148f, -8.54751527471874f,  9.47693607801280f, -8.81498681370155f,  6.85401540936998f, -4.39470996079559f,  2.19611684890774f, -0.75104302451432f, 0.13149317958808f },
@@ -196,10 +151,6 @@ static const float  BButter [9] [3] = {
     { 0.94597685600279f, -1.89195371200558f, 0.94597685600279f }
 };
 
-#ifdef WIN32
-#pragma warning ( default : 4305 )
-#endif
-
 /* When calling this procedure, make sure that ip[-order] and op[-order] point to real data! */
 
 static void
@@ -220,52 +171,55 @@ filter ( const float* input, float* output, size_t nSamples, const float* a, con
 /* returns a INIT_GAIN_ANALYSIS_OK if successful, INIT_GAIN_ANALYSIS_ERROR if not */
 
 int
-ResetSampleFrequency ( long samplefreq ) {
+replaygain_analysis_reset_sample_frequency ( struct replaygain_t *rg, long samplefreq ) {
+	if(NULL == rg)
+		return INIT_GAIN_ANALYSIS_ERROR;
+	
     int  i;
 
     /* zero out initial values */
     for ( i = 0; i < MAX_ORDER; i++ )
-        linprebuf[i] = lstepbuf[i] = loutbuf[i] = rinprebuf[i] = rstepbuf[i] = routbuf[i] = 0.f;
+        rg->linprebuf[i] = rg->lstepbuf[i] = rg->loutbuf[i] = rg->rinprebuf[i] = rg->rstepbuf[i] = rg->routbuf[i] = 0.f;
 
     switch ( (int)(samplefreq) ) {
-        case 48000: freqindex = 0; break;
-        case 44100: freqindex = 1; break;
-        case 32000: freqindex = 2; break;
-        case 24000: freqindex = 3; break;
-        case 22050: freqindex = 4; break;
-        case 16000: freqindex = 5; break;
-        case 12000: freqindex = 6; break;
-        case 11025: freqindex = 7; break;
-        case  8000: freqindex = 8; break;
+        case 48000: rg->freqindex = 0; break;
+        case 44100: rg->freqindex = 1; break;
+        case 32000: rg->freqindex = 2; break;
+        case 24000: rg->freqindex = 3; break;
+        case 22050: rg->freqindex = 4; break;
+        case 16000: rg->freqindex = 5; break;
+        case 12000: rg->freqindex = 6; break;
+        case 11025: rg->freqindex = 7; break;
+        case  8000: rg->freqindex = 8; break;
         default:    return INIT_GAIN_ANALYSIS_ERROR;
     }
 
-    sampleWindow = (int) ceil (samplefreq * RMS_WINDOW_TIME);
+    rg->sampleWindow = (int) ceil (samplefreq * RMS_WINDOW_TIME);
 
-    lsum         = 0.;
-    rsum         = 0.;
-    totsamp      = 0;
+    rg->lsum         = 0.;
+    rg->rsum         = 0.;
+    rg->totsamp      = 0;
 
-    memset ( A, 0, sizeof(A) );
+    memset ( rg->A, 0, sizeof(rg->A) );
 
 	return INIT_GAIN_ANALYSIS_OK;
 }
 
 int
-InitGainAnalysis ( long samplefreq )
+replaygain_analysis_init ( struct replaygain_t *rg, long samplefreq )
 {
-	if (ResetSampleFrequency(samplefreq) != INIT_GAIN_ANALYSIS_OK) {
+	if (replaygain_analysis_reset_sample_frequency(rg, samplefreq) != INIT_GAIN_ANALYSIS_OK) {
 		return INIT_GAIN_ANALYSIS_ERROR;
 	}
 
-    linpre       = linprebuf + MAX_ORDER;
-    rinpre       = rinprebuf + MAX_ORDER;
-    lstep        = lstepbuf  + MAX_ORDER;
-    rstep        = rstepbuf  + MAX_ORDER;
-    lout         = loutbuf   + MAX_ORDER;
-    rout         = routbuf   + MAX_ORDER;
+    rg->linpre       = rg->linprebuf + MAX_ORDER;
+    rg->rinpre       = rg->rinprebuf + MAX_ORDER;
+    rg->lstep        = rg->lstepbuf  + MAX_ORDER;
+    rg->rstep        = rg->rstepbuf  + MAX_ORDER;
+    rg->lout         = rg->loutbuf   + MAX_ORDER;
+    rg->rout         = rg->routbuf   + MAX_ORDER;
 
-    memset ( B, 0, sizeof(B) );
+    memset ( rg->B, 0, sizeof(rg->B) );
 
     return INIT_GAIN_ANALYSIS_OK;
 }
@@ -273,7 +227,7 @@ InitGainAnalysis ( long samplefreq )
 /* returns GAIN_ANALYSIS_OK if successful, GAIN_ANALYSIS_ERROR if not */
 
 int
-AnalyzeSamples ( const float* left_samples, const float* right_samples, size_t num_samples, int num_channels )
+replaygain_analysis_analyze_samples ( struct replaygain_t *rg, const float* left_samples, const float* right_samples, size_t num_samples, int num_channels )
 {
     const float*  curleft;
     const float*  curright;
@@ -295,19 +249,19 @@ AnalyzeSamples ( const float* left_samples, const float* right_samples, size_t n
     }
 
     if ( num_samples < MAX_ORDER ) {
-        memcpy ( linprebuf + MAX_ORDER, left_samples , num_samples * sizeof(float) );
-        memcpy ( rinprebuf + MAX_ORDER, right_samples, num_samples * sizeof(float) );
+        memcpy ( rg->linprebuf + MAX_ORDER, left_samples , num_samples * sizeof(float) );
+        memcpy ( rg->rinprebuf + MAX_ORDER, right_samples, num_samples * sizeof(float) );
     }
     else {
-        memcpy ( linprebuf + MAX_ORDER, left_samples,  MAX_ORDER   * sizeof(float) );
-        memcpy ( rinprebuf + MAX_ORDER, right_samples, MAX_ORDER   * sizeof(float) );
+        memcpy ( rg->linprebuf + MAX_ORDER, left_samples,  MAX_ORDER   * sizeof(float) );
+        memcpy ( rg->rinprebuf + MAX_ORDER, right_samples, MAX_ORDER   * sizeof(float) );
     }
 
     while ( batchsamples > 0 ) {
-        cursamples = batchsamples > (long)(sampleWindow-totsamp)  ?  (long)(sampleWindow - totsamp)  :  batchsamples;
+        cursamples = batchsamples > (long)(rg->sampleWindow-rg->totsamp)  ?  (long)(rg->sampleWindow - rg->totsamp)  :  batchsamples;
         if ( cursamplepos < MAX_ORDER ) {
-            curleft  = linpre+cursamplepos;
-            curright = rinpre+cursamplepos;
+            curleft  = rg->linpre+cursamplepos;
+            curright = rg->rinpre+cursamplepos;
             if (cursamples > MAX_ORDER - cursamplepos )
                 cursamples = MAX_ORDER - cursamplepos;
         }
@@ -316,45 +270,45 @@ AnalyzeSamples ( const float* left_samples, const float* right_samples, size_t n
             curright = right_samples + cursamplepos;
         }
 
-        filter ( curleft , lstep + totsamp, cursamples, AYule[freqindex], BYule[freqindex], YULE_ORDER );
-        filter ( curright, rstep + totsamp, cursamples, AYule[freqindex], BYule[freqindex], YULE_ORDER );
+        filter ( curleft , rg->lstep + rg->totsamp, cursamples, AYule[rg->freqindex], BYule[rg->freqindex], YULE_ORDER );
+        filter ( curright, rg->rstep + rg->totsamp, cursamples, AYule[rg->freqindex], BYule[rg->freqindex], YULE_ORDER );
 
-        filter ( lstep + totsamp, lout + totsamp, cursamples, AButter[freqindex], BButter[freqindex], BUTTER_ORDER );
-        filter ( rstep + totsamp, rout + totsamp, cursamples, AButter[freqindex], BButter[freqindex], BUTTER_ORDER );
+        filter ( rg->lstep + rg->totsamp, rg->lout + rg->totsamp, cursamples, AButter[rg->freqindex], BButter[rg->freqindex], BUTTER_ORDER );
+        filter ( rg->rstep + rg->totsamp, rg->rout + rg->totsamp, cursamples, AButter[rg->freqindex], BButter[rg->freqindex], BUTTER_ORDER );
 
         for ( i = 0; i < cursamples; i++ ) {             /* Get the squared values */
-            lsum += lout [totsamp+i] * lout [totsamp+i];
-            rsum += rout [totsamp+i] * rout [totsamp+i];
+            rg->lsum += rg->lout [rg->totsamp+i] * rg->lout [rg->totsamp+i];
+            rg->rsum += rg->rout [rg->totsamp+i] * rg->rout [rg->totsamp+i];
         }
 
         batchsamples -= cursamples;
         cursamplepos += cursamples;
-        totsamp      += cursamples;
-        if ( totsamp == sampleWindow ) {  /* Get the Root Mean Square (RMS) for this set of samples */
-            double  val  = STEPS_per_dB * 10. * log10 ( (lsum+rsum) / totsamp * 0.5 + 1.e-37 );
+        rg->totsamp += cursamples;
+        if ( rg->totsamp == rg->sampleWindow ) {  /* Get the Root Mean Square (RMS) for this set of samples */
+            double  val  = STEPS_per_dB * 10. * log10 ( (rg->lsum+rg->rsum) / rg->totsamp * 0.5 + 1.e-37 );
             int     ival = (int) val;
             if ( ival <                     0 ) ival = 0;
-            if ( ival >= (int)(sizeof(A)/sizeof(*A)) ) ival = (int)(sizeof(A)/sizeof(*A)) - 1;
-            A [ival]++;
-            lsum = rsum = 0.;
-            memmove ( loutbuf , loutbuf  + totsamp, MAX_ORDER * sizeof(float) );
-            memmove ( routbuf , routbuf  + totsamp, MAX_ORDER * sizeof(float) );
-            memmove ( lstepbuf, lstepbuf + totsamp, MAX_ORDER * sizeof(float) );
-            memmove ( rstepbuf, rstepbuf + totsamp, MAX_ORDER * sizeof(float) );
-            totsamp = 0;
+            if ( ival >= (int)(sizeof(rg->A)/sizeof(*(rg->A))) ) ival = (int)(sizeof(rg->A)/sizeof(*(rg->A))) - 1;
+            rg->A [ival]++;
+            rg->lsum = rg->rsum = 0.;
+            memmove ( rg->loutbuf , rg->loutbuf  + rg->totsamp, MAX_ORDER * sizeof(float) );
+            memmove ( rg->routbuf , rg->routbuf  + rg->totsamp, MAX_ORDER * sizeof(float) );
+            memmove ( rg->lstepbuf, rg->lstepbuf + rg->totsamp, MAX_ORDER * sizeof(float) );
+            memmove ( rg->rstepbuf, rg->rstepbuf + rg->totsamp, MAX_ORDER * sizeof(float) );
+            rg->totsamp = 0;
         }
-        if ( totsamp > sampleWindow )   /* somehow I really screwed up: Error in programming! Contact author about totsamp > sampleWindow */
+        if ( rg->totsamp > rg->sampleWindow )   /* somehow I really screwed up: Error in programming! Contact author about totsamp > sampleWindow */
             return GAIN_ANALYSIS_ERROR;
     }
     if ( num_samples < MAX_ORDER ) {
-        memmove ( linprebuf,                           linprebuf + num_samples, (MAX_ORDER-num_samples) * sizeof(float) );
-        memmove ( rinprebuf,                           rinprebuf + num_samples, (MAX_ORDER-num_samples) * sizeof(float) );
-        memcpy  ( linprebuf + MAX_ORDER - num_samples, left_samples,          num_samples             * sizeof(float) );
-        memcpy  ( rinprebuf + MAX_ORDER - num_samples, right_samples,         num_samples             * sizeof(float) );
+        memmove ( rg->linprebuf,                           rg->linprebuf + num_samples, (MAX_ORDER-num_samples) * sizeof(float) );
+        memmove ( rg->rinprebuf,                           rg->rinprebuf + num_samples, (MAX_ORDER-num_samples) * sizeof(float) );
+        memcpy  ( rg->linprebuf + MAX_ORDER - num_samples, left_samples,          num_samples             * sizeof(float) );
+        memcpy  ( rg->rinprebuf + MAX_ORDER - num_samples, right_samples,         num_samples             * sizeof(float) );
     }
     else {
-        memcpy  ( linprebuf, left_samples  + num_samples - MAX_ORDER, MAX_ORDER * sizeof(float) );
-        memcpy  ( rinprebuf, right_samples + num_samples - MAX_ORDER, MAX_ORDER * sizeof(float) );
+        memcpy  ( rg->linprebuf, left_samples  + num_samples - MAX_ORDER, MAX_ORDER * sizeof(float) );
+        memcpy  ( rg->rinprebuf, right_samples + num_samples - MAX_ORDER, MAX_ORDER * sizeof(float) );
     }
 
     return GAIN_ANALYSIS_OK;
@@ -385,31 +339,34 @@ analyzeResult ( uint32_t* Array, size_t len )
 
 
 float
-GetTitleGain ( void )
+replaygain_analysis_get_title_gain ( struct replaygain_t *rg )
 {
+	assert(NULL != rg);
+
     float  retval;
     unsigned int    i;
 
-    retval = analyzeResult ( A, sizeof(A)/sizeof(*A) );
+    retval = analyzeResult ( rg->A, sizeof(rg->A)/sizeof(*(rg->A)) );
 
-    for ( i = 0; i < sizeof(A)/sizeof(*A); i++ ) {
-        B[i] += A[i];
-        A[i]  = 0;
+    for ( i = 0; i < sizeof(rg->A)/sizeof(*(rg->A)); i++ ) {
+        rg->B[i] += rg->A[i];
+        rg->A[i]  = 0;
     }
 
     for ( i = 0; i < MAX_ORDER; i++ )
-        linprebuf[i] = lstepbuf[i] = loutbuf[i] = rinprebuf[i] = rstepbuf[i] = routbuf[i] = 0.f;
+        rg->linprebuf[i] = rg->lstepbuf[i] = rg->loutbuf[i] = rg->rinprebuf[i] = rg->rstepbuf[i] = rg->routbuf[i] = 0.f;
 
-    totsamp = 0;
-    lsum    = rsum = 0.;
+    rg->totsamp = 0;
+    rg->lsum    = rg->rsum = 0.;
     return retval;
 }
 
 
 float
-GetAlbumGain ( void )
+replaygain_analysis_get_album_gain ( struct replaygain_t *rg )
 {
-    return analyzeResult ( B, sizeof(B)/sizeof(*B) );
+	assert(NULL != rg);
+    return analyzeResult ( rg->B, sizeof(rg->B)/sizeof(*(rg->B)) );
 }
 
 /* end of replaygain_analysis.c */
