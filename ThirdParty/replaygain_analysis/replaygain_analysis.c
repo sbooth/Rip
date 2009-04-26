@@ -98,6 +98,7 @@
 #include <stdint.h>
 #include <string.h>
 #include <math.h>
+#include <assert.h>
 
 #include "replaygain_analysis.h"
 
@@ -171,9 +172,9 @@ filter ( const float* input, float* output, size_t nSamples, const float* a, con
 /* returns a INIT_GAIN_ANALYSIS_OK if successful, INIT_GAIN_ANALYSIS_ERROR if not */
 
 int
-replaygain_analysis_reset_sample_frequency ( struct replaygain_t *rg, long samplefreq ) {
-	if(NULL == rg)
-		return INIT_GAIN_ANALYSIS_ERROR;
+replaygain_analysis_reset_sample_frequency ( struct replaygain_t *rg, long samplefreq )
+{
+	assert(NULL != rg);
 	
     int  i;
 
@@ -208,6 +209,8 @@ replaygain_analysis_reset_sample_frequency ( struct replaygain_t *rg, long sampl
 int
 replaygain_analysis_init ( struct replaygain_t *rg, long samplefreq )
 {
+	assert(NULL != rg);
+
 	if (replaygain_analysis_reset_sample_frequency(rg, samplefreq) != INIT_GAIN_ANALYSIS_OK) {
 		return INIT_GAIN_ANALYSIS_ERROR;
 	}
@@ -229,6 +232,8 @@ replaygain_analysis_init ( struct replaygain_t *rg, long samplefreq )
 int
 replaygain_analysis_analyze_samples ( struct replaygain_t *rg, const float* left_samples, const float* right_samples, size_t num_samples, int num_channels )
 {
+	assert(NULL != rg);
+
     const float*  curleft;
     const float*  curright;
     long            batchsamples;
