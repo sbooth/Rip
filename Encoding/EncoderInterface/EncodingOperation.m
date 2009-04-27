@@ -27,6 +27,11 @@ NSString * const	kMetadataMCNKey							= @"MCN";
 NSString * const	kMetadataMusicBrainzAlbumIDKey			= @"MusicBrainzAlbumID";
 NSString * const	kMetadataMusicBrainzTrackIDKey			= @"MusicBrainzTrackID";
 NSString * const	kMetadataAdditionalMetadataKey			= @"additionalMetadata";
+NSString * const	kReplayGainReferenceLoudnessKey			= @"replayGainReferenceLoudess";
+NSString * const	kReplayGainTrackGainKey					= @"replayGainTrackGain";
+NSString * const	kReplayGainTrackPeakKey					= @"replayGainTrackPeak";
+NSString * const	kReplayGainAlbumGainKey					= @"replayGainAlbumGain";
+NSString * const	kReplayGainAlbumPeakKey					= @"replayGainAlbumPeak";
 NSString * const	kAlbumArtFrontCoverKey					= @"albumArtFrontCover";
 
 NSString * const	kTrackMetadataArrayKey					= @"tracks";

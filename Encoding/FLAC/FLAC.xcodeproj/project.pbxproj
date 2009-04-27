@@ -11,9 +11,7 @@
 		3252C1090DD2309D00856BFE /* FLACEncoderInterface.m in Sources */ = {isa = PBXBuildFile; fileRef = 3252C1070DD2309D00856BFE /* FLACEncoderInterface.m */; };
 		3252C1160DD2318200856BFE /* EncoderInterface.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3252C0F70DD2302100856BFE /* EncoderInterface.framework */; };
 		3252C14F0DD2349100856BFE /* flac in Resources */ = {isa = PBXBuildFile; fileRef = 3252C14D0DD2349100856BFE /* flac */; };
-		3252C1500DD2349100856BFE /* metaflac in Resources */ = {isa = PBXBuildFile; fileRef = 3252C14E0DD2349100856BFE /* metaflac */; };
 		328DE16D0E5B8B7500F5BD13 /* FLACLogo.png in Resources */ = {isa = PBXBuildFile; fileRef = 328DE16C0E5B8B7500F5BD13 /* FLACLogo.png */; };
-		32C7B45F0EB8A31D00D1A722 /* FLACPostProcessingOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 32C7B45E0EB8A31D00D1A722 /* FLACPostProcessingOperation.m */; };
 		32E9F7860DD6950700E8ACCA /* FLACSettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 32E9F7850DD6950700E8ACCA /* FLACSettingsViewController.m */; };
 		32E9F78E0DD6957600E8ACCA /* FLACSettings.xib in Resources */ = {isa = PBXBuildFile; fileRef = 32E9F78C0DD6957600E8ACCA /* FLACSettings.xib */; };
 		8D5B49B0048680CD000E48DA /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C167DFE841241C02AAC07 /* InfoPlist.strings */; };
@@ -48,10 +46,7 @@
 		3252C1060DD2309D00856BFE /* FLACEncoderInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FLACEncoderInterface.h; sourceTree = "<group>"; };
 		3252C1070DD2309D00856BFE /* FLACEncoderInterface.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FLACEncoderInterface.m; sourceTree = "<group>"; };
 		3252C14D0DD2349100856BFE /* flac */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = flac; sourceTree = "<group>"; };
-		3252C14E0DD2349100856BFE /* metaflac */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = metaflac; sourceTree = "<group>"; };
 		328DE16C0E5B8B7500F5BD13 /* FLACLogo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = FLACLogo.png; sourceTree = "<group>"; };
-		32C7B45D0EB8A31D00D1A722 /* FLACPostProcessingOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FLACPostProcessingOperation.h; sourceTree = "<group>"; };
-		32C7B45E0EB8A31D00D1A722 /* FLACPostProcessingOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FLACPostProcessingOperation.m; sourceTree = "<group>"; };
 		32DBCF630370AF2F00C91783 /* FLAC_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FLAC_Prefix.pch; sourceTree = "<group>"; };
 		32E9F7840DD6950700E8ACCA /* FLACSettingsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FLACSettingsViewController.h; sourceTree = "<group>"; };
 		32E9F7850DD6950700E8ACCA /* FLACSettingsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FLACSettingsViewController.m; sourceTree = "<group>"; };
@@ -101,7 +96,6 @@
 				328DE16C0E5B8B7500F5BD13 /* FLACLogo.png */,
 				32E9F78C0DD6957600E8ACCA /* FLACSettings.xib */,
 				3252C14D0DD2349100856BFE /* flac */,
-				3252C14E0DD2349100856BFE /* metaflac */,
 				8D5B49B7048680CD000E48DA /* Info.plist */,
 				089C167DFE841241C02AAC07 /* InfoPlist.strings */,
 			);
@@ -117,8 +111,6 @@
 				3252C1070DD2309D00856BFE /* FLACEncoderInterface.m */,
 				32E9F7840DD6950700E8ACCA /* FLACSettingsViewController.h */,
 				32E9F7850DD6950700E8ACCA /* FLACSettingsViewController.m */,
-				32C7B45D0EB8A31D00D1A722 /* FLACPostProcessingOperation.h */,
-				32C7B45E0EB8A31D00D1A722 /* FLACPostProcessingOperation.m */,
 			);
 			name = Classes;
 			sourceTree = "<group>";
@@ -228,7 +220,6 @@
 			files = (
 				8D5B49B0048680CD000E48DA /* InfoPlist.strings in Resources */,
 				3252C14F0DD2349100856BFE /* flac in Resources */,
-				3252C1500DD2349100856BFE /* metaflac in Resources */,
 				32E9F78E0DD6957600E8ACCA /* FLACSettings.xib in Resources */,
 				328DE16D0E5B8B7500F5BD13 /* FLACLogo.png in Resources */,
 			);
@@ -244,7 +235,6 @@
 				3252C1080DD2309D00856BFE /* FLACEncodeOperation.m in Sources */,
 				3252C1090DD2309D00856BFE /* FLACEncoderInterface.m in Sources */,
 				32E9F7860DD6950700E8ACCA /* FLACSettingsViewController.m in Sources */,
-				32C7B45F0EB8A31D00D1A722 /* FLACPostProcessingOperation.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

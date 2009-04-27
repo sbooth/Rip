@@ -7,8 +7,6 @@
 #import "AIFFEncodeOperation.h"
 #import "AIFFSettingsViewController.h"
 
-#import "EncoderInterface/EncodingPostProcessingOperation.h"
-
 @implementation AIFFEncoderInterface
 
 - (NSDictionary *) defaultSettings
@@ -48,11 +46,6 @@
 - (EncodingOperation *) encodingOperation
 {
 	return [[AIFFEncodeOperation alloc] init];
-}
-
-- (EncodingPostProcessingOperation *) encodingPostProcessingOperation
-{
-	return nil;
 }
 
 - (NSString *) pathExtensionForSettings:(NSDictionary *)settings

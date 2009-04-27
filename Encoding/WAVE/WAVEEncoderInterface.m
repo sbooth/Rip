@@ -7,8 +7,6 @@
 #import "WAVEEncodeOperation.h"
 #import "WAVESettingsViewController.h"
 
-#import "EncoderInterface/EncodingPostProcessingOperation.h"
-
 @implementation WAVEEncoderInterface
 
 - (NSDictionary *) defaultSettings
@@ -48,11 +46,6 @@
 - (EncodingOperation *) encodingOperation
 {
 	return [[WAVEEncodeOperation alloc] init];
-}
-
-- (EncodingPostProcessingOperation *) encodingPostProcessingOperation
-{
-	return nil;
 }
 
 - (NSString *) pathExtensionForSettings:(NSDictionary *)settings

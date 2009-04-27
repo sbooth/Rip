@@ -11,6 +11,7 @@
 #include <taglib/unsynchronizedlyricsframe.h>
 #include <taglib/uniquefileidentifierframe.h>
 #include <taglib/attachedpictureframe.h>
+#include <taglib/relativevolumeframe.h>
 
 // ========================================
 // Utility function to get a timestamp in the format required by ID3v2 tags
@@ -228,6 +229,114 @@ getID3v2Timestamp()
 		
 		fileRef.tag()->addFrame(ufidFrame);
 	}
+	
+
+	// ReplayGain
+	NSNumber *trackGain = [self.metadata valueForKey:kReplayGainTrackGainKey];
+	NSNumber *trackPeak = [self.metadata valueForKey:kReplayGainTrackPeakKey];
+	NSNumber *albumGain = [self.metadata valueForKey:kReplayGainAlbumGainKey];
+	NSNumber *albumPeak = [self.metadata valueForKey:kReplayGainAlbumPeakKey];
+	
+	// Write TXXX frames
+	TagLib::ID3v2::UserTextIdentificationFrame *trackGainFrame = TagLib::ID3v2::UserTextIdentificationFrame::find(fileRef.tag(), "replaygain_track_gain");
+	TagLib::ID3v2::UserTextIdentificationFrame *trackPeakFrame = TagLib::ID3v2::UserTextIdentificationFrame::find(fileRef.tag(), "replaygain_track_peak");
+	TagLib::ID3v2::UserTextIdentificationFrame *albumGainFrame = TagLib::ID3v2::UserTextIdentificationFrame::find(fileRef.tag(), "replaygain_album_gain");
+	TagLib::ID3v2::UserTextIdentificationFrame *albumPeakFrame = TagLib::ID3v2::UserTextIdentificationFrame::find(fileRef.tag(), "replaygain_album_peak");
+	
+	if(trackGainFrame)
+		fileRef.tag()->removeFrame(trackGainFrame);
+	
+	if(trackPeakFrame)
+		fileRef.tag()->removeFrame(trackPeakFrame);
+	
+	if(albumGainFrame)
+		fileRef.tag()->removeFrame(albumGainFrame);
+	
+	if(albumPeakFrame)
+		fileRef.tag()->removeFrame(albumPeakFrame);
+	
+	if(trackGain) {
+		TagLib::ID3v2::UserTextIdentificationFrame *userTextFrame = new TagLib::ID3v2::UserTextIdentificationFrame();
+		if(!userTextFrame) {
+			self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:ENOMEM userInfo:nil];
+			return;
+		}
+		
+		userTextFrame->setDescription(TagLib::String("replaygain_track_gain", TagLib::String::Latin1));
+		userTextFrame->setText(TagLib::String([[NSString stringWithFormat:@"%+2.2f dB", [trackGain floatValue]] UTF8String], TagLib::String::UTF8));
+		
+		fileRef.tag()->addFrame(userTextFrame);
+	}
+	
+	if(trackPeak) {
+		TagLib::ID3v2::UserTextIdentificationFrame *userTextFrame = new TagLib::ID3v2::UserTextIdentificationFrame();
+		if(!userTextFrame) {
+			self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:ENOMEM userInfo:nil];
+			return;
+		}
+		
+		userTextFrame->setDescription(TagLib::String("replaygain_track_peak", TagLib::String::Latin1));
+		userTextFrame->setText(TagLib::String([[NSString stringWithFormat:@"%1.8f dB", [trackPeak floatValue]] UTF8String], TagLib::String::UTF8));
+		
+		fileRef.tag()->addFrame(userTextFrame);
+	}
+	
+	if(albumGain) {
+		TagLib::ID3v2::UserTextIdentificationFrame *userTextFrame = new TagLib::ID3v2::UserTextIdentificationFrame();
+		if(!userTextFrame) {
+			self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:ENOMEM userInfo:nil];
+			return;
+		}
+		
+		userTextFrame->setDescription(TagLib::String("replaygain_album_gain", TagLib::String::Latin1));
+		userTextFrame->setText(TagLib::String([[NSString stringWithFormat:@"%+2.2f dB", [albumGain floatValue]] UTF8String], TagLib::String::UTF8));
+		
+		fileRef.tag()->addFrame(userTextFrame);
+	}
+	
+	if(albumPeak) {
+		TagLib::ID3v2::UserTextIdentificationFrame *userTextFrame = new TagLib::ID3v2::UserTextIdentificationFrame();
+		if(!userTextFrame) {
+			self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:ENOMEM userInfo:nil];
+			return;
+		}
+		
+		userTextFrame->setDescription(TagLib::String("replaygain_album_peak", TagLib::String::Latin1));
+		userTextFrame->setText(TagLib::String([[NSString stringWithFormat:@"%1.8f dB", [albumPeak floatValue]] UTF8String], TagLib::String::UTF8));
+		
+		fileRef.tag()->addFrame(userTextFrame);
+	}
+	
+	// Also write the RVA2 frames
+	fileRef.tag()->removeFrames("RVA2");
+	if(trackGain) {
+		TagLib::ID3v2::RelativeVolumeFrame *relativeVolumeFrame = new TagLib::ID3v2::RelativeVolumeFrame();
+		if(!relativeVolumeFrame) {
+			self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:ENOMEM userInfo:nil];
+			return;
+		}
+		
+		relativeVolumeFrame->setIdentification(TagLib::String("track", TagLib::String::Latin1));
+		relativeVolumeFrame->setVolumeAdjustment([trackGain floatValue], TagLib::ID3v2::RelativeVolumeFrame::MasterVolume);
+		
+		fileRef.tag()->addFrame(relativeVolumeFrame);
+	}
+	
+	if(albumGain) {
+		TagLib::ID3v2::RelativeVolumeFrame *relativeVolumeFrame = new TagLib::ID3v2::RelativeVolumeFrame();
+		if(!relativeVolumeFrame) {
+			self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:ENOMEM userInfo:nil];
+			return;
+		}
+		
+		relativeVolumeFrame->setIdentification(TagLib::String("album", TagLib::String::Latin1));
+		relativeVolumeFrame->setVolumeAdjustment([albumGain floatValue], TagLib::ID3v2::RelativeVolumeFrame::MasterVolume);
+		
+		fileRef.tag()->addFrame(relativeVolumeFrame);
+	}
+	
+	
+	
 	
 	// Album art
 	if([self.metadata objectForKey:kAlbumArtFrontCoverKey]) {

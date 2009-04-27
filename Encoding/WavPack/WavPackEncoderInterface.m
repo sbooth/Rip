@@ -6,7 +6,6 @@
 #import "WavPackEncoderInterface.h"
 #import "WavPackEncodeOperation.h"
 #import "WavPackSettingsViewController.h"
-#import "WavPackPostProcessingOperation.h"
 
 @implementation WavPackEncoderInterface
 
@@ -28,11 +27,6 @@
 - (EncodingOperation *) encodingOperation
 {
 	return [[WavPackEncodeOperation alloc] init];
-}
-
-- (EncodingPostProcessingOperation *) encodingPostProcessingOperation
-{
-	return [[WavPackPostProcessingOperation alloc] init];
 }
 
 - (NSString *) pathExtensionForSettings:(NSDictionary *)settings

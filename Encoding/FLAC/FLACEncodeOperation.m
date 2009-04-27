@@ -88,6 +88,37 @@ setArgumentForTag(NSMutableArray *arguments, NSDictionary *metadata, NSString *k
 	setArgumentForTag(arguments, self.metadata, kMetadataMusicBrainzAlbumIDKey, @"MUSICBRAINZ_ALBUMID");
 	setArgumentForTag(arguments, self.metadata, kMetadataMusicBrainzTrackIDKey, @"MUSICBRAINZ_TRACKID");
 	
+	// Replay gain information
+	NSNumber *referenceLoudness = [self.metadata objectForKey:kReplayGainReferenceLoudnessKey];
+	if(referenceLoudness) {
+		[arguments addObject:@"-T"];
+		[arguments addObject:[NSString stringWithFormat:@"REPLAYGAIN_REFERENCE_LOUDNESS=%2.1f dB", [referenceLoudness floatValue]]];
+	}
+	
+	NSNumber *trackGain = [self.metadata objectForKey:kReplayGainTrackGainKey];
+	if(trackGain) {
+		[arguments addObject:@"-T"];
+		[arguments addObject:[NSString stringWithFormat:@"REPLAYGAIN_TRACK_GAIN=%+2.2f dB", [trackGain floatValue]]];
+	}
+
+	NSNumber *trackPeak = [self.metadata objectForKey:kReplayGainTrackPeakKey];
+	if(trackPeak) {
+		[arguments addObject:@"-T"];
+		[arguments addObject:[NSString stringWithFormat:@"REPLAYGAIN_TRACK_PEAK=%1.8f", [trackPeak floatValue]]];
+	}
+
+	NSNumber *albumGain = [self.metadata objectForKey:kReplayGainAlbumGainKey];
+	if(albumGain) {
+		[arguments addObject:@"-T"];
+		[arguments addObject:[NSString stringWithFormat:@"REPLAYGAIN_ALBUM_GAIN=%+2.2f dB", [albumGain floatValue]]];
+	}
+
+	NSNumber *albumPeak = [self.metadata objectForKey:kReplayGainAlbumPeakKey];
+	if(albumPeak) {
+		[arguments addObject:@"-T"];
+		[arguments addObject:[NSString stringWithFormat:@"REPLAYGAIN_ALBUM_PEAK=%1.8f", [albumPeak floatValue]]];
+	}
+	
 	// Additional metadata (ie MUSICBRAINZ_SORTORDER)
 	NSDictionary *additionalMetadata = [self.metadata objectForKey:kMetadataAdditionalMetadataKey];
 	if([additionalMetadata count]) {

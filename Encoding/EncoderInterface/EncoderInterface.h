@@ -1,11 +1,11 @@
 /*
- *  Copyright (C) 2008 Stephen F. Booth <me@sbooth.org>
+ *  Copyright (C) 2008 - 2009 Stephen F. Booth <me@sbooth.org>
  *  All Rights Reserved
  */
 
 #import <Cocoa/Cocoa.h>
 
-@class EncodingOperation, EncodingPostProcessingOperation;
+@class EncodingOperation;
 
 // ========================================
 // The interface encoders must implement to integrate with Rip
@@ -21,9 +21,6 @@
 
 // Provide an instance of an EncodingOperation subclass
 - (EncodingOperation *) encodingOperation;
-
-// Provide an instance of an EncodingPostProcessingOperation subclass
-- (EncodingPostProcessingOperation *) encodingPostProcessingOperation;
 
 // Determine which filename extension should be used for output based on the given settings
 - (NSString *) pathExtensionForSettings:(NSDictionary *)settings;

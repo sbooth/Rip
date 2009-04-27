@@ -28,6 +28,12 @@ extern NSString * const		kMetadataMusicBrainzAlbumIDKey;		// NSString *
 extern NSString * const		kMetadataMusicBrainzTrackIDKey;		// NSString *
 extern NSString * const		kMetadataAdditionalMetadataKey;		// NSDictionary *
 
+extern NSString * const		kReplayGainReferenceLoudnessKey;	// NSNumber *
+extern NSString * const		kReplayGainTrackGainKey;			// NSNumber *
+extern NSString * const		kReplayGainTrackPeakKey;			// NSNumber *
+extern NSString * const		kReplayGainAlbumGainKey;			// NSNumber *
+extern NSString * const		kReplayGainAlbumPeakKey;			// NSNumber *
+
 extern NSString * const		kAlbumArtFrontCoverKey;				// NSURL *
 
 // ========================================

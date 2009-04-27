@@ -10,10 +10,8 @@
 		3252C1080DD2309D00856BFE /* WavPackEncodeOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 3252C1050DD2309D00856BFE /* WavPackEncodeOperation.m */; };
 		3252C1090DD2309D00856BFE /* WavPackEncoderInterface.m in Sources */ = {isa = PBXBuildFile; fileRef = 3252C1070DD2309D00856BFE /* WavPackEncoderInterface.m */; };
 		3252C1160DD2318200856BFE /* EncoderInterface.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3252C0F70DD2302100856BFE /* EncoderInterface.framework */; };
-		32C7B45F0EB8A31D00D1A722 /* WavPackPostProcessingOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 32C7B45E0EB8A31D00D1A722 /* WavPackPostProcessingOperation.m */; };
 		32CE93310F56527800AB328A /* wavpack in Resources */ = {isa = PBXBuildFile; fileRef = 32CE932E0F56527800AB328A /* wavpack */; };
 		32CE93320F56527800AB328A /* WavPackLogo.gif in Resources */ = {isa = PBXBuildFile; fileRef = 32CE932F0F56527800AB328A /* WavPackLogo.gif */; };
-		32CE93330F56527800AB328A /* wvgain in Resources */ = {isa = PBXBuildFile; fileRef = 32CE93300F56527800AB328A /* wvgain */; };
 		32CE933C0F5652BB00AB328A /* WavPackSettings.xib in Resources */ = {isa = PBXBuildFile; fileRef = 32CE933A0F5652BB00AB328A /* WavPackSettings.xib */; };
 		32E9F7860DD6950700E8ACCA /* WavPackSettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 32E9F7850DD6950700E8ACCA /* WavPackSettingsViewController.m */; };
 		8D5B49B0048680CD000E48DA /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C167DFE841241C02AAC07 /* InfoPlist.strings */; };
@@ -47,11 +45,8 @@
 		3252C1050DD2309D00856BFE /* WavPackEncodeOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WavPackEncodeOperation.m; sourceTree = "<group>"; };
 		3252C1060DD2309D00856BFE /* WavPackEncoderInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WavPackEncoderInterface.h; sourceTree = "<group>"; };
 		3252C1070DD2309D00856BFE /* WavPackEncoderInterface.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WavPackEncoderInterface.m; sourceTree = "<group>"; };
-		32C7B45D0EB8A31D00D1A722 /* WavPackPostProcessingOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WavPackPostProcessingOperation.h; sourceTree = "<group>"; };
-		32C7B45E0EB8A31D00D1A722 /* WavPackPostProcessingOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WavPackPostProcessingOperation.m; sourceTree = "<group>"; };
 		32CE932E0F56527800AB328A /* wavpack */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = wavpack; sourceTree = "<group>"; };
 		32CE932F0F56527800AB328A /* WavPackLogo.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = WavPackLogo.gif; sourceTree = "<group>"; };
-		32CE93300F56527800AB328A /* wvgain */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = wvgain; sourceTree = "<group>"; };
 		32CE933B0F5652BB00AB328A /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/WavPackSettings.xib; sourceTree = "<group>"; };
 		32DBCF630370AF2F00C91783 /* WavPack_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WavPack_Prefix.pch; sourceTree = "<group>"; };
 		32E9F7840DD6950700E8ACCA /* WavPackSettingsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WavPackSettingsViewController.h; sourceTree = "<group>"; };
@@ -101,7 +96,6 @@
 				32CE933A0F5652BB00AB328A /* WavPackSettings.xib */,
 				32CE932E0F56527800AB328A /* wavpack */,
 				32CE932F0F56527800AB328A /* WavPackLogo.gif */,
-				32CE93300F56527800AB328A /* wvgain */,
 				8D5B49B7048680CD000E48DA /* Info.plist */,
 				089C167DFE841241C02AAC07 /* InfoPlist.strings */,
 			);
@@ -117,8 +111,6 @@
 				3252C1070DD2309D00856BFE /* WavPackEncoderInterface.m */,
 				32E9F7840DD6950700E8ACCA /* WavPackSettingsViewController.h */,
 				32E9F7850DD6950700E8ACCA /* WavPackSettingsViewController.m */,
-				32C7B45D0EB8A31D00D1A722 /* WavPackPostProcessingOperation.h */,
-				32C7B45E0EB8A31D00D1A722 /* WavPackPostProcessingOperation.m */,
 			);
 			name = Classes;
 			sourceTree = "<group>";
@@ -229,7 +221,6 @@
 				8D5B49B0048680CD000E48DA /* InfoPlist.strings in Resources */,
 				32CE93310F56527800AB328A /* wavpack in Resources */,
 				32CE93320F56527800AB328A /* WavPackLogo.gif in Resources */,
-				32CE93330F56527800AB328A /* wvgain in Resources */,
 				32CE933C0F5652BB00AB328A /* WavPackSettings.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -244,7 +235,6 @@
 				3252C1080DD2309D00856BFE /* WavPackEncodeOperation.m in Sources */,
 				3252C1090DD2309D00856BFE /* WavPackEncoderInterface.m in Sources */,
 				32E9F7860DD6950700E8ACCA /* WavPackSettingsViewController.m in Sources */,
-				32C7B45F0EB8A31D00D1A722 /* WavPackPostProcessingOperation.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
