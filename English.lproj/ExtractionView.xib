@@ -8,6 +8,7 @@
 		<string key="IBDocument.HIToolboxVersion">353.00</string>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
+			<integer value="1" id="9"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -35,7 +36,7 @@
 				<string key="NSClassName">NSApplication</string>
 			</object>
 			<object class="NSCustomView" id="1059721489">
-				<nil key="NSNextResponder"/>
+				<reference key="NSNextResponder"/>
 				<int key="NSvFlags">274</int>
 				<object class="NSMutableArray" key="NSSubviews">
 					<bool key="EncodedWithXMLCoder">YES</bool>
@@ -256,6 +257,7 @@
 								</object>
 								<string key="NSFrame">{{1, 17}, {598, 132}}</string>
 								<reference key="NSSuperview" ref="556946201"/>
+								<reference key="NSNextKeyView" ref="850261619"/>
 								<reference key="NSDocView" ref="850261619"/>
 								<reference key="NSBGColor" ref="103175614"/>
 								<int key="NScvFlags">4</int>
@@ -288,6 +290,7 @@
 								</object>
 								<string key="NSFrame">{{1, 0}, {598, 17}}</string>
 								<reference key="NSSuperview" ref="556946201"/>
+								<reference key="NSNextKeyView" ref="121925097"/>
 								<reference key="NSDocView" ref="121925097"/>
 								<reference key="NSBGColor" ref="103175614"/>
 								<int key="NScvFlags">4</int>
@@ -296,6 +299,7 @@
 						</object>
 						<string key="NSFrameSize">{600, 150}</string>
 						<reference key="NSSuperview" ref="1059721489"/>
+						<reference key="NSNextKeyView" ref="575199332"/>
 						<int key="NSsFlags">562</int>
 						<reference key="NSVScroller" ref="4717849"/>
 						<reference key="NSHScroller" ref="1034670189"/>
@@ -391,7 +395,7 @@
 									</object>
 									<object class="NSMutableArray" key="dict.values">
 										<bool key="EncodedWithXMLCoder">YES</bool>
-										<integer value="1"/>
+										<reference ref="9"/>
 										<integer value="1040"/>
 									</object>
 								</object>
@@ -509,6 +513,7 @@
 					</object>
 				</object>
 				<string key="NSFrameSize">{600, 300}</string>
+				<reference key="NSSuperview"/>
 				<string key="NSClassName">NSView</string>
 			</object>
 			<object class="NSArrayController" id="235018877">
@@ -1134,7 +1139,7 @@
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">147</int>
+			<int key="maxID">153</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -1164,9 +1169,11 @@
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>cancel:</string>
 							<string>extract:</string>
+							<string>skipTrack:</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>id</string>
 							<string>id</string>
 							<string>id</string>
 						</object>

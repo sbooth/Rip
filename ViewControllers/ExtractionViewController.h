@@ -6,6 +6,8 @@
 #import <Cocoa/Cocoa.h>
 #include <DiskArbitration/DiskArbitration.h>
 
+#include "replaygain_analysis.h"
+
 @class CompactDisc, DriveInformation, AccurateRipDiscRecord;
 @class ExtractionOperation, ExtractedAudioFile;
 @class TrackDescriptor;
@@ -71,6 +73,8 @@ typedef enum _eExtractionMode eExtractionMode;
 	NSMutableSet *_trackExtractionRecords;
 	NSMutableSet *_failedTrackIDs;
 	
+	struct replaygain_t _rg;
+	
 	// Properties maintained for UI
 	TrackDescriptor *_currentTrack;
 	NSMutableSet *_tracks;
@@ -101,6 +105,7 @@ typedef enum _eExtractionMode eExtractionMode;
 // ========================================
 // The meat & potatoes
 - (IBAction) extract:(id)sender;
+- (IBAction) skipTrack:(id)sender;
 
 // ========================================
 // Action methods

@@ -29,6 +29,7 @@
 		326558EC0F99551900403217 /* SFBCrashReporter.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 326558E80F99550D00403217 /* SFBCrashReporter.framework */; };
 		3268C3760EB04CC500FF62F8 /* BitArrayTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 3268C3750EB04CC500FF62F8 /* BitArrayTest.m */; };
 		3268C3830EB04D3B00FF62F8 /* BitArray.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C4C8DFF0D5E2A0600DC0279 /* BitArray.m */; };
+		326F619C0FA01BB6000FC74D /* ReplayGainCalculationOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 326F619B0FA01BB6000FC74D /* ReplayGainCalculationOperation.m */; };
 		3274C2DA0F171827005B28BB /* Version.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 3274C2D90F171827005B28BB /* Version.xcconfig */; };
 		328371610EA7DCFB0011EB44 /* EncoderWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 328371600EA7DCFB0011EB44 /* EncoderWindowController.m */; };
 		328371680EA7DD650011EB44 /* EncoderWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 328371660EA7DD650011EB44 /* EncoderWindow.xib */; };
@@ -70,6 +71,8 @@
 		32A2C10D0F0A8EE000CA8DDE /* BGHUDAppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A2C10C0F0A8EE000CA8DDE /* BGHUDAppKit.framework */; };
 		32A2C1100F0A8EF100CA8DDE /* BGHUDAppKit.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 32A2C10C0F0A8EE000CA8DDE /* BGHUDAppKit.framework */; };
 		32A2C1440F0A91A300CA8DDE /* HexadecimalNumberFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = 32A2C1430F0A91A300CA8DDE /* HexadecimalNumberFormatter.m */; };
+		32A5F8DE0FA4B862009AD850 /* replaygain_analysis.c in Sources */ = {isa = PBXBuildFile; fileRef = 32A5F8DC0FA4B862009AD850 /* replaygain_analysis.c */; };
+		32A5F9B40FA4E780009AD850 /* ReplayGainUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 32A5F9B30FA4E780009AD850 /* ReplayGainUtilities.m */; };
 		32AB63A60E68B45800EA423A /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 32AB63A50E68B45800EA423A /* SystemConfiguration.framework */; };
 		32AC75640E7634A5009A5E1B /* ReadOffsetCalculationOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 32AC75630E7634A5009A5E1B /* ReadOffsetCalculationOperation.m */; };
 		32B1A36F0E8F0D35005A9AD9 /* DiscInspectorPanelController.m in Sources */ = {isa = PBXBuildFile; fileRef = 32B1A36E0E8F0D35005A9AD9 /* DiscInspectorPanelController.m */; };
@@ -418,6 +421,8 @@
 		3268C35B0EB04C2300FF62F8 /* Tests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Tests-Info.plist"; sourceTree = "<group>"; };
 		3268C3740EB04CC500FF62F8 /* BitArrayTest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BitArrayTest.h; path = Tests/BitArrayTest.h; sourceTree = "<group>"; };
 		3268C3750EB04CC500FF62F8 /* BitArrayTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BitArrayTest.m; path = Tests/BitArrayTest.m; sourceTree = "<group>"; };
+		326F619A0FA01BB6000FC74D /* ReplayGainCalculationOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReplayGainCalculationOperation.h; sourceTree = "<group>"; };
+		326F619B0FA01BB6000FC74D /* ReplayGainCalculationOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ReplayGainCalculationOperation.m; sourceTree = "<group>"; };
 		3274C2D90F171827005B28BB /* Version.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Version.xcconfig; sourceTree = "<group>"; };
 		3283715F0EA7DCFB0011EB44 /* EncoderWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EncoderWindowController.h; sourceTree = "<group>"; };
 		328371600EA7DCFB0011EB44 /* EncoderWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EncoderWindowController.m; sourceTree = "<group>"; };
@@ -477,6 +482,10 @@
 		32A2C10C0F0A8EE000CA8DDE /* BGHUDAppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = BGHUDAppKit.framework; path = Frameworks/BGHUDAppKit.framework; sourceTree = "<group>"; };
 		32A2C1420F0A91A300CA8DDE /* HexadecimalNumberFormatter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HexadecimalNumberFormatter.h; sourceTree = "<group>"; };
 		32A2C1430F0A91A300CA8DDE /* HexadecimalNumberFormatter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HexadecimalNumberFormatter.m; sourceTree = "<group>"; };
+		32A5F8DC0FA4B862009AD850 /* replaygain_analysis.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = replaygain_analysis.c; sourceTree = "<group>"; };
+		32A5F8DD0FA4B862009AD850 /* replaygain_analysis.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = replaygain_analysis.h; sourceTree = "<group>"; };
+		32A5F9B20FA4E780009AD850 /* ReplayGainUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReplayGainUtilities.h; sourceTree = "<group>"; };
+		32A5F9B30FA4E780009AD850 /* ReplayGainUtilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ReplayGainUtilities.m; sourceTree = "<group>"; };
 		32AB63260E68AF3F00EA423A /* NSViewController+PreferencesViewControllerMethods.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSViewController+PreferencesViewControllerMethods.h"; sourceTree = "<group>"; };
 		32AB63A50E68B45800EA423A /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		32AC75620E7634A5009A5E1B /* ReadOffsetCalculationOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReadOffsetCalculationOperation.h; sourceTree = "<group>"; };
@@ -910,8 +919,18 @@
 			children = (
 				322EB43C0F8C30020081A563 /* AquaticPrime */,
 				322EB4400F8C30210081A563 /* ImageAndTextCell */,
+				32A5F8DB0FA4B862009AD850 /* replaygain_analysis */,
 			);
 			path = ThirdParty;
+			sourceTree = "<group>";
+		};
+		32A5F8DB0FA4B862009AD850 /* replaygain_analysis */ = {
+			isa = PBXGroup;
+			children = (
+				32A5F8DC0FA4B862009AD850 /* replaygain_analysis.c */,
+				32A5F8DD0FA4B862009AD850 /* replaygain_analysis.h */,
+			);
+			path = replaygain_analysis;
 			sourceTree = "<group>";
 		};
 		32BBF0880EC6B32300EC2FBE /* Audio */ = {
@@ -994,6 +1013,8 @@
 				3295B3780F7F001400AF55EF /* NSString+PathSanitizationMethods.m */,
 				322177090F9BA68D00E4424B /* NSColor+HexadecimalColorMethods.h */,
 				3221770A0F9BA68D00E4424B /* NSColor+HexadecimalColorMethods.m */,
+				32A5F9B20FA4E780009AD850 /* ReplayGainUtilities.h */,
+				32A5F9B30FA4E780009AD850 /* ReplayGainUtilities.m */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -1120,6 +1141,8 @@
 				8C8EFBC90D6E7C21009E9299 /* MCNDetectionOperation.m */,
 				32AC75620E7634A5009A5E1B /* ReadOffsetCalculationOperation.h */,
 				32AC75630E7634A5009A5E1B /* ReadOffsetCalculationOperation.m */,
+				326F619A0FA01BB6000FC74D /* ReplayGainCalculationOperation.h */,
+				326F619B0FA01BB6000FC74D /* ReplayGainCalculationOperation.m */,
 			);
 			path = Operations;
 			sourceTree = "<group>";
@@ -1599,6 +1622,9 @@
 				322EB43F0F8C30020081A563 /* AquaticPrime.m in Sources */,
 				322EB4430F8C30210081A563 /* ImageAndTextCell.m in Sources */,
 				3221770B0F9BA68D00E4424B /* NSColor+HexadecimalColorMethods.m in Sources */,
+				326F619C0FA01BB6000FC74D /* ReplayGainCalculationOperation.m in Sources */,
+				32A5F8DE0FA4B862009AD850 /* replaygain_analysis.c in Sources */,
+				32A5F9B40FA4E780009AD850 /* ReplayGainUtilities.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
