@@ -10,6 +10,7 @@
 		324529690F6A0D0600CC2341 /* FileUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 324529680F6A0D0600CC2341 /* FileUtilities.m */; };
 		328378360EAEDEF50011EB44 /* AppleLosslessEncodeOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 328378350EAEDEF50011EB44 /* AppleLosslessEncodeOperation.m */; };
 		328378530EAEE2EB0011EB44 /* AtomicParsley in Resources */ = {isa = PBXBuildFile; fileRef = 328378520EAEE2EB0011EB44 /* AtomicParsley */; };
+		32A5FB790FA565C3009AD850 /* NSImage+BitmapRepresentationMethods.m in Sources */ = {isa = PBXBuildFile; fileRef = 32A5FB780FA565C3009AD850 /* NSImage+BitmapRepresentationMethods.m */; };
 		32C5ABCC0E6D1A27007C1E7A /* AppleLosslessSettings.xib in Resources */ = {isa = PBXBuildFile; fileRef = 32C5ABCA0E6D1A27007C1E7A /* AppleLosslessSettings.xib */; };
 		32C5ABD00E6D1A9B007C1E7A /* CoreAudioEncodeOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 32C5ABCF0E6D1A9B007C1E7A /* CoreAudioEncodeOperation.m */; };
 		32E9F8F90DD7584500E8ACCA /* AppleLosslessSettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 32E9F8F80DD7584500E8ACCA /* AppleLosslessSettingsViewController.m */; };
@@ -47,6 +48,8 @@
 		328378340EAEDEF50011EB44 /* AppleLosslessEncodeOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppleLosslessEncodeOperation.h; sourceTree = "<group>"; };
 		328378350EAEDEF50011EB44 /* AppleLosslessEncodeOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppleLosslessEncodeOperation.m; sourceTree = "<group>"; };
 		328378520EAEE2EB0011EB44 /* AtomicParsley */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = AtomicParsley; sourceTree = "<group>"; };
+		32A5FB770FA565C3009AD850 /* NSImage+BitmapRepresentationMethods.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSImage+BitmapRepresentationMethods.h"; path = "../../Utilities/NSImage+BitmapRepresentationMethods.h"; sourceTree = SOURCE_ROOT; };
+		32A5FB780FA565C3009AD850 /* NSImage+BitmapRepresentationMethods.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSImage+BitmapRepresentationMethods.m"; path = "../../Utilities/NSImage+BitmapRepresentationMethods.m"; sourceTree = SOURCE_ROOT; };
 		32C5ABCB0E6D1A27007C1E7A /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/AppleLosslessSettings.xib; sourceTree = "<group>"; };
 		32C5ABCE0E6D1A9B007C1E7A /* CoreAudioEncodeOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CoreAudioEncodeOperation.h; path = ../CoreAudio/CoreAudioEncodeOperation.h; sourceTree = SOURCE_ROOT; };
 		32C5ABCF0E6D1A9B007C1E7A /* CoreAudioEncodeOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CoreAudioEncodeOperation.m; path = ../CoreAudio/CoreAudioEncodeOperation.m; sourceTree = SOURCE_ROOT; };
@@ -153,6 +156,8 @@
 		32C88E010371C26100C91783 /* Other Sources */ = {
 			isa = PBXGroup;
 			children = (
+				32A5FB770FA565C3009AD850 /* NSImage+BitmapRepresentationMethods.h */,
+				32A5FB780FA565C3009AD850 /* NSImage+BitmapRepresentationMethods.m */,
 				324529670F6A0D0600CC2341 /* FileUtilities.h */,
 				324529680F6A0D0600CC2341 /* FileUtilities.m */,
 				8C3C19610D73EAB7001BAC88 /* EncoderInterface.xcodeproj */,
@@ -247,6 +252,7 @@
 				32C5ABD00E6D1A9B007C1E7A /* CoreAudioEncodeOperation.m in Sources */,
 				328378360EAEDEF50011EB44 /* AppleLosslessEncodeOperation.m in Sources */,
 				324529690F6A0D0600CC2341 /* FileUtilities.m in Sources */,
+				32A5FB790FA565C3009AD850 /* NSImage+BitmapRepresentationMethods.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

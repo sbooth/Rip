@@ -12,6 +12,9 @@
 		3252C1160DD2318200856BFE /* EncoderInterface.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3252C0F70DD2302100856BFE /* EncoderInterface.framework */; };
 		3252C14F0DD2349100856BFE /* flac in Resources */ = {isa = PBXBuildFile; fileRef = 3252C14D0DD2349100856BFE /* flac */; };
 		328DE16D0E5B8B7500F5BD13 /* FLACLogo.png in Resources */ = {isa = PBXBuildFile; fileRef = 328DE16C0E5B8B7500F5BD13 /* FLACLogo.png */; };
+		32A5FB900FA56695009AD850 /* FileUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 32A5FB8D0FA56695009AD850 /* FileUtilities.m */; };
+		32A5FB910FA56695009AD850 /* NSImage+BitmapRepresentationMethods.m in Sources */ = {isa = PBXBuildFile; fileRef = 32A5FB8F0FA56695009AD850 /* NSImage+BitmapRepresentationMethods.m */; };
+		32A5FB9A0FA56718009AD850 /* metaflac in Resources */ = {isa = PBXBuildFile; fileRef = 32A5FB990FA56718009AD850 /* metaflac */; };
 		32E9F7860DD6950700E8ACCA /* FLACSettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 32E9F7850DD6950700E8ACCA /* FLACSettingsViewController.m */; };
 		32E9F78E0DD6957600E8ACCA /* FLACSettings.xib in Resources */ = {isa = PBXBuildFile; fileRef = 32E9F78C0DD6957600E8ACCA /* FLACSettings.xib */; };
 		8D5B49B0048680CD000E48DA /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C167DFE841241C02AAC07 /* InfoPlist.strings */; };
@@ -47,6 +50,11 @@
 		3252C1070DD2309D00856BFE /* FLACEncoderInterface.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FLACEncoderInterface.m; sourceTree = "<group>"; };
 		3252C14D0DD2349100856BFE /* flac */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = flac; sourceTree = "<group>"; };
 		328DE16C0E5B8B7500F5BD13 /* FLACLogo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = FLACLogo.png; sourceTree = "<group>"; };
+		32A5FB8C0FA56695009AD850 /* FileUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FileUtilities.h; path = ../../Utilities/FileUtilities.h; sourceTree = SOURCE_ROOT; };
+		32A5FB8D0FA56695009AD850 /* FileUtilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FileUtilities.m; path = ../../Utilities/FileUtilities.m; sourceTree = SOURCE_ROOT; };
+		32A5FB8E0FA56695009AD850 /* NSImage+BitmapRepresentationMethods.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSImage+BitmapRepresentationMethods.h"; path = "../../Utilities/NSImage+BitmapRepresentationMethods.h"; sourceTree = SOURCE_ROOT; };
+		32A5FB8F0FA56695009AD850 /* NSImage+BitmapRepresentationMethods.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSImage+BitmapRepresentationMethods.m"; path = "../../Utilities/NSImage+BitmapRepresentationMethods.m"; sourceTree = SOURCE_ROOT; };
+		32A5FB990FA56718009AD850 /* metaflac */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = metaflac; sourceTree = "<group>"; };
 		32DBCF630370AF2F00C91783 /* FLAC_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FLAC_Prefix.pch; sourceTree = "<group>"; };
 		32E9F7840DD6950700E8ACCA /* FLACSettingsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FLACSettingsViewController.h; sourceTree = "<group>"; };
 		32E9F7850DD6950700E8ACCA /* FLACSettingsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FLACSettingsViewController.m; sourceTree = "<group>"; };
@@ -93,6 +101,7 @@
 		089C167CFE841241C02AAC07 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				32A5FB990FA56718009AD850 /* metaflac */,
 				328DE16C0E5B8B7500F5BD13 /* FLACLogo.png */,
 				32E9F78C0DD6957600E8ACCA /* FLACSettings.xib */,
 				3252C14D0DD2349100856BFE /* flac */,
@@ -152,6 +161,10 @@
 		32C88E010371C26100C91783 /* Other Sources */ = {
 			isa = PBXGroup;
 			children = (
+				32A5FB8C0FA56695009AD850 /* FileUtilities.h */,
+				32A5FB8D0FA56695009AD850 /* FileUtilities.m */,
+				32A5FB8E0FA56695009AD850 /* NSImage+BitmapRepresentationMethods.h */,
+				32A5FB8F0FA56695009AD850 /* NSImage+BitmapRepresentationMethods.m */,
 				3252C0F20DD2302100856BFE /* EncoderInterface.xcodeproj */,
 				32DBCF630370AF2F00C91783 /* FLAC_Prefix.pch */,
 			);
@@ -222,6 +235,7 @@
 				3252C14F0DD2349100856BFE /* flac in Resources */,
 				32E9F78E0DD6957600E8ACCA /* FLACSettings.xib in Resources */,
 				328DE16D0E5B8B7500F5BD13 /* FLACLogo.png in Resources */,
+				32A5FB9A0FA56718009AD850 /* metaflac in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -235,6 +249,8 @@
 				3252C1080DD2309D00856BFE /* FLACEncodeOperation.m in Sources */,
 				3252C1090DD2309D00856BFE /* FLACEncoderInterface.m in Sources */,
 				32E9F7860DD6950700E8ACCA /* FLACSettingsViewController.m in Sources */,
+				32A5FB900FA56695009AD850 /* FileUtilities.m in Sources */,
+				32A5FB910FA56695009AD850 /* NSImage+BitmapRepresentationMethods.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

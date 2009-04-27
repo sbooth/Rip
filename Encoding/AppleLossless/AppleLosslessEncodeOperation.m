@@ -5,6 +5,7 @@
 
 #import "AppleLosslessEncodeOperation.h"
 #import "FileUtilities.h"
+#import "NSImage+BitmapRepresentationMethods.h"
 
 @implementation AppleLosslessEncodeOperation
 
@@ -106,9 +107,14 @@
 		[arguments addObject:@"--comment"];
 		[arguments addObject:[self.metadata objectForKey:kMetadataCommentKey]];
 	}
+	NSURL *frontCoverURL = nil;
 	if([self.metadata objectForKey:kAlbumArtFrontCoverKey]) {
+		NSImage *frontCoverImage = [self.metadata objectForKey:kAlbumArtFrontCoverKey];
+		frontCoverURL = temporaryURLWithExtension(@"png");
+		NSData *frontCoverPNGData = [frontCoverImage PNGData];
+		[frontCoverPNGData writeToURL:frontCoverURL atomically:NO];
+		
 		[arguments addObject:@"--artwork"];
-		NSURL *frontCoverURL = [self.metadata objectForKey:kAlbumArtFrontCoverKey];
 		[arguments addObject:[frontCoverURL path]];
 	}
 	
@@ -160,6 +166,12 @@
 		else
 			self.error = error;
 	}
+	
+	// Delete the temporary album art
+	NSError *error = nil;
+	BOOL removeSuccessful = [[NSFileManager defaultManager] removeItemAtPath:[frontCoverURL path] error:&error];
+	if(!removeSuccessful)
+		self.error = error;
 }
 
 @end

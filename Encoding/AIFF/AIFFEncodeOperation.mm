@@ -230,7 +230,6 @@ getID3v2Timestamp()
 		fileRef.tag()->addFrame(ufidFrame);
 	}
 	
-
 	// ReplayGain
 	NSNumber *trackGain = [self.metadata valueForKey:kReplayGainTrackGainKey];
 	NSNumber *trackPeak = [self.metadata valueForKey:kReplayGainTrackPeakKey];
@@ -335,12 +334,9 @@ getID3v2Timestamp()
 		fileRef.tag()->addFrame(relativeVolumeFrame);
 	}
 	
-	
-	
-	
 	// Album art
 	if([self.metadata objectForKey:kAlbumArtFrontCoverKey]) {
-		NSImage *image = [[NSImage alloc] initWithContentsOfURL:[self.metadata objectForKey:kAlbumArtFrontCoverKey]];
+		NSImage *image = [self.metadata objectForKey:kAlbumArtFrontCoverKey];
 		NSData *imageData = [image PNGData];
 		TagLib::ID3v2::AttachedPictureFrame *pictureFrame = new TagLib::ID3v2::AttachedPictureFrame();
 		

@@ -4,6 +4,8 @@
  */
 
 #import "FLACEncodeOperation.h"
+#import "FileUtilities.h"
+#import "NSImage+BitmapRepresentationMethods.h"
 
 // ========================================
 // KVC key names for the metadata dictionaries
@@ -181,7 +183,11 @@ setArgumentForTag(NSMutableArray *arguments, NSDictionary *metadata, NSString *k
 	arguments = [NSMutableArray array];
 
 	// Album art
-	NSURL *frontCoverURL = [self.metadata objectForKey:kAlbumArtFrontCoverKey];
+	NSImage *frontCoverImage = [self.metadata objectForKey:kAlbumArtFrontCoverKey];
+	NSURL *frontCoverURL = temporaryURLWithExtension(@"png");
+	NSData *frontCoverPNGData = [frontCoverImage PNGData];
+	[frontCoverPNGData writeToURL:frontCoverURL atomically:NO];
+	
 	[arguments addObject:[NSString stringWithFormat:@"--import-picture-from=%@", [frontCoverURL path]]];
 	
 	// Input files
@@ -214,6 +220,12 @@ setArgumentForTag(NSMutableArray *arguments, NSDictionary *metadata, NSString *k
 	terminationStatus = [task terminationStatus];
 	if(EXIT_SUCCESS != terminationStatus)
 		self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:terminationStatus userInfo:nil];
+
+	// Delete the temporary album art
+	NSError *error = nil;
+	BOOL removeSuccessful = [[NSFileManager defaultManager] removeItemAtPath:[frontCoverURL path] error:&error];
+	if(!removeSuccessful)
+		self.error = error;
 }
 
 @end

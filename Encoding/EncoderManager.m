@@ -75,12 +75,8 @@ metadataForTrackExtractionRecord(TrackExtractionRecord *trackExtractionRecord)
 
 	// Album artwork
 	NSImage *frontCoverImage = albumMetadata.artwork.frontCoverImage;
-	if(frontCoverImage) {
-		NSURL *frontCoverURL = temporaryURLWithExtension(@"png");
-		NSData *frontCoverPNGData = [frontCoverImage PNGData];
-		[frontCoverPNGData writeToURL:frontCoverURL atomically:NO];
-		[metadata setObject:frontCoverURL forKey:kAlbumArtFrontCoverKey];
-	}
+	if(frontCoverImage)
+		[metadata setObject:frontCoverImage forKey:kAlbumArtFrontCoverKey];
 
 	// Track metadata
 	if(trackMetadata.additionalMetadata)
@@ -398,6 +394,12 @@ static EncoderManager *sSharedEncoderManager				= nil;
 			NSFileManager *fileManager = [NSFileManager defaultManager];
 			if([fileManager fileExistsAtPath:[operation.inputURL path]] && ![fileManager removeItemAtPath:[operation.inputURL path] error:&error])
 				[[NSApplication sharedApplication] presentError:error];
+			
+			// Remove the temporary cue sheet
+//			if(operation.isImage) {
+//				if([fileManager fileExistsAtPath:[operation.cueSheetURL path] && ![fileManager removeItemAtPath:[operation.cueSheetURL path] error:&error])
+//					[[NSApplication sharedApplication] presentError:error];
+//			}
 		}
 	}
 	else

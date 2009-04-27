@@ -34,7 +34,7 @@ extern NSString * const		kReplayGainTrackPeakKey;			// NSNumber *
 extern NSString * const		kReplayGainAlbumGainKey;			// NSNumber *
 extern NSString * const		kReplayGainAlbumPeakKey;			// NSNumber *
 
-extern NSString * const		kAlbumArtFrontCoverKey;				// NSURL *
+extern NSString * const		kAlbumArtFrontCoverKey;				// NSImage *
 
 // ========================================
 // This value will only be present if inputURL represents a disc image
