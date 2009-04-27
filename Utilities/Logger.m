@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2008 Stephen F. Booth <me@sbooth.org>
+ *  Copyright (C) 2008 - 2009 Stephen F. Booth <me@sbooth.org>
  *  All Rights Reserved
  */
 
@@ -123,7 +123,9 @@ static Logger *sSharedLogger				= nil;
 	
 	// Don't let an exception here ruin our day
 	@try {
-		[_logFile writeData:data];
+		@synchronized(_logFile) {
+			[_logFile writeData:data];
+		}
 	}
 	@catch(NSException *exception) {
 		NSLog(@"Unable to write to log file: %@", exception);

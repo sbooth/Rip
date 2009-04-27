@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2007 - 2008 Stephen F. Booth <me@sbooth.org>
+ *  Copyright (C) 2007 - 2009 Stephen F. Booth <me@sbooth.org>
  *  All Rights Reserved
  */
 
@@ -16,11 +16,11 @@ AudioStreamBasicDescription getStreamDescriptionForCDDA()
 	cddaASBD.mFormatFlags = kAudioFormatFlagIsSignedInteger | kAudioFormatFlagIsPacked;
 	cddaASBD.mReserved = 0;
 	
-	cddaASBD.mSampleRate = 44100;
-	cddaASBD.mChannelsPerFrame = 2;
-	cddaASBD.mBitsPerChannel = 16;
+	cddaASBD.mSampleRate = CDDA_SAMPLE_RATE;
+	cddaASBD.mChannelsPerFrame = CDDA_CHANNELS_PER_FRAME;
+	cddaASBD.mBitsPerChannel = CDDA_BITS_PER_CHANNEL;
 	
-	cddaASBD.mBytesPerFrame = cddaASBD.mChannelsPerFrame * (cddaASBD.mBitsPerChannel / 8);
+	cddaASBD.mBytesPerFrame = CDDA_CHANNELS_PER_FRAME * (CDDA_BITS_PER_CHANNEL / 8);
 	cddaASBD.mFramesPerPacket = 1;
 	cddaASBD.mBytesPerPacket = cddaASBD.mBytesPerFrame * cddaASBD.mFramesPerPacket;
 	
@@ -40,13 +40,13 @@ BOOL streamDescriptionIsCDDA(const AudioStreamBasicDescription *asbd)
 	if(!(kAudioFormatFlagIsSignedInteger & asbd->mFormatFlags) || !((kAudioFormatFlagIsPacked & asbd->mFormatFlags)))
 		return NO;
 	
-	if(44100 != asbd->mSampleRate)
+	if(CDDA_SAMPLE_RATE != asbd->mSampleRate)
 		return NO;
 	
-	if(2 != asbd->mChannelsPerFrame)
+	if(CDDA_CHANNELS_PER_FRAME != asbd->mChannelsPerFrame)
 		return NO;
 	
-	if(16 != asbd->mBitsPerChannel)
+	if(CDDA_BITS_PER_CHANNEL != asbd->mBitsPerChannel)
 		return NO;
 	
 	return YES;
