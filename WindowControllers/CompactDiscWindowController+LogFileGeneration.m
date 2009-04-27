@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2008 Stephen F. Booth <me@sbooth.org>
+ *  Copyright (C) 2008 - 2009 Stephen F. Booth <me@sbooth.org>
  *  All Rights Reserved
  */
 
@@ -13,6 +13,7 @@
 #import "AlbumMetadata.h"
 #import "SessionDescriptor.h"
 #import "TrackDescriptor.h"
+#import "TrackMetadata.h"
 
 #import "CDMSFFormatter.h"
 #import "PregapFormatter.h"
@@ -54,7 +55,12 @@
 	
 	[result appendString:@"Extracted Audio\n"];
 	[result appendString:@"========================================\n"];
-	
+
+	[result appendFormat:@"Album replay gain:  %+.2f dB\n", [self.compactDisc.metadata.replayGain floatValue]];
+	[result appendFormat:@"Album peak level:   %1.8f\n", [self.compactDisc.metadata.peak floatValue]];
+
+	[result appendString:@"\n"];
+
 	for(TrackExtractionRecord *extractionRecord in sortedExtractionRecords) {		
 		[result appendFormat:@"Track %@ saved to %@\n", extractionRecord.track.number, [[extractionRecord.outputURL path] lastPathComponent]];
 		
@@ -63,6 +69,11 @@
 		[result appendFormat:@"    Audio MD5 hash:         %@\n", extractionRecord.MD5];
 		[result appendFormat:@"    Audio SHA1 hash:        %@\n", extractionRecord.SHA1];
 		[result appendFormat:@"    AccurateRip checksum:   %08lx\n", extractionRecord.accurateRipChecksum.unsignedIntegerValue];
+
+		[result appendString:@"\n"];
+
+		[result appendFormat:@"    Replay gain:            %+2.2f dB\n", [extractionRecord.track.metadata.replayGain floatValue]];
+		[result appendFormat:@"    Peak level:             %1.8f\n", [extractionRecord.track.metadata.peak floatValue]];
 
 		if(extractionRecord.accurateRipConfidenceLevel) {
 			[result appendString:@"\n"];
@@ -147,6 +158,11 @@
 		[result appendFormat:@"    Audio MD5 hash:         %@\n", extractionRecord.MD5];
 		[result appendFormat:@"    Audio SHA1 hash:        %@\n", extractionRecord.SHA1];
 		[result appendFormat:@"    AccurateRip checksum:   %08lx\n", extractionRecord.accurateRipChecksum.unsignedIntegerValue];
+		
+		[result appendString:@"\n"];
+		
+		[result appendFormat:@"    Replay gain:            %+2.2f dB\n", [extractionRecord.track.metadata.replayGain floatValue]];
+		[result appendFormat:@"    Peak level:             %1.8f\n", [extractionRecord.track.metadata.peak floatValue]];
 		
 		if(extractionRecord.accurateRipConfidenceLevel) {
 			[result appendString:@"\n"];
