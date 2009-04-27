@@ -24,6 +24,8 @@
 @property (assign) NSNumber * isCompilation;
 @property (assign) NSString * MCN;
 @property (assign) NSString * musicBrainzID;
+@property (assign) NSNumber * peak;
+@property (assign) NSNumber * replayGain;
 @property (assign) NSString * title;
 
 // ========================================

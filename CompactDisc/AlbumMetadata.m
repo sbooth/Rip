@@ -17,6 +17,8 @@
 @dynamic isCompilation;
 @dynamic MCN;
 @dynamic musicBrainzID;
+@dynamic replayGain;
+@dynamic peak;
 @dynamic title;
 
 // ========================================
