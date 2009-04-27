@@ -1600,12 +1600,6 @@ static NSString * const kkAudioExtractionKVOContext		= @"org.sbooth.Rip.Extracti
 	else
 		[[Logger sharedLogger] logMessageWithLevel:eLogMessageLevelDebug format:@"Unable to calculate replay gain"];
 
-	// Save changes to the MOC, so others can pull in the changes
-	if([self.managedObjectContext hasChanges]) {
-		if(![self.managedObjectContext save:error])
-			[self presentError:*error modalForWindow:self.view.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
-	}
-		
 	[_trackExtractionRecords addObject:extractionRecord];
 	[_tracksTable reloadData];
 	
