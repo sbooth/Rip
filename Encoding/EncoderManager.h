@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2008 Stephen F. Booth <me@sbooth.org>
+ *  Copyright (C) 2008 - 2009 Stephen F. Booth <me@sbooth.org>
  *  All Rights Reserved
  */
 
@@ -63,16 +63,9 @@ typedef enum _eExistingOutputFileHandling eExistingOutputFileHandling;
 // ========================================
 // Queue an encoding request
 - (BOOL) encodeTrackExtractionRecord:(TrackExtractionRecord *)trackExtractionRecord error:(NSError **)error;
-- (BOOL) encodeTrackExtractionRecord:(TrackExtractionRecord *)trackExtractionRecord encodingOperation:(EncodingOperation **)encodingOperation delayPostProcessing:(BOOL)delayPostProcessing error:(NSError **)error;
+- (BOOL) encodeTrackExtractionRecord:(TrackExtractionRecord *)trackExtractionRecord encodingOperation:(EncodingOperation **)encodingOperation error:(NSError **)error;
 
 - (BOOL) encodeImageExtractionRecord:(ImageExtractionRecord *)imageExtractionRecord error:(NSError **)error;
-- (BOOL) encodeImageExtractionRecord:(ImageExtractionRecord *)imageExtractionRecord encodingOperation:(EncodingOperation **)encodingOperation delayPostProcessing:(BOOL)delayPostProcessing error:(NSError **)error;
-
-// ========================================
-// Post-encoding processing
-- (BOOL) postProcessEncodingOperation:(EncodingOperation *)encodingOperation forTrackExtractionRecord:(TrackExtractionRecord *)trackExtractionRecord error:(NSError **)error;
-- (BOOL) postProcessEncodingOperations:(NSArray *)encodingOperations forTrackExtractionRecords:(NSArray *)trackExtractionRecords error:(NSError **)error;
-
-- (BOOL) postProcessEncodingOperation:(EncodingOperation *)encodingOperation forImageExtractionRecord:(ImageExtractionRecord *)imageExtractionRecord error:(NSError **)error;
+- (BOOL) encodeImageExtractionRecord:(ImageExtractionRecord *)imageExtractionRecord encodingOperation:(EncodingOperation **)encodingOperation error:(NSError **)error;
 
 @end
