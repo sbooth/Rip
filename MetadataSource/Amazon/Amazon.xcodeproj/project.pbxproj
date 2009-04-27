@@ -58,7 +58,7 @@
 		328AB4440F808F23001F1C78 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		328DE65F0E5FDB8000F5BD13 /* AmazonInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AmazonInterface.h; sourceTree = "<group>"; };
 		328DE6600E5FDB8000F5BD13 /* AmazonInterface.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AmazonInterface.m; sourceTree = "<group>"; };
-		328DE66D0E5FDC0500F5BD13 /* AlbumArtExchange_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AlbumArtExchange_Prefix.pch; sourceTree = "<group>"; };
+		32A5FB660FA5657C009AD850 /* Amazon_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Amazon_Prefix.pch; sourceTree = "<group>"; };
 		32AC71240E7191DF009A5E1B /* AmazonViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AmazonViewController.h; sourceTree = "<group>"; };
 		32AC71250E7191DF009A5E1B /* AmazonViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AmazonViewController.m; sourceTree = "<group>"; };
 		8D5B49B6048680CD000E48DA /* Amazon.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Amazon.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -166,8 +166,8 @@
 		32C88E010371C26100C91783 /* Other Sources */ = {
 			isa = PBXGroup;
 			children = (
+				32A5FB660FA5657C009AD850 /* Amazon_Prefix.pch */,
 				328AB2E00F808396001F1C78 /* MetadataSourceInterface.xcodeproj */,
-				328DE66D0E5FDC0500F5BD13 /* AlbumArtExchange_Prefix.pch */,
 			);
 			name = "Other Sources";
 			sourceTree = "<group>";
