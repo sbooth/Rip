@@ -8,7 +8,6 @@
 #import "EncoderManager.h"
 #import "EncoderInterface/EncoderInterface.h"
 
-#define USE_ANIMATION 0
 #define TRANSITION_ANIMATION_DURATION 0.125
 
 @implementation EncoderPreferencesViewController

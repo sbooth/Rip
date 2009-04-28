@@ -8,7 +8,6 @@
 #import "MusicDatabaseManager.h"
 #import "MusicDatabaseInterface/MusicDatabaseInterface.h"
 
-#define USE_ANIMATION 0
 #define TRANSITION_ANIMATION_DURATION 0.125
 
 @implementation MusicDatabasePreferencesViewController
