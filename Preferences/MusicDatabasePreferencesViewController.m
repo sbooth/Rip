@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2008 Stephen F. Booth <me@sbooth.org>
+ *  Copyright (C) 2008 - 2009 Stephen F. Booth <me@sbooth.org>
  *  All Rights Reserved
  */
 
@@ -7,6 +7,9 @@
 #import "NSViewController+PreferencesViewControllerMethods.h"
 #import "MusicDatabaseManager.h"
 #import "MusicDatabaseInterface/MusicDatabaseInterface.h"
+
+#define USE_ANIMATION 0
+#define TRANSITION_ANIMATION_DURATION 0.125
 
 @implementation MusicDatabasePreferencesViewController
 
@@ -137,7 +140,7 @@
 		
 		NSViewAnimation *fadeOutAnimation = [[NSViewAnimation alloc] initWithViewAnimations:[NSArray arrayWithObject:fadeOutAnimationDictionary]];
 		
-		[fadeOutAnimation setDuration:0.25];
+		[fadeOutAnimation setDuration:TRANSITION_ANIMATION_DURATION];
 		[fadeOutAnimation setAnimationCurve:NSAnimationEaseIn];
 		[fadeOutAnimation setAnimationBlockingMode:NSAnimationBlocking];
 		
@@ -215,7 +218,7 @@
 	
 	NSViewAnimation *fadeInAnimation = [[NSViewAnimation alloc] initWithViewAnimations:[NSArray arrayWithObject:fadeInAnimationDictionary]];
 	
-	[fadeInAnimation setDuration:0.25];
+	[fadeInAnimation setDuration:TRANSITION_ANIMATION_DURATION];
 	[fadeInAnimation setAnimationCurve:NSAnimationEaseIn];
 	
 	[fadeInAnimation startAnimation];
