@@ -383,7 +383,7 @@ static NSString * const kkAudioExtractionKVOContext		= @"org.sbooth.Rip.Extracti
 	
 	self.disk = NULL;
 
-	[self.view.window.windowController extractionFinishedWithReturnCode:NSCancelButton];
+	[[[[self view] window] windowController] extractionFinishedWithReturnCode:NSCancelButton];
 }
 
 - (NSArray *) orderedTracks
@@ -402,7 +402,7 @@ static NSString * const kkAudioExtractionKVOContext		= @"org.sbooth.Rip.Extracti
 	NSError *error = nil;
 	NSArray *tracks = [self.managedObjectContext executeFetchRequest:trackFetchRequest error:&error];
 	if(!tracks) {
-		[self presentError:error modalForWindow:self.view.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
+		[self presentError:error modalForWindow:[[self view] window] delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
 		return nil;
 	}
 	
@@ -425,7 +425,7 @@ static NSString * const kkAudioExtractionKVOContext		= @"org.sbooth.Rip.Extracti
 	NSError *error = nil;
 	NSArray *tracks = [self.managedObjectContext executeFetchRequest:trackFetchRequest error:&error];
 	if(!tracks) {
-		[self presentError:error modalForWindow:self.view.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
+		[self presentError:error modalForWindow:[[self view] window] delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
 		return nil;
 	}
 	
@@ -507,7 +507,7 @@ static NSString * const kkAudioExtractionKVOContext		= @"org.sbooth.Rip.Extracti
 	
 	self.disk = NULL;
 	
-	[self.view.window.windowController extractionFinishedWithReturnCode:(didRecover ? NSOKButton : NSCancelButton)];
+	[[[[self view] window] windowController] extractionFinishedWithReturnCode:(didRecover ? NSOKButton : NSCancelButton)];
 }
 
 - (void) audioExtractionTimerFired:(NSTimer *)timer
@@ -837,12 +837,12 @@ static NSString * const kkAudioExtractionKVOContext		= @"org.sbooth.Rip.Extracti
 	// Delete the output file if the operation was cancelled or did not succeed
 	if(operation.error || operation.isCancelled) {
 		if(operation.error)
-			[self presentError:operation.error modalForWindow:self.view.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
+			[self presentError:operation.error modalForWindow:[[self view] window] delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
 		
 		NSError *error = nil;
 		NSFileManager *fileManager = [NSFileManager defaultManager];
 		if([fileManager fileExistsAtPath:operation.URL.path] && ![fileManager removeItemAtPath:operation.URL.path error:&error])
-			[self presentError:error modalForWindow:self.view.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
+			[self presentError:error modalForWindow:[[self view] window] delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
 		
 		return;
 	}
@@ -879,7 +879,7 @@ static NSString * const kkAudioExtractionKVOContext		= @"org.sbooth.Rip.Extracti
 		if([self.managedObjectContext hasChanges]) {
 			NSError *error;
 			if(![self.managedObjectContext save:&error])
-				[self presentError:error modalForWindow:self.view.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
+				[self presentError:error modalForWindow:[[self view] window] delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
 		}
 		
 		// Send the extracted audio to the encoder
@@ -908,12 +908,12 @@ static NSString * const kkAudioExtractionKVOContext		= @"org.sbooth.Rip.Extracti
 			else {
 				ImageExtractionRecord *imageExtractionRecord = [self createImageExtractionRecord];
 				if(!imageExtractionRecord)
-					[self presentError:error modalForWindow:self.view.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
+					[self presentError:error modalForWindow:[[self view] window] delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
 				
 				_imageExtractionRecord = imageExtractionRecord;
 				
 				if(![[EncoderManager sharedEncoderManager] encodeImageExtractionRecord:self.imageExtractionRecord error:&error])
-					[self presentError:error modalForWindow:self.view.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
+					[self presentError:error modalForWindow:[[self view] window] delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
 			}
 		}
 		else
@@ -925,7 +925,7 @@ static NSString * const kkAudioExtractionKVOContext		= @"org.sbooth.Rip.Extracti
 		
 		self.disk = NULL;
 		
-		[self.view.window.windowController extractionFinishedWithReturnCode:NSOKButton];
+		[[[[self view] window] windowController] extractionFinishedWithReturnCode:NSOKButton];
 	}
 }
 
@@ -965,7 +965,7 @@ static NSString * const kkAudioExtractionKVOContext		= @"org.sbooth.Rip.Extracti
 				if(trackPrepared)
 					[self startExtractingNextTrack];
 				else
-					[self presentError:error modalForWindow:self.view.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
+					[self presentError:error modalForWindow:[[self view] window] delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
 				
 				return;
 			}
@@ -997,7 +997,7 @@ static NSString * const kkAudioExtractionKVOContext		= @"org.sbooth.Rip.Extracti
 				if(trackPrepared)
 					[self startExtractingNextTrack];
 				else
-					[self presentError:error modalForWindow:self.view.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
+					[self presentError:error modalForWindow:[[self view] window] delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
 				
 				return;
 			}
@@ -1033,7 +1033,7 @@ static NSString * const kkAudioExtractionKVOContext		= @"org.sbooth.Rip.Extracti
 			if(trackPrepared)
 				[self startExtractingNextTrack];
 			else
-				[self presentError:error modalForWindow:self.view.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
+				[self presentError:error modalForWindow:[[self view] window] delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
 			
 			return;
 		}
@@ -1506,7 +1506,7 @@ static NSString * const kkAudioExtractionKVOContext		= @"org.sbooth.Rip.Extracti
 	NSError *error = nil;
 	ExtractedAudioFile *inputFile = [ExtractedAudioFile openFileForReadingAtURL:operation.URL error:&error];
 	if(!inputFile) {
-		[self presentError:error modalForWindow:self.view.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
+		[self presentError:error modalForWindow:[[self view] window] delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
 		return NO;
 	}
 	
@@ -1515,7 +1515,7 @@ static NSString * const kkAudioExtractionKVOContext		= @"org.sbooth.Rip.Extracti
 		_synthesizedTrack = [ExtractedAudioFile createFileAtURL:temporaryURLWithExtension(@"wav") error:&error];
 		if(!_synthesizedTrack) {
 			[inputFile closeFile];
-			[self presentError:error modalForWindow:self.view.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
+			[self presentError:error modalForWindow:[[self view] window] delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
 			return NO;
 		}
 	}

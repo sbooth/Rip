@@ -166,6 +166,7 @@ static NSString * const kMusicDatabaseQueryKVOContext	= @"org.sbooth.Rip.Compact
 - (void) musicDatabaseQueryOperationDidReturn:(MusicDatabaseQueryOperation *)operation;
 - (void) extractTracks:(NSSet *)tracks extractionMode:(eExtractionMode)extractionMode;
 - (void) showSuccessfulExtractionSheetDismissalTimerFired:(NSTimer *)timer;
+- (void) swapMainViewController:(NSViewController *)oldViewController withViewController:(NSViewController *)newViewController;
 @end
 
 // ========================================
@@ -256,14 +257,15 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 	
 	_extractionViewController = [[ExtractionViewController alloc] init];
 
-	[_mainView addSubview:_metadataViewController.view];
+	[_mainView addSubview:[_metadataViewController view]];
 	[self setNextResponder:_metadataViewController];
+	[[self window] setInitialFirstResponder:[_metadataViewController view]];
 }
 
 - (BOOL) validateMenuItem:(NSMenuItem *)menuItem
 {
 	// Only allow disc-related actions if the main metadata view is diplayed
-	if(![_metadataViewController.view isDescendantOf:_mainView])
+	if(![[_metadataViewController view] isDescendantOf:_mainView])
 		return NO;
 	else if([menuItem action] == @selector(copySelectedTracks:)) {
 		NSUInteger countOfSelectedTracks = self.compactDisc.firstSession.selectedTracks.count;
@@ -331,7 +333,7 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 
 - (BOOL) validateToolbarItem:(NSToolbarItem *)theItem
 {
-	if(![_metadataViewController.view isDescendantOf:_mainView])
+	if(![[_metadataViewController view] isDescendantOf:_mainView])
 		return NO;
 	else if([theItem action] == @selector(copySelectedTracks:))
 		return (0 != self.compactDisc.firstSession.selectedTracks.count);
@@ -469,10 +471,8 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 - (void) metadataSourceViewController:(NSViewController *)viewController finishedWithReturnCode:(int)returnCode
 {
 	// Replace the metadata source view with the metadata view
-	_metadataViewController.view.frame = viewController.view.frame;
-	[_mainView replaceSubview:viewController.view with:_metadataViewController.view];
-	[self setNextResponder:_metadataViewController];
-
+	[self swapMainViewController:viewController withViewController:_metadataViewController];
+	
 	if(NSCancelButton == returnCode)
 		return;
 
@@ -865,10 +865,9 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 	metadataSourceData.delegate = self;
 	
 	[viewController setRepresentedObject:metadataSourceData];
-	[viewController.view setFrame:_metadataViewController.view.frame];
-	
-	[_mainView replaceSubview:_metadataViewController.view with:viewController.view];
-	[self setNextResponder:_metadataViewController];
+
+	// Swap in the metadata view
+	[self swapMainViewController:_metadataViewController withViewController:viewController];
 }
 
 - (IBAction) queryAccurateRip:(id)sender
@@ -949,11 +948,9 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 @implementation CompactDiscWindowController (ExtractionViewControllerMethods)
 
 - (void) extractionFinishedWithReturnCode:(int)returnCode
-{
+{	
 	// Replace the extraction view with the metadata view
-	_metadataViewController.view.frame = _extractionViewController.view.frame;
-	[_mainView replaceSubview:_extractionViewController.view with:_metadataViewController.view];
-	[self setNextResponder:_metadataViewController];
+	[self swapMainViewController:_extractionViewController withViewController:_metadataViewController];
 	
 	if(NSCancelButton == returnCode)
 		return;
@@ -1194,11 +1191,7 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 		[self presentError:error modalForWindow:self.window delegate:nil didPresentSelector:NULL contextInfo:NULL];
 	
 	// Set the view's frame, so when added it will have the correct size (views are not auto-sized when added)
-	_extractionViewController.view.frame = _metadataViewController.view.frame;
-	
-	// Swap it in
-	[_mainView replaceSubview:_metadataViewController.view with:_extractionViewController.view];
-	[self setNextResponder:_extractionViewController];
+	[self swapMainViewController:_metadataViewController withViewController:_extractionViewController];
 	
 	// Set up the audio extraction parameters
 	_extractionViewController.disk = self.disk;
@@ -1216,6 +1209,22 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 {
 	NSPanel *panel = [[timer userInfo] lastObject];
 	[[NSApplication sharedApplication] endSheet:panel returnCode:NSAlertDefaultReturn];
+}
+
+- (void) swapMainViewController:(NSViewController *)oldViewController withViewController:(NSViewController *)newViewController
+{
+	NSParameterAssert(nil != oldViewController);
+	NSParameterAssert(nil != newViewController);
+	NSParameterAssert(oldViewController != newViewController);
+	
+	// Make sure the view to be swapped in has the same frame as the old view
+	[[newViewController view] setFrame:[[oldViewController view] frame]];
+	
+	[_mainView replaceSubview:[oldViewController view] with:[newViewController view]];
+	
+	// Ensure the view controller and its view are the next responders
+	[self setNextResponder:newViewController];
+	[[self window] setInitialFirstResponder:[newViewController view]];
 }
 
 @end

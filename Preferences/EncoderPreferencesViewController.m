@@ -53,12 +53,12 @@
 	[_encoderSettingsViewController setRepresentedObject:[encoderSettings mutableCopy]];
 	
 	// Adjust two view sizes to accomodate the encoder's settings view:
-	//  1. The frame belonging to self.view
+	//  1. The frame belonging to [self view]
 	//  2. The frame belonging to _encoderSettingsView
 	
 	// Calculate the difference between the current and target encoder settings view sizes
 	NSRect currentEncoderSettingsViewFrame = [_encoderSettingsView frame];
-	NSRect targetEncoderSettingsViewFrame = [_encoderSettingsViewController.view frame];
+	NSRect targetEncoderSettingsViewFrame = [[_encoderSettingsViewController view] frame];
 	
 	// The frames of both views will be adjusted by the following dimensions
 	CGFloat viewDeltaX = targetEncoderSettingsViewFrame.size.width - currentEncoderSettingsViewFrame.size.width;
@@ -69,18 +69,18 @@
 	newEncoderSettingsViewFrame.size.width += viewDeltaX;
 	newEncoderSettingsViewFrame.size.height += viewDeltaY;
 	
-	NSRect currentViewFrame = [self.view frame];
+	NSRect currentViewFrame = [[self view] frame];
 	NSRect newViewFrame = currentViewFrame;
 	
 	newViewFrame.size.width += viewDeltaX;
 	newViewFrame.size.height += viewDeltaY;
 	
 	// Set the new sizes
-	[self.view setFrame:newViewFrame];
+	[[self view] setFrame:newViewFrame];
 	[_encoderSettingsView setFrame:newEncoderSettingsViewFrame];
 	
 	// Now that the sizes are correct, add the view controller's view to the view hierarchy
-	[_encoderSettingsView addSubview:_encoderSettingsViewController.view];
+	[_encoderSettingsView addSubview:[_encoderSettingsViewController view]];
 }
 
 - (NSArray *) availableEncoders
@@ -136,7 +136,7 @@
 
 #if USE_ANIMATION
 		NSDictionary *fadeOutAnimationDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-													_encoderSettingsViewController.view, NSViewAnimationTargetKey,
+													[_encoderSettingsViewController view], NSViewAnimationTargetKey,
 													NSViewAnimationFadeOutEffect, NSViewAnimationEffectKey,
 													nil];
 		
@@ -148,9 +148,9 @@
 		
 		[fadeOutAnimation startAnimation];
 		
-		[_encoderSettingsViewController.view removeFromSuperviewWithoutNeedingDisplay];
+		[[_encoderSettingsViewController view] removeFromSuperviewWithoutNeedingDisplay];
 #else
-		[_encoderSettingsViewController.view removeFromSuperview];
+		[[_encoderSettingsViewController view] removeFromSuperview];
 #endif
 				
 		[self savePreferences:sender];
@@ -174,13 +174,13 @@
 	[_encoderSettingsViewController setRepresentedObject:[encoderSettings mutableCopy]];
 
 	// Adjust three view sizes to accomodate the encoder's settings view:
-	//  1. The frame belonging to self.view
+	//  1. The frame belonging to [self view]
 	//  2. The frame belonging to _encoderSettingsView
 	//  3. The enclosing window's frame
 	
 	// Calculate the difference between the current and target encoder settings view sizes
 	NSRect currentEncoderSettingsViewFrame = [_encoderSettingsView frame];
-	NSRect targetEncoderSettingsViewFrame = [_encoderSettingsViewController.view frame];
+	NSRect targetEncoderSettingsViewFrame = [[_encoderSettingsViewController view] frame];
 
 	// The frames of all views will be adjusted by the following dimensions
 	CGFloat viewDeltaX = targetEncoderSettingsViewFrame.size.width - currentEncoderSettingsViewFrame.size.width;
@@ -200,7 +200,7 @@
 	newEncoderSettingsViewFrame.size.width += viewDeltaX;
 	newEncoderSettingsViewFrame.size.height += viewDeltaY;
 
-	NSRect currentViewFrame = [self.view frame];
+	NSRect currentViewFrame = [[self view] frame];
 	NSRect newViewFrame = currentViewFrame;
 	
 	newViewFrame.size.width += viewDeltaX;
@@ -208,15 +208,15 @@
 
 	// Set the new sizes
 	[[[self view] window] setFrame:newWindowFrame display:YES animate:YES];
-	[self.view setFrame:newViewFrame];
+	[[self view] setFrame:newViewFrame];
 	[_encoderSettingsView setFrame:newEncoderSettingsViewFrame];
 		
 	// Now that the sizes are correct, add the view controller's view to the view hierarchy
-	[_encoderSettingsView addSubview:_encoderSettingsViewController.view];
+	[_encoderSettingsView addSubview:[_encoderSettingsViewController view]];
 
 #if USE_ANIMATION
 	NSDictionary *fadeInAnimationDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-											   _encoderSettingsViewController.view, NSViewAnimationTargetKey,
+											   [_encoderSettingsViewController view], NSViewAnimationTargetKey,
 											   NSViewAnimationFadeInEffect, NSViewAnimationEffectKey,
 											   nil];
 

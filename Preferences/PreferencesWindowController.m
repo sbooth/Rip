@@ -90,7 +90,7 @@ static PreferencesWindowController *sSharedPreferencesWindowController = nil;
 		if([_preferencesViewController respondsToSelector:@selector(savePreferences:)])
 			[_preferencesViewController savePreferences:self];
 
-		[_preferencesViewController.view removeFromSuperview];
+		[[_preferencesViewController view] removeFromSuperview];
 	}
 	
 	// Adjust the window and view's frame size to match the preference's view size
@@ -99,7 +99,7 @@ static PreferencesWindowController *sSharedPreferencesWindowController = nil;
 
 	// Calculate the difference between the current and target preference view sizes
 	NSRect currentPreferencesViewFrame = [_preferencesView frame];
-	NSRect targetPreferencesViewFrame = [_preferencesViewController.view frame];
+	NSRect targetPreferencesViewFrame = [[_preferencesViewController view] frame];
 	
 	CGFloat viewDeltaX = targetPreferencesViewFrame.size.width - currentPreferencesViewFrame.size.width;
 	CGFloat viewDeltaY = targetPreferencesViewFrame.size.height - currentPreferencesViewFrame.size.height;
@@ -123,9 +123,9 @@ static PreferencesWindowController *sSharedPreferencesWindowController = nil;
 	[_preferencesView setFrame:newViewFrame];
 	
 	// Now that the sizes are correct, add the view controller's view to the view hierarchy
-	[_preferencesView addSubview:_preferencesViewController.view];
+	[_preferencesView addSubview:[_preferencesViewController view]];
 	[self setNextResponder:_preferencesViewController];
-	[[self window] setInitialFirstResponder:_preferencesViewController.view];
+	[[self window] setInitialFirstResponder:[_preferencesViewController view]];
 
 	// Set the window's title to the name of the preference view
 	[[self window] setTitle:[_preferencesViewController title]];

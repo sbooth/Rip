@@ -53,12 +53,12 @@
 	[_musicDatabaseSettingsViewController setRepresentedObject:[musicDatabaseSettings mutableCopy]];
 	
 	// Adjust two view sizes to accomodate the musicDatabase's settings view:
-	//  1. The frame belonging to self.view
+	//  1. The frame belonging to [self view]
 	//  2. The frame belonging to _musicDatabaseSettingsView
 	
 	// Calculate the difference between the current and target musicDatabase settings view sizes
 	NSRect currentMusicDatabaseSettingsViewFrame = [_musicDatabaseSettingsView frame];
-	NSRect targetMusicDatabaseSettingsViewFrame = [_musicDatabaseSettingsViewController.view frame];
+	NSRect targetMusicDatabaseSettingsViewFrame = [[_musicDatabaseSettingsViewController view] frame];
 	
 	// The frames of both views will be adjusted by the following dimensions
 	CGFloat viewDeltaX = targetMusicDatabaseSettingsViewFrame.size.width - currentMusicDatabaseSettingsViewFrame.size.width;
@@ -69,18 +69,18 @@
 	newMusicDatabaseSettingsViewFrame.size.width += viewDeltaX;
 	newMusicDatabaseSettingsViewFrame.size.height += viewDeltaY;
 	
-	NSRect currentViewFrame = [self.view frame];
+	NSRect currentViewFrame = [[self view] frame];
 	NSRect newViewFrame = currentViewFrame;
 	
 	newViewFrame.size.width += viewDeltaX;
 	newViewFrame.size.height += viewDeltaY;
 	
 	// Set the new sizes
-	[self.view setFrame:newViewFrame];
+	[[self view] setFrame:newViewFrame];
 	[_musicDatabaseSettingsView setFrame:newMusicDatabaseSettingsViewFrame];
 	
 	// Now that the sizes are correct, add the view controller's view to the view hierarchy
-	[_musicDatabaseSettingsView addSubview:_musicDatabaseSettingsViewController.view];
+	[_musicDatabaseSettingsView addSubview:[_musicDatabaseSettingsViewController view]];
 }
 
 - (NSArray *) availableMusicDatabases
@@ -133,7 +133,7 @@
 		
 #if USE_ANIMATION
 		NSDictionary *fadeOutAnimationDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-													_musicDatabaseSettingsViewController.view, NSViewAnimationTargetKey,
+													[_musicDatabaseSettingsViewController view], NSViewAnimationTargetKey,
 													NSViewAnimationFadeOutEffect, NSViewAnimationEffectKey,
 													nil];
 		
@@ -145,9 +145,9 @@
 		
 		[fadeOutAnimation startAnimation];
 
-		[_musicDatabaseSettingsViewController.view removeFromSuperviewWithoutNeedingDisplay];
+		[[_musicDatabaseSettingsViewController view] removeFromSuperviewWithoutNeedingDisplay];
 #else
-		[_musicDatabaseSettingsViewController.view removeFromSuperview];		
+		[[_musicDatabaseSettingsViewController view] removeFromSuperview];		
 #endif
 		
 		[self savePreferences:sender];
@@ -171,13 +171,13 @@
 	[_musicDatabaseSettingsViewController setRepresentedObject:[musicDatabaseSettings mutableCopy]];
 	
 	// Adjust three view sizes to accomodate the musicDatabase's settings view:
-	//  1. The frame belonging to self.view
+	//  1. The frame belonging to [self view]
 	//  2. The frame belonging to _musicDatabaseSettingsView
 	//  3. The enclosing window's frame
 	
 	// Calculate the difference between the current and target musicDatabase settings view sizes
 	NSRect currentMusicDatabaseSettingsViewFrame = [_musicDatabaseSettingsView frame];
-	NSRect targetMusicDatabaseSettingsViewFrame = [_musicDatabaseSettingsViewController.view frame];
+	NSRect targetMusicDatabaseSettingsViewFrame = [[_musicDatabaseSettingsViewController view] frame];
 	
 	// The frames of all views will be adjusted by the following dimensions
 	CGFloat viewDeltaX = targetMusicDatabaseSettingsViewFrame.size.width - currentMusicDatabaseSettingsViewFrame.size.width;
@@ -197,7 +197,7 @@
 	newMusicDatabaseSettingsViewFrame.size.width += viewDeltaX;
 	newMusicDatabaseSettingsViewFrame.size.height += viewDeltaY;
 	
-	NSRect currentViewFrame = [self.view frame];
+	NSRect currentViewFrame = [[self view] frame];
 	NSRect newViewFrame = currentViewFrame;
 	
 	newViewFrame.size.width += viewDeltaX;
@@ -205,15 +205,15 @@
 	
 	// Set the new sizes
 	[[[self view] window] setFrame:newWindowFrame display:YES animate:YES];
-	[self.view setFrame:newViewFrame];
+	[[self view] setFrame:newViewFrame];
 	[_musicDatabaseSettingsView setFrame:newMusicDatabaseSettingsViewFrame];
 	
 	// Now that the sizes are correct, add the view controller's view to the view hierarchy
-	[_musicDatabaseSettingsView addSubview:_musicDatabaseSettingsViewController.view];
+	[_musicDatabaseSettingsView addSubview:[_musicDatabaseSettingsViewController view]];
 	
 #if USE_ANIMATION
 	NSDictionary *fadeInAnimationDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-											   _musicDatabaseSettingsViewController.view, NSViewAnimationTargetKey,
+											   [_musicDatabaseSettingsViewController view], NSViewAnimationTargetKey,
 											   NSViewAnimationFadeInEffect, NSViewAnimationEffectKey,
 											   nil];
 	
