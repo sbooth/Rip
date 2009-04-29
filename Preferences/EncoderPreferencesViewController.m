@@ -8,7 +8,7 @@
 #import "EncoderManager.h"
 #import "EncoderInterface/EncoderInterface.h"
 
-#define TRANSITION_ANIMATION_DURATION 0.125
+#define TRANSITION_ANIMATION_DURATION 0.15
 
 @implementation EncoderPreferencesViewController
 
@@ -135,10 +135,10 @@
 	if(_encoderSettingsViewController) {
 
 #if USE_ANIMATION
-		NSMutableDictionary *fadeOutAnimationDictionary = [NSMutableDictionary dictionary];
-		
-		[fadeOutAnimationDictionary setObject:_encoderSettingsViewController.view forKey:NSViewAnimationTargetKey];
-        [fadeOutAnimationDictionary setObject:NSViewAnimationFadeOutEffect forKey:NSViewAnimationEffectKey];
+		NSDictionary *fadeOutAnimationDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
+													_encoderSettingsViewController.view, NSViewAnimationTargetKey,
+													NSViewAnimationFadeOutEffect, NSViewAnimationEffectKey,
+													nil];
 		
 		NSViewAnimation *fadeOutAnimation = [[NSViewAnimation alloc] initWithViewAnimations:[NSArray arrayWithObject:fadeOutAnimationDictionary]];
 		
@@ -147,10 +147,12 @@
 		[fadeOutAnimation setAnimationBlockingMode:NSAnimationBlocking];
 		
 		[fadeOutAnimation startAnimation];
-#endif
 		
+		[_encoderSettingsViewController.view removeFromSuperviewWithoutNeedingDisplay];
+#else
 		[_encoderSettingsViewController.view removeFromSuperview];
-		
+#endif
+				
 		[self savePreferences:sender];
 	}
 
@@ -213,15 +215,16 @@
 	[_encoderSettingsView addSubview:_encoderSettingsViewController.view];
 
 #if USE_ANIMATION
-	NSMutableDictionary *fadeInAnimationDictionary = [NSMutableDictionary dictionary];
-
-	[fadeInAnimationDictionary setObject:_encoderSettingsViewController.view forKey:NSViewAnimationTargetKey];	 
-	[fadeInAnimationDictionary setObject:NSViewAnimationFadeInEffect forKey:NSViewAnimationEffectKey];
+	NSDictionary *fadeInAnimationDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
+											   _encoderSettingsViewController.view, NSViewAnimationTargetKey,
+											   NSViewAnimationFadeInEffect, NSViewAnimationEffectKey,
+											   nil];
 
 	NSViewAnimation *fadeInAnimation = [[NSViewAnimation alloc] initWithViewAnimations:[NSArray arrayWithObject:fadeInAnimationDictionary]];
 
 	[fadeInAnimation setDuration:TRANSITION_ANIMATION_DURATION];
-	[fadeInAnimation setAnimationCurve:NSAnimationEaseIn];
+	[fadeInAnimation setAnimationCurve:NSAnimationEaseOut];
+	[fadeInAnimation setAnimationBlockingMode:NSAnimationBlocking];
 
 	[fadeInAnimation startAnimation];
 #endif

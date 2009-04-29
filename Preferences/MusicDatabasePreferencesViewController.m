@@ -8,7 +8,7 @@
 #import "MusicDatabaseManager.h"
 #import "MusicDatabaseInterface/MusicDatabaseInterface.h"
 
-#define TRANSITION_ANIMATION_DURATION 0.125
+#define TRANSITION_ANIMATION_DURATION 0.15
 
 @implementation MusicDatabasePreferencesViewController
 
@@ -132,10 +132,10 @@
 	if(_musicDatabaseSettingsViewController) {
 		
 #if USE_ANIMATION
-		NSMutableDictionary *fadeOutAnimationDictionary = [NSMutableDictionary dictionary];
-		
-		[fadeOutAnimationDictionary setObject:_musicDatabaseSettingsViewController.view forKey:NSViewAnimationTargetKey];
-        [fadeOutAnimationDictionary setObject:NSViewAnimationFadeOutEffect forKey:NSViewAnimationEffectKey];
+		NSDictionary *fadeOutAnimationDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
+													_musicDatabaseSettingsViewController.view, NSViewAnimationTargetKey,
+													NSViewAnimationFadeOutEffect, NSViewAnimationEffectKey,
+													nil];
 		
 		NSViewAnimation *fadeOutAnimation = [[NSViewAnimation alloc] initWithViewAnimations:[NSArray arrayWithObject:fadeOutAnimationDictionary]];
 		
@@ -144,9 +144,11 @@
 		[fadeOutAnimation setAnimationBlockingMode:NSAnimationBlocking];
 		
 		[fadeOutAnimation startAnimation];
+
+		[_musicDatabaseSettingsViewController.view removeFromSuperviewWithoutNeedingDisplay];
+#else
+		[_musicDatabaseSettingsViewController.view removeFromSuperview];		
 #endif
-		
-		[_musicDatabaseSettingsViewController.view removeFromSuperview];
 		
 		[self savePreferences:sender];
 	}
@@ -210,15 +212,16 @@
 	[_musicDatabaseSettingsView addSubview:_musicDatabaseSettingsViewController.view];
 	
 #if USE_ANIMATION
-	NSMutableDictionary *fadeInAnimationDictionary = [NSMutableDictionary dictionary];
-	
-	[fadeInAnimationDictionary setObject:_musicDatabaseSettingsViewController.view forKey:NSViewAnimationTargetKey];	 
-	[fadeInAnimationDictionary setObject:NSViewAnimationFadeInEffect forKey:NSViewAnimationEffectKey];
+	NSDictionary *fadeInAnimationDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
+											   _musicDatabaseSettingsViewController.view, NSViewAnimationTargetKey,
+											   NSViewAnimationFadeInEffect, NSViewAnimationEffectKey,
+											   nil];
 	
 	NSViewAnimation *fadeInAnimation = [[NSViewAnimation alloc] initWithViewAnimations:[NSArray arrayWithObject:fadeInAnimationDictionary]];
 	
 	[fadeInAnimation setDuration:TRANSITION_ANIMATION_DURATION];
-	[fadeInAnimation setAnimationCurve:NSAnimationEaseIn];
+	[fadeInAnimation setAnimationCurve:NSAnimationEaseOut];
+	[fadeInAnimation setAnimationBlockingMode:NSAnimationBlocking];
 	
 	[fadeInAnimation startAnimation];
 #endif
