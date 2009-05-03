@@ -28,17 +28,17 @@
 {
 	// Create the various inspector panels
 	NSViewController *viewController = [[NSViewController alloc] initWithNibName:@"TrackInspectorView" bundle:nil];
-	viewController.title = NSLocalizedString(@"Track", @"The name of the track inspector panel");
+	viewController.title = NSLocalizedString(@"Track Information", @"The name of the track inspector panel");
 	[viewController bind:@"representedObject" toObject:self withKeyPath:@"inspectedDocument" options:nil];
 	[_inspectorView addInspectorPaneController:viewController];
 
 	viewController = [[NSViewController alloc] initWithNibName:@"DiscInspectorView" bundle:nil];
-	viewController.title = NSLocalizedString(@"Disc", @"The name of the disc inspector panel");
+	viewController.title = NSLocalizedString(@"Disc Information", @"The name of the disc inspector panel");
 	[viewController bind:@"representedObject" toObject:self withKeyPath:@"inspectedDocument" options:nil];
 	[_inspectorView addInspectorPaneController:viewController];
 
 	viewController = [[NSViewController alloc] initWithNibName:@"DriveInspectorView" bundle:nil];
-	viewController.title = NSLocalizedString(@"Drive", @"The name of the drive inspector panel");
+	viewController.title = NSLocalizedString(@"Drive Information", @"The name of the drive inspector panel");
 	[viewController bind:@"representedObject" toObject:self withKeyPath:@"inspectedDocument" options:nil];
 	[_inspectorView addInspectorPaneController:viewController];
 }
