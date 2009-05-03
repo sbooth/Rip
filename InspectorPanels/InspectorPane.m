@@ -11,13 +11,14 @@
 #import <QuartzCore/QuartzCore.h>
 
 #define ANIMATION_DURATION 0.15
+#define SLOW_ANIMATION_DURATION (8 * ANIMATION_DURATION)
 
-NSString * const InspectorPaneDidCollapseNotification	= @"InspectorPaneDidCollapseNotification";
-NSString * const InspectorPaneDidExpandNotification		= @"InspectorPaneDidExpandNotification";
+@interface InspectorPane ()
+@property (assign, getter=isCollapsed) BOOL collapsed;
+@end
 
 @interface InspectorPane (Private)
 - (void) createHeaderAndBody;
-- (void) toggleCollapsedWithAnimation:(BOOL)animate;
 @end
 
 @implementation InspectorPane
@@ -51,7 +52,45 @@ NSString * const InspectorPaneDidExpandNotification		= @"InspectorPaneDidExpandN
 	
 #pragma unused(sender)
 	
-	[self toggleCollapsedWithAnimation:YES];
+	[self setCollapsed:!self.isCollapsed animate:YES];
+}
+
+- (void) setCollapsed:(BOOL)collapsed animate:(BOOL)animate
+{
+	if(self.isCollapsed == collapsed)
+		return;
+	
+	self.collapsed = collapsed;
+	[[_headerView disclosureButton] setState:(collapsed ? NSOffState : NSOnState)];
+	
+	CGFloat headerHeight = [[self headerView] frame].size.height;
+	
+	NSRect currentFrame = [self frame];
+	NSRect newFrame = currentFrame;
+	
+	newFrame.size.height = headerHeight + (self.isCollapsed ? -1 : [self bodyView].normalHeight);
+	newFrame.origin.y += currentFrame.size.height - newFrame.size.height;
+	
+	if(animate) {
+		BOOL shiftPressed = (NSShiftKeyMask & [[[NSApplication sharedApplication] currentEvent] modifierFlags]) != 0;
+		
+		// Modify the default animation for frame changes
+		CABasicAnimation *frameSizeAnimation = [[self animator] animationForKey:@"frameSize"];
+		
+		// Don't modify the returned animation (in case it is shared)
+		if(frameSizeAnimation) {
+			frameSizeAnimation = [frameSizeAnimation copy];
+			
+			frameSizeAnimation.duration = shiftPressed ? SLOW_ANIMATION_DURATION : ANIMATION_DURATION;
+			frameSizeAnimation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
+			
+			[[self animator] setAnimations:[NSDictionary dictionaryWithObject:frameSizeAnimation forKey:@"frameSize"]];
+		}
+		
+		[[self animator] setFrame:newFrame];
+	}
+	else
+		[self setFrame:newFrame];
 }
 
 - (InspectorPaneHeader *) headerView
@@ -87,30 +126,6 @@ NSString * const InspectorPaneDidExpandNotification		= @"InspectorPaneDidExpandN
 	[self addSubview:_bodyView];
 
 	[self setAutoresizesSubviews:YES];
-}
-
-- (void) toggleCollapsedWithAnimation:(BOOL)animate
-{
-	self.collapsed = !self.isCollapsed;
-	
-	CGFloat headerHeight = [[self headerView] frame].size.height;
-	
-	NSRect currentFrame = [self frame];
-	NSRect newFrame = currentFrame;
-
-	newFrame.size.height = headerHeight + (self.isCollapsed ? -1 : [self bodyView].normalHeight);
-	newFrame.origin.y += currentFrame.size.height - newFrame.size.height;
-	
-	// FIXME: this doesn't work
-	if(0&&animate)
-		[[self animator] setFrame:newFrame];
-	else
-		[self setFrame:newFrame];
-
-	if(self.collapsed)
-		[[NSNotificationCenter defaultCenter] postNotificationName:InspectorPaneDidCollapseNotification object:self];
-	else
-		[[NSNotificationCenter defaultCenter] postNotificationName:InspectorPaneDidExpandNotification object:self];
 }
 
 @end

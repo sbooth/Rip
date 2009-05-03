@@ -9,9 +9,6 @@
 
 @class InspectorPaneHeader, InspectorPaneBody;
 
-extern NSString * const InspectorPaneDidCollapseNotification;
-extern NSString * const InspectorPaneDidExpandNotification;
-
 @interface InspectorPane : NSView
 {
 @private
@@ -20,12 +17,13 @@ extern NSString * const InspectorPaneDidExpandNotification;
 	InspectorPaneBody *_bodyView;
 }
 
-@property (assign, getter=isCollapsed) BOOL collapsed;
+@property (readonly, assign, getter=isCollapsed) BOOL collapsed;
 
 - (NSString *) title;
 - (void) setTitle:(NSString *)title;
 
 - (IBAction) toggleCollapsed:(id)sender;
+- (void) setCollapsed:(BOOL)collapsed animate:(BOOL)animate;
 
 - (InspectorPaneHeader *) headerView;
 - (InspectorPaneBody *) bodyView;
