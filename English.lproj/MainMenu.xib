@@ -704,17 +704,6 @@
 									<reference key="NSOnImage" ref="314800402"/>
 									<reference key="NSMixedImage" ref="940492740"/>
 								</object>
-								<object class="NSMenuItem" id="299356726">
-									<reference key="NSMenu" ref="835318025"/>
-									<bool key="NSIsDisabled">YES</bool>
-									<bool key="NSIsSeparator">YES</bool>
-									<string key="NSTitle"/>
-									<string key="NSKeyEquiv"/>
-									<int key="NSKeyEquivModMask">1048576</int>
-									<int key="NSMnemonicLoc">2147483647</int>
-									<reference key="NSOnImage" ref="314800402"/>
-									<reference key="NSMixedImage" ref="940492740"/>
-								</object>
 								<object class="NSMenuItem" id="1049745543">
 									<reference key="NSMenu" ref="835318025"/>
 									<string key="NSTitle">Show Metadata Editor</string>
@@ -725,25 +714,6 @@
 									<reference key="NSMixedImage" ref="940492740"/>
 								</object>
 								<object class="NSMenuItem" id="460322575">
-									<reference key="NSMenu" ref="835318025"/>
-									<bool key="NSIsDisabled">YES</bool>
-									<bool key="NSIsSeparator">YES</bool>
-									<string key="NSTitle"/>
-									<string key="NSKeyEquiv"/>
-									<int key="NSKeyEquivModMask">1048576</int>
-									<int key="NSMnemonicLoc">2147483647</int>
-									<reference key="NSOnImage" ref="314800402"/>
-									<reference key="NSMixedImage" ref="940492740"/>
-								</object>
-								<object class="NSMenuItem" id="989392888">
-									<reference key="NSMenu" ref="835318025"/>
-									<string key="NSTitle">Show Encoder</string>
-									<string key="NSKeyEquiv"/>
-									<int key="NSMnemonicLoc">2147483647</int>
-									<reference key="NSOnImage" ref="314800402"/>
-									<reference key="NSMixedImage" ref="940492740"/>
-								</object>
-								<object class="NSMenuItem" id="1042892780">
 									<reference key="NSMenu" ref="835318025"/>
 									<bool key="NSIsDisabled">YES</bool>
 									<bool key="NSIsSeparator">YES</bool>
@@ -800,9 +770,6 @@
 			</object>
 			<object class="NSCustomObject" id="994231247">
 				<string key="NSClassName">PreferencesWindowController</string>
-			</object>
-			<object class="NSCustomObject" id="399806870">
-				<string key="NSClassName">EncoderWindowController</string>
 			</object>
 			<object class="NSCustomObject" id="365335436">
 				<string key="NSClassName">MetadataEditorPanelController</string>
@@ -1085,14 +1052,6 @@
 						<reference key="destination" ref="757568367"/>
 					</object>
 					<int key="connectionID">437</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">toggleEncoderWindow:</string>
-						<reference key="source" ref="399806870"/>
-						<reference key="destination" ref="989392888"/>
-					</object>
-					<int key="connectionID">447</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
@@ -1434,23 +1393,15 @@
 						<reference key="object" ref="835318025"/>
 						<object class="NSMutableArray" key="children">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<reference ref="299356726"/>
 							<reference ref="625202149"/>
 							<reference ref="575023229"/>
 							<reference ref="1011231497"/>
 							<reference ref="332926328"/>
-							<reference ref="1042892780"/>
-							<reference ref="989392888"/>
 							<reference ref="1049745543"/>
 							<reference ref="460322575"/>
 							<reference ref="42241277"/>
 						</object>
 						<reference key="parent" ref="713487014"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">92</int>
-						<reference key="object" ref="299356726"/>
-						<reference key="parent" ref="835318025"/>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">5</int>
@@ -1661,21 +1612,6 @@
 						<int key="objectID">436</int>
 						<reference key="object" ref="93614879"/>
 						<reference key="parent" ref="466310130"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">443</int>
-						<reference key="object" ref="399806870"/>
-						<reference key="parent" ref="1049"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">444</int>
-						<reference key="object" ref="1042892780"/>
-						<reference key="parent" ref="835318025"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">445</int>
-						<reference key="object" ref="989392888"/>
-						<reference key="parent" ref="835318025"/>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">448</int>
@@ -1901,10 +1837,6 @@
 					<string>433.IBPluginDependency</string>
 					<string>435.IBPluginDependency</string>
 					<string>436.IBPluginDependency</string>
-					<string>443.IBPluginDependency</string>
-					<string>444.IBPluginDependency</string>
-					<string>444.ImportedFromIB2</string>
-					<string>445.IBPluginDependency</string>
 					<string>448.IBPluginDependency</string>
 					<string>448.ImportedFromIB2</string>
 					<string>450.IBPluginDependency</string>
@@ -1951,8 +1883,6 @@
 					<string>81.editorWindowContentRectSynchronizationRect</string>
 					<string>83.IBPluginDependency</string>
 					<string>83.ImportedFromIB2</string>
-					<string>92.IBPluginDependency</string>
-					<string>92.ImportedFromIB2</string>
 				</object>
 				<object class="NSMutableArray" key="dict.values">
 					<bool key="EncodedWithXMLCoder">YES</bool>
@@ -2018,7 +1948,7 @@
 					<reference ref="9"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="9"/>
-					<string>{{411, 542}, {228, 163}}</string>
+					<string>{{411, 582}, {228, 123}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="9"/>
 					<string>{{267, 667}, {241, 123}}</string>
@@ -2067,10 +1997,6 @@
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<reference ref="9"/>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="9"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="9"/>
@@ -2114,8 +2040,6 @@
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="9"/>
 					<string>{{65, 587}, {199, 203}}</string>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<reference ref="9"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="9"/>
 				</object>
@@ -2248,31 +2172,6 @@
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
 						<string key="minorKey">WindowControllers/DetectPregapsSheetController.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className">EncoderWindowController</string>
-					<string key="superclassName">NSWindowController</string>
-					<object class="NSMutableDictionary" key="actions">
-						<string key="NS.key.0">toggleEncoderWindow:</string>
-						<string key="NS.object.0">id</string>
-					</object>
-					<object class="NSMutableDictionary" key="outlets">
-						<bool key="EncodedWithXMLCoder">YES</bool>
-						<object class="NSMutableArray" key="dict.sortedKeys">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>_arrayController</string>
-							<string>_tableView</string>
-						</object>
-						<object class="NSMutableArray" key="dict.values">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>NSArrayController</string>
-							<string>NSTableView</string>
-						</object>
-					</object>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">WindowControllers/EncoderWindowController.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
