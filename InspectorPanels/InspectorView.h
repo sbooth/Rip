@@ -7,6 +7,8 @@
 
 @interface InspectorView : NSView
 {
+@private
+	NSSize _initialWindowSize;
 }
 
 - (void) addInspectorPaneController:(NSViewController *)paneController;

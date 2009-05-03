@@ -7,20 +7,50 @@
 #import "InspectorPane.h"
 
 @interface InspectorView (Private)
-- (void) inspectorPaneDidCollapseOrExpand:(NSNotification *)notification;
+- (void) inspectorPaneFrameDidChange:(NSNotification *)notification;
+- (void) applicationWillTerminate:(NSNotification *)notification;
 - (void) layoutSubviews;
 @end
 
 @implementation InspectorView
+
+- (void) awakeFromNib
+{
+	_initialWindowSize = [[self window] frame].size;
+	
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillTerminate:) name:NSApplicationWillTerminateNotification object:nil];
+
+	// Iterate through each pane and restore its state
+	NSString *autosaveName = [[self window] frameAutosaveName];
+	if(!autosaveName)
+		return;
+	
+	for(NSView *inspectorPane in [self subviews]) {
+		if(![inspectorPane isKindOfClass:[inspectorPane class]])
+			continue;
+		
+		InspectorPane *pane = (InspectorPane *)inspectorPane;
+		NSString *paneAutosaveName = [autosaveName stringByAppendingFormat:@" %@ Pane", [pane title]];
+		
+		[[NSUserDefaults standardUserDefaults] setBool:pane.isCollapsed forKey:paneAutosaveName];
+	}
+}
 
 - (void) didAddSubview:(NSView *)subview
 {
 	NSParameterAssert(nil != subview);
 	
 	if([subview isKindOfClass:[InspectorPane class]]) {
-		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(inspectorPaneDidCollapseOrExpand:) name:InspectorPaneDidCollapseNotification object:subview];
+		// Restore the pane's size
+		NSString *autosaveName = [[self window] frameAutosaveName];
+		if(autosaveName) {
+			InspectorPane *pane = (InspectorPane *)subview;
+			NSString *paneAutosaveName = [autosaveName stringByAppendingFormat:@" %@ Pane", [pane title]];
+			[pane setCollapsed:[[NSUserDefaults standardUserDefaults] boolForKey:paneAutosaveName] animate:NO];
+		}
 
-		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(inspectorPaneDidCollapseOrExpand:) name:InspectorPaneDidExpandNotification object:subview];
+		[subview setPostsFrameChangedNotifications:YES];
+		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(inspectorPaneFrameDidChange:) name:NSViewFrameDidChangeNotification object:subview];
 	}
 }
 
@@ -29,8 +59,8 @@
 	NSParameterAssert(nil != subview);
 
 	if([subview isKindOfClass:[InspectorPane class]]) {
-		[[NSNotificationCenter defaultCenter] removeObserver:self name:InspectorPaneDidCollapseNotification object:subview];
-		[[NSNotificationCenter defaultCenter] removeObserver:self name:InspectorPaneDidExpandNotification object:subview];
+		[subview setPostsFrameChangedNotifications:NO];
+		[[NSNotificationCenter defaultCenter] removeObserver:self name:NSViewFrameDidChangeNotification object:subview];
 	}
 }
 
@@ -73,12 +103,55 @@
 
 @implementation InspectorView (Private)
 
-- (void) inspectorPaneDidCollapseOrExpand:(NSNotification *)notification
+- (void) inspectorPaneFrameDidChange:(NSNotification *)notification
+{
+	NSParameterAssert(nil != notification);
+	NSParameterAssert(nil != [notification object]);
+	NSParameterAssert([[notification object] isKindOfClass:[InspectorPane class]]);
+	
+	InspectorPane *pane = [notification object];
+	
+	[pane setPostsFrameChangedNotifications:NO];
+	
+	[self layoutSubviews];
+
+	[pane setPostsFrameChangedNotifications:YES];
+}
+
+- (void) applicationWillTerminate:(NSNotification *)notification
 {
 	
 #pragma unused(notification)
 	
-	[self layoutSubviews];
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
+	
+	// Iterate through each pane and save its state
+	NSString *autosaveName = [[self window] frameAutosaveName];
+	if(!autosaveName)
+		return;
+	
+	for(NSView *inspectorPane in [self subviews]) {
+		if(![inspectorPane isKindOfClass:[InspectorPane class]])
+			continue;
+		
+		InspectorPane *pane = (InspectorPane *)inspectorPane;
+		NSString *paneAutosaveName = [autosaveName stringByAppendingFormat:@" %@ Pane", [pane title]];
+
+		[[NSUserDefaults standardUserDefaults] setBool:pane.isCollapsed forKey:paneAutosaveName];
+	}
+	
+	[[NSUserDefaults standardUserDefaults] synchronize];
+
+	// Reset the window's frame to its initial size
+	NSRect currentWindowFrame = [[self window] frame];
+	NSRect newWindowFrame = currentWindowFrame;
+
+	CGFloat deltaY = _initialWindowSize.height - currentWindowFrame.size.height;
+	
+	newWindowFrame.origin.y -= deltaY;
+	newWindowFrame.size.height += deltaY;
+
+	[[self window] setFrame:newWindowFrame display:NO animate:NO];
 }
 
 - (void) layoutSubviews
