@@ -34,7 +34,7 @@
 				<string key="NSClassName">NSApplication</string>
 			</object>
 			<object class="NSCustomView" id="1005">
-				<nil key="NSNextResponder"/>
+				<reference key="NSNextResponder"/>
 				<int key="NSvFlags">268</int>
 				<object class="NSMutableArray" key="NSSubviews">
 					<bool key="EncodedWithXMLCoder">YES</bool>
@@ -43,6 +43,7 @@
 						<int key="NSvFlags">268</int>
 						<string key="NSFrame">{{85, 61}, {47, 11}}</string>
 						<reference key="NSSuperview" ref="1005"/>
+						<reference key="NSWindow"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="67096081">
 							<int key="NSCellFlags">68288064</int>
@@ -79,6 +80,7 @@
 						<int key="NSvFlags">268</int>
 						<string key="NSFrame">{{56, 42}, {76, 11}}</string>
 						<reference key="NSSuperview" ref="1005"/>
+						<reference key="NSWindow"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="816568669">
 							<int key="NSCellFlags">68288064</int>
@@ -95,6 +97,7 @@
 						<int key="NSvFlags">268</int>
 						<string key="NSFrame">{{80, 23}, {52, 11}}</string>
 						<reference key="NSSuperview" ref="1005"/>
+						<reference key="NSWindow"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="556833180">
 							<int key="NSCellFlags">68288064</int>
@@ -111,6 +114,7 @@
 						<int key="NSvFlags">268</int>
 						<string key="NSFrame">{{104, 4}, {28, 11}}</string>
 						<reference key="NSSuperview" ref="1005"/>
+						<reference key="NSWindow"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="127768545">
 							<int key="NSCellFlags">68288064</int>
@@ -127,6 +131,7 @@
 						<int key="NSvFlags">268</int>
 						<string key="NSFrame">{{134, 61}, {99, 11}}</string>
 						<reference key="NSSuperview" ref="1005"/>
+						<reference key="NSWindow"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="514593530">
 							<int key="NSCellFlags">68288064</int>
@@ -147,9 +152,10 @@
 						<int key="NSvFlags">268</int>
 						<string key="NSFrame">{{134, 23}, {99, 11}}</string>
 						<reference key="NSSuperview" ref="1005"/>
+						<reference key="NSWindow"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="977926063">
-							<int key="NSCellFlags">68288064</int>
+							<int key="NSCellFlags">70385217</int>
 							<int key="NSCellFlags2">272892928</int>
 							<string key="NSContents">#</string>
 							<reference key="NSSupport" ref="22"/>
@@ -163,6 +169,7 @@
 						<int key="NSvFlags">268</int>
 						<string key="NSFrame">{{134, 4}, {99, 11}}</string>
 						<reference key="NSSuperview" ref="1005"/>
+						<reference key="NSWindow"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="1060232898">
 							<int key="NSCellFlags">68288064</int>
@@ -179,9 +186,10 @@
 						<int key="NSvFlags">268</int>
 						<string key="NSFrame">{{134, 42}, {99, 11}}</string>
 						<reference key="NSSuperview" ref="1005"/>
+						<reference key="NSWindow"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="738932138">
-							<int key="NSCellFlags">68288064</int>
+							<int key="NSCellFlags">70385217</int>
 							<int key="NSCellFlags2">272892928</int>
 							<string key="NSContents">#</string>
 							<reference key="NSSupport" ref="22"/>
@@ -192,6 +200,8 @@
 					</object>
 				</object>
 				<string key="NSFrameSize">{250, 76}</string>
+				<reference key="NSSuperview"/>
+				<reference key="NSWindow"/>
 				<string key="NSClassName">NSView</string>
 			</object>
 			<object class="NSObjectController" id="606095533">
@@ -238,22 +248,6 @@
 						</object>
 					</object>
 					<int key="connectionID">7</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBBindingConnection" key="connection">
-						<string key="label">value: selection.metadata.MCN</string>
-						<reference key="source" ref="981348008"/>
-						<reference key="destination" ref="606095533"/>
-						<object class="NSNibBindingConnector" key="connector">
-							<reference key="NSSource" ref="981348008"/>
-							<reference key="NSDestination" ref="606095533"/>
-							<string key="NSLabel">value: selection.metadata.MCN</string>
-							<string key="NSBinding">value</string>
-							<string key="NSKeyPath">selection.metadata.MCN</string>
-							<int key="NSNibBindingConnectorVersion">2</int>
-						</object>
-					</object>
-					<int key="connectionID">22</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBBindingConnection" key="connection">
@@ -310,6 +304,26 @@
 						<reference key="destination" ref="658116454"/>
 					</object>
 					<int key="connectionID">28</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBBindingConnection" key="connection">
+						<string key="label">value: selection.metadata.MCN</string>
+						<reference key="source" ref="981348008"/>
+						<reference key="destination" ref="606095533"/>
+						<object class="NSNibBindingConnector" key="connector">
+							<reference key="NSSource" ref="981348008"/>
+							<reference key="NSDestination" ref="606095533"/>
+							<string key="NSLabel">value: selection.metadata.MCN</string>
+							<string key="NSBinding">value</string>
+							<string key="NSKeyPath">selection.metadata.MCN</string>
+							<object class="NSDictionary" key="NSOptions">
+								<string key="NS.key.0">NSNullPlaceholder</string>
+								<string key="NS.object.0">Unknown</string>
+							</object>
+							<int key="NSNibBindingConnectorVersion">2</int>
+						</object>
+					</object>
+					<int key="connectionID">29</int>
 				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -560,7 +574,7 @@
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">28</int>
+			<int key="maxID">29</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
