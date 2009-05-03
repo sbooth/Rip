@@ -73,8 +73,6 @@
 		3295B4250F7F13E800AF55EF /* ETAFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = 3295B4240F7F13E800AF55EF /* ETAFormatter.m */; };
 		3295B4930F7F267100AF55EF /* Green Check.png in Resources */ = {isa = PBXBuildFile; fileRef = 3295B4920F7F267100AF55EF /* Green Check.png */; };
 		3295B4B30F7F2F0200AF55EF /* Red X.png in Resources */ = {isa = PBXBuildFile; fileRef = 3295B4B20F7F2F0200AF55EF /* Red X.png */; };
-		32A2C10D0F0A8EE000CA8DDE /* BGHUDAppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 32A2C10C0F0A8EE000CA8DDE /* BGHUDAppKit.framework */; };
-		32A2C1100F0A8EF100CA8DDE /* BGHUDAppKit.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 32A2C10C0F0A8EE000CA8DDE /* BGHUDAppKit.framework */; };
 		32A2C1440F0A91A300CA8DDE /* HexadecimalNumberFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = 32A2C1430F0A91A300CA8DDE /* HexadecimalNumberFormatter.m */; };
 		32A5F8DE0FA4B862009AD850 /* replaygain_analysis.c in Sources */ = {isa = PBXBuildFile; fileRef = 32A5F8DC0FA4B862009AD850 /* replaygain_analysis.c */; };
 		32A5F9B40FA4E780009AD850 /* ReplayGainUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 32A5F9B30FA4E780009AD850 /* ReplayGainUtilities.m */; };
@@ -374,7 +372,6 @@
 				328AB1DE0F807539001F1C78 /* MetadataSourceInterface.framework in Copy Frameworks */,
 				8CA35F950D2F42B300F89E3B /* discid.framework in Copy Frameworks */,
 				32C793F60E291B4B0079706C /* Sparkle.framework in Copy Frameworks */,
-				32A2C1100F0A8EF100CA8DDE /* BGHUDAppKit.framework in Copy Frameworks */,
 			);
 			name = "Copy Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -488,7 +485,6 @@
 		3295B4240F7F13E800AF55EF /* ETAFormatter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ETAFormatter.m; sourceTree = "<group>"; };
 		3295B4920F7F267100AF55EF /* Green Check.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Green Check.png"; sourceTree = "<group>"; };
 		3295B4B20F7F2F0200AF55EF /* Red X.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Red X.png"; sourceTree = "<group>"; };
-		32A2C10C0F0A8EE000CA8DDE /* BGHUDAppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = BGHUDAppKit.framework; path = Frameworks/BGHUDAppKit.framework; sourceTree = "<group>"; };
 		32A2C1420F0A91A300CA8DDE /* HexadecimalNumberFormatter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HexadecimalNumberFormatter.h; sourceTree = "<group>"; };
 		32A2C1430F0A91A300CA8DDE /* HexadecimalNumberFormatter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HexadecimalNumberFormatter.m; sourceTree = "<group>"; };
 		32A5F8DC0FA4B862009AD850 /* replaygain_analysis.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = replaygain_analysis.c; sourceTree = "<group>"; };
@@ -632,7 +628,6 @@
 				32C793F30E291B3D0079706C /* Sparkle.framework in Frameworks */,
 				328DE5130E5FC67500F5BD13 /* MusicDatabaseInterface.framework in Frameworks */,
 				32AB63A60E68B45800EA423A /* SystemConfiguration.framework in Frameworks */,
-				32A2C10D0F0A8EE000CA8DDE /* BGHUDAppKit.framework in Frameworks */,
 				328AB1DB0F8074E4001F1C78 /* MetadataSourceInterface.framework in Frameworks */,
 				326558E90F99550D00403217 /* SFBCrashReporter.framework in Frameworks */,
 				321CB2040FA9FB10009DBC39 /* QuartzCore.framework in Frameworks */,
@@ -648,7 +643,6 @@
 				326558E80F99550D00403217 /* SFBCrashReporter.framework */,
 				322EB4640F8C325B0081A563 /* AddressBook.framework */,
 				32C9F23A0F7973790050F4B2 /* QuartzCore.framework */,
-				32A2C10C0F0A8EE000CA8DDE /* BGHUDAppKit.framework */,
 				32C793F20E291B3D0079706C /* Sparkle.framework */,
 				8CA35F910D2F42A800F89E3B /* discid.framework */,
 				32AB63A50E68B45800EA423A /* SystemConfiguration.framework */,
@@ -1266,7 +1260,6 @@
 				8D15AC330486D014006FF6A4 /* Frameworks */,
 				8CA35D6B0D2E7B1900F89E3B /* Copy Frameworks */,
 				8C3C17F80D73981A001BAC88 /* Copy PlugIns */,
-				32C9F1180F782C4F0050F4B2 /* Delete BGHudAppKit Resources */,
 			);
 			buildRules = (
 			);
@@ -1527,20 +1520,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "# Run the unit tests in this test bundle.\n\"${SYSTEM_DEVELOPER_DIR}/Tools/RunUnitTests\"\n";
-		};
-		32C9F1180F782C4F0050F4B2 /* Delete BGHudAppKit Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "Delete BGHudAppKit Resources";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "rm -fR \"${CONFIGURATION_BUILD_DIR}/${WRAPPER_NAME}/Contents/Frameworks/BGHUDAppKit.framework/Versions/Current/Resources\"";
 		};
 /* End PBXShellScriptBuildPhase section */
 
