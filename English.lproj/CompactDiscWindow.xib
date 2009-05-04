@@ -56,7 +56,6 @@
 							<string>33F70C32-AECD-4866-BCCB-D0DF04C7A943</string>
 							<string>60D5BC32-2A05-48DD-B6D0-2314B5F1D105</string>
 							<string>7B827D79-E6AC-4534-9288-EF73E0528BC1</string>
-							<string>8CD8543D-AEE3-45FA-87A9-80A350096D03</string>
 							<string>B269A944-1907-4863-A806-B95F4D73467B</string>
 							<string>B84E8A09-CC82-422D-9B6F-984706653F4A</string>
 							<string>NSToolbarCustomizeToolbarItem</string>
@@ -143,28 +142,6 @@
 								<object class="NSCustomResource" key="NSToolbarItemImage">
 									<string key="NSClassName">NSImage</string>
 									<string key="NSResourceName">CopyTracksToolbarIcon</string>
-								</object>
-								<nil key="NSToolbarItemTarget"/>
-								<nil key="NSToolbarItemAction"/>
-								<string key="NSToolbarItemMinSize">{0, 0}</string>
-								<string key="NSToolbarItemMaxSize">{0, 0}</string>
-								<bool key="NSToolbarItemEnabled">YES</bool>
-								<bool key="NSToolbarItemAutovalidates">YES</bool>
-								<int key="NSToolbarItemTag">-1</int>
-								<bool key="NSToolbarIsUserRemovable">YES</bool>
-								<int key="NSToolbarItemVisibilityPriority">0</int>
-							</object>
-							<object class="NSToolbarItem" id="263946920">
-								<object class="NSMutableString" key="NSToolbarItemIdentifier">
-									<characters key="NS.bytes">8CD8543D-AEE3-45FA-87A9-80A350096D03</characters>
-								</object>
-								<string key="NSToolbarItemLabel">Metadata</string>
-								<string key="NSToolbarItemPaletteLabel">Metadata</string>
-								<string key="NSToolbarItemToolTip"/>
-								<nil key="NSToolbarItemView"/>
-								<object class="NSCustomResource" key="NSToolbarItemImage">
-									<string key="NSClassName">NSImage</string>
-									<string key="NSResourceName">EditMetadataToolbarIcon</string>
 								</object>
 								<nil key="NSToolbarItemTarget"/>
 								<nil key="NSToolbarItemAction"/>
@@ -416,7 +393,7 @@ ELIAAAAAAAgACAAIAAgAAQABAAEAAQ</bytes>
 							</object>
 						</object>
 					</object>
-					<object class="NSMutableArray" key="NSToolbarIBAllowedItems">
+					<object class="NSArray" key="NSToolbarIBAllowedItems">
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<reference ref="462869114"/>
 						<reference ref="625918845"/>
@@ -428,18 +405,18 @@ ELIAAAAAAAgACAAIAAgAAQABAAEAAQ</bytes>
 						<reference ref="471833597"/>
 						<reference ref="358069776"/>
 						<reference ref="1037897102"/>
-						<reference ref="263946920"/>
 					</object>
 					<object class="NSMutableArray" key="NSToolbarIBDefaultItems">
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<reference ref="462869114"/>
 						<reference ref="625918845"/>
-						<reference ref="662091436"/>
 						<reference ref="871018455"/>
+						<reference ref="662091436"/>
+						<reference ref="471833597"/>
 						<reference ref="1022285606"/>
 						<reference ref="1052596469"/>
 						<reference ref="471833597"/>
-						<reference ref="358069776"/>
+						<reference ref="1037897102"/>
 					</object>
 					<object class="NSMutableArray" key="NSToolbarIBSelectableItems">
 						<bool key="EncodedWithXMLCoder">YES</bool>
@@ -1006,7 +983,6 @@ ELIAAAAAAAgACAAIAAgAAQABAAEAAQ</bytes>
 							<reference ref="1052596469"/>
 							<reference ref="1037897102"/>
 							<reference ref="1022285606"/>
-							<reference ref="263946920"/>
 						</object>
 						<reference key="parent" ref="275939982"/>
 					</object>
@@ -1111,11 +1087,6 @@ ELIAAAAAAAgACAAIAAgAAQABAAEAAQ</bytes>
 						<reference key="parent" ref="954211299"/>
 					</object>
 					<object class="IBObjectRecord">
-						<int key="objectID">100816</int>
-						<reference key="object" ref="263946920"/>
-						<reference key="parent" ref="954211299"/>
-					</object>
-					<object class="IBObjectRecord">
 						<int key="objectID">100870</int>
 						<reference key="object" ref="381069397"/>
 						<reference key="parent" ref="568628114"/>
@@ -1160,7 +1131,6 @@ ELIAAAAAAAgACAAIAAgAAQABAAEAAQ</bytes>
 					<string>100783.IBPluginDependency</string>
 					<string>100788.IBPluginDependency</string>
 					<string>100796.IBPluginDependency</string>
-					<string>100816.IBPluginDependency</string>
 					<string>100870.IBPluginDependency</string>
 					<string>100880.IBPluginDependency</string>
 					<string>5.IBEditorWindowLastContentRect</string>
@@ -1177,10 +1147,9 @@ ELIAAAAAAAgACAAIAAgAAQABAAEAAQ</bytes>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{179, 765}, {616, 0}}</string>
+					<string>{{115, 738}, {616, 0}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>{{92, 734}, {616, 0}}</string>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -1268,12 +1237,14 @@ ELIAAAAAAAgACAAIAAgAAQABAAEAAQ</bytes>
 							<string>queryMusicDatabase:</string>
 							<string>readISRCs:</string>
 							<string>readMCN:</string>
+							<string>searchForMetadata:</string>
 							<string>selectAllTracks:</string>
 							<string>submitToDefaultMusicDatabase:</string>
 							<string>submitToMusicDatabase:</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>id</string>
 							<string>id</string>
 							<string>id</string>
 							<string>id</string>
