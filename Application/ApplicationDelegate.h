@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2007 - 2008 Stephen F. Booth <me@sbooth.org>
+ *  Copyright (C) 2007 - 2009 Stephen F. Booth <me@sbooth.org>
  *  All Rights Reserved
  */
 
@@ -8,6 +8,8 @@
 
 @interface ApplicationDelegate : NSObject
 {
+	IBOutlet NSWindowController *_inspectorPanelWindowController;
+	
 @private
 	DASessionRef _diskArbitrationSession;
 	NSPersistentStoreCoordinator *_persistentStoreCoordinator;

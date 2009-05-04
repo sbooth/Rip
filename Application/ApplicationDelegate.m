@@ -265,6 +265,10 @@ diskDisappearedCallback(DADiskRef disk, void *context)
 	DARegisterDiskDisappearedCallback(_diskArbitrationSession, matchDictionary, diskDisappearedCallback, self);
 	
 	CFRelease(matchDictionary);
+	
+	// Re-open the inspector
+	if([[NSUserDefaults standardUserDefaults] boolForKey:@"Inspector Window Open"])
+		[_inspectorPanelWindowController showWindow:self];
 }
 
 - (NSApplicationTerminateReply) applicationShouldTerminate:(NSApplication *)sender
@@ -328,6 +332,10 @@ diskDisappearedCallback(DADiskRef disk, void *context)
 		DASessionUnscheduleFromRunLoop(_diskArbitrationSession, CFRunLoopGetCurrent(), kCFRunLoopDefaultMode);
 		CFRelease(_diskArbitrationSession), _diskArbitrationSession = NULL;
 	}
+	
+	// Save the closed/open state of the inspector
+	if([_inspectorPanelWindowController isWindowLoaded])
+		[[NSUserDefaults standardUserDefaults] setBool:[[_inspectorPanelWindowController window] isVisible] forKey:@"Inspector Window Open"];
 	
 	// Close the log file
 	[[Logger sharedLogger] logMessage:NSLocalizedString(@"Log closed", @"")];
