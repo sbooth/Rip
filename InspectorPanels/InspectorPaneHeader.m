@@ -140,7 +140,7 @@
 	NSRect boundsRect = [self bounds];
 	
 	NSRect buttonRect = NSMakeRect(3, 2, DISCLOSURE_BUTTON_SIZE, DISCLOSURE_BUTTON_SIZE);
-	NSRect labelRect = NSMakeRect(16, 1, boundsRect.size.width - DISCLOSURE_BUTTON_SIZE - 15, 14);
+	NSRect labelRect = NSMakeRect(16, 1, boundsRect.size.width - DISCLOSURE_BUTTON_SIZE - 4, 14);
 		
 	_disclosureButton = [[NSButton alloc] initWithFrame:buttonRect];
 	
