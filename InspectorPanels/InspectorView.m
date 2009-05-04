@@ -70,11 +70,11 @@
 {
 	NSParameterAssert(nil != paneController);
 	
-	[self addInspectorPane:[paneController view] withTitle:[paneController title]];
+	[self addInspectorPane:[paneController view] title:[paneController title]];
 	
 }
 
-- (void) addInspectorPane:(NSView *)paneBody withTitle:(NSString *)title
+- (void) addInspectorPane:(NSView *)paneBody title:(NSString *)title
 {
 	NSParameterAssert(nil != paneBody);
 	NSParameterAssert(nil != title);

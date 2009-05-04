@@ -12,6 +12,6 @@
 }
 
 - (void) addInspectorPaneController:(NSViewController *)paneController;
-- (void) addInspectorPane:(NSView *)paneBody withTitle:(NSString *)title;
+- (void) addInspectorPane:(NSView *)paneBody title:(NSString *)title;
 
 @end
