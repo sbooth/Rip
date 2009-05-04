@@ -61,7 +61,7 @@
 		return;
 	
 	self.collapsed = collapsed;
-	[[_headerView disclosureButton] setState:(collapsed ? NSOffState : NSOnState)];
+	[[_headerView disclosureButton] setState:(self.isCollapsed ? NSOffState : NSOnState)];
 	
 	CGFloat headerHeight = [[self headerView] frame].size.height;
 	
