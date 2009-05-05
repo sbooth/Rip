@@ -85,13 +85,10 @@
 	[self setNeedsDisplay:YES];
 }
 
-- (void) mouseDragged:(NSEvent *)event
+- (void) mouseDragged:(NSEvent *)theEvent
 {
-	
-#pragma unused(theEvent)
-
-	NSPoint point = [self convertPoint:[event locationInWindow] fromView:nil];
-	_pressed = NSPointInRect(point, [self bounds]);
+	NSPoint point = [self convertPoint:[theEvent locationInWindow] fromView:nil];
+	_pressed = NSMouseInRect(point, [self bounds], [self isFlipped]);
 	
 	[self setNeedsDisplay:YES];
 }
