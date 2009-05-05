@@ -65,18 +65,17 @@
 {
     NSWindow *window = self.window;
 	
-	if(window.isVisible && window.isKeyWindow)
+	if(window.isVisible)
 		[window orderOut:sender];
 	else
-		[window makeKeyAndOrderFront:sender];
+		[window orderFront:sender];
 }
 
 - (BOOL) validateMenuItem:(NSMenuItem *)menuItem
 {
 	if([menuItem action] == @selector(toggleInspectorPanel:)) {
-		NSString *menuTitle = nil;
-		
-		if(!self.isWindowLoaded || !self.window.isVisible || !self. window.isKeyWindow)
+		NSString *menuTitle = nil;		
+		if(!self.isWindowLoaded || !self.window.isVisible)
 			menuTitle = NSLocalizedString(@"Show Inspector", @"Menu Item");
 		else
 			menuTitle = NSLocalizedString(@"Hide Inspector", @"Menu Item");
