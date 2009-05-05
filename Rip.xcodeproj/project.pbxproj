@@ -78,6 +78,7 @@
 		32A5F9B40FA4E780009AD850 /* ReplayGainUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 32A5F9B30FA4E780009AD850 /* ReplayGainUtilities.m */; };
 		32AB63A60E68B45800EA423A /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 32AB63A50E68B45800EA423A /* SystemConfiguration.framework */; };
 		32AC75640E7634A5009A5E1B /* ReadOffsetCalculationOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 32AC75630E7634A5009A5E1B /* ReadOffsetCalculationOperation.m */; };
+		32B8B3B50FB07F830028FE10 /* ChannelFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = 32B8B3B40FB07F830028FE10 /* ChannelFormatter.m */; };
 		32BBEFD10EC63B4200EC2FBE /* CDDAUtilitiesTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 32BBEFD00EC63B4200EC2FBE /* CDDAUtilitiesTest.m */; };
 		32BBF08B0EC6B34A00EC2FBE /* ExtractedAudioFile.m in Sources */ = {isa = PBXBuildFile; fileRef = 32BBF08A0EC6B34A00EC2FBE /* ExtractedAudioFile.m */; };
 		32BBF1510EC8875100EC2FBE /* CopyImageToolbarIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 32BBF1480EC8875100EC2FBE /* CopyImageToolbarIcon.png */; };
@@ -495,6 +496,8 @@
 		32AB63A50E68B45800EA423A /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		32AC75620E7634A5009A5E1B /* ReadOffsetCalculationOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReadOffsetCalculationOperation.h; sourceTree = "<group>"; };
 		32AC75630E7634A5009A5E1B /* ReadOffsetCalculationOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ReadOffsetCalculationOperation.m; sourceTree = "<group>"; };
+		32B8B3B30FB07F830028FE10 /* ChannelFormatter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChannelFormatter.h; sourceTree = "<group>"; };
+		32B8B3B40FB07F830028FE10 /* ChannelFormatter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ChannelFormatter.m; sourceTree = "<group>"; };
 		32BBEFCF0EC63B4200EC2FBE /* CDDAUtilitiesTest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CDDAUtilitiesTest.h; path = Tests/CDDAUtilitiesTest.h; sourceTree = "<group>"; };
 		32BBEFD00EC63B4200EC2FBE /* CDDAUtilitiesTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CDDAUtilitiesTest.m; path = Tests/CDDAUtilitiesTest.m; sourceTree = "<group>"; };
 		32BBF0890EC6B34A00EC2FBE /* ExtractedAudioFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExtractedAudioFile.h; sourceTree = "<group>"; };
@@ -1058,6 +1061,8 @@
 				3295B35B0F7EFF1000AF55EF /* SecondsFormatter.m */,
 				3295B4230F7F13E800AF55EF /* ETAFormatter.h */,
 				3295B4240F7F13E800AF55EF /* ETAFormatter.m */,
+				32B8B3B30FB07F830028FE10 /* ChannelFormatter.h */,
+				32B8B3B40FB07F830028FE10 /* ChannelFormatter.m */,
 			);
 			path = Formatters;
 			sourceTree = "<group>";
@@ -1611,6 +1616,7 @@
 				321CB16B0FA9058E009DBC39 /* InspectorPane.m in Sources */,
 				321CB1740FA90636009DBC39 /* InspectorPaneHeader.m in Sources */,
 				321CB1770FA90645009DBC39 /* InspectorPaneBody.m in Sources */,
+				32B8B3B50FB07F830028FE10 /* ChannelFormatter.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
