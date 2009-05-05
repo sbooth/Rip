@@ -50,21 +50,21 @@
 	[gradient drawInRect:rect angle:270];
 	
 	singlePixelRect.origin.y = 0;
-	if(NSIntersectsRect(rect, singlePixelRect)) {
+	if([self needsToDrawRect:singlePixelRect]) {
 		[bottomBorderColor setFill];
-		[NSBezierPath fillRect:NSIntersectionRect(rect, singlePixelRect)];
+		[NSBezierPath fillRect:singlePixelRect];
 	}
 	
 	singlePixelRect.origin.y = [self bounds].size.height - 1;
-	if(NSIntersectsRect(rect, singlePixelRect)) {
+	if([self needsToDrawRect:singlePixelRect]) {
 		[topBorderColorAbove setFill];
-		[NSBezierPath fillRect:NSIntersectionRect(rect, singlePixelRect)];
+		[NSBezierPath fillRect:singlePixelRect];
 	}
 	
 	singlePixelRect.origin.y -= 1;
-	if(NSIntersectsRect(rect, singlePixelRect)) {
+	if([self needsToDrawRect:singlePixelRect]) {
 		[topBorderColorBelow setFill];
-		[NSBezierPath fillRect:NSIntersectionRect(rect, singlePixelRect)];
+		[NSBezierPath fillRect:singlePixelRect];
 	}
 	
 	[[NSColor colorWithCalibratedWhite:0.f alpha:0.03f] setFill];
