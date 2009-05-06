@@ -78,7 +78,13 @@
 		32A5F9B40FA4E780009AD850 /* ReplayGainUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 32A5F9B30FA4E780009AD850 /* ReplayGainUtilities.m */; };
 		32AB63A60E68B45800EA423A /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 32AB63A50E68B45800EA423A /* SystemConfiguration.framework */; };
 		32AC75640E7634A5009A5E1B /* ReadOffsetCalculationOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 32AC75630E7634A5009A5E1B /* ReadOffsetCalculationOperation.m */; };
+		32B42B000FB1465F00AA4EDF /* TrackMetadataInspectorView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 32B42AFE0FB1465F00AA4EDF /* TrackMetadataInspectorView.xib */; };
+		32B42B110FB1489200AA4EDF /* AlbumMetadataInspectorView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 32B42B0F0FB1489200AA4EDF /* AlbumMetadataInspectorView.xib */; };
+		32B42B160FB1491600AA4EDF /* AdditionalAlbumMetadataInspectorView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 32B42B140FB1491600AA4EDF /* AdditionalAlbumMetadataInspectorView.xib */; };
+		32B42B210FB14B6300AA4EDF /* AdditionalTrackMetadataInspectorView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 32B42B1F0FB14B6300AA4EDF /* AdditionalTrackMetadataInspectorView.xib */; };
 		32B8B3B50FB07F830028FE10 /* ChannelFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = 32B8B3B40FB07F830028FE10 /* ChannelFormatter.m */; };
+		32B8B41D0FB0AFB20028FE10 /* ViewSelectorBar.m in Sources */ = {isa = PBXBuildFile; fileRef = 32B8B3FD0FB0A9B00028FE10 /* ViewSelectorBar.m */; };
+		32B998F30FB12460005C8ACA /* ViewSelector.m in Sources */ = {isa = PBXBuildFile; fileRef = 32B998F20FB12460005C8ACA /* ViewSelector.m */; };
 		32BBEFD10EC63B4200EC2FBE /* CDDAUtilitiesTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 32BBEFD00EC63B4200EC2FBE /* CDDAUtilitiesTest.m */; };
 		32BBF08B0EC6B34A00EC2FBE /* ExtractedAudioFile.m in Sources */ = {isa = PBXBuildFile; fileRef = 32BBF08A0EC6B34A00EC2FBE /* ExtractedAudioFile.m */; };
 		32BBF1510EC8875100EC2FBE /* CopyImageToolbarIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 32BBF1480EC8875100EC2FBE /* CopyImageToolbarIcon.png */; };
@@ -496,8 +502,16 @@
 		32AB63A50E68B45800EA423A /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		32AC75620E7634A5009A5E1B /* ReadOffsetCalculationOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReadOffsetCalculationOperation.h; sourceTree = "<group>"; };
 		32AC75630E7634A5009A5E1B /* ReadOffsetCalculationOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ReadOffsetCalculationOperation.m; sourceTree = "<group>"; };
+		32B42AFF0FB1465F00AA4EDF /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/TrackMetadataInspectorView.xib; sourceTree = "<group>"; };
+		32B42B100FB1489200AA4EDF /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/AlbumMetadataInspectorView.xib; sourceTree = "<group>"; };
+		32B42B150FB1491600AA4EDF /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/AdditionalAlbumMetadataInspectorView.xib; sourceTree = "<group>"; };
+		32B42B200FB14B6300AA4EDF /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/AdditionalTrackMetadataInspectorView.xib; sourceTree = "<group>"; };
 		32B8B3B30FB07F830028FE10 /* ChannelFormatter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChannelFormatter.h; sourceTree = "<group>"; };
 		32B8B3B40FB07F830028FE10 /* ChannelFormatter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ChannelFormatter.m; sourceTree = "<group>"; };
+		32B8B3FC0FB0A9B00028FE10 /* ViewSelectorBar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViewSelectorBar.h; sourceTree = "<group>"; };
+		32B8B3FD0FB0A9B00028FE10 /* ViewSelectorBar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViewSelectorBar.m; sourceTree = "<group>"; };
+		32B998F10FB12460005C8ACA /* ViewSelector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViewSelector.h; sourceTree = "<group>"; };
+		32B998F20FB12460005C8ACA /* ViewSelector.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViewSelector.m; sourceTree = "<group>"; };
 		32BBEFCF0EC63B4200EC2FBE /* CDDAUtilitiesTest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CDDAUtilitiesTest.h; path = Tests/CDDAUtilitiesTest.h; sourceTree = "<group>"; };
 		32BBEFD00EC63B4200EC2FBE /* CDDAUtilitiesTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CDDAUtilitiesTest.m; path = Tests/CDDAUtilitiesTest.m; sourceTree = "<group>"; };
 		32BBF0890EC6B34A00EC2FBE /* ExtractedAudioFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExtractedAudioFile.h; sourceTree = "<group>"; };
@@ -744,6 +758,7 @@
 		2A37F4B8FDCFA73011CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				32B42B0F0FB1489200AA4EDF /* AlbumMetadataInspectorView.xib */,
 				32C19DDB0FABDC7E00AEDA04 /* DiscInspectorView.xib */,
 				32C19DCF0FABD9DB00AEDA04 /* DriveInspectorView.xib */,
 				32C19DAC0FABD43D00AEDA04 /* TrackInspectorView.xib */,
@@ -772,6 +787,9 @@
 				32C7B6820EBE1AFA00D1A722 /* Growl Registration Ticket.growlRegDict */,
 				32C9F2C00F7B1B5D0050F4B2 /* ExtractionView.xib */,
 				321CB1300FA8A2A4009DBC39 /* InspectorPanel.xib */,
+				32B42AFE0FB1465F00AA4EDF /* TrackMetadataInspectorView.xib */,
+				32B42B140FB1491600AA4EDF /* AdditionalAlbumMetadataInspectorView.xib */,
+				32B42B1F0FB14B6300AA4EDF /* AdditionalTrackMetadataInspectorView.xib */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -1193,6 +1211,10 @@
 				321CB1730FA90636009DBC39 /* InspectorPaneHeader.m */,
 				321CB1750FA90645009DBC39 /* InspectorPaneBody.h */,
 				321CB1760FA90645009DBC39 /* InspectorPaneBody.m */,
+				32B8B3FC0FB0A9B00028FE10 /* ViewSelectorBar.h */,
+				32B8B3FD0FB0A9B00028FE10 /* ViewSelectorBar.m */,
+				32B998F10FB12460005C8ACA /* ViewSelector.h */,
+				32B998F20FB12460005C8ACA /* ViewSelector.m */,
 			);
 			name = InspectorPanel;
 			path = InspectorPanels;
@@ -1507,6 +1529,10 @@
 				32C19DAE0FABD43D00AEDA04 /* TrackInspectorView.xib in Resources */,
 				32C19DD10FABD9DB00AEDA04 /* DriveInspectorView.xib in Resources */,
 				32C19DDD0FABDC7E00AEDA04 /* DiscInspectorView.xib in Resources */,
+				32B42B000FB1465F00AA4EDF /* TrackMetadataInspectorView.xib in Resources */,
+				32B42B110FB1489200AA4EDF /* AlbumMetadataInspectorView.xib in Resources */,
+				32B42B160FB1491600AA4EDF /* AdditionalAlbumMetadataInspectorView.xib in Resources */,
+				32B42B210FB14B6300AA4EDF /* AdditionalTrackMetadataInspectorView.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1617,6 +1643,8 @@
 				321CB1740FA90636009DBC39 /* InspectorPaneHeader.m in Sources */,
 				321CB1770FA90645009DBC39 /* InspectorPaneBody.m in Sources */,
 				32B8B3B50FB07F830028FE10 /* ChannelFormatter.m in Sources */,
+				32B8B41D0FB0AFB20028FE10 /* ViewSelectorBar.m in Sources */,
+				32B998F30FB12460005C8ACA /* ViewSelector.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1785,6 +1813,38 @@
 				3292521B0EA55CBC00DF820C /* English */,
 			);
 			name = CalculateAccurateRipOffsetsSheet.xib;
+			sourceTree = "<group>";
+		};
+		32B42AFE0FB1465F00AA4EDF /* TrackMetadataInspectorView.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				32B42AFF0FB1465F00AA4EDF /* English */,
+			);
+			name = TrackMetadataInspectorView.xib;
+			sourceTree = "<group>";
+		};
+		32B42B0F0FB1489200AA4EDF /* AlbumMetadataInspectorView.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				32B42B100FB1489200AA4EDF /* English */,
+			);
+			name = AlbumMetadataInspectorView.xib;
+			sourceTree = "<group>";
+		};
+		32B42B140FB1491600AA4EDF /* AdditionalAlbumMetadataInspectorView.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				32B42B150FB1491600AA4EDF /* English */,
+			);
+			name = AdditionalAlbumMetadataInspectorView.xib;
+			sourceTree = "<group>";
+		};
+		32B42B1F0FB14B6300AA4EDF /* AdditionalTrackMetadataInspectorView.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				32B42B200FB14B6300AA4EDF /* English */,
+			);
+			name = AdditionalTrackMetadataInspectorView.xib;
 			sourceTree = "<group>";
 		};
 		32C19DAC0FABD43D00AEDA04 /* TrackInspectorView.xib */ = {

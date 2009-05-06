@@ -5,11 +5,14 @@
 
 #import <Cocoa/Cocoa.h>
 
+@class ViewSelector;
+
 // ========================================
 // A HUD panel for editing the metadata of the selected tracks
 // ========================================
 @interface MetadataEditorPanelController : NSWindowController
 {
+	IBOutlet ViewSelector * _viewSelector;
 @private
 	id _inspectedDocument;
 }

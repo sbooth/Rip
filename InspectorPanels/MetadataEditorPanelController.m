@@ -5,6 +5,7 @@
 
 #import "MetadataEditorPanelController.h"
 #import "CompactDiscWindowController.h"
+#import "ViewSelector.h"
 
 @interface MetadataEditorPanelController ()
 @property (readonly) NSManagedObjectContext * managedObjectContext;
@@ -24,6 +25,31 @@
 - (id) init
 {
 	return [super initWithWindowNibName:@"MetadataEditorPanel"];
+}
+
+- (void) awakeFromNib
+{
+	NSImage *image = [NSImage imageNamed:@"NSAdvanced"];
+	[image setSize:NSMakeSize(16, 16)];
+
+	NSViewController *viewController = [[NSViewController alloc] initWithNibName:@"AlbumMetadataInspectorView" bundle:nil];
+	[viewController bind:@"representedObject" toObject:self withKeyPath:@"inspectedDocument" options:nil];
+	[_viewSelector addItemWithView:[viewController view] image:image tooltip:@"Album Metadata"];
+
+	image = [NSImage imageNamed:@"NSApplicationIcon"];
+	[image setSize:NSMakeSize(16, 16)];
+
+	viewController = [[NSViewController alloc] initWithNibName:@"TrackMetadataInspectorView" bundle:nil];
+	[viewController bind:@"representedObject" toObject:self withKeyPath:@"inspectedDocument" options:nil];
+	[_viewSelector addItemWithView:[viewController view] image:image tooltip:@"Track Metadata"];
+
+	viewController = [[NSViewController alloc] initWithNibName:@"AdditionalAlbumMetadataInspectorView" bundle:nil];
+	[viewController bind:@"representedObject" toObject:self withKeyPath:@"inspectedDocument" options:nil];
+	[_viewSelector addItemWithView:[viewController view] image:image tooltip:@"Additional Album Metadata"];
+
+	viewController = [[NSViewController alloc] initWithNibName:@"AdditionalTrackMetadataInspectorView" bundle:nil];
+	[viewController bind:@"representedObject" toObject:self withKeyPath:@"inspectedDocument" options:nil];
+	[_viewSelector addItemWithView:[viewController view] image:image tooltip:@"Additional Track Metadata"];
 }
 
 - (void) windowDidLoad
@@ -70,7 +96,7 @@
 	if([menuItem action] == @selector(toggleMetadataEditorPanel:)) {
 		NSString *menuTitle = nil;
 		
-		if(!self.isWindowLoaded || !self.window.isVisible || !self. window.isKeyWindow)
+		if(!self.isWindowLoaded || !self.window.isVisible/* || !self. window.isKeyWindow*/)
 			menuTitle = NSLocalizedString(@"Show Metadata Editor", @"Menu Item");
 		else
 			menuTitle = NSLocalizedString(@"Hide Metadata Editor", @"Menu Item");
