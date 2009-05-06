@@ -266,9 +266,12 @@ diskDisappearedCallback(DADiskRef disk, void *context)
 	
 	CFRelease(matchDictionary);
 	
-	// Re-open the inspector
-	if([[NSUserDefaults standardUserDefaults] boolForKey:@"Inspector Window Open"])
+	// Re-open windows
+	if([[NSUserDefaults standardUserDefaults] boolForKey:@"Inspector Panel Open"])
 		[_inspectorPanelWindowController showWindow:self];
+
+	if([[NSUserDefaults standardUserDefaults] boolForKey:@"Metadata Editor Open"])
+		[_metadataEditorPanelWindowController showWindow:self];
 }
 
 - (NSApplicationTerminateReply) applicationShouldTerminate:(NSApplication *)sender
@@ -333,10 +336,13 @@ diskDisappearedCallback(DADiskRef disk, void *context)
 		CFRelease(_diskArbitrationSession), _diskArbitrationSession = NULL;
 	}
 	
-	// Save the closed/open state of the inspector
+	// Save the closed/open state of important windows
 	if([_inspectorPanelWindowController isWindowLoaded])
-		[[NSUserDefaults standardUserDefaults] setBool:[[_inspectorPanelWindowController window] isVisible] forKey:@"Inspector Window Open"];
-	
+		[[NSUserDefaults standardUserDefaults] setBool:[[_inspectorPanelWindowController window] isVisible] forKey:@"Inspector Panel Open"];
+
+	if([_metadataEditorPanelWindowController isWindowLoaded])
+		[[NSUserDefaults standardUserDefaults] setBool:[[_metadataEditorPanelWindowController window] isVisible] forKey:@"Metadata Editor Open"];
+
 	// Close the log file
 	[[Logger sharedLogger] logMessage:NSLocalizedString(@"Log closed", @"")];
 	if(_logFile)

@@ -9,6 +9,7 @@
 @interface ApplicationDelegate : NSObject
 {
 	IBOutlet NSWindowController *_inspectorPanelWindowController;
+	IBOutlet NSWindowController *_metadataEditorPanelWindowController;
 	
 @private
 	DASessionRef _diskArbitrationSession;
