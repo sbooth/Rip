@@ -26,7 +26,7 @@
 		return;
 	
 	for(NSView *inspectorPane in [self subviews]) {
-		if(![inspectorPane isKindOfClass:[inspectorPane class]])
+		if(![inspectorPane isKindOfClass:[InspectorPane class]])
 			continue;
 		
 		InspectorPane *pane = (InspectorPane *)inspectorPane;
