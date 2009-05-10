@@ -59,6 +59,14 @@ enum {
 	[self drawGridLines];
 }
 
+- (BOOL)acceptsFirstMouse:(NSEvent *)theEvent
+{
+	
+#pragma unused(theEvent)
+
+	return YES;
+}
+
 - (void) mouseDown:(NSEvent *)theEvent
 {
 	_pressedIndex = -1;
@@ -102,7 +110,7 @@ enum {
 
 #pragma unused(theEvent)
 	
-	if(-1 != _pressedIndex)
+	if(-1 != _pressedIndex && self.selectedIndex != _pressedIndex)
 		self.selectedIndex = _pressedIndex;
 	
 	_pressedIndex = -1;
