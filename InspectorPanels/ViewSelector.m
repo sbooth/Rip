@@ -6,6 +6,8 @@
 #import "ViewSelector.h"
 #import "ViewSelectorBar.h"
 
+#import <QuartzCore/QuartzCore.h>
+
 @interface ViewSelector (Private)
 - (void) createSelectorBarAndBody;
 - (void) applicationWillTerminate:(NSNotification *)notification;
@@ -36,6 +38,30 @@
 	_initialWindowSize = [[self window] frame].size;
 	
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillTerminate:) name:NSApplicationWillTerminateNotification object:nil];
+
+#if USE_CORE_ANIMATION
+	[_bodyView setWantsLayer:YES];
+
+	/*
+	 CIBarsSwipeTransition,
+	 CICopyMachineTransition,
+	 CIDisintegrateWithMaskTransition,
+	 CIDissolveTransition,
+	 CIFlashTransition,
+	 CIModTransition,
+	 CIPageCurlTransition,
+	 CIRippleTransition,
+	 CISwipeTransition
+	 */
+	CIFilter *transitionFilter = [CIFilter filterWithName:@"CIDissolveTransition"];
+	[transitionFilter setDefaults];
+	
+	CATransition *transition = [CATransition animation];
+	[transition setFilter:transitionFilter];
+
+	NSDictionary *animations = [NSDictionary dictionaryWithObject:transition forKey:@"subviews"];
+	[_bodyView setAnimations:animations];
+#endif
 
 	// Iterate through each pane and restore its state
 	NSString *autosaveName = [[self window] frameAutosaveName];
@@ -87,7 +113,8 @@
 	[[self window] setFrame:newWindowFrame display:YES animate:YES];
 	
 	if(newView) {
-		[_bodyView addSubview:newView];
+//		[_bodyView addSubview:newView];
+		[[_bodyView animator] addSubview:newView];
 		[[self window] setTitle:[_selectorBar tooltipAtIndex:[newIndex integerValue]]];
 	}
 }

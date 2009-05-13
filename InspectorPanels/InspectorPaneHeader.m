@@ -10,6 +10,10 @@
 
 @interface InspectorPaneHeader (Private)
 - (void) createDisclosureButtonAndLabel;
+#if USE_ALTERNATE_APPEARANCE
+- (void) drawBorders;
+- (void) drawBackground;
+#endif
 @end
 
 @implementation InspectorPaneHeader
@@ -36,6 +40,25 @@
 
 - (void) drawRect:(NSRect)rect
 {
+#if USE_ALTERNATE_APPEARANCE
+	[self drawBackground];
+	[self drawBorders];
+
+	if(_pressed) {
+		NSColor *pressedColor = [NSColor colorWithCalibratedWhite:0.75f alpha:0.5f];
+		
+		[pressedColor set];
+		[NSBezierPath fillRect:rect];
+	}
+	else if(NSOnState == [_disclosureButton state]) {
+		// FIXME: Not quite the same color as IB
+		NSColor *highlightColor = [NSColor colorWithCalibratedRed:0.81f green:0.84f blue:0.87f alpha:0.5f];
+		highlightColor = [[NSColor selectedControlColor] colorWithAlphaComponent:0.55f];
+		
+		[highlightColor set];
+		[NSBezierPath fillRect:rect];
+	}
+#else
 	NSColor *startColor = [NSColor colorWithCalibratedWhite:0.880f alpha:1.f];
 	NSColor *endColor = [NSColor colorWithCalibratedWhite:0.773f alpha:1.f];
 	NSGradient *gradient = [[NSGradient alloc] initWithStartingColor:startColor endingColor:endColor];
@@ -44,27 +67,33 @@
 	NSColor *topBorderColorBelow = [NSColor colorWithCalibratedWhite:0.925f alpha:1.f];
 	NSColor *bottomBorderColor = [NSColor colorWithCalibratedWhite:0.612f alpha:1.f];
 	
-	NSRect singlePixelRect = [self bounds];
-	singlePixelRect.size.height = 1;
-	
 	[gradient drawInRect:rect angle:270];
 	
-	singlePixelRect.origin.y = 0;
-	if([self needsToDrawRect:singlePixelRect]) {
+	NSRect bottomBorderRect = [self bounds];
+	bottomBorderRect.size.height = 1;
+	bottomBorderRect.origin.y = 0;
+	
+	if([self needsToDrawRect:bottomBorderRect]) {
 		[bottomBorderColor setFill];
-		[NSBezierPath fillRect:singlePixelRect];
+		[NSBezierPath fillRect:bottomBorderRect];
 	}
 	
-	singlePixelRect.origin.y = [self bounds].size.height - 1;
-	if([self needsToDrawRect:singlePixelRect]) {
+	NSRect topBorderRect = [self bounds];
+	topBorderRect.size.height = 1;
+	topBorderRect.origin.y = [self bounds].size.height - 1;
+
+	if([self needsToDrawRect:topBorderRect]) {
 		[topBorderColorAbove setFill];
-		[NSBezierPath fillRect:singlePixelRect];
+		[NSBezierPath fillRect:topBorderRect];
 	}
 	
-	singlePixelRect.origin.y -= 1;
-	if([self needsToDrawRect:singlePixelRect]) {
+	NSRect topBorderAboveRect = [self bounds];
+	topBorderAboveRect.size.height = 1;
+	topBorderAboveRect.origin.y -= 1;
+	
+	if([self needsToDrawRect:topBorderAboveRect]) {
 		[topBorderColorBelow setFill];
-		[NSBezierPath fillRect:singlePixelRect];
+		[NSBezierPath fillRect:topBorderAboveRect];
 	}
 	
 	[[NSColor colorWithCalibratedWhite:0.f alpha:0.03f] setFill];
@@ -74,6 +103,7 @@
 		[[NSColor colorWithCalibratedWhite:0.f alpha:0.07f] setFill];
 		[NSBezierPath fillRect:rect];
 	}
+#endif
 }
 
 - (void) mouseDown:(NSEvent *)theEvent
@@ -159,5 +189,51 @@
 	[self addSubview:_disclosureButton];
 	[self addSubview:_titleTextField];
 }
+
+#if USE_ALTERNATE_APPEARANCE
+- (void) drawBorders
+{
+	NSRect bounds = [self bounds];
+	
+	NSColor *highlightColor = [NSColor colorWithDeviceWhite:0.53f alpha:1.f];
+	[highlightColor set];
+	
+	// Draw the top border
+	NSRect topBorderRect = bounds;
+	topBorderRect.origin.y = bounds.size.height - 1;
+	topBorderRect.size.height = 1;
+	
+	if([self needsToDrawRect:topBorderRect])
+		[NSBezierPath fillRect:topBorderRect];	
+
+	// Draw the bottom border
+	NSRect bottomBorderRect = bounds;
+	bottomBorderRect.size.height = 1;
+	
+	if([self needsToDrawRect:bottomBorderRect])
+		[NSBezierPath fillRect:bottomBorderRect];	
+}
+
+- (void) drawBackground
+{
+	NSColor *topColor = [NSColor colorWithDeviceWhite:0.84f alpha:1.f];
+	NSColor *bottomColor = [NSColor /*windowBackgroundColor*/colorWithDeviceWhite:0.9f alpha:1.f];
+	
+	NSGradient *gradient = [[NSGradient alloc] initWithStartingColor:topColor endingColor:bottomColor];
+	
+	NSRect bounds = [self bounds];
+	
+	NSRect topRect, bottomRect;
+	NSDivideRect(bounds, &bottomRect, &topRect, bounds.size.height / 2, NSMinYEdge);
+	
+	[[NSColor windowBackgroundColor] set];
+	
+	if([self needsToDrawRect:topRect])
+		[NSBezierPath fillRect:topRect];
+	
+	if([self needsToDrawRect:bottomRect])
+		[gradient drawInRect:bottomRect angle:270];
+}
+#endif
 
 @end
