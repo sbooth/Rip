@@ -773,6 +773,11 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 	operation.freeDBDiscID = self.compactDisc.freeDBDiscID;
 	operation.musicBrainzDiscID = self.compactDisc.musicBrainzDiscID;
 	
+	// Observe the operation's progress
+	[operation addObserver:self forKeyPath:@"isExecuting" options:NSKeyValueObservingOptionNew context:kMusicDatabaseQueryKVOContext];
+	[operation addObserver:self forKeyPath:@"isCancelled" options:NSKeyValueObservingOptionNew context:kMusicDatabaseQueryKVOContext];
+	[operation addObserver:self forKeyPath:@"isFinished" options:NSKeyValueObservingOptionNew context:kMusicDatabaseQueryKVOContext];
+	
 	[self.operationQueue addOperation:operation];	
 }
 
@@ -1073,16 +1078,28 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 {
 	NSParameterAssert(nil != musicDatabaseEntry);
 
+	// Indicates whether nil metadata values in this query should overwrite existing values
+	BOOL eraseExistingMetadata = [[NSUserDefaults standardUserDefaults] boolForKey:@"OverwriteAllMetadata"];
+	
 	// Set the album's metadata
-	self.compactDisc.metadata.additionalMetadata = [musicDatabaseEntry valueForKey:kMetadataAdditionalMetadataKey];
-	self.compactDisc.metadata.artist = [musicDatabaseEntry valueForKey:kMetadataAlbumArtistKey];
-	self.compactDisc.metadata.date = [musicDatabaseEntry valueForKey:kMetadataReleaseDateKey];
-	self.compactDisc.metadata.discNumber = [musicDatabaseEntry valueForKey:kMetadataDiscNumberKey];
-	self.compactDisc.metadata.discTotal = [musicDatabaseEntry valueForKey:kMetadataDiscTotalKey];
-	self.compactDisc.metadata.isCompilation = [musicDatabaseEntry valueForKey:kMetadataCompilationKey];
-	self.compactDisc.metadata.MCN = [musicDatabaseEntry valueForKey:kMetadataMCNKey];
-	self.compactDisc.metadata.musicBrainzID = [musicDatabaseEntry valueForKey:kMetadataMusicBrainzIDKey];
-	self.compactDisc.metadata.title = [musicDatabaseEntry valueForKey:kMetadataAlbumTitleKey];
+	if(eraseExistingMetadata || [musicDatabaseEntry valueForKey:kMetadataAdditionalMetadataKey])
+		self.compactDisc.metadata.additionalMetadata = [musicDatabaseEntry valueForKey:kMetadataAdditionalMetadataKey];
+	if(eraseExistingMetadata || [musicDatabaseEntry valueForKey:kMetadataAlbumArtistKey])
+		self.compactDisc.metadata.artist = [musicDatabaseEntry valueForKey:kMetadataAlbumArtistKey];
+	if(eraseExistingMetadata || [musicDatabaseEntry valueForKey:kMetadataReleaseDateKey])
+		self.compactDisc.metadata.date = [musicDatabaseEntry valueForKey:kMetadataReleaseDateKey];
+	if(eraseExistingMetadata || [musicDatabaseEntry valueForKey:kMetadataDiscNumberKey])
+		self.compactDisc.metadata.discNumber = [musicDatabaseEntry valueForKey:kMetadataDiscNumberKey];
+	if(eraseExistingMetadata || [musicDatabaseEntry valueForKey:kMetadataDiscTotalKey])
+		self.compactDisc.metadata.discTotal = [musicDatabaseEntry valueForKey:kMetadataDiscTotalKey];
+	if(eraseExistingMetadata || [musicDatabaseEntry valueForKey:kMetadataCompilationKey])
+		self.compactDisc.metadata.isCompilation = [musicDatabaseEntry valueForKey:kMetadataCompilationKey];
+	if(eraseExistingMetadata || [musicDatabaseEntry valueForKey:kMetadataMCNKey])
+		self.compactDisc.metadata.MCN = [musicDatabaseEntry valueForKey:kMetadataMCNKey];
+	if(eraseExistingMetadata || [musicDatabaseEntry valueForKey:kMetadataMusicBrainzIDKey])
+		self.compactDisc.metadata.musicBrainzID = [musicDatabaseEntry valueForKey:kMetadataMusicBrainzIDKey];
+	if(eraseExistingMetadata || [musicDatabaseEntry valueForKey:kMetadataAlbumTitleKey])
+		self.compactDisc.metadata.title = [musicDatabaseEntry valueForKey:kMetadataAlbumTitleKey];
 
 	// Set each track's metadata
 	NSArray *trackMetadataArray = [musicDatabaseEntry valueForKey:kTrackMetadataArrayKey];
@@ -1093,15 +1110,24 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 		if(!track)
 			continue;
 		
-		track.metadata.additionalMetadata = [trackMetadata valueForKey:kMetadataAdditionalMetadataKey];
-		track.metadata.artist = [trackMetadata valueForKey:kMetadataArtistKey];
-		track.metadata.composer = [trackMetadata valueForKey:kMetadataComposerKey];
-		track.metadata.date = [trackMetadata valueForKey:kMetadataReleaseDateKey];
-		track.metadata.genre = [trackMetadata valueForKey:kMetadataGenreKey];
-		track.metadata.ISRC = [musicDatabaseEntry valueForKey:kMetadataISRCKey];
-		track.metadata.lyrics = [trackMetadata valueForKey:kMetadataLyricsKey];
-		track.metadata.musicBrainzID = [trackMetadata valueForKey:kMetadataMusicBrainzIDKey];
-		track.metadata.title = [trackMetadata valueForKey:kMetadataTitleKey];
+		if(eraseExistingMetadata || [musicDatabaseEntry valueForKey:kMetadataAdditionalMetadataKey])
+			track.metadata.additionalMetadata = [trackMetadata valueForKey:kMetadataAdditionalMetadataKey];
+		if(eraseExistingMetadata || [musicDatabaseEntry valueForKey:kMetadataArtistKey])
+			track.metadata.artist = [trackMetadata valueForKey:kMetadataArtistKey];
+		if(eraseExistingMetadata || [musicDatabaseEntry valueForKey:kMetadataComposerKey])
+			track.metadata.composer = [trackMetadata valueForKey:kMetadataComposerKey];
+		if(eraseExistingMetadata || [musicDatabaseEntry valueForKey:kMetadataReleaseDateKey])
+			track.metadata.date = [trackMetadata valueForKey:kMetadataReleaseDateKey];
+		if(eraseExistingMetadata || [musicDatabaseEntry valueForKey:kMetadataGenreKey])
+			track.metadata.genre = [trackMetadata valueForKey:kMetadataGenreKey];
+		if(eraseExistingMetadata || [musicDatabaseEntry valueForKey:kMetadataISRCKey])
+			track.metadata.ISRC = [musicDatabaseEntry valueForKey:kMetadataISRCKey];
+		if(eraseExistingMetadata || [musicDatabaseEntry valueForKey:kMetadataLyricsKey])
+			track.metadata.lyrics = [trackMetadata valueForKey:kMetadataLyricsKey];
+		if(eraseExistingMetadata || [musicDatabaseEntry valueForKey:kMetadataMusicBrainzIDKey])
+			track.metadata.musicBrainzID = [trackMetadata valueForKey:kMetadataMusicBrainzIDKey];
+		if(eraseExistingMetadata || [musicDatabaseEntry valueForKey:kMetadataTitleKey])
+			track.metadata.title = [trackMetadata valueForKey:kMetadataTitleKey];
 	}
 	
 	// Save the metadata
@@ -1155,7 +1181,7 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 	}
 	
 	NSUInteger matchCount = operation.queryResults.count;
-	
+
 	if(0 == matchCount) {
 		NSBeginAlertSheet(NSLocalizedString(@"The disc was not found.", @"Music database search failed"), 
 						  NSLocalizedString(@"OK", @"Button"),
