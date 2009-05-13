@@ -631,7 +631,7 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 
 #pragma unused(sender)
 
-	[self extractTracks:self.compactDisc.firstSession.tracks extractionMode:eExtractionModeIndividualTracks];
+	[self extractTracks:self.compactDisc.firstSession.tracks extractionMode:eExtractionModeImage];
 }
 
 - (IBAction) detectPregaps:(id)sender
@@ -1035,10 +1035,22 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 	}
 	
 	NSError *error = nil;
-	if(![self writeLogFileToURL:logFileURL forTrackExtractionRecords:_extractionViewController.trackExtractionRecords error:&error])
-		[self presentError:error modalForWindow:self.window delegate:nil didPresentSelector:NULL contextInfo:NULL];
+	if(eExtractionModeImage == _extractionViewController.extractionMode) {
+		if(![self writeLogFileToURL:logFileURL imageExtractionRecord:_extractionViewController.imageExtractionRecord error:&error])
+			[self presentError:error modalForWindow:self.window delegate:nil didPresentSelector:NULL contextInfo:NULL];
+	}
+	else {
+		if(![self writeLogFileToURL:logFileURL trackExtractionRecords:_extractionViewController.trackExtractionRecords error:&error])
+			[self presentError:error modalForWindow:self.window delegate:nil didPresentSelector:NULL contextInfo:NULL];
+	}
 	
 	// Save a cue sheet
+//	pathname = [filename stringByAppendingPathExtension:@"cue"];
+//	outputPath = [[baseURL path] stringByAppendingPathComponent:pathname];
+//	NSURL *cueSheetURL = [NSURL fileURLWithPath:outputPath];
+//	
+//	if(![self.compactDisc writeCueSheetToURL:cueSheetURL error:&error])
+//		[self presentError:error modalForWindow:self.window delegate:nil didPresentSelector:NULL contextInfo:NULL];
 	
 	if(![_extractionViewController.failedTrackIDs count]) {
 		// Create a sheet that will auto-dismiss notifying the user that the extraction was successful

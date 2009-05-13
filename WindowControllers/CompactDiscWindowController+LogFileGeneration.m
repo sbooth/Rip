@@ -28,7 +28,7 @@
 
 @implementation CompactDiscWindowController (LogFileGeneration)
 
-- (BOOL) writeLogFileToURL:(NSURL *)logFileURL forTrackExtractionRecords:(NSSet *)trackExtractionRecords error:(NSError **)error
+- (BOOL) writeLogFileToURL:(NSURL *)logFileURL trackExtractionRecords:(NSSet *)trackExtractionRecords error:(NSError **)error
 {
 	NSParameterAssert(nil != logFileURL);
 	NSParameterAssert(nil != trackExtractionRecords);
@@ -116,7 +116,7 @@
 		return [result writeToURL:logFileURL atomically:YES encoding:NSUTF8StringEncoding error:error];
 }
 
-- (BOOL) writeLogFileToURL:(NSURL *)logFileURL forImageExtractionRecord:(ImageExtractionRecord *)imageExtractionRecord error:(NSError **)error
+- (BOOL) writeLogFileToURL:(NSURL *)logFileURL imageExtractionRecord:(ImageExtractionRecord *)imageExtractionRecord error:(NSError **)error
 {
 	NSParameterAssert(nil != logFileURL);
 	NSParameterAssert(nil != imageExtractionRecord);
