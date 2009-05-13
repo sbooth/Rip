@@ -142,14 +142,13 @@ metadataForImageExtractionRecord(ImageExtractionRecord *imageExtractionRecord)
 		[metadata setObject:albumMetadata.title forKey:kMetadataAlbumTitleKey];
 	[metadata setObject:[NSNumber numberWithFloat:89.f] forKey:kReplayGainReferenceLoudnessKey];
 
+	// Cue sheet
+	[metadata setObject:[imageExtractionRecord.disc cueSheetString] forKey:kCueSheetKey];
+	
 	// Album artwork
 	NSImage *frontCoverImage = albumMetadata.artwork.frontCoverImage;
-	if(frontCoverImage) {
-		NSURL *frontCoverURL = temporaryURLWithExtension(@"png");
-		NSData *frontCoverPNGData = [frontCoverImage PNGData];
-		[frontCoverPNGData writeToURL:frontCoverURL atomically:NO];
-		[metadata setObject:frontCoverURL forKey:kAlbumArtFrontCoverKey];
-	}
+	if(frontCoverImage)
+		[metadata setObject:frontCoverImage forKey:kAlbumArtFrontCoverKey];
 
 	// Individual track metadata
 	NSMutableArray *trackMetadataArray = [NSMutableArray array];

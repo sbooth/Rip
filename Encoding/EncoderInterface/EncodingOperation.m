@@ -32,6 +32,7 @@ NSString * const	kReplayGainTrackGainKey					= @"replayGainTrackGain";
 NSString * const	kReplayGainTrackPeakKey					= @"replayGainTrackPeak";
 NSString * const	kReplayGainAlbumGainKey					= @"replayGainAlbumGain";
 NSString * const	kReplayGainAlbumPeakKey					= @"replayGainAlbumPeak";
+NSString * const	kCueSheetKey							= @"cueSheet";
 NSString * const	kAlbumArtFrontCoverKey					= @"albumArtFrontCover";
 
 NSString * const	kTrackMetadataArrayKey					= @"tracks";

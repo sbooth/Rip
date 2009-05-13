@@ -34,6 +34,7 @@ extern NSString * const		kReplayGainTrackPeakKey;			// NSNumber *
 extern NSString * const		kReplayGainAlbumGainKey;			// NSNumber *
 extern NSString * const		kReplayGainAlbumPeakKey;			// NSNumber *
 
+extern NSString * const		kCueSheetKey;						// NSString *
 extern NSString * const		kAlbumArtFrontCoverKey;				// NSImage *
 
 // ========================================

@@ -121,6 +121,25 @@ setArgumentForTag(NSMutableArray *arguments, NSDictionary *metadata, NSString *k
 		[arguments addObject:[NSString stringWithFormat:@"REPLAYGAIN_ALBUM_PEAK=%1.8f", [albumPeak floatValue]]];
 	}
 	
+	// Album art
+	NSImage *frontCoverImage = [self.metadata objectForKey:kAlbumArtFrontCoverKey];
+	NSURL *frontCoverURL = nil;
+	if(frontCoverImage) {
+		frontCoverURL = temporaryURLWithExtension(@"png");
+		NSData *frontCoverPNGData = [frontCoverImage PNGData];
+		if([frontCoverPNGData writeToURL:frontCoverURL atomically:NO])
+			[arguments addObject:[NSString stringWithFormat:@"--picture=%@", [frontCoverURL path]]];
+	}
+
+	// Cue sheet
+	NSString *cueSheetString = [self.metadata objectForKey:kCueSheetKey];
+	NSURL *cueSheetURL = nil;
+	if(cueSheetString) {
+		cueSheetURL = temporaryURLWithExtension(@"cue");
+		if([cueSheetString writeToURL:cueSheetURL atomically:NO encoding:NSUTF8StringEncoding error:NULL])
+			[arguments addObject:[NSString stringWithFormat:@"--cuesheet=%@", [cueSheetURL path]]];
+	}
+	
 	// Additional metadata (ie MUSICBRAINZ_SORTORDER)
 	NSDictionary *additionalMetadata = [self.metadata objectForKey:kMetadataAdditionalMetadataKey];
 	if([additionalMetadata count]) {
@@ -160,6 +179,16 @@ setArgumentForTag(NSMutableArray *arguments, NSDictionary *metadata, NSString *k
 		[NSThread sleepForTimeInterval:SLEEP_TIME_INTERVAL];
 	}
 	
+	// Delete the temporary files
+	NSError *error = nil;
+	BOOL removeSuccessful = [[NSFileManager defaultManager] removeItemAtPath:[frontCoverURL path] error:&error];
+	if(!removeSuccessful)
+		self.error = error;
+
+	removeSuccessful = [[NSFileManager defaultManager] removeItemAtPath:[cueSheetURL path] error:&error];
+	if(!removeSuccessful)
+		self.error = error;
+	
 	// Get the result
 	int terminationStatus = [task terminationStatus];
 	if(EXIT_SUCCESS != terminationStatus) {
@@ -167,65 +196,6 @@ setArgumentForTag(NSMutableArray *arguments, NSDictionary *metadata, NSString *k
 		return;
 	}
 
-	// Add album artwork, if present
-	if(![self.metadata objectForKey:kAlbumArtFrontCoverKey])
-		return;
-
-	// Locate the metaflac executable
-	NSString *metaflacPath = [[NSBundle bundleWithIdentifier:@"org.sbooth.Rip.Encoder.FLAC"] pathForResource:@"metaflac" ofType:nil];
-	if(nil == metaflacPath) {
-		self.error = [NSError errorWithDomain:NSOSStatusErrorDomain code:fnfErr userInfo:nil];
-		return;
-	}
-	
-	// Create the task
-	task = [[NSTask alloc] init];
-	arguments = [NSMutableArray array];
-
-	// Album art
-	NSImage *frontCoverImage = [self.metadata objectForKey:kAlbumArtFrontCoverKey];
-	NSURL *frontCoverURL = temporaryURLWithExtension(@"png");
-	NSData *frontCoverPNGData = [frontCoverImage PNGData];
-	[frontCoverPNGData writeToURL:frontCoverURL atomically:NO];
-	
-	[arguments addObject:[NSString stringWithFormat:@"--import-picture-from=%@", [frontCoverURL path]]];
-	
-	// Input files
-	[arguments addObject:[self.outputURL path]];
-	
-	// Task setup
-	[task setLaunchPath:metaflacPath];
-	[task setArguments:arguments];
-	
-	// Redirect input and output to /dev/null
-#if (!DEBUG)
-	[task setStandardOutput:[NSFileHandle fileHandleWithNullDevice]];
-	[task setStandardError:[NSFileHandle fileHandleWithNullDevice]];
-#endif
-	
-	// Run the task
-	[task launch];
-	
-	while([task isRunning]) {
-		
-		// Allow the task to be cancelled
-		if(self.isCancelled)
-			[task terminate];
-		
-		// Sleep to avoid spinning
-		[NSThread sleepForTimeInterval:SLEEP_TIME_INTERVAL];
-	}
-	
-	// Get the result
-	terminationStatus = [task terminationStatus];
-	if(EXIT_SUCCESS != terminationStatus)
-		self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:terminationStatus userInfo:nil];
-
-	// Delete the temporary album art
-	NSError *error = nil;
-	BOOL removeSuccessful = [[NSFileManager defaultManager] removeItemAtPath:[frontCoverURL path] error:&error];
-	if(!removeSuccessful)
-		self.error = error;
 }
 
 @end
