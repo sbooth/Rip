@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2008 Stephen F. Booth <me@sbooth.org>
+ *  Copyright (C) 2008 - 2009 Stephen F. Booth <me@sbooth.org>
  *  All Rights Reserved
  */
 
@@ -14,10 +14,8 @@
 
 @implementation CompactDisc (CueSheetGeneration)
 
-- (BOOL) writeCueSheetToURL:(NSURL *)cueSheetURL error:(NSError **)error
+- (NSString *) cueSheetString
 {
-	NSParameterAssert(nil != cueSheetURL);
-	
 	NSMutableString *cueSheetString = [NSMutableString string];
 	
 	NSString *appName = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleName"];
@@ -102,7 +100,14 @@
 		[cueSheetString appendString:@"\n"];
 	}
 	
-	return [cueSheetString writeToURL:cueSheetURL atomically:YES encoding:NSUTF8StringEncoding error:error];
+	return [cueSheetString copy];
+}
+
+- (BOOL) writeCueSheetToURL:(NSURL *)cueSheetURL error:(NSError **)error
+{
+	NSParameterAssert(nil != cueSheetURL);
+	
+	return [[self cueSheetString] writeToURL:cueSheetURL atomically:YES encoding:NSUTF8StringEncoding error:error];
 }
 
 @end
