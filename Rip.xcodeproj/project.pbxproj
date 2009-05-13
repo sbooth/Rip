@@ -15,6 +15,7 @@
 		3213B2E40FB9F9B000137097 /* ExtractionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3213B2E10FB9F9B000137097 /* ExtractionViewController.m */; };
 		3213B2E50FB9F9B000137097 /* MetadataViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3213B2E30FB9F9B000137097 /* MetadataViewController.m */; };
 		3215E80A0F884A5000F84429 /* AIFF.bundle in Copy PlugIns */ = {isa = PBXBuildFile; fileRef = 3215E7D90F8848F600F84429 /* AIFF.bundle */; };
+		321716550FBB4829004C5F28 /* LyricsMetadataEditorPaneIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 321716540FBB4829004C5F28 /* LyricsMetadataEditorPaneIcon.png */; };
 		321CB1280FA8A23C009DBC39 /* InspectorPanelController.m in Sources */ = {isa = PBXBuildFile; fileRef = 321CB1270FA8A23C009DBC39 /* InspectorPanelController.m */; };
 		321CB1310FA8A2A4009DBC39 /* InspectorPanel.xib in Resources */ = {isa = PBXBuildFile; fileRef = 321CB1300FA8A2A4009DBC39 /* InspectorPanel.xib */; };
 		321CB15B0FA901CB009DBC39 /* InspectorView.m in Sources */ = {isa = PBXBuildFile; fileRef = 321CB15A0FA901CB009DBC39 /* InspectorView.m */; };
@@ -408,6 +409,7 @@
 		3213B2E20FB9F9B000137097 /* MetadataViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MetadataViewController.h; sourceTree = "<group>"; };
 		3213B2E30FB9F9B000137097 /* MetadataViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MetadataViewController.m; sourceTree = "<group>"; };
 		3215E7D00F8848F600F84429 /* AIFF.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = AIFF.xcodeproj; path = AIFF/AIFF.xcodeproj; sourceTree = "<group>"; };
+		321716540FBB4829004C5F28 /* LyricsMetadataEditorPaneIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = LyricsMetadataEditorPaneIcon.png; sourceTree = "<group>"; };
 		321CB1260FA8A23C009DBC39 /* InspectorPanelController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InspectorPanelController.h; sourceTree = "<group>"; };
 		321CB1270FA8A23C009DBC39 /* InspectorPanelController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = InspectorPanelController.m; sourceTree = "<group>"; };
 		321CB12E0FA8A29E009DBC39 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/InspectorPanel.xib; sourceTree = "<group>"; };
@@ -1117,6 +1119,7 @@
 		8C4C8AA70D5A902F00DC0279 /* Images */ = {
 			isa = PBXGroup;
 			children = (
+				321716540FBB4829004C5F28 /* LyricsMetadataEditorPaneIcon.png */,
 				3213B2AD0FB9DC8200137097 /* AdditionalAlbumMetadataEditorPaneIcon.png */,
 				3213B2AE0FB9DC8200137097 /* AdditionalTrackMetadataEditorPaneIcon.png */,
 				3213B2A60FB9DC1A00137097 /* AlbumMetadataEditorPaneIcon.png */,
@@ -1553,6 +1556,7 @@
 				3213B2AF0FB9DC8200137097 /* AdditionalAlbumMetadataEditorPaneIcon.png in Resources */,
 				3213B2B00FB9DC8200137097 /* AdditionalTrackMetadataEditorPaneIcon.png in Resources */,
 				3213B2B80FB9EF0B00137097 /* TrackLyricsInspectorView.xib in Resources */,
+				321716550FBB4829004C5F28 /* LyricsMetadataEditorPaneIcon.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

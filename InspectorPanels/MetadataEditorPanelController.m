@@ -30,36 +30,26 @@
 - (void) awakeFromNib
 {
 	NSImage *image = [NSImage imageNamed:@"AlbumMetadataEditorPaneIcon"];
-	[image setSize:NSMakeSize(16, 16)];
-
 	NSViewController *viewController = [[NSViewController alloc] initWithNibName:@"AlbumMetadataInspectorView" bundle:nil];
 	[viewController bind:@"representedObject" toObject:self withKeyPath:@"inspectedDocument" options:nil];
 	[_viewSelector addItemWithView:[viewController view] image:image tooltip:NSLocalizedString(@"Album Metadata", @"")];
 
 	image = [NSImage imageNamed:@"TrackMetadataEditorPaneIcon"];
-	[image setSize:NSMakeSize(16, 16)];
-
 	viewController = [[NSViewController alloc] initWithNibName:@"TrackMetadataInspectorView" bundle:nil];
 	[viewController bind:@"representedObject" toObject:self withKeyPath:@"inspectedDocument" options:nil];
 	[_viewSelector addItemWithView:[viewController view] image:image tooltip:NSLocalizedString(@"Track Metadata", @"")];
 
-	image = [NSImage imageNamed:@"NSAdvanced"];
-	[image setSize:NSMakeSize(16, 16)];
-	
+	image = [NSImage imageNamed:@"LyricsMetadataEditorPaneIcon"];
 	viewController = [[NSViewController alloc] initWithNibName:@"TrackLyricsInspectorView" bundle:nil];
 	[viewController bind:@"representedObject" toObject:self withKeyPath:@"inspectedDocument" options:nil];
 	[_viewSelector addItemWithView:[viewController view] image:image tooltip:NSLocalizedString(@"Lyrics", @"")];
 	
 	image = [NSImage imageNamed:@"AdditionalAlbumMetadataEditorPaneIcon"];
-	[image setSize:NSMakeSize(16, 16)];
-
 	viewController = [[NSViewController alloc] initWithNibName:@"AdditionalAlbumMetadataInspectorView" bundle:nil];
 	[viewController bind:@"representedObject" toObject:self withKeyPath:@"inspectedDocument" options:nil];
 	[_viewSelector addItemWithView:[viewController view] image:image tooltip:NSLocalizedString(@"Additional Album Metadata", @"")];
 
 	image = [NSImage imageNamed:@"AdditionalTrackMetadataEditorPaneIcon"];
-	[image setSize:NSMakeSize(16, 16)];
-
 	viewController = [[NSViewController alloc] initWithNibName:@"AdditionalTrackMetadataInspectorView" bundle:nil];
 	[viewController bind:@"representedObject" toObject:self withKeyPath:@"inspectedDocument" options:nil];
 	[_viewSelector addItemWithView:[viewController view] image:image tooltip:NSLocalizedString(@"Additional Track Metadata", @"")];
