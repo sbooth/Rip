@@ -259,7 +259,6 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 
 	[_mainView addSubview:[_metadataViewController view]];
 	[self setNextResponder:_metadataViewController];
-	[[self window] setInitialFirstResponder:[_metadataViewController view]];
 }
 
 - (BOOL) validateMenuItem:(NSMenuItem *)menuItem
@@ -1262,7 +1261,6 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 	
 	// Ensure the view controller and its view are the next responders
 	[self setNextResponder:newViewController];
-	[[self window] setInitialFirstResponder:[newViewController view]];
 }
 
 @end
