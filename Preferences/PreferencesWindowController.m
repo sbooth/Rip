@@ -124,8 +124,14 @@ static PreferencesWindowController *sSharedPreferencesWindowController = nil;
 	
 	// Now that the sizes are correct, add the view controller's view to the view hierarchy
 	[_preferencesView addSubview:[_preferencesViewController view]];
+
+	// Set the next responder and key view
 	[self setNextResponder:_preferencesViewController];
 
+	NSView *view = [[_preferencesViewController view] nextValidKeyView];
+	if(view)
+		[[self window] makeFirstResponder:view];
+	
 	// Set the window's title to the name of the preference view
 	[[self window] setTitle:[_preferencesViewController title]];
 	

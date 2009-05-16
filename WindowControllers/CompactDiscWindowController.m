@@ -1261,6 +1261,10 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 	
 	// Ensure the view controller and its view are the next responders
 	[self setNextResponder:newViewController];
+	
+	NSView *view = [[newViewController view] nextValidKeyView];
+	if(view)
+		[[self window] makeFirstResponder:view];
 }
 
 @end
