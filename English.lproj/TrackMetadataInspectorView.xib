@@ -601,38 +601,6 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBBindingConnection" key="connection">
-						<string key="label">value: selection.selection.metadata.ISRC</string>
-						<reference key="source" ref="570325532"/>
-						<reference key="destination" ref="33737633"/>
-						<object class="NSNibBindingConnector" key="connector">
-							<reference key="NSSource" ref="570325532"/>
-							<reference key="NSDestination" ref="33737633"/>
-							<string key="NSLabel">value: selection.selection.metadata.ISRC</string>
-							<string key="NSBinding">value</string>
-							<string key="NSKeyPath">selection.selection.metadata.ISRC</string>
-							<int key="NSNibBindingConnectorVersion">2</int>
-						</object>
-					</object>
-					<int key="connectionID">65</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBBindingConnection" key="connection">
-						<string key="label">value: selection.selection.metadata.musicBrainzID</string>
-						<reference key="source" ref="722670383"/>
-						<reference key="destination" ref="33737633"/>
-						<object class="NSNibBindingConnector" key="connector">
-							<reference key="NSSource" ref="722670383"/>
-							<reference key="NSDestination" ref="33737633"/>
-							<string key="NSLabel">value: selection.selection.metadata.musicBrainzID</string>
-							<string key="NSBinding">value</string>
-							<string key="NSKeyPath">selection.selection.metadata.musicBrainzID</string>
-							<int key="NSNibBindingConnectorVersion">2</int>
-						</object>
-					</object>
-					<int key="connectionID">66</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBBindingConnection" key="connection">
 						<string key="label">value: selection.selection.metadata.replayGain</string>
 						<reference key="source" ref="232500046"/>
 						<reference key="destination" ref="33737633"/>
@@ -734,6 +702,46 @@
 						<reference key="destination" ref="248190688"/>
 					</object>
 					<int key="connectionID">77</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBBindingConnection" key="connection">
+						<string key="label">value: selection.selection.metadata.ISRC</string>
+						<reference key="source" ref="570325532"/>
+						<reference key="destination" ref="33737633"/>
+						<object class="NSNibBindingConnector" key="connector">
+							<reference key="NSSource" ref="570325532"/>
+							<reference key="NSDestination" ref="33737633"/>
+							<string key="NSLabel">value: selection.selection.metadata.ISRC</string>
+							<string key="NSBinding">value</string>
+							<string key="NSKeyPath">selection.selection.metadata.ISRC</string>
+							<object class="NSDictionary" key="NSOptions">
+								<string key="NS.key.0">NSAllowsEditingMultipleValuesSelection</string>
+								<boolean value="NO" key="NS.object.0" id="6"/>
+							</object>
+							<int key="NSNibBindingConnectorVersion">2</int>
+						</object>
+					</object>
+					<int key="connectionID">78</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBBindingConnection" key="connection">
+						<string key="label">value: selection.selection.metadata.musicBrainzID</string>
+						<reference key="source" ref="722670383"/>
+						<reference key="destination" ref="33737633"/>
+						<object class="NSNibBindingConnector" key="connector">
+							<reference key="NSSource" ref="722670383"/>
+							<reference key="NSDestination" ref="33737633"/>
+							<string key="NSLabel">value: selection.selection.metadata.musicBrainzID</string>
+							<string key="NSBinding">value</string>
+							<string key="NSKeyPath">selection.selection.metadata.musicBrainzID</string>
+							<object class="NSDictionary" key="NSOptions">
+								<string key="NS.key.0">NSAllowsEditingMultipleValuesSelection</string>
+								<reference key="NS.object.0" ref="6"/>
+							</object>
+							<int key="NSNibBindingConnectorVersion">2</int>
+						</object>
+					</object>
+					<int key="connectionID">79</int>
 				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -1148,7 +1156,7 @@
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">77</int>
+			<int key="maxID">79</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
