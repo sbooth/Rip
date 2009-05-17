@@ -81,6 +81,11 @@
 	
 	// Now that the sizes are correct, add the view controller's view to the view hierarchy
 	[_musicDatabaseSettingsView addSubview:[_musicDatabaseSettingsViewController view]];
+
+	// Update the key view
+	NSView *view = [[_musicDatabaseSettingsViewController view] nextValidKeyView];
+	if(view)
+		[[view window] makeFirstResponder:view];	
 }
 
 - (NSArray *) availableMusicDatabases
@@ -211,6 +216,11 @@
 	// Now that the sizes are correct, add the view controller's view to the view hierarchy
 	[_musicDatabaseSettingsView addSubview:[_musicDatabaseSettingsViewController view]];
 	
+	// Update the key view
+	NSView *view = [[_musicDatabaseSettingsViewController view] nextValidKeyView];
+	if(view)
+		[[view window] makeFirstResponder:view];	
+
 #if USE_ANIMATION
 	NSDictionary *fadeInAnimationDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
 											   [_musicDatabaseSettingsViewController view], NSViewAnimationTargetKey,
