@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2008 Stephen F. Booth <me@sbooth.org>
+ *  Copyright (C) 2008 - 2009 Stephen F. Booth <me@sbooth.org>
  *  All Rights Reserved
  */
 
@@ -128,7 +128,7 @@ static PreferencesWindowController *sSharedPreferencesWindowController = nil;
 	// Set the next responder and key view
 	[self setNextResponder:_preferencesViewController];
 
-	NSView *view = [[_preferencesViewController view] nextValidKeyView];
+	NSView *view = [_preferencesView nextValidKeyView];
 	if(view)
 		[[self window] makeFirstResponder:view];
 	

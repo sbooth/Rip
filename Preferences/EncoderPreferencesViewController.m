@@ -81,6 +81,11 @@
 	
 	// Now that the sizes are correct, add the view controller's view to the view hierarchy
 	[_encoderSettingsView addSubview:[_encoderSettingsViewController view]];
+	
+	// Update the key view
+	NSView *view = [[_encoderSettingsViewController view] nextValidKeyView];
+	if(view)
+		[[view window] makeFirstResponder:view];	
 }
 
 - (NSArray *) availableEncoders
@@ -214,6 +219,11 @@
 	// Now that the sizes are correct, add the view controller's view to the view hierarchy
 	[_encoderSettingsView addSubview:[_encoderSettingsViewController view]];
 
+	// Update the key view
+	NSView *view = [[_encoderSettingsViewController view] nextValidKeyView];
+	if(view)
+		[[view window] makeFirstResponder:view];	
+	
 #if USE_ANIMATION
 	NSDictionary *fadeInAnimationDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
 											   [_encoderSettingsViewController view], NSViewAnimationTargetKey,
