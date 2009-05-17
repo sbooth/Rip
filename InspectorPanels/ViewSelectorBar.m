@@ -203,7 +203,7 @@ enum {
 
 - (ViewSelectorBarItem *) itemAtIndex:(NSInteger)itemIndex
 {
-	NSParameterAssert(0 <= itemIndex && itemIndex < [_items count]);
+	NSParameterAssert(0 <= itemIndex && itemIndex < (NSInteger)[_items count]);
 	
 	return [_items objectAtIndex:itemIndex];
 }
