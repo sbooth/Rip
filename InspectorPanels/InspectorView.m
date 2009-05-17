@@ -22,17 +22,16 @@
 
 	// Iterate through each pane and restore its state
 	NSString *autosaveName = [[self window] frameAutosaveName];
-	if(!autosaveName)
-		return;
-	
-	for(NSView *inspectorPane in [self subviews]) {
-		if(![inspectorPane isKindOfClass:[InspectorPane class]])
-			continue;
-		
-		InspectorPane *pane = (InspectorPane *)inspectorPane;
-		NSString *paneAutosaveName = [autosaveName stringByAppendingFormat:@" %@ Pane", [pane title]];
-		
-		[[NSUserDefaults standardUserDefaults] setBool:pane.isCollapsed forKey:paneAutosaveName];
+	if(autosaveName) {
+		for(NSView *inspectorPane in [self subviews]) {
+			if(![inspectorPane isKindOfClass:[InspectorPane class]])
+				continue;
+			
+			InspectorPane *pane = (InspectorPane *)inspectorPane;
+			NSString *paneAutosaveName = [autosaveName stringByAppendingFormat:@" %@ Pane", [pane title]];
+			
+			[[NSUserDefaults standardUserDefaults] setBool:pane.isCollapsed forKey:paneAutosaveName];
+		}
 	}
 }
 
@@ -127,21 +126,20 @@
 	
 	// Iterate through each pane and save its state
 	NSString *autosaveName = [[self window] frameAutosaveName];
-	if(!autosaveName)
-		return;
-	
-	for(NSView *inspectorPane in [self subviews]) {
-		if(![inspectorPane isKindOfClass:[InspectorPane class]])
-			continue;
+	if(autosaveName) {
+		for(NSView *inspectorPane in [self subviews]) {
+			if(![inspectorPane isKindOfClass:[InspectorPane class]])
+				continue;
+			
+			InspectorPane *pane = (InspectorPane *)inspectorPane;
+			NSString *paneAutosaveName = [autosaveName stringByAppendingFormat:@" %@ Pane", [pane title]];
+			
+			[[NSUserDefaults standardUserDefaults] setBool:pane.isCollapsed forKey:paneAutosaveName];
+		}
 		
-		InspectorPane *pane = (InspectorPane *)inspectorPane;
-		NSString *paneAutosaveName = [autosaveName stringByAppendingFormat:@" %@ Pane", [pane title]];
-
-		[[NSUserDefaults standardUserDefaults] setBool:pane.isCollapsed forKey:paneAutosaveName];
+		[[NSUserDefaults standardUserDefaults] synchronize];
 	}
 	
-	[[NSUserDefaults standardUserDefaults] synchronize];
-
 	// Reset the window's frame to its initial size
 	NSRect currentWindowFrame = [[self window] frame];
 	NSRect newWindowFrame = currentWindowFrame;

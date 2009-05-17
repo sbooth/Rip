@@ -4,6 +4,7 @@
  */
 
 #import "ViewSelectorBar.h"
+#import "ViewSelectorBarItem.h"
 
 #define MARGIN_SIZE 2
 
@@ -35,11 +36,22 @@ enum {
 	return self;
 }
 
+- (id) initWithCoder:(NSCoder *)decoder
+{
+	if((self = [super initWithCoder:decoder])) {
+		_items = [NSMutableArray array];
+		_selectedIndex = -1;
+		_pressedIndex = -1;
+	}
+	return self;
+}
+
 - (void) drawRect:(NSRect)rect
 {
 
 #pragma unused(rect)
 	
+	// The background is a two-tone gradient in the bottom half of bounds
 	[self drawBackground];
 	
 	// Draw the images
@@ -58,6 +70,8 @@ enum {
 	// Draw the grid lines
 	[self drawGridLines];
 }
+
+#pragma mark Mouse Methods
 
 - (BOOL)acceptsFirstMouse:(NSEvent *)theEvent
 {
@@ -117,21 +131,13 @@ enum {
 	[self setNeedsDisplay:YES];
 }
 
-- (void) setSelectedIndex:(NSInteger)selectedIndex
-{
-	NSParameterAssert(selectedIndex < (NSInteger)[_items count]);
-	
-	_selectedIndex = selectedIndex;
-}
+#pragma mark Item Management
 
-- (void) addItemWithImage:(NSImage *)image tooltip:(NSString *)tooltip
+- (void) addItem:(ViewSelectorBarItem *)item
 {
-	NSParameterAssert(nil != image);
-	NSParameterAssert(nil != tooltip);
+	NSParameterAssert(nil != item);
 	
-	NSDictionary *itemInfo = [NSDictionary dictionaryWithObjectsAndKeys:image, @"image", tooltip, @"tooltip", nil];
-	
-	[_items addObject:itemInfo];
+	[_items addObject:item];
 
 	// Recalculate the tool tip rectangles
 	[self removeAllToolTips];
@@ -140,30 +146,78 @@ enum {
 	NSUInteger itemIndex;
 	for(itemIndex = 0; itemIndex < itemCount; ++itemIndex) {
 		NSRect cellRect = [self frameRectForCellAtIndex:itemIndex];
-		itemInfo = [_items objectAtIndex:itemIndex];
-		NSString *itemTooltip = [itemInfo objectForKey:@"tooltip"];
+		ViewSelectorBarItem *itemInfo = [_items objectAtIndex:itemIndex];
+		NSString *itemTooltip = [itemInfo tooltip];
 		if(itemTooltip)
 			[self addToolTipRect:cellRect owner:itemTooltip userData:NULL];
 	}
 	
 	// Ensure an item is selected
-	if(-1 == self.selectedIndex)
+	if(-1 == self.selectedIndex/* && itemCount*/)
 		self.selectedIndex = 0;
 }
 
-- (NSImage *) imageAtIndex:(NSInteger)itemIndex
+- (void) setSelectedIndex:(NSInteger)selectedIndex
 {
-	NSParameterAssert(itemIndex < (NSInteger)[_items count]);
+	NSParameterAssert(selectedIndex < (NSInteger)[_items count]);
 	
-	return [[_items objectAtIndex:itemIndex] objectForKey:@"image"];
-	
+	_selectedIndex = selectedIndex;
 }
 
-- (NSString *) tooltipAtIndex:(NSInteger)itemIndex
+- (ViewSelectorBarItem *) selectedItem
 {
-	NSParameterAssert(itemIndex < (NSInteger)[_items count]);
+	NSInteger selectedIndex = self.selectedIndex;
+	if(-1 == selectedIndex)
+		return nil;
 	
-	return [[_items objectAtIndex:itemIndex] objectForKey:@"tooltip"];
+	return [_items objectAtIndex:self.selectedIndex];
+}
+
+- (BOOL) selectItem:(ViewSelectorBarItem *)item
+{
+	NSParameterAssert(nil != item);
+
+	for(ViewSelectorBarItem *currentItem in _items) {
+		if(item == currentItem) {
+			self.selectedIndex = [_items indexOfObject:currentItem];
+			return YES;
+		}
+	}
+	
+	return NO;
+}
+
+- (BOOL) selectItemWithIdentifer:(NSString *)itemIdentifier
+{
+	NSParameterAssert(nil != itemIdentifier);
+	
+	for(ViewSelectorBarItem *item in _items) {
+		if([[item identifier] isEqualToString:itemIdentifier]) {
+			self.selectedIndex = [_items indexOfObject:item];
+			return YES;
+		}
+	}
+	
+	return NO;
+}
+
+- (ViewSelectorBarItem *) itemAtIndex:(NSInteger)itemIndex
+{
+	NSParameterAssert(0 <= itemIndex && itemIndex < [_items count]);
+	
+	return [_items objectAtIndex:itemIndex];
+}
+
+- (ViewSelectorBarItem *) itemWithIdentifier:(NSString *)itemIdentifier
+{
+	NSParameterAssert(nil != itemIdentifier);
+	
+	for(ViewSelectorBarItem *item in _items) {
+		if([[item identifier] isEqualToString:itemIdentifier])
+			return item;
+	}
+	
+	return nil;
 }
 
 @end
@@ -179,7 +233,7 @@ enum {
 	CGFloat cellWidth = bounds.size.width / itemCount;
 	CGFloat cellHeight = bounds.size.height;
 	
-	NSColor *highlightColor = [NSColor colorWithDeviceWhite:0.53f alpha:1.f];
+	NSColor *highlightColor = [NSColor colorWithCalibratedWhite:0.53f alpha:1.f];
 	[highlightColor set];
 	
 	// Draw the bottom border
@@ -210,8 +264,8 @@ enum {
 
 - (void) drawBackground
 {
-	NSColor *topColor = [NSColor colorWithDeviceWhite:0.84f alpha:1.f];
-	NSColor *bottomColor = [NSColor /*windowBackgroundColor*/colorWithDeviceWhite:0.9f alpha:1.f];
+	NSColor *topColor = [NSColor colorWithCalibratedWhite:0.84f alpha:1.f];
+	NSColor *bottomColor = [NSColor /*windowBackgroundColor*/colorWithCalibratedWhite:0.9f alpha:1.f];
 	
 	NSGradient *gradient = [[NSGradient alloc] initWithStartingColor:topColor endingColor:bottomColor];
 	
@@ -260,7 +314,7 @@ enum {
 	cellFrame = NSInsetRect(cellFrame, MARGIN_SIZE, MARGIN_SIZE);
 	
 	// Draw the image, centered in the rect
-	NSImage *image = [[_items objectAtIndex:cellIndex] objectForKey:@"image"];
+	NSImage *image = [[_items objectAtIndex:cellIndex] image];
 	NSSize imageSize = [image size];
 	
 	NSPoint centerPoint = cellFrame.origin;

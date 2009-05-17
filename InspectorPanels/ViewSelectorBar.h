@@ -5,6 +5,8 @@
 
 #import <Cocoa/Cocoa.h>
 
+@class ViewSelectorBarItem;
+
 @interface ViewSelectorBar : NSView
 {
 @private
@@ -14,10 +16,14 @@
 }
 
 @property (assign) NSInteger selectedIndex;
+@property (readonly) ViewSelectorBarItem * selectedItem;
 
-- (void) addItemWithImage:(NSImage *)image tooltip:(NSString *)tooltip;
+- (void) addItem:(ViewSelectorBarItem *)item;
 
-- (NSImage *) imageAtIndex:(NSInteger)itemIndex;
-- (NSString *) tooltipAtIndex:(NSInteger)itemIndex;
+- (BOOL) selectItem:(ViewSelectorBarItem *)item;
+- (BOOL) selectItemWithIdentifer:(NSString *)itemIdentifier;
+
+- (ViewSelectorBarItem *) itemAtIndex:(NSInteger)itemIndex;
+- (ViewSelectorBarItem *) itemWithIdentifier:(NSString *)itemIdentifier;
 
 @end

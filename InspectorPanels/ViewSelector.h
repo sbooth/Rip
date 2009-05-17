@@ -15,10 +15,7 @@
 	NSSize _initialWindowSize;
 	ViewSelectorBar *_selectorBar;
 	NSView *_bodyView;
-	NSMutableArray *_views;
 }
-
-- (void) addItemWithView:(NSView *)view image:(NSImage *)image tooltip:(NSString *)tooltip;
 
 - (ViewSelectorBar *) selectorBar;
 
