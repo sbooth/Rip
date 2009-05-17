@@ -16,6 +16,8 @@
 		3213B2E50FB9F9B000137097 /* MetadataViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3213B2E30FB9F9B000137097 /* MetadataViewController.m */; };
 		3215E80A0F884A5000F84429 /* AIFF.bundle in Copy PlugIns */ = {isa = PBXBuildFile; fileRef = 3215E7D90F8848F600F84429 /* AIFF.bundle */; };
 		321716550FBB4829004C5F28 /* LyricsMetadataEditorPaneIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 321716540FBB4829004C5F28 /* LyricsMetadataEditorPaneIcon.png */; };
+		321717E10FBF9EB9004C5F28 /* AlbumArtEditorPaneIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 321717E00FBF9EB9004C5F28 /* AlbumArtEditorPaneIcon.png */; };
+		321717E60FBF9F14004C5F28 /* AlbumArtInspectorView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 321717E40FBF9F14004C5F28 /* AlbumArtInspectorView.xib */; };
 		321CB1280FA8A23C009DBC39 /* InspectorPanelController.m in Sources */ = {isa = PBXBuildFile; fileRef = 321CB1270FA8A23C009DBC39 /* InspectorPanelController.m */; };
 		321CB1310FA8A2A4009DBC39 /* InspectorPanel.xib in Resources */ = {isa = PBXBuildFile; fileRef = 321CB1300FA8A2A4009DBC39 /* InspectorPanel.xib */; };
 		321CB15B0FA901CB009DBC39 /* InspectorView.m in Sources */ = {isa = PBXBuildFile; fileRef = 321CB15A0FA901CB009DBC39 /* InspectorView.m */; };
@@ -98,7 +100,6 @@
 		32BBF1510EC8875100EC2FBE /* CopyImageToolbarIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 32BBF1480EC8875100EC2FBE /* CopyImageToolbarIcon.png */; };
 		32BBF1520EC8875100EC2FBE /* CopyTracksToolbarIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 32BBF1490EC8875100EC2FBE /* CopyTracksToolbarIcon.png */; };
 		32BBF1530EC8875100EC2FBE /* DetectPregapsToolbarIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 32BBF14A0EC8875100EC2FBE /* DetectPregapsToolbarIcon.png */; };
-		32BBF1540EC8875100EC2FBE /* EditMetadataToolbarIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 32BBF14B0EC8875100EC2FBE /* EditMetadataToolbarIcon.png */; };
 		32BBF1550EC8875100EC2FBE /* EjectDiscToolbarIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 32BBF14C0EC8875100EC2FBE /* EjectDiscToolbarIcon.png */; };
 		32BBF1560EC8875100EC2FBE /* EncoderPreferencesToolbarIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 32BBF14D0EC8875100EC2FBE /* EncoderPreferencesToolbarIcon.png */; };
 		32BBF1570EC8875100EC2FBE /* LookupDiscToolbarIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 32BBF14E0EC8875100EC2FBE /* LookupDiscToolbarIcon.png */; };
@@ -410,6 +411,8 @@
 		3213B2E30FB9F9B000137097 /* MetadataViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MetadataViewController.m; sourceTree = "<group>"; };
 		3215E7D00F8848F600F84429 /* AIFF.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = AIFF.xcodeproj; path = AIFF/AIFF.xcodeproj; sourceTree = "<group>"; };
 		321716540FBB4829004C5F28 /* LyricsMetadataEditorPaneIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = LyricsMetadataEditorPaneIcon.png; sourceTree = "<group>"; };
+		321717E00FBF9EB9004C5F28 /* AlbumArtEditorPaneIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = AlbumArtEditorPaneIcon.png; sourceTree = "<group>"; };
+		321717E50FBF9F14004C5F28 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/AlbumArtInspectorView.xib; sourceTree = "<group>"; };
 		321CB1260FA8A23C009DBC39 /* InspectorPanelController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InspectorPanelController.h; sourceTree = "<group>"; };
 		321CB1270FA8A23C009DBC39 /* InspectorPanelController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = InspectorPanelController.m; sourceTree = "<group>"; };
 		321CB12E0FA8A29E009DBC39 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/InspectorPanel.xib; sourceTree = "<group>"; };
@@ -770,6 +773,7 @@
 		2A37F4B8FDCFA73011CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				321717E40FBF9F14004C5F28 /* AlbumArtInspectorView.xib */,
 				3213B2B60FB9EF0B00137097 /* TrackLyricsInspectorView.xib */,
 				32B42B0F0FB1489200AA4EDF /* AlbumMetadataInspectorView.xib */,
 				32C19DDB0FABDC7E00AEDA04 /* DiscInspectorView.xib */,
@@ -1119,6 +1123,7 @@
 		8C4C8AA70D5A902F00DC0279 /* Images */ = {
 			isa = PBXGroup;
 			children = (
+				321717E00FBF9EB9004C5F28 /* AlbumArtEditorPaneIcon.png */,
 				321716540FBB4829004C5F28 /* LyricsMetadataEditorPaneIcon.png */,
 				3213B2AD0FB9DC8200137097 /* AdditionalAlbumMetadataEditorPaneIcon.png */,
 				3213B2AE0FB9DC8200137097 /* AdditionalTrackMetadataEditorPaneIcon.png */,
@@ -1529,7 +1534,6 @@
 				32BBF1510EC8875100EC2FBE /* CopyImageToolbarIcon.png in Resources */,
 				32BBF1520EC8875100EC2FBE /* CopyTracksToolbarIcon.png in Resources */,
 				32BBF1530EC8875100EC2FBE /* DetectPregapsToolbarIcon.png in Resources */,
-				32BBF1540EC8875100EC2FBE /* EditMetadataToolbarIcon.png in Resources */,
 				32BBF1550EC8875100EC2FBE /* EjectDiscToolbarIcon.png in Resources */,
 				32BBF1560EC8875100EC2FBE /* EncoderPreferencesToolbarIcon.png in Resources */,
 				32BBF1570EC8875100EC2FBE /* LookupDiscToolbarIcon.png in Resources */,
@@ -1557,6 +1561,8 @@
 				3213B2B00FB9DC8200137097 /* AdditionalTrackMetadataEditorPaneIcon.png in Resources */,
 				3213B2B80FB9EF0B00137097 /* TrackLyricsInspectorView.xib in Resources */,
 				321716550FBB4829004C5F28 /* LyricsMetadataEditorPaneIcon.png in Resources */,
+				321717E10FBF9EB9004C5F28 /* AlbumArtEditorPaneIcon.png in Resources */,
+				321717E60FBF9F14004C5F28 /* AlbumArtInspectorView.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1765,6 +1771,14 @@
 				3213B2B70FB9EF0B00137097 /* English */,
 			);
 			name = TrackLyricsInspectorView.xib;
+			sourceTree = "<group>";
+		};
+		321717E40FBF9F14004C5F28 /* AlbumArtInspectorView.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				321717E50FBF9F14004C5F28 /* English */,
+			);
+			name = AlbumArtInspectorView.xib;
 			sourceTree = "<group>";
 		};
 		321CB1300FA8A2A4009DBC39 /* InspectorPanel.xib */ = {

@@ -39,6 +39,11 @@
 	[viewController bind:@"representedObject" toObject:self withKeyPath:@"inspectedDocument" options:nil];
 	[_viewSelector addItemWithView:[viewController view] image:image tooltip:NSLocalizedString(@"Track Metadata", @"")];
 
+	image = [NSImage imageNamed:@"AlbumArtEditorPaneIcon"];
+	viewController = [[NSViewController alloc] initWithNibName:@"AlbumArtInspectorView" bundle:nil];
+	[viewController bind:@"representedObject" toObject:self withKeyPath:@"inspectedDocument" options:nil];
+	[_viewSelector addItemWithView:[viewController view] image:image tooltip:NSLocalizedString(@"Album Art", @"")];
+	
 	image = [NSImage imageNamed:@"LyricsMetadataEditorPaneIcon"];
 	viewController = [[NSViewController alloc] initWithNibName:@"TrackLyricsInspectorView" bundle:nil];
 	[viewController bind:@"representedObject" toObject:self withKeyPath:@"inspectedDocument" options:nil];
