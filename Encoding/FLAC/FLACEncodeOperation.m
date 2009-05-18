@@ -181,21 +181,20 @@ setArgumentForTag(NSMutableArray *arguments, NSDictionary *metadata, NSString *k
 	
 	// Delete the temporary files
 	NSError *error = nil;
-	BOOL removeSuccessful = [[NSFileManager defaultManager] removeItemAtPath:[frontCoverURL path] error:&error];
-	if(!removeSuccessful)
-		self.error = error;
+	if(frontCoverURL) {
+		if(![[NSFileManager defaultManager] removeItemAtPath:[frontCoverURL path] error:&error])
+			self.error = error;
+	}
 
-	removeSuccessful = [[NSFileManager defaultManager] removeItemAtPath:[cueSheetURL path] error:&error];
-	if(!removeSuccessful)
-		self.error = error;
+	if(cueSheetURL) {
+		if(![[NSFileManager defaultManager] removeItemAtPath:[cueSheetURL path] error:&error])
+			self.error = error;
+	}
 	
 	// Get the result
 	int terminationStatus = [task terminationStatus];
-	if(EXIT_SUCCESS != terminationStatus) {
+	if(EXIT_SUCCESS != terminationStatus)
 		self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:terminationStatus userInfo:nil];
-		return;
-	}
-
 }
 
 @end
