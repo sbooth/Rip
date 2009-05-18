@@ -195,7 +195,7 @@
 {
 	NSRect bounds = [self bounds];
 	
-	NSColor *highlightColor = [NSColor colorWithDeviceWhite:0.53f alpha:1.f];
+	NSColor *highlightColor = [NSColor colorWithCalibratedWhite:0.53f alpha:1.f];
 	[highlightColor set];
 	
 	// Draw the top border
@@ -216,8 +216,8 @@
 
 - (void) drawBackground
 {
-	NSColor *topColor = [NSColor colorWithDeviceWhite:0.84f alpha:1.f];
-	NSColor *bottomColor = [NSColor /*windowBackgroundColor*/colorWithDeviceWhite:0.9f alpha:1.f];
+	NSColor *topColor = [NSColor colorWithCalibratedWhite:0.84f alpha:1.f];
+	NSColor *bottomColor = [NSColor /*windowBackgroundColor*/colorWithCalibratedWhite:0.9f alpha:1.f];
 	
 	NSGradient *gradient = [[NSGradient alloc] initWithStartingColor:topColor endingColor:bottomColor];
 	

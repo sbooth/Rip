@@ -32,7 +32,6 @@
 
 - (void) awakeFromNib
 {
-	NSLog(@"ViewSelector awakeFromNib");
 	_initialWindowSize = [[self window] frame].size;
 	
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillTerminate:) name:NSApplicationWillTerminateNotification object:nil];
@@ -61,15 +60,15 @@
 	[_bodyView setAnimations:animations];
 #endif
 
-	// Restore the selected pane
-	NSString *autosaveName = [[self window] frameAutosaveName];
-	if(autosaveName) {
-		NSString *selectedPaneDefaultsName = [autosaveName stringByAppendingFormat:@" Selected Pane"];		
-		NSString *selectedIdentifier = [[NSUserDefaults standardUserDefaults] stringForKey:selectedPaneDefaultsName];
-
-		if(selectedIdentifier)
-			[[self selectorBar] selectItemWithIdentifer:selectedIdentifier];
-	}
+//	// Restore the selected pane
+//	NSString *autosaveName = [[self window] frameAutosaveName];
+//	if(autosaveName) {
+//		NSString *selectedPaneDefaultsName = [autosaveName stringByAppendingFormat:@" Selected Pane"];		
+//		NSString *selectedIdentifier = [[NSUserDefaults standardUserDefaults] stringForKey:selectedPaneDefaultsName];
+//
+//		if(selectedIdentifier)
+//			[[self selectorBar] selectItemWithIdentifer:selectedIdentifier];
+//	}
 }
 
 - (void) observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
@@ -168,16 +167,16 @@
 	
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 	
-	// Save the selected pane
-	NSString *autosaveName = [[self window] frameAutosaveName];
-	if(autosaveName) {
-		NSString *selectedIdentifier = [[[self selectorBar] selectedItem] identifier];
-		NSString *selectedPaneDefaultsName = [autosaveName stringByAppendingFormat:@" Selected Pane"];
-		
-		[[NSUserDefaults standardUserDefaults] setValue:selectedIdentifier forKey:selectedPaneDefaultsName];
-		
-		[[NSUserDefaults standardUserDefaults] synchronize];
-	}	
+//	// Save the selected pane
+//	NSString *autosaveName = [[self window] frameAutosaveName];
+//	if(autosaveName) {
+//		NSString *selectedIdentifier = [[[self selectorBar] selectedItem] identifier];
+//		NSString *selectedPaneDefaultsName = [autosaveName stringByAppendingFormat:@" Selected Pane"];
+//		
+//		[[NSUserDefaults standardUserDefaults] setValue:selectedIdentifier forKey:selectedPaneDefaultsName];
+//		
+//		[[NSUserDefaults standardUserDefaults] synchronize];
+//	}	
 	
 	// Reset the window's frame to its initial size
 	NSRect currentWindowFrame = [[self window] frame];

@@ -18,6 +18,7 @@
 
 @interface MetadataEditorPanelController (Private)
 - (void) activeDocumentChanged;
+- (void) applicationWillTerminate:(NSNotification *)notification;
 @end
 
 @implementation MetadataEditorPanelController
@@ -31,6 +32,8 @@
 
 - (void) awakeFromNib
 {
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillTerminate:) name:NSApplicationWillTerminateNotification object:nil];
+
 	NSViewController *viewController = [[NSViewController alloc] initWithNibName:@"AlbumMetadataInspectorView" bundle:nil];
 	[viewController bind:@"representedObject" toObject:self withKeyPath:@"inspectedDocument" options:nil];
 	
@@ -96,10 +99,22 @@
 											  view:[viewController view]];
 	
 	[[_viewSelector selectorBar] addItem:item];
+
+	// Restore the selected pane
+	NSString *autosaveName = [[self window] frameAutosaveName];
+	if(autosaveName) {
+		NSString *selectedPaneDefaultsName = [autosaveName stringByAppendingFormat:@" Selected Pane"];		
+		NSString *selectedIdentifier = [[NSUserDefaults standardUserDefaults] stringForKey:selectedPaneDefaultsName];
+		
+		if(selectedIdentifier)
+			[[_viewSelector selectorBar] selectItemWithIdentifer:selectedIdentifier];
+	}	
 }
 
 - (void) windowDidLoad
 {
+	[[self window] setMovableByWindowBackground:YES];
+
 	[self activeDocumentChanged];
 	[[NSApplication sharedApplication] addObserver:self forKeyPath:@"mainWindow.windowController" options:0 context:[self class]];
 	
@@ -162,6 +177,25 @@
 	id mainDocument = [[[NSApplication sharedApplication] mainWindow] windowController];
 	if(mainDocument != self.inspectedDocument)
 		self.inspectedDocument = (mainDocument && [mainDocument isKindOfClass:[CompactDiscWindowController class]]) ? mainDocument : nil;   
+}
+
+- (void) applicationWillTerminate:(NSNotification *)notification
+{
+	
+#pragma unused(notification)
+	
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
+	
+	// Save the selected pane
+	NSString *autosaveName = [[self window] frameAutosaveName];
+	if(autosaveName) {
+		NSString *selectedIdentifier = [[[_viewSelector selectorBar] selectedItem] identifier];
+		NSString *selectedPaneDefaultsName = [autosaveName stringByAppendingFormat:@" Selected Pane"];
+		
+		[[NSUserDefaults standardUserDefaults] setValue:selectedIdentifier forKey:selectedPaneDefaultsName];
+		
+		[[NSUserDefaults standardUserDefaults] synchronize];
+	}	
 }
 
 @end
