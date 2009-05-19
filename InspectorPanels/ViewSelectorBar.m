@@ -295,8 +295,7 @@ enum {
 	if(eCellSelectedState == state) {
 		// FIXME: Not quite the same color as IB
 //		NSColor *highlightColor = [NSColor colorWithCalibratedRed:0.81f green:0.84f blue:0.87f alpha:0.5f];
-		NSColor *highlightColor = [NSColor selectedControlColor];
-		highlightColor = [[NSColor selectedControlColor] colorWithAlphaComponent:0.55f];
+		NSColor *highlightColor = [[NSColor selectedControlColor] colorWithAlphaComponent:0.55f];
 		
 		[highlightColor set];
 		[NSBezierPath fillRect:cellFrame];

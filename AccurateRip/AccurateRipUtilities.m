@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2007 - 2008 Stephen F. Booth <me@sbooth.org>
+ *  Copyright (C) 2007 - 2009 Stephen F. Booth <me@sbooth.org>
  *  All Rights Reserved
  */
 
@@ -65,7 +65,7 @@ calculateAccurateRipChecksumForFile(NSURL *fileURL, BOOL firstTrack, BOOL lastTr
 	}
 	
 cleanup:
-	status = AudioFileClose(file);
+	/*status = */AudioFileClose(file);
 /*	if(noErr != status)
 		return 0;*/
 	
@@ -196,7 +196,7 @@ calculateAccurateRipChecksumForFileRegionUsingOffset(NSURL *fileURL, NSRange sec
 		;
 
 cleanup:
-	status = AudioFileClose(file);
+	/*status = */AudioFileClose(file);
 /*	if(noErr != status)
 	 return 0;*/
 	

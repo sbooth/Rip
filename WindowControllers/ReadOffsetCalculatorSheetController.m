@@ -211,8 +211,7 @@ static NSString * const kCalculateOffsetsKVOContext		= @"org.sbooth.Rip.ReadOffs
 
 	// Set up  operations for querying AccurateRip and extracting the audio
 	AccurateRipQueryOperation *accurateRipQueryOperation = [[AccurateRipQueryOperation alloc] init];
-	
-	accurateRipQueryOperation = [[AccurateRipQueryOperation alloc] init];
+
 	accurateRipQueryOperation.compactDiscID = self.compactDisc.objectID;
 	
 	// Extract a portion of the first track on the disc that is at least six seconds long

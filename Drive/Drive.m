@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2005 - 2008 Stephen F. Booth <me@sbooth.org>
+ *  Copyright (C) 2005 - 2009 Stephen F. Booth <me@sbooth.org>
  *  All Rights Reserved
  */
 
@@ -79,6 +79,10 @@
 
 	int result = close(self.fd);
 	self.fd = -1;
+
+	// We no longer need exclusive access to the disk
+//	DADiskUnclaim(self.disk);
+	
 	if(-1 == result) {
 		[[Logger sharedLogger] logMessage:@"Unable to close the drive"];
 		self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:nil];
@@ -310,6 +314,7 @@
 - (NSUInteger) readCD:(void *)buffer sectorAreas:(uint8_t)sectorAreas startSector:(NSUInteger)startSector sectorCount:(NSUInteger)sectorCount
 {
 	NSParameterAssert(NULL != buffer);
+	NSParameterAssert(0 != sectorAreas);
 	NSParameterAssert(0 < sectorCount);
 	
 	dk_cd_read_t	cd_read;

@@ -81,8 +81,7 @@
 	NSNumber *oldIndex = [change objectForKey:NSKeyValueChangeOldKey];
 	NSNumber *newIndex = [change objectForKey:NSKeyValueChangeNewKey];
 	
-	NSView *oldView = nil, *newView = nil;
-	
+	NSView *oldView = nil;
 	if(-1 != [oldIndex integerValue]) {
 		oldView = [[[self selectorBar] itemAtIndex:[oldIndex unsignedIntegerValue]] view];
 		[oldView removeFromSuperviewWithoutNeedingDisplay];
@@ -90,8 +89,13 @@
 	else
 		oldView = _bodyView;
 
-	if(-1 != [newIndex integerValue])
-		newView = [[[self selectorBar] itemAtIndex:[newIndex unsignedIntegerValue]] view];
+	// No new view was specified, so keep the existing window frame but clear the title
+	if(-1 == [newIndex integerValue]) {
+		[[self window] setTitle:@""];
+		return;
+	}
+	
+	NSView *newView = [[[self selectorBar] itemAtIndex:[newIndex unsignedIntegerValue]] view];
 	
 	// Calculate the new window size
 	CGFloat deltaY = [newView frame].size.height - [oldView frame].size.height;
@@ -108,25 +112,23 @@
 	
 	[[self window] setFrame:newWindowFrame display:YES animate:YES];
 	
-	if(newView) {
 #if USE_CORE_ANIMATION
-		[[_bodyView animator] addSubview:newView];
+	[[_bodyView animator] addSubview:newView];
 #else
-		[_bodyView addSubview:newView];
+	[_bodyView addSubview:newView];
 #endif
-			
-		// Update the key view
-		NSView *view = [newView nextValidKeyView];
-		if(view)
-			[[self window] makeFirstResponder:view];
 		
-		// Set the window's title to the selected pane's title
-		NSString *newTitle = [[[self selectorBar] itemAtIndex:[newIndex integerValue]] label];
-		if(!newTitle)
-			newTitle = @"";
-		
-		[[self window] setTitle:newTitle];
-	}
+	// Update the key view
+	NSView *view = [newView nextValidKeyView];
+	if(view)
+		[[self window] makeFirstResponder:view];
+	
+	// Set the window's title to the selected pane's title
+	NSString *newTitle = [[[self selectorBar] itemAtIndex:[newIndex integerValue]] label];
+	if(!newTitle)
+		newTitle = @"";
+	
+	[[self window] setTitle:newTitle];
 }
 
 - (ViewSelectorBar *) selectorBar

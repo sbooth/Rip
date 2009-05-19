@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2008 Stephen F. Booth <me@sbooth.org>
+ *  Copyright (C) 2008 - 2009 Stephen F. Booth <me@sbooth.org>
  *  All Rights Reserved
  */
 
@@ -45,18 +45,12 @@ NSString * const	kMusicBrainzServiceName					= @"MusicBrainz";
 		NSString *password = [[NSString alloc] initWithBytes:passwordData length:passwordLength encoding:NSUTF8StringEncoding];
 		[_musicBrainzPasswordTextField setStringValue:password];
 	}
-	else if(errSecItemNotFound == status)
-		;
-	else
-		;
 	
 	// Clean up
-	status = SecKeychainItemFreeContent(NULL, passwordData);
-	if(noErr != status)
-		;
+	/*status = */SecKeychainItemFreeContent(NULL, passwordData);
 	
 	if(keychainItemRef)
-		CFRelease(keychainItemRef);
+		CFRelease(keychainItemRef), keychainItemRef = NULL;
 }
 
 @end
@@ -94,31 +88,26 @@ NSString * const	kMusicBrainzServiceName					= @"MusicBrainz";
 	
 	// If the item wasn't found, store it
 	if(errSecItemNotFound == status) {		
-		status = SecKeychainAddGenericPassword(NULL,
-											   strlen(serviceNameUTF8),
-											   serviceNameUTF8,
-											   strlen(usernameUTF8),
-											   usernameUTF8,
-											   strlen(passwordUTF8), 
-											   passwordUTF8, 
-											   &keychainItemRef);
-		if(noErr != status)
-			;
+		/*status = */SecKeychainAddGenericPassword(NULL,
+												   strlen(serviceNameUTF8),
+												   serviceNameUTF8,
+												   strlen(usernameUTF8),
+												   usernameUTF8,
+												   strlen(passwordUTF8), 
+												   passwordUTF8, 
+												   &keychainItemRef);
 	}
 	// Otherwise, update the password
 	else if(noErr == status) {
-		status = SecKeychainItemModifyAttributesAndData(keychainItemRef,
-														NULL,
-														strlen(passwordUTF8), 
-														passwordUTF8);
+		/*status = */SecKeychainItemModifyAttributesAndData(keychainItemRef,
+															NULL,
+															strlen(passwordUTF8), 
+															passwordUTF8);
 	}
-	else {
-		
-	}
-
+	
 	// Clean up
 	if(keychainItemRef)
-		CFRelease(keychainItemRef);
+		CFRelease(keychainItemRef), keychainItemRef = NULL;
 }
 
 @end

@@ -7,6 +7,7 @@
 #import "NSViewController+PreferencesViewControllerMethods.h"
 #import "EncoderManager.h"
 #import "EncoderInterface/EncoderInterface.h"
+#import "Logger.h"
 
 #define TRANSITION_ANIMATION_DURATION 0.15
 
@@ -169,9 +170,10 @@
 
 	_encoderSettingsViewController = [encoderInterface configurationViewController];
 
-	// Some encoders may not allow user configuration
+	// Some encoders (in the future) may not allow user configuration
 	if(!_encoderSettingsViewController) {
-		NSLog(@"nil NSViewController subclasses aren't currently supported!");
+		[[Logger sharedLogger] logMessageWithLevel:eLogMessageLevelDebug format:@"[%@ configurationViewController] is nil, which is unsupported at this time", NSStringFromClass(encoderClass)];
+		return;
 	}
 
 	// The encoder's view controller uses the representedObject property to hold the encoder settings

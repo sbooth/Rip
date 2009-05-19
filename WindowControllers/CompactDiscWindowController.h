@@ -35,8 +35,6 @@
 @property (readonly, assign) CompactDisc * compactDisc;
 @property (readonly, assign) DriveInformation * driveInformation;
 
-@property (readonly, assign, getter = isExtracting) BOOL extracting;
-
 @property (readonly, assign) MetadataViewController * metadataViewController;
 @property (readonly, assign) ExtractionViewController * extractionViewController;
 

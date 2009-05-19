@@ -7,6 +7,7 @@
 #import "NSViewController+PreferencesViewControllerMethods.h"
 #import "MusicDatabaseManager.h"
 #import "MusicDatabaseInterface/MusicDatabaseInterface.h"
+#import "Logger.h"
 
 #define TRANSITION_ANIMATION_DURATION 0.15
 
@@ -166,9 +167,10 @@
 	
 	_musicDatabaseSettingsViewController = [musicDatabaseInterface configurationViewController];
 	
-	// Some musicDatabases may not allow user configuration
+	// Some musicDatabases (in the future) may not allow user configuration
 	if(!_musicDatabaseSettingsViewController) {
-		NSLog(@"nil NSViewController subclasses aren't currently supported!");
+		[[Logger sharedLogger] logMessageWithLevel:eLogMessageLevelDebug format:@"[%@ configurationViewController] is nil, which is unsupported at this time", NSStringFromClass(musicDatabaseClass)];
+		return;
 	}
 	
 	// The musicDatabase's view controller uses the representedObject property to hold the musicDatabase settings

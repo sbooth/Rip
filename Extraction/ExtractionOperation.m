@@ -403,7 +403,7 @@ zeroTrailingBitsOfBufferInPlace(void *buffer,
 		CC_SHA1_Update(&sha1, audioData.bytes, audioData.length);
 
 		// Housekeeping
-		packetNumber += packetCount;
+//		packetNumber += packetCount;
 	}
 
 	// ========================================
