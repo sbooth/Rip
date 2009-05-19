@@ -401,9 +401,6 @@ zeroTrailingBitsOfBufferInPlace(void *buffer,
 		// Update the MD5 and SHA1 digests
 		CC_MD5_Update(&md5, audioData.bytes, audioData.length);
 		CC_SHA1_Update(&sha1, audioData.bytes, audioData.length);
-
-		// Housekeeping
-//		packetNumber += packetCount;
 	}
 
 	// ========================================

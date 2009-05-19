@@ -20,7 +20,7 @@
 
 	// Process the CDTOC into a more friendly format
 	CDTOC *toc = (CDTOC *)[self.discTOC bytes];
-	NSUInteger /*firstTrackNumber = 0,*/ lastTrackNumber = 0;
+	NSUInteger lastTrackNumber = 0;
 	
 	// Iterate through each descriptor in the first session and extract the information we need
 	NSUInteger numDescriptors = CDTOCGetDescriptorCount(toc);
@@ -32,11 +32,8 @@
 		if(1 != desc->session)
 			continue;
 		
-		// First track
-		if(0xA0 == desc->point && 1 == desc->adr)
-			;//firstTrackNumber = desc->p.minute;
 		// Last track
-		else if(0xA1 == desc->point && 1 == desc->adr)
+		if(0xA1 == desc->point && 1 == desc->adr)
 			lastTrackNumber = desc->p.minute;
 	}
 	

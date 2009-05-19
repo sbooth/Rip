@@ -66,8 +66,6 @@ calculateAccurateRipChecksumForFile(NSURL *fileURL, BOOL firstTrack, BOOL lastTr
 	
 cleanup:
 	/*status = */AudioFileClose(file);
-/*	if(noErr != status)
-		return 0;*/
 	
 	return checksum;
 }
@@ -197,8 +195,6 @@ calculateAccurateRipChecksumForFileRegionUsingOffset(NSURL *fileURL, NSRange sec
 
 cleanup:
 	/*status = */AudioFileClose(file);
-/*	if(noErr != status)
-	 return 0;*/
 	
 	return checksum;
 }
