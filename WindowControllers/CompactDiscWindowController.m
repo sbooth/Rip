@@ -1121,23 +1121,23 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 		if(!track)
 			continue;
 		
-		if(eraseExistingMetadata || [musicDatabaseEntry valueForKey:kMetadataAdditionalMetadataKey])
+		if(eraseExistingMetadata || [trackMetadata valueForKey:kMetadataAdditionalMetadataKey])
 			track.metadata.additionalMetadata = [trackMetadata valueForKey:kMetadataAdditionalMetadataKey];
-		if(eraseExistingMetadata || [musicDatabaseEntry valueForKey:kMetadataArtistKey])
+		if(eraseExistingMetadata || [trackMetadata valueForKey:kMetadataArtistKey])
 			track.metadata.artist = [trackMetadata valueForKey:kMetadataArtistKey];
-		if(eraseExistingMetadata || [musicDatabaseEntry valueForKey:kMetadataComposerKey])
+		if(eraseExistingMetadata || [trackMetadata valueForKey:kMetadataComposerKey])
 			track.metadata.composer = [trackMetadata valueForKey:kMetadataComposerKey];
-		if(eraseExistingMetadata || [musicDatabaseEntry valueForKey:kMetadataReleaseDateKey])
+		if(eraseExistingMetadata || [trackMetadata valueForKey:kMetadataReleaseDateKey])
 			track.metadata.date = [trackMetadata valueForKey:kMetadataReleaseDateKey];
-		if(eraseExistingMetadata || [musicDatabaseEntry valueForKey:kMetadataGenreKey])
+		if(eraseExistingMetadata || [trackMetadata valueForKey:kMetadataGenreKey])
 			track.metadata.genre = [trackMetadata valueForKey:kMetadataGenreKey];
-		if(eraseExistingMetadata || [musicDatabaseEntry valueForKey:kMetadataISRCKey])
-			track.metadata.ISRC = [musicDatabaseEntry valueForKey:kMetadataISRCKey];
-		if(eraseExistingMetadata || [musicDatabaseEntry valueForKey:kMetadataLyricsKey])
+		if(eraseExistingMetadata || [trackMetadata valueForKey:kMetadataISRCKey])
+			track.metadata.ISRC = [trackMetadata valueForKey:kMetadataISRCKey];
+		if(eraseExistingMetadata || [trackMetadata valueForKey:kMetadataLyricsKey])
 			track.metadata.lyrics = [trackMetadata valueForKey:kMetadataLyricsKey];
-		if(eraseExistingMetadata || [musicDatabaseEntry valueForKey:kMetadataMusicBrainzIDKey])
+		if(eraseExistingMetadata || [trackMetadata valueForKey:kMetadataMusicBrainzIDKey])
 			track.metadata.musicBrainzID = [trackMetadata valueForKey:kMetadataMusicBrainzIDKey];
-		if(eraseExistingMetadata || [musicDatabaseEntry valueForKey:kMetadataTitleKey])
+		if(eraseExistingMetadata || [trackMetadata valueForKey:kMetadataTitleKey])
 			track.metadata.title = [trackMetadata valueForKey:kMetadataTitleKey];
 	}
 	
