@@ -169,9 +169,10 @@
 	
 	// Delete the temporary album art
 	NSError *error = nil;
-	BOOL removeSuccessful = [[NSFileManager defaultManager] removeItemAtPath:[frontCoverURL path] error:&error];
-	if(!removeSuccessful)
-		self.error = error;
+	if(frontCoverURL) {
+		if(![[NSFileManager defaultManager] removeItemAtPath:[frontCoverURL path] error:&error])
+			self.error = error;
+	}
 }
 
 @end
