@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2008 Stephen F. Booth <me@sbooth.org>
+ *  Copyright (C) 2008 - 2009 Stephen F. Booth <me@sbooth.org>
  *  All Rights Reserved
  */
 
@@ -93,14 +93,11 @@ NSString * const	kAccurateRipTrackIDKey					= @"accurateRipTrackID";
 		// Check all the pressings that were found in AccurateRip for matching checksums
 		for(AccurateRipDiscRecord *accurateRipDisc in trackDescriptor.session.disc.accurateRipDiscs) {
 			
-			// Only key discs contain track offset information
-			if(!accurateRipDisc.isKeyDisc)
-				continue;
-			
 			// Determine what AccurateRip checksum we are attempting to match
 			AccurateRipTrackRecord *accurateRipTrack = [accurateRipDisc trackNumber:trackDescriptor.number.unsignedIntegerValue];
 			
-			if(!accurateRipTrack)
+			// If the track wasn't found or doesn't contain an offset checksum, it can't be used
+			if(!accurateRipTrack || !accurateRipTrack.offsetChecksum)
 				continue;
 
 			if(accurateRipTrack.offsetChecksum.unsignedIntegerValue == trackActualOffsetChecksum) {
