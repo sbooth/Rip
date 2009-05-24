@@ -18,6 +18,10 @@
 {
 	NSMutableString *cueSheetString = [NSMutableString string];
 	
+	// For proper cue sheet generation, only strings with spaces are enclosed in quotes
+	NSCharacterSet *whitespaceCharacterSet = [NSCharacterSet whitespaceCharacterSet];
+	
+	// Header
 	NSString *appName = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleName"];
 	NSString *shortVersionNumber = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
 	NSString *versionNumber = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"];	
@@ -28,20 +32,39 @@
 	[cueSheetString appendFormat:@"REM FreeDB Disc ID %08x\n", self.freeDBDiscID];
 	[cueSheetString appendFormat:@"REM MusicBrainz Disc ID %@\n", self.musicBrainzDiscID];
 	
-	if(self.metadata.date)
-		[cueSheetString appendFormat:@"REM DATE %@\n", self.metadata.date];
+	NSString *date = self.metadata.date;
+	if(date && [date length]) {
+		NSRange whitespaceRange = [date rangeOfCharacterFromSet:whitespaceCharacterSet];
+		if(NSNotFound == whitespaceRange.location && 0 == whitespaceRange.length)
+			[cueSheetString appendFormat:@"REM DATE %@\n", date];
+		else
+			[cueSheetString appendFormat:@"REM DATE \"%@\"\n", date];
+	}
 	
 	[cueSheetString appendString:@"\n"];
 	
-	if(self.metadata.MCN)
+	NSString *MCN = self.metadata.MCN;
+	if(MCN && [MCN length] && [MCN integerValue])
 		[cueSheetString appendFormat:@"CATALOG %@\n", self.metadata.MCN];
 	
 	// Title, artist
-	if(self.metadata.title)
-		[cueSheetString appendFormat:@"TITLE \"%@\"\n", self.metadata.title];
+	NSString *title = self.metadata.title;
+	if(title && [title length]) {
+		NSRange whitespaceRange = [title rangeOfCharacterFromSet:whitespaceCharacterSet];
+		if(NSNotFound == whitespaceRange.location && 0 == whitespaceRange.length)
+			[cueSheetString appendFormat:@"TITLE %@\n", title];
+		else
+			[cueSheetString appendFormat:@"TITLE \"%@\"\n", title];
+	}
 	
-	if(self.metadata.artist)
-		[cueSheetString appendFormat:@"PERFORMER \"%@\"\n", self.metadata.artist];
+	NSString *artist = self.metadata.artist;
+	if(artist && [artist length]) {
+		NSRange whitespaceRange = [artist rangeOfCharacterFromSet:whitespaceCharacterSet];
+		if(NSNotFound == whitespaceRange.location && 0 == whitespaceRange.length)
+			[cueSheetString appendFormat:@"PERFORMER %@\n", artist];
+		else
+			[cueSheetString appendFormat:@"PERFORMER \"%@\"\n", artist];
+	}
 	
 	[cueSheetString appendString:@"\n"];
 	
@@ -88,14 +111,32 @@
 			[cueSheetString appendFormat:@"  FLAGS %@\n", [flagsArray componentsJoinedByString:@" "]];
 		
 		// Track title, artist and composer
-		if(trackDescriptor.metadata.title)
-			[cueSheetString appendFormat:@"  TITLE \"%@\"\n", trackDescriptor.metadata.title];
+		title = trackDescriptor.metadata.title;
+		if(title && [title length]) {
+			NSRange whitespaceRange = [title rangeOfCharacterFromSet:whitespaceCharacterSet];
+			if(NSNotFound == whitespaceRange.location && 0 == whitespaceRange.length)
+				[cueSheetString appendFormat:@"  TITLE %@\n", title];
+			else
+				[cueSheetString appendFormat:@"  TITLE \"%@\"\n", title];
+		}
 		
-		if(trackDescriptor.metadata.artist)
-			[cueSheetString appendFormat:@"  PERFORMER \"%@\"\n", trackDescriptor.metadata.artist];
+		artist = trackDescriptor.metadata.artist;
+		if(artist && [artist length]) {
+			NSRange whitespaceRange = [artist rangeOfCharacterFromSet:whitespaceCharacterSet];
+			if(NSNotFound == whitespaceRange.location && 0 == whitespaceRange.length)
+				[cueSheetString appendFormat:@"  PERFORMER %@\n", artist];
+			else
+				[cueSheetString appendFormat:@"  PERFORMER \"%@\"\n", artist];
+		}
 		
-		if(trackDescriptor.metadata.composer)
-			[cueSheetString appendFormat:@"  SONGWRITER \"%@\"\n", trackDescriptor.metadata.composer];
+		NSString *composer = trackDescriptor.metadata.composer;
+		if(composer && [composer length]) {
+			NSRange whitespaceRange = [composer rangeOfCharacterFromSet:whitespaceCharacterSet];
+			if(NSNotFound == whitespaceRange.location && 0 == whitespaceRange.length)
+				[cueSheetString appendFormat:@"  SONGWRITER %@\n", composer];
+			else
+				[cueSheetString appendFormat:@"  SONGWRITER \"%@\"\n", composer];
+		}
 		
 		[cueSheetString appendString:@"\n"];
 	}
