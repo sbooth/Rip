@@ -136,7 +136,7 @@
 	int8_t *buffer = calloc(sectors.length, kCDSectorSizeCDDA);
 
 	NSError *localError = nil;
-	NSUInteger sectorsRead = [self readAudioForSectors:sectors intoBuffer:buffer error:&localError];
+	NSUInteger sectorsRead = [self readAudioForSectors:sectors buffer:buffer error:&localError];
 	
 	if(0 == sectorsRead && localError) {
 		free(buffer);
@@ -149,7 +149,7 @@
 	return [NSData dataWithBytesNoCopy:buffer length:(kCDSectorSizeCDDA * sectorsRead) freeWhenDone:YES];
 }
 
-- (NSUInteger) readAudioForSectors:(NSRange)sectors intoBuffer:(void *)buffer error:(NSError **)error
+- (NSUInteger) readAudioForSectors:(NSRange)sectors buffer:(void *)buffer error:(NSError **)error
 {
 	NSParameterAssert(NULL != buffer);
 
@@ -232,6 +232,7 @@
 	
 	return self;
 }
+
 - (BOOL) createFile:(NSError **)error
 {
 	// Set up the ASBD for CDDA audio
