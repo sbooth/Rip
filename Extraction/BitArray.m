@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2005 - 2008 Stephen F. Booth <me@sbooth.org>
+ *  Copyright (C) 2005 - 2009 Stephen F. Booth <me@sbooth.org>
  *  All Rights Reserved
  */
 
@@ -23,6 +23,13 @@
 	if((self = [super init]))
 		self.bitCount = bitCount;
 	return self;
+}
+
+- (id) initWithData:(NSData *)data
+{
+	NSParameterAssert(nil != data);
+	
+	return [self initWithBits:[data bytes] bitCount:([data length] / 8)];
 }
 
 - (id) initWithBits:(const void *)buffer bitCount:(NSUInteger)bitCount

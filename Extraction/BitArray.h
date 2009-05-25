@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2005 - 2008 Stephen F. Booth <me@sbooth.org>
+ *  Copyright (C) 2005 - 2009 Stephen F. Booth <me@sbooth.org>
  *  All Rights Reserved
  */
 
@@ -29,6 +29,7 @@
 // Creation
 + (id) bitArrayWithBitCount:(NSUInteger)bitCount;
 - (id) initWithBitCount:(NSUInteger)bitCount;
+- (id) initWithData:(NSData *)data;
 - (id) initWithBits:(const void *)buffer bitCount:(NSUInteger)bitCount;
 
 // ========================================
