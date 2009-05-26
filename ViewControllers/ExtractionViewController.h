@@ -57,9 +57,7 @@ typedef enum _eExtractionMode eExtractionMode;
 	
 	NSMutableArray *_partialExtractions;
 	NSMutableIndexSet *_sectorsNeedingVerification;
-	
-	NSMutableArray *_encodingOperations;
-	
+
 	NSUInteger _requiredMatches;
 	NSUInteger _retryCount;
 	NSUInteger _maxRetries;
