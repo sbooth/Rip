@@ -1402,7 +1402,6 @@ static NSString * const kkAudioExtractionKVOContext		= @"org.sbooth.Rip.Extracti
 {
 	// This will (hopefully) contain an error-free version of the sector
 	int8_t synthesizedSector [kCDSectorSizeCDDA];
-	memset(&synthesizedSector, 0, kCDSectorSizeCDDA);
 
 	NSMutableIndexSet *verifiedSectorPositions = [NSMutableIndexSet indexSet];
 
@@ -1551,41 +1550,35 @@ static NSString * const kkAudioExtractionKVOContext		= @"org.sbooth.Rip.Extracti
 	// Strip off the cushion sectors before encoding, if present
 	if(operation.cushionSectors) {
 		ExtractedAudioFile *inputFile = [ExtractedAudioFile openFileForReadingAtURL:operation.URL error:error];
+		
 		if(!inputFile)
 			return nil;
 		
 		ExtractedAudioFile *outputFile = [ExtractedAudioFile createFileAtURL:temporaryURLWithExtension(@"wav") error:error];
+		
 		if(!outputFile) {
 			[inputFile closeFile], inputFile = nil;
 			return nil;
 		}
 		
-//		int8_t buffer [kCDSectorSizeCDDA];
+		int8_t buffer [kCDSectorSizeCDDA];
 		NSUInteger startingSector = operation.cushionSectors;
 		NSUInteger sectorCount = operation.sectors.length;
 		NSUInteger sectorCounter = 0;
 		
+		// Copy sectors from the input file to the output file, one sector at a time
 		while(sectorCounter < sectorCount) {
-//			NSUInteger sectorsRead = [inputFile readAudioForSectors:NSMakeRange(startingSector, 1) intoBuffer:buffer error:error];
-//			if(0 == sectorsRead) {
-//				[inputFile closeFile], inputFile = nil;
-//				[outputFile closeFile], outputFile = nil;
-//				return nil;
-//			}
-			NSData *audioData = [inputFile audioDataForSector:startingSector error:error];
-			if(!audioData) {
+			NSUInteger sectorsRead = [inputFile readAudioForSectors:NSMakeRange(startingSector, 1) buffer:buffer error:error];
+
+			if(0 == sectorsRead) {
 				[inputFile closeFile], inputFile = nil;
 				[outputFile closeFile], outputFile = nil;
 				return nil;
 			}
 			
-//			NSUInteger sectorsWritten = [outputFile setAudio:buffer forSectors:NSMakeRange(sectorCounter, 1) error:error];
-//			if(0 == sectorsWritten) {
-//				[inputFile closeFile], inputFile = nil;
-//				[outputFile closeFile], outputFile = nil;
-//				return nil;
-//			}
-			if(![outputFile setAudioData:audioData forSector:sectorCounter error:error]) {
+			NSUInteger sectorsWritten = [outputFile setAudio:buffer forSectors:NSMakeRange(sectorCounter, 1) error:error];
+			
+			if(0 == sectorsWritten) {
 				[inputFile closeFile], inputFile = nil;
 				[outputFile closeFile], outputFile = nil;
 				return nil;
@@ -1808,6 +1801,7 @@ static NSString * const kkAudioExtractionKVOContext		= @"org.sbooth.Rip.Extracti
 	NSArray *sortedTrackExtractionRecords = [[_trackExtractionRecords allObjects] sortedArrayUsingDescriptors:[NSArray arrayWithObject:trackNumberSortDescriptor]];
 	
 	NSUInteger imageSectorNumber = 0;
+	int8_t buffer [kCDSectorSizeCDDA];
 	
 	// Loop over all the extracted tracks and concatenate them together
 	for(TrackExtractionRecord *trackExtractionRecord in sortedTrackExtractionRecords) {
@@ -1823,15 +1817,18 @@ static NSString * const kkAudioExtractionKVOContext		= @"org.sbooth.Rip.Extracti
 		
 		while(fileSectorNumber < fileSectorCount) {
 			// Read a single sector of data
-			NSData *audioData = [trackFile audioDataForSector:fileSectorNumber error:&error];
-			if(!audioData) {
+			NSUInteger sectorsRead = [trackFile readAudioForSectors:NSMakeRange(fileSectorNumber, 1) buffer:buffer error:&error];
+			
+			if(0 == sectorsRead) {
 				[trackFile closeFile], trackFile = nil;
 				[imageFile closeFile], imageFile = nil;
 				return nil;
 			}
 			
 			// Write it to the output file
-			if(![imageFile setAudioData:audioData forSector:imageSectorNumber error:&error]) {
+			NSUInteger sectorsWritten = [imageFile setAudio:buffer forSectors:NSMakeRange(imageSectorNumber, 1) error:&error];
+			
+			if(0 == sectorsWritten) {
 				[trackFile closeFile], trackFile = nil;
 				[imageFile closeFile], imageFile = nil;
 				return nil;
