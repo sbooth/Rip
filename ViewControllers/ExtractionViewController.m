@@ -1174,8 +1174,7 @@ static NSString * const kkAudioExtractionKVOContext		= @"org.sbooth.Rip.Extracti
 		NSString *MD5 = _synthesizedTrack.MD5;
 		NSString *SHA1 = _synthesizedTrack.SHA1;
 		
-		[_synthesizedTrack closeFile];
-		_synthesizedTrack = nil;
+		[_synthesizedTrack closeFile], _synthesizedTrack = nil;
 		
 		// Calculate the AccurateRip checksum
 		NSUInteger accurateRipChecksum = calculateAccurateRipChecksumForFile(fileURL,
@@ -1282,7 +1281,7 @@ static NSString * const kkAudioExtractionKVOContext		= @"org.sbooth.Rip.Extracti
 			}
 			
 			NSString *previousSHA1 = previousFile.SHA1;
-			[previousFile closeFile];
+			[previousFile closeFile], previousFile = nil;
 			
 			// If the two synthesized tracks match, send one to the encoder
 			if([previousSHA1 isEqualToString:SHA1]) {
@@ -1434,15 +1433,16 @@ static NSString * const kkAudioExtractionKVOContext		= @"org.sbooth.Rip.Extracti
 		NSData *sectorData = [operationFile audioDataForSector:sectorIndex error:&error];
 		const int8_t *rawSectorBytes = [sectorData bytes];
 		
+		[operationFile closeFile], operationFile = nil;
+
 		// Determine which bytes in the sector are valid (free of C2 errors)
 		NSData *sectorErrorData = [operation.errorFlags objectForKey:[NSNumber numberWithUnsignedInteger:sectorIndex]];
 		
-		BitArray *sectorErrors = nil;
 		NSIndexSet *errorFreePositions = nil;
 
 		// If sectorErrorData is nil it means no C2 errors exist for the sector
 		if(sectorErrorData) {
-			sectorErrors = [[BitArray alloc] initWithData:sectorErrorData];
+			BitArray *sectorErrors = [[BitArray alloc] initWithData:sectorErrorData];
 			errorFreePositions = [sectorErrors indexSetForZeroes];
 		}
 		
@@ -1476,15 +1476,16 @@ static NSString * const kkAudioExtractionKVOContext		= @"org.sbooth.Rip.Extracti
 			NSData *otherSectorData = [otherOperationFile audioDataForSector:otherSectorIndex error:&error];
 			const int8_t *otherRawSectorBytes = [otherSectorData bytes];
 			
+			[otherOperationFile closeFile], otherOperationFile = nil;
+			
 			// Determine which bytes in the sector are valid (free of C2 errors)
 			NSData *otherSectorErrorData = [otherOperation.errorFlags objectForKey:[NSNumber numberWithUnsignedInteger:otherSectorIndex]];
 			
-			BitArray *otherSectorErrors = nil;
 			NSIndexSet *otherErrorFreePositions = nil;
 
 			// If otherSectorErrorData is nil it means no C2 errors exist for the sector
 			if(otherSectorErrorData) {
-				otherSectorErrors = [[BitArray alloc] initWithData:otherSectorErrorData];
+				BitArray *otherSectorErrors = [[BitArray alloc] initWithData:otherSectorErrorData];
 				otherErrorFreePositions = [otherSectorErrors indexSetForZeroes];
 			}
 			
@@ -1555,7 +1556,7 @@ static NSString * const kkAudioExtractionKVOContext		= @"org.sbooth.Rip.Extracti
 		
 		ExtractedAudioFile *outputFile = [ExtractedAudioFile createFileAtURL:temporaryURLWithExtension(@"wav") error:error];
 		if(!outputFile) {
-			[inputFile closeFile];
+			[inputFile closeFile], inputFile = nil;
 			return nil;
 		}
 		
@@ -1567,26 +1568,26 @@ static NSString * const kkAudioExtractionKVOContext		= @"org.sbooth.Rip.Extracti
 		while(sectorCounter < sectorCount) {
 //			NSUInteger sectorsRead = [inputFile readAudioForSectors:NSMakeRange(startingSector, 1) intoBuffer:buffer error:error];
 //			if(0 == sectorsRead) {
-//				[inputFile closeFile];
-//				[outputFile closeFile];
+//				[inputFile closeFile], inputFile = nil;
+//				[outputFile closeFile], outputFile = nil;
 //				return nil;
 //			}
 			NSData *audioData = [inputFile audioDataForSector:startingSector error:error];
 			if(!audioData) {
-				[inputFile closeFile];
-				[outputFile closeFile];
+				[inputFile closeFile], inputFile = nil;
+				[outputFile closeFile], outputFile = nil;
 				return nil;
 			}
 			
 //			NSUInteger sectorsWritten = [outputFile setAudio:buffer forSectors:NSMakeRange(sectorCounter, 1) error:error];
 //			if(0 == sectorsWritten) {
-//				[inputFile closeFile];
-//				[outputFile closeFile];
+//				[inputFile closeFile], inputFile = nil;
+//				[outputFile closeFile], outputFile = nil;
 //				return nil;
 //			}
 			if(![outputFile setAudioData:audioData forSector:sectorCounter error:error]) {
-				[inputFile closeFile];
-				[outputFile closeFile];
+				[inputFile closeFile], inputFile = nil;
+				[outputFile closeFile], outputFile = nil;
 				return nil;
 			}
 			
@@ -1598,8 +1599,8 @@ static NSString * const kkAudioExtractionKVOContext		= @"org.sbooth.Rip.Extracti
 		if(![operation.MD5 isEqualToString:outputFile.MD5] || ![operation.SHA1 isEqualToString:outputFile.SHA1]) {
 			[[Logger sharedLogger] logMessage:@"Internal inconsistency: MD5 or SHA1 for extracted and synthesized audio don't match"];
 			
-			[inputFile closeFile];
-			[outputFile closeFile];
+			[inputFile closeFile], inputFile = nil;
+			[outputFile closeFile], outputFile = nil;
 			
 			if(error)
 				*error = [NSError errorWithDomain:NSCocoaErrorDomain code:42 userInfo:nil];
@@ -1608,8 +1609,8 @@ static NSString * const kkAudioExtractionKVOContext		= @"org.sbooth.Rip.Extracti
 		
 		URL = outputFile.URL;
 		
-		[inputFile closeFile];
-		[outputFile closeFile];
+		[inputFile closeFile], inputFile = nil;
+		[outputFile closeFile], outputFile = nil;
 	}
 	
 	return URL;
@@ -1699,7 +1700,7 @@ static NSString * const kkAudioExtractionKVOContext		= @"org.sbooth.Rip.Extracti
 	if(!_synthesizedTrack) {
 		_synthesizedTrack = [ExtractedAudioFile createFileAtURL:temporaryURLWithExtension(@"wav") error:&error];
 		if(!_synthesizedTrack) {
-			[inputFile closeFile];
+			[inputFile closeFile], inputFile = nil;
 			[self presentError:error modalForWindow:[[self view] window] delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
 			return NO;
 		}
@@ -1757,7 +1758,7 @@ static NSString * const kkAudioExtractionKVOContext		= @"org.sbooth.Rip.Extracti
 		sectorIndex = [sectors indexGreaterThanIndex:sectorIndex];
 	}
 	
-	[inputFile closeFile];
+	[inputFile closeFile], inputFile = nil;
 	
 	return YES;
 }
@@ -1813,7 +1814,7 @@ static NSString * const kkAudioExtractionKVOContext		= @"org.sbooth.Rip.Extracti
 		// Open the track for reading
 		ExtractedAudioFile *trackFile = [ExtractedAudioFile openFileForReadingAtURL:trackExtractionRecord.inputURL error:&error];
 		if(nil == trackFile) {
-			[imageFile closeFile];
+			[imageFile closeFile], imageFile = nil;
 			return nil;
 		}
 		
@@ -1824,15 +1825,15 @@ static NSString * const kkAudioExtractionKVOContext		= @"org.sbooth.Rip.Extracti
 			// Read a single sector of data
 			NSData *audioData = [trackFile audioDataForSector:fileSectorNumber error:&error];
 			if(!audioData) {
-				[trackFile closeFile];
-				[imageFile closeFile];
+				[trackFile closeFile], trackFile = nil;
+				[imageFile closeFile], imageFile = nil;
 				return nil;
 			}
 			
 			// Write it to the output file
 			if(![imageFile setAudioData:audioData forSector:imageSectorNumber error:&error]) {
-				[trackFile closeFile];
-				[imageFile closeFile];
+				[trackFile closeFile], trackFile = nil;
+				[imageFile closeFile], imageFile = nil;
 				return nil;
 			}
 			
@@ -1840,7 +1841,7 @@ static NSString * const kkAudioExtractionKVOContext		= @"org.sbooth.Rip.Extracti
 			++imageSectorNumber;
 		}
 		
-		[trackFile closeFile];
+		[trackFile closeFile], trackFile = nil;
 	}
 	
 	// Create the extraction record
@@ -1856,7 +1857,7 @@ static NSString * const kkAudioExtractionKVOContext		= @"org.sbooth.Rip.Extracti
 	
 	[extractionRecord addTracks:_trackExtractionRecords];
 	
-	[imageFile closeFile];
+	[imageFile closeFile], imageFile = nil;
 	
 	return extractionRecord;
 }
