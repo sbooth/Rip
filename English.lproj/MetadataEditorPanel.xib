@@ -171,8 +171,8 @@
 					<string>{{102, 657}, {400, 150}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>{{102, 657}, {400, 150}}</string>
-					<boolean value="YES"/>
 					<boolean value="NO" id="6"/>
+					<reference ref="6"/>
 					<reference ref="6"/>
 					<string>{300, 300}</string>
 					<string>{300, 150}</string>
