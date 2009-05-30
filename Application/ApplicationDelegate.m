@@ -343,6 +343,8 @@ diskDisappearedCallback(DADiskRef disk, void *context)
 	if([_metadataEditorPanelWindowController isWindowLoaded])
 		[[NSUserDefaults standardUserDefaults] setBool:[[_metadataEditorPanelWindowController window] isVisible] forKey:@"Metadata Editor Open"];
 
+	[[NSUserDefaults standardUserDefaults] synchronize];
+	
 	// Close the log file
 	[[Logger sharedLogger] logMessage:NSLocalizedString(@"Log closed", @"")];
 	if(_logFile)
