@@ -52,21 +52,22 @@ typedef enum _eExtractionMode eExtractionMode;
 	
 	NSMutableSet *_trackIDsRemaining;
 	
-	ExtractionOperation *_copyOperation;
-	ExtractionOperation *_verificationOperation;
-	
+	NSMutableArray *_wholeExtractions;
 	NSMutableArray *_partialExtractions;
 	NSMutableIndexSet *_sectorsNeedingVerification;
 
-	NSUInteger _requiredMatches;
+	ExtractedAudioFile *_synthesizedTrack;
+	
+	NSMutableArray *_synthesizedTrackURLs;
+	NSMutableDictionary *_synthesizedTrackSHAs;
+
+	NSUInteger _requiredSectorMatches;
+	NSUInteger _requiredTrackMatches;
 	NSUInteger _retryCount;
 	NSUInteger _maxRetries;
 	
 	eExtractionMode _extractionMode;
-	
-	ExtractedAudioFile *_synthesizedTrack;
-	NSURL *_synthesizedCopyURL;
-	
+		
 	ImageExtractionRecord *_imageExtractionRecord;
 	NSMutableSet *_trackExtractionRecords;
 	NSMutableSet *_failedTrackIDs;
@@ -87,7 +88,8 @@ typedef enum _eExtractionMode eExtractionMode;
 @property (copy) NSSet * trackIDs;
 
 @property (assign) NSUInteger maxRetries;
-@property (assign) NSUInteger requiredMatches;
+@property (assign) NSUInteger requiredSectorMatches;
+@property (assign) NSUInteger requiredTrackMatches;
 
 @property (assign) eExtractionMode extractionMode;
 

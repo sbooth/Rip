@@ -1236,7 +1236,8 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 	_extractionViewController.trackIDs = [tracks valueForKey:@"objectID"];
 	
 	_extractionViewController.maxRetries = [[NSUserDefaults standardUserDefaults] integerForKey:@"maxRetries"];
-	_extractionViewController.requiredMatches = [[NSUserDefaults standardUserDefaults] integerForKey:@"requiredMatches"];
+	_extractionViewController.requiredSectorMatches = [[NSUserDefaults standardUserDefaults] integerForKey:@"requiredSectorMatches"];
+	_extractionViewController.requiredTrackMatches = [[NSUserDefaults standardUserDefaults] integerForKey:@"requiredTrackMatches"];
 	
 	// Start extracting
 	[_extractionViewController extract:self];
