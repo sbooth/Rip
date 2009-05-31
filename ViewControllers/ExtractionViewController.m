@@ -1571,6 +1571,8 @@ accurateRipAlternatePressingOffset:(NSNumber *)accurateRipAlternatePressingOffse
 		
 		// If so, prepare the track for encoding
 		if(trackURL) {
+			[[Logger sharedLogger] logMessageWithLevel:eLogMessageLevelDebug format:@"Number of required track matches reached"];
+			
 			// Calculate the AR checksum and MD5/SHA1 digests for the track
 			NSUInteger accurateRipChecksum = calculateAccurateRipChecksumForFile(trackURL, 
 																				 [self.compactDisc.firstSession.firstTrack.number isEqualToNumber:track.number],
@@ -1588,8 +1590,6 @@ accurateRipAlternatePressingOffset:(NSNumber *)accurateRipAlternatePressingOffse
 			
 			if(trackPrepared)
 				[self startExtractingNextTrack];
-//			else
-//				[self presentError:error modalForWindow:[[self view] window] delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
 		}
 		// If not, determine any mismatched sectors and re-extract them
 		else {
@@ -1685,7 +1685,7 @@ accurateRipAlternatePressingOffset:(NSNumber *)accurateRipAlternatePressingOffse
 	// If all sectors are verified, encode the track if it is verified by AccurateRip or the
 	// required number of matches have been reached
 	if(![_sectorsNeedingVerification count]) {
-		[[Logger sharedLogger] logMessage:@"Track has no errors"];
+//		[[Logger sharedLogger] logMessage:@"Track has no errors"];
 		
 		// Cache the results in case the track isn't verified
 		[_synthesizedTrackURLs addObject:_synthesizedTrack.URL];
@@ -1698,6 +1698,8 @@ accurateRipAlternatePressingOffset:(NSNumber *)accurateRipAlternatePressingOffse
 		NSURL *fileURL = _synthesizedTrack.URL;
 		NSString *MD5 = _synthesizedTrack.MD5;
 		NSString *SHA1 = _synthesizedTrack.SHA1;
+		
+		[[Logger sharedLogger] logMessageWithLevel:eLogMessageLevelDebug format:@"Track has no errors, MD5 = %@", MD5];
 		
 		[_synthesizedTrack closeFile], _synthesizedTrack = nil;
 		
@@ -1790,6 +1792,8 @@ accurateRipAlternatePressingOffset:(NSNumber *)accurateRipAlternatePressingOffse
 		
 		// If so, prepare the track for encoding
 		if(trackURL) {
+			[[Logger sharedLogger] logMessageWithLevel:eLogMessageLevelDebug format:@"Number of required track matches reached"];
+
 			// Calculate the AR checksum and MD5/SHA1 digests for the track
 			accurateRipChecksum = calculateAccurateRipChecksumForFile(trackURL, 
 																	  [self.compactDisc.firstSession.firstTrack.number isEqualToNumber:track.number],
@@ -1807,46 +1811,45 @@ accurateRipAlternatePressingOffset:(NSNumber *)accurateRipAlternatePressingOffse
 			
 			if(trackPrepared)
 				[self startExtractingNextTrack];
-			//			else
-			//				[self presentError:error modalForWindow:[[self view] window] delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
 		}
-		
-		[[Logger sharedLogger] logMessageWithLevel:eLogMessageLevelDebug format:@"Track still has errors after synthesis"];
-		
-		// Retry the track if the maximum retry count hasn't been exceeded
-		if(self.retryCount <= self.maxRetries) {
-
-			if((_synthesizedTrackURLs.count + _wholeExtractions.count) > self.requiredTrackMatches)
-				++_retryCount;
-			
-			// Remove temporary files for the partial extractions only
-			NSError *error = nil;
-			for(NSURL *URL in [_partialExtractions valueForKey:@"URL"]) {
-				if(![[NSFileManager defaultManager] removeItemAtPath:[URL path] error:&error])
-					[[Logger sharedLogger] logMessage:@"Error removing temporary file: %@", [error localizedDescription]];
-			}
-
-			_partialExtractions = [NSMutableArray array];
-			_sectorsNeedingVerification = [NSMutableIndexSet indexSet];
-			
-			// Get started on the track
-			[self extractWholeTrack:track];
-		}
-		// Failure
 		else {
-			[[Logger sharedLogger] logMessage:@"Extraction failed for track %@: maximum retry count exceeded", track.number];
+			[[Logger sharedLogger] logMessageWithLevel:eLogMessageLevelDebug format:@"Track still has errors after synthesis"];
 			
-			[_failedTrackIDs addObject:[track objectID]];
-
-			[_tracksTable reloadData];
-
-			// A failure for a single track still allows individual tracks to be extracted
-			if(eExtractionModeIndividualTracks == self.extractionMode)
-				[self startExtractingNextTrack];
-			// If a single tracks fails to extract an image cannot be generated
-			else if(eExtractionModeImage == self.extractionMode) {
-				[self resetExtractionState];
-				[_trackIDsRemaining removeAllObjects];
+			// Retry the track if the maximum retry count hasn't been exceeded
+			if(self.retryCount <= self.maxRetries) {
+				
+				if((_synthesizedTrackURLs.count + _wholeExtractions.count) > self.requiredTrackMatches)
+					++_retryCount;
+				
+				// Remove temporary files for the partial extractions only
+				NSError *error = nil;
+				for(NSURL *URL in [_partialExtractions valueForKey:@"URL"]) {
+					if(![[NSFileManager defaultManager] removeItemAtPath:[URL path] error:&error])
+						[[Logger sharedLogger] logMessage:@"Error removing temporary file: %@", [error localizedDescription]];
+				}
+				
+				_partialExtractions = [NSMutableArray array];
+				_sectorsNeedingVerification = [NSMutableIndexSet indexSet];
+				
+				// Get (re)started on the track
+				[self extractWholeTrack:track];
+			}
+			// Failure
+			else {
+				[[Logger sharedLogger] logMessage:@"Extraction failed for track %@: maximum retry count exceeded", track.number];
+				
+				[_failedTrackIDs addObject:[track objectID]];
+				
+				[_tracksTable reloadData];
+				
+				// A failure for a single track still allows individual tracks to be extracted
+				if(eExtractionModeIndividualTracks == self.extractionMode)
+					[self startExtractingNextTrack];
+				// If a single tracks fails to extract an image cannot be generated
+				else if(eExtractionModeImage == self.extractionMode) {
+					[self resetExtractionState];
+					[_trackIDsRemaining removeAllObjects];
+				}
 			}
 		}
 	}
