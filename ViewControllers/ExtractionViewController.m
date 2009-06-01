@@ -68,7 +68,7 @@ static NSString * const kkAudioExtractionKVOContext		= @"org.sbooth.Rip.Extracti
 #define MINIMUM_DISC_READ_SIZE (2048 * 1024)
 
 // For debugging
-#define ENABLE_ACCURATERIP 0
+#define ENABLE_ACCURATERIP 1
 
 // ========================================
 // Secret goodness
@@ -191,6 +191,7 @@ static NSString * const kkAudioExtractionKVOContext		= @"org.sbooth.Rip.Extracti
 - (NSIndexSet *) mismatchedSectorsForTrack:(TrackDescriptor *)track useC2:(BOOL)useC2;
 
 - (NSURL *) outputURLForTrack:(TrackDescriptor *)track;
+- (NSURL *) outputURLForTrack:(TrackDescriptor *)track useC2:(BOOL)useC2;
 
 - (BOOL) saveSector:(NSUInteger)sector sectorData:(NSData *)sectorData forTrack:(TrackDescriptor *)track;
 - (BOOL) saveSectors:(NSIndexSet *)sectors fromOperation:(ExtractionOperation *)operation forTrack:(TrackDescriptor *)track;
@@ -1395,7 +1396,9 @@ accurateRipAlternatePressingOffset:(NSNumber *)accurateRipAlternatePressingOffse
 		[self processExtractionOperation:operation forPartialTrack:track];
 	
 	// If no tracks are being processed and none remain to be extracted, we are finished			
-	if(![[self.operationQueue operations] count] && ![_trackIDsRemaining count]) {
+	if(([_trackExtractionRecords count] + [_failedTrackIDs count]) == [_trackIDs count]) {
+		
+		[[Logger sharedLogger] logMessageWithLevel:eLogMessageLevelDebug format:@"Extraction finished"];
 		
 		// Calculate the album replay gain
 		track.session.disc.metadata.replayGain = [NSNumber numberWithFloat:replaygain_analysis_get_album_gain(&_rg)];
@@ -1436,11 +1439,18 @@ accurateRipAlternatePressingOffset:(NSNumber *)accurateRipAlternatePressingOffse
 				_imageExtractionRecord = imageExtractionRecord;
 				
 				if(![[EncoderManager sharedEncoderManager] encodeImageExtractionRecord:self.imageExtractionRecord error:&error])
-					[self presentError:error modalForWindow:[[self view] window] delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
+					[self presentError:error 
+						modalForWindow:[[self view] window]
+							  delegate:self
+					didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:)
+						   contextInfo:NULL];
 			}
 		}
 		else
 			[[Logger sharedLogger] logMessage:@"Unknown extraction mode"];
+		
+		[self.operationQueue cancelAllOperations];
+		[self removeTemporaryFiles];
 		
 		// Remove any active timers
 		[_activeTimers makeObjectsPerformSelector:@selector(invalidate)];
@@ -1693,6 +1703,8 @@ accurateRipAlternatePressingOffset:(NSNumber *)accurateRipAlternatePressingOffse
 	// required number of matches have been reached
 	if(![_sectorsNeedingVerification count]) {
 		
+		[[Logger sharedLogger] logMessageWithLevel:eLogMessageLevelDebug format:@"All sector errors resolved"];
+		
 		// Cache the results in case the track isn't verified
 		[_synthesizedTrackURLs addObject:_synthesizedTrack.URL];
 		[_synthesizedTrackSHAs setObject:_synthesizedTrack.SHA1 forKey:_synthesizedTrack.URL];
@@ -1704,8 +1716,6 @@ accurateRipAlternatePressingOffset:(NSNumber *)accurateRipAlternatePressingOffse
 		NSURL *fileURL = _synthesizedTrack.URL;
 		NSString *MD5 = _synthesizedTrack.MD5;
 		NSString *SHA1 = _synthesizedTrack.SHA1;
-		
-		[[Logger sharedLogger] logMessageWithLevel:eLogMessageLevelDebug format:@"All sector errors resolved, track MD5 = %@", MD5];
 		
 		[_synthesizedTrack closeFile], _synthesizedTrack = nil;
 		
@@ -1819,7 +1829,7 @@ accurateRipAlternatePressingOffset:(NSNumber *)accurateRipAlternatePressingOffse
 				[self startExtractingNextTrack];
 		}
 		else {
-			[[Logger sharedLogger] logMessageWithLevel:eLogMessageLevelDebug format:@"Track still has errors after synthesis"];
+			[[Logger sharedLogger] logMessageWithLevel:eLogMessageLevelDebug format:@"Required number of track matches not reached, retrying"];
 			
 			// Retry the track if the maximum retry count hasn't been exceeded
 			if(self.retryCount <= self.maxRetries) {
@@ -2215,6 +2225,11 @@ accurateRipAlternatePressingOffset:(NSNumber *)accurateRipAlternatePressingOffse
 
 - (NSURL *) outputURLForTrack:(TrackDescriptor *)track
 {
+	return [self outputURLForTrack:track useC2:[self.driveInformation.useC2 boolValue]];
+}
+
+- (NSURL *) outputURLForTrack:(TrackDescriptor *)track useC2:(BOOL)useC2
+{
 	NSParameterAssert(nil != track);
 	
 	// For a track to be successfully extracted, it must match self.requiredMatches
@@ -2233,12 +2248,20 @@ accurateRipAlternatePressingOffset:(NSNumber *)accurateRipAlternatePressingOffse
 		ExtractionOperation *operation = [_wholeExtractions objectAtIndex:trackIndex];		
 		NSUInteger matchCount = 0;
 
+		// Use C2 if specified
+		if(useC2 && ((operation.useC2 != useC2) || ([operation.blockErrorFlags count])))
+			continue;
+		
 		// Compare to the whole extraction operations
 		for(ExtractionOperation *otherOperation in _wholeExtractions) {
 			
 			// Skip ourselves
 			if(operation == otherOperation)
 				continue;
+			
+			// Use C2 if specified
+			if(useC2 && ((otherOperation.useC2 != useC2) || ([otherOperation.blockErrorFlags count])))
+				continue;			
 			
 			// If the SHA1 hashes match, we've a match
 			if([operation.SHA1 isEqualToString:otherOperation.SHA1])
@@ -2269,6 +2292,10 @@ accurateRipAlternatePressingOffset:(NSNumber *)accurateRipAlternatePressingOffse
 
 		// Compare to the whole extraction operations
 		for(ExtractionOperation *operation in _wholeExtractions) {
+			
+			// Use C2 if specified
+			if(useC2 && ((operation.useC2 != useC2) || ([operation.blockErrorFlags count])))
+				continue;			
 			
 			// If the SHA1 hashes match, we've a match
 			if([synthesizedSHA1 isEqualToString:operation.SHA1])
