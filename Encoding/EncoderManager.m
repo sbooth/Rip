@@ -393,12 +393,6 @@ static EncoderManager *sSharedEncoderManager				= nil;
 			NSFileManager *fileManager = [NSFileManager defaultManager];
 			if([fileManager fileExistsAtPath:[operation.inputURL path]] && ![fileManager removeItemAtPath:[operation.inputURL path] error:&error])
 				[[NSApplication sharedApplication] presentError:error];
-			
-			// Remove the temporary cue sheet
-//			if(operation.isImage) {
-//				if([fileManager fileExistsAtPath:[operation.cueSheetURL path] && ![fileManager removeItemAtPath:[operation.cueSheetURL path] error:&error])
-//					[[NSApplication sharedApplication] presentError:error];
-//			}
 		}
 	}
 	else
