@@ -68,7 +68,7 @@ static NSDictionary * metadataForTrack(TrackDescriptor *track)
 	if(trackMetadata.composer)
 		[metadata setObject:trackMetadata.composer forKey:kMetadataComposerKey];
 	if(trackMetadata.date)
-		[metadata setObject:trackMetadata.artist forKey:kMetadataReleaseDateKey];
+		[metadata setObject:trackMetadata.date forKey:kMetadataReleaseDateKey];
 	if(trackMetadata.genre)
 		[metadata setObject:trackMetadata.genre forKey:kMetadataGenreKey];
 	if(trackMetadata.ISRC)
