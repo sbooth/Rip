@@ -562,6 +562,8 @@ static NSString * const kkAudioExtractionKVOContext		= @"org.sbooth.Rip.Extracti
 	
 #pragma unused(contextInfo)
 	
+	[self removeTemporaryFiles];
+	
 	// Remove any active timers
 	[_activeTimers makeObjectsPerformSelector:@selector(invalidate)];
 	[_activeTimers removeAllObjects];
@@ -1396,13 +1398,15 @@ accurateRipAlternatePressingOffset:(NSNumber *)accurateRipAlternatePressingOffse
 		[self processExtractionOperation:operation forPartialTrack:track];
 	
 	// If no tracks are being processed and none remain to be extracted, we are finished			
-	if(([_trackExtractionRecords count] + [_failedTrackIDs count]) == [_trackIDs count]) {
+	if(!_currentTrack && ![_trackIDsRemaining count]) {
 		
 		[[Logger sharedLogger] logMessageWithLevel:eLogMessageLevelDebug format:@"Extraction finished"];
 		
-		// Calculate the album replay gain
-		track.session.disc.metadata.replayGain = [NSNumber numberWithFloat:replaygain_analysis_get_album_gain(&_rg)];
-		track.session.disc.metadata.peak = [NSNumber numberWithFloat:replaygain_analysis_get_album_peak(&_rg)];
+		// Calculate the album replay gain if any tracks were successfully extracted
+		if([_trackExtractionRecords count]) {
+			track.session.disc.metadata.replayGain = [NSNumber numberWithFloat:replaygain_analysis_get_album_gain(&_rg)];
+			track.session.disc.metadata.peak = [NSNumber numberWithFloat:replaygain_analysis_get_album_peak(&_rg)];
+		}
 		
 		// Save changes to the MOC, so others can synchronize
 		if([self.managedObjectContext hasChanges]) {
@@ -1417,6 +1421,8 @@ accurateRipAlternatePressingOffset:(NSNumber *)accurateRipAlternatePressingOffse
 			for(TrackExtractionRecord *extractionRecord in _trackExtractionRecords) {
 				// If this track can't be encoded, just skip it
 				if(![[EncoderManager sharedEncoderManager] encodeTrackExtractionRecord:extractionRecord error:&error]) {
+					// Don't leave the input file dangling
+					/*success =*/[[NSFileManager defaultManager] removeItemAtPath:[extractionRecord.inputURL path] error:&error];
 					[self.managedObjectContext deleteObject:extractionRecord];
 					continue;
 				}
@@ -1434,7 +1440,11 @@ accurateRipAlternatePressingOffset:(NSNumber *)accurateRipAlternatePressingOffse
 			else {
 				ImageExtractionRecord *imageExtractionRecord = [self createImageExtractionRecord];
 				if(!imageExtractionRecord)
-					[self presentError:error modalForWindow:[[self view] window] delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
+					[self presentError:error
+						modalForWindow:[[self view] window]
+							  delegate:self
+					didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:)
+						   contextInfo:NULL];
 				
 				_imageExtractionRecord = imageExtractionRecord;
 				
@@ -1862,7 +1872,8 @@ accurateRipAlternatePressingOffset:(NSNumber *)accurateRipAlternatePressingOffse
 					[self startExtractingNextTrack];
 				// If a single tracks fails to extract an image cannot be generated
 				else if(eExtractionModeImage == self.extractionMode) {
-					[self resetExtractionState];
+					// Set the conditions for termination
+					_currentTrack = nil;
 					[_trackIDsRemaining removeAllObjects];
 				}
 			}
