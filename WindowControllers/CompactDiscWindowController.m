@@ -76,7 +76,7 @@ static NSDictionary * metadataForTrack(TrackDescriptor *track)
 	if(trackMetadata.lyrics)
 		[metadata setObject:trackMetadata.lyrics forKey:kMetadataLyricsKey];
 	if(trackMetadata.musicBrainzID)
-		[metadata setObject:trackMetadata.artist forKey:kMetadataMusicBrainzIDKey];
+		[metadata setObject:trackMetadata.musicBrainzID forKey:kMetadataMusicBrainzIDKey];
 	if(trackMetadata.title)
 		[metadata setObject:trackMetadata.title forKey:kMetadataTitleKey];
 
