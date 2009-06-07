@@ -68,7 +68,7 @@ NSString * const	kAccurateRipTrackIDKey					= @"accurateRipTrackID";
 		self.error = [NSError errorWithDomain:NSOSStatusErrorDomain code:paramErr userInfo:nil];
 		return;
 	}
-	
+
 	NSMutableArray *possibleReadOffsets = [NSMutableArray array];
 	
 	// Adjust the starting sector in the file
@@ -89,18 +89,18 @@ NSString * const	kAccurateRipTrackIDKey					= @"accurateRipTrackID";
 																								  NO,
 																								  NO,
 																								  currentOffset);
-
+		
 		// Check all the pressings that were found in AccurateRip for matching checksums
 		for(AccurateRipDiscRecord *accurateRipDisc in trackDescriptor.session.disc.accurateRipDiscs) {
 			
 			// Determine what AccurateRip checksum we are attempting to match
-			AccurateRipTrackRecord *accurateRipTrack = [accurateRipDisc trackNumber:trackDescriptor.number.unsignedIntegerValue];
+			AccurateRipTrackRecord *accurateRipTrack = [accurateRipDisc trackNumber:[trackDescriptor.number unsignedIntegerValue]];
 			
 			// If the track wasn't found or doesn't contain an offset checksum, it can't be used
 			if(!accurateRipTrack || !accurateRipTrack.offsetChecksum)
 				continue;
 
-			if(accurateRipTrack.offsetChecksum.unsignedIntegerValue == trackActualOffsetChecksum) {
+			if([accurateRipTrack.offsetChecksum unsignedIntegerValue] == trackActualOffsetChecksum) {
 				NSDictionary *offsetDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
 												  [NSNumber numberWithInteger:currentOffset], kReadOffsetKey,
 												  accurateRipTrack.confidenceLevel, kConfidenceLevelKey,
@@ -115,8 +115,11 @@ NSString * const	kAccurateRipTrackIDKey					= @"accurateRipTrackID";
 		self.fractionComplete = fabsf(firstOffsetToTry - currentOffset) / (float)(lastOffsetToTry - firstOffsetToTry);
 	}
 	
-	if(possibleReadOffsets.count)
-		self.possibleReadOffsets = possibleReadOffsets;
+	// Sort the possible read offsets by confidence level
+	if(possibleReadOffsets.count) {
+		NSSortDescriptor *confidenceLevelSortDescriptor = [[NSSortDescriptor alloc] initWithKey:kConfidenceLevelKey ascending:NO];
+		self.possibleReadOffsets = [possibleReadOffsets sortedArrayUsingDescriptors:[NSArray arrayWithObject:confidenceLevelSortDescriptor]];
+	}
 }
 
 @end
