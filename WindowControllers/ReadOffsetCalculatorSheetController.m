@@ -237,7 +237,7 @@ static NSString * const kCalculateOffsetsKVOContext		= @"org.sbooth.Rip.ReadOffs
 	NSUInteger sixSecondPointSector = trackSectorRange.firstSector + (6 * CDDA_SECTORS_PER_SECOND);
 	
 	SectorRange *sectorsToExtract = [SectorRange sectorRangeWithFirstSector:(sixSecondPointSector - MAXIMUM_OFFSET_TO_CHECK_IN_SECTORS)
-																sectorCount:(2 * MAXIMUM_OFFSET_TO_CHECK_IN_SECTORS)];
+																sectorCount:((2 * MAXIMUM_OFFSET_TO_CHECK_IN_SECTORS) + 1)];
 
 	ExtractionOperation *extractionOperation = [[ExtractionOperation alloc] init];
 	
