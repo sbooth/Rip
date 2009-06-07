@@ -124,25 +124,16 @@ calculateAccurateRipChecksumForFileRegionUsingOffset(NSURL *fileURL, NSRange sec
 		--lastSectorToRead;
 	}
 	
-	// readOffsetInSectors is the additional number of sectors that must be extracted (at the end) to ensure a 
-	// complete sector will exist when the beginning of the read is adjusted by the read offset.
-	// If this value is larger than one sector, one sector less than this should be skipped at the beginning.
-	// For example, suppose the desired range is sectors 1 through 10 and the read offset is 600 frames.
-	// In this case readOffsetInSectors will be 2, and the actual read should be from sectors 2 through 12, with the 
-	// first 12 frames of sector 2 skipped and the last 12 frames of sector 12 skipped.
-	NSUInteger readOffsetInSectors = (readOffsetInFrames +  (AUDIO_FRAMES_PER_CDDA_SECTOR - 1)) / AUDIO_FRAMES_PER_CDDA_SECTOR;
-	NSUInteger readOffsetInBytes = 2 * sizeof(int16_t) * readOffsetInFrames;
-	
-	// Adjust the sectors for the read offset
-	if(1 < readOffsetInSectors) {
-		firstSectorToRead += readOffsetInSectors - 1;
-		
-		// Skipped whole sectors are taken into account above, so subtract them out here
-		while(kCDSectorSizeCDDA > readOffsetInBytes)
-			readOffsetInBytes -= kCDSectorSizeCDDA;
+	// Adjust the sectors which will be read for read offsets equal to or larger than one sector
+	while(AUDIO_FRAMES_PER_CDDA_SECTOR <= readOffsetInFrames) {
+		readOffsetInFrames -= AUDIO_FRAMES_PER_CDDA_SECTOR;
+		++firstSectorToRead;
+		++lastSectorToRead;
 	}
-	
-	lastSectorToRead += readOffsetInSectors;
+
+	// A positive read offset will require one extra sector at the end
+	if(readOffsetInFrames)
+		++lastSectorToRead;
 
 	// Clamp the read range to the range of audio contained in the file
 	NSUInteger sectorsOfSilenceToPrepend = 0;
@@ -157,8 +148,8 @@ calculateAccurateRipChecksumForFileRegionUsingOffset(NSURL *fileURL, NSRange sec
 		lastSectorToRead = totalSectorsInFile;
 	}
 	
-	// The block range is inclusive, but should indicate the number of complete blocks to be read
-	NSUInteger totalBlocks = lastSectorToRead - firstSectorToRead - readOffsetInSectors + 1;
+	// The number of complete blocks to be read
+	NSUInteger totalBlocks = lastSectorToRead - firstSectorToRead;
 	NSUInteger blockNumber = 0;
 	
 	int8_t buffer [kCDSectorSizeCDDA];
@@ -171,7 +162,7 @@ calculateAccurateRipChecksumForFileRegionUsingOffset(NSURL *fileURL, NSRange sec
 	// Adjust the starting packet for the read offset
 	SInt64 startingPacket = (firstSectorToRead * AUDIO_FRAMES_PER_CDDA_SECTOR) + readOffsetInFrames;
 	
-	// Iteratively process each CDDA sector in the file, adjusting each read for the specified read offset
+	// Iteratively process each CDDA sector in the file
 	NSUInteger sectorCount = totalBlocks - (sectorsOfSilenceToPrepend + sectorsOfSilenceToAppend);
 	while(sectorCount--) {
 		
