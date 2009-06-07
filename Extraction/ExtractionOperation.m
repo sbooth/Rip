@@ -197,26 +197,16 @@ zeroTrailingBitsOfBufferInPlace(void *buffer,
 		--lastSectorToRead;
 	}
 
-	// readOffsetInSectors is the additional number of sectors that must be extracted (at the end) to ensure a 
-	// complete sector will exist when the beginning of the read is adjusted by the read offset.
-	// If this value is larger than one sector, one sector less than this should be skipped at the beginning.
-	// For example, suppose the desired range is sectors 1 through 10 and the read offset is 600 frames.
-	// In this case readOffsetInSectors will be 2, and the actual read should be from sectors 2 through 12, with the 
-	// first 12 frames of sector 2 skipped and the last 12 frames of sector 12 skipped.
-	NSUInteger readOffsetInSectors = (readOffsetInFrames +  (AUDIO_FRAMES_PER_CDDA_SECTOR - 1)) / AUDIO_FRAMES_PER_CDDA_SECTOR;
-	NSUInteger readOffsetInBytes = 2 * sizeof(int16_t) * readOffsetInFrames;
-	
-	// Adjust the sectors for the read offset
-	if(1 < readOffsetInSectors) {
-		firstSectorToRead += readOffsetInSectors - 1;
-		
-		// Skipped whole sectors are taken into account above, so subtract them out here
-		while(kCDSectorSizeCDDA > readOffsetInBytes)
-			readOffsetInBytes -= kCDSectorSizeCDDA;
+	// Adjust the sectors which will be read for read offsets equal to or larger than one sector
+	while(AUDIO_FRAMES_PER_CDDA_SECTOR <= readOffsetInFrames) {
+		readOffsetInFrames -= AUDIO_FRAMES_PER_CDDA_SECTOR;
+		++firstSectorToRead;
+		++lastSectorToRead;
 	}
 	
-	lastSectorToRead += readOffsetInSectors;
-
+	// Determine the number of bytes which should be skipped before the desired audio data is reached
+	NSUInteger readOffsetInBytes = 2 * sizeof(int16_t) * readOffsetInFrames;
+	
 	// Determine the first sector that can be legally read (so as not to over-read the lead in)
 	NSInteger firstPermissibleSector = 0;
 	if(self.allowedSectors)
@@ -341,7 +331,7 @@ zeroTrailingBitsOfBufferInPlace(void *buffer,
 		// If this is the last read, remove the last readOffset sample frames of data
 		else if(!sectorsOfSilenceToAppend && readRange.lastSector == self.sectorsRead.lastSector) {
 			audioData = [NSData dataWithBytesNoCopy:audioBuffer
-											 length:((kCDSectorSizeCDDA * (sectorsRead - readOffsetInSectors)) + readOffsetInBytes)
+											 length:((kCDSectorSizeCDDA * sectorsRead) + readOffsetInBytes)
 									   freeWhenDone:NO];
 
 			// Discard any C2 error bits corresponding to discarded samples in the read offset
