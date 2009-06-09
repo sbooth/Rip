@@ -44,7 +44,7 @@
 
 #import "NSString+PathSanitizationMethods.h"
 #import "NSImage+BitmapRepresentationMethods.h"
-
+#import "DriveOffsetQueryOperation.h"
 #define WINDOW_BORDER_THICKNESS ((CGFloat)20)
 
 // ========================================
@@ -596,7 +596,12 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 // Run the drive offset calculation routines
 - (IBAction) determineDriveReadOffset:(id)sender
 {
-	
+	DriveOffsetQueryOperation *op = [[DriveOffsetQueryOperation alloc] init];
+	op.disk = self.disk;
+	[op start];
+	if(op.readOffset)
+		NSLog(@"Drive read offset is %@", op.readOffset);
+	return;
 #pragma unused(sender)
 	
 	ReadOffsetCalculatorSheetController *sheetController = [[ReadOffsetCalculatorSheetController alloc] init];
