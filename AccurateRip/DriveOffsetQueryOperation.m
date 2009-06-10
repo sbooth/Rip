@@ -111,21 +111,15 @@
 		
 //		NSString *miscString = [NSString stringWithCString:(const char *)misc encoding:NSASCIIStringEncoding];
 		
-		// Split the vendor and product and see if they match the specified drive
-		NSArray *vendorAndProduct = [nameString componentsSeparatedByString:@" - "];
-		if(2 <= [vendorAndProduct count]) {
-			NSString *vendor = [vendorAndProduct objectAtIndex:0];
-			NSString *product = [vendorAndProduct objectAtIndex:1];
-
-			// They match, so save the read offset
-			if([vendorName isEqualToString:vendor] && [productName isEqualToString:product]) {
-				self.readOffset = [NSNumber numberWithShort:readOffset];
-				return;
-			}
+		NSString *vendorAndProduct = [NSString stringWithFormat:@"%@ - %@", vendorName, productName];
+		if([vendorAndProduct isEqualToString:nameString]) {
+			self.readOffset = [NSNumber numberWithShort:readOffset];
+			[[Logger sharedLogger] logMessageWithLevel:eLogMessageLevelDebug format:@"Drive read offset is%hi", readOffset];
+			return;
 		}
-		
+
 		driveRecordOffset += driveRecordSize;
-	}	
+	}
 }
 
 @end
