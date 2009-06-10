@@ -44,7 +44,7 @@
 
 #import "NSString+PathSanitizationMethods.h"
 #import "NSImage+BitmapRepresentationMethods.h"
-#import "DriveOffsetQueryOperation.h"
+
 #define WINDOW_BORDER_THICKNESS ((CGFloat)20)
 
 // ========================================
@@ -149,6 +149,8 @@ static NSString * const kMusicDatabaseQueryKVOContext	= @"org.sbooth.Rip.Compact
 @end
 
 @interface CompactDiscWindowController (SheetCallbacks)
+- (void) readOffsetKnownSheetDidEnd:(NSWindow *)sheet returnCode:(NSInteger)returnCode contextInfo:(void *)contextInfo;
+- (void) readOffsetNotConfiguredSheetDidEnd:(NSWindow *)sheet returnCode:(NSInteger)returnCode contextInfo:(void *)contextInfo;
 - (void) showMusicDatabaseMatchesSheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode contextInfo:(void *)contextInfo;
 - (void) createCueSheetSavePanelDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode  contextInfo:(void *)contextInfo;
 - (void) showSuccessfulExtractionSheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode contextInfo:(void *)contextInfo;
@@ -596,22 +598,37 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 // Run the drive offset calculation routines
 - (IBAction) determineDriveReadOffset:(id)sender
 {
-	DriveOffsetQueryOperation *op = [[DriveOffsetQueryOperation alloc] init];
-	op.disk = self.disk;
-	[op start];
-	if(op.readOffset)
-		NSLog(@"Drive read offset is %@", op.readOffset);
-	return;
+
 #pragma unused(sender)
-	
-	ReadOffsetCalculatorSheetController *sheetController = [[ReadOffsetCalculatorSheetController alloc] init];
-	
-	sheetController.disk = self.disk;
-	
-	[sheetController beginReadOffsetCalculatorSheetForWindow:self.window 
-											   modalDelegate:nil 
-											  didEndSelector:NULL 
-												 contextInfo:NULL];
+
+	NSString *driveOffsetsPath = [[NSBundle mainBundle] pathForResource:@"DriveOffsets" ofType:@"plist" inDirectory:nil];
+	NSDictionary *driveOffsets = [NSDictionary dictionaryWithContentsOfFile:driveOffsetsPath];
+
+	NSString *vendorAndProduct = [NSString stringWithFormat:@"%@ - %@", self.driveInformation.vendorName, self.driveInformation.productName];
+
+	NSNumber *driveOffset = [driveOffsets objectForKey:vendorAndProduct];
+	if(driveOffset)
+		NSBeginAlertSheet([NSString stringWithFormat:NSLocalizedString(@"The suggested read offset for \u201c%@ %@\u201d is %@ audio frames.  Would you like to use this read offset?", @""), self.driveInformation.vendorName, self.driveInformation.productName, driveOffset],
+						  NSLocalizedString(@"Yes", @""), 
+						  NSLocalizedString(@"Calculate", @""),
+						  NSLocalizedString(@"No", @""),
+						  self.window,
+						  self,
+						  @selector(readOffsetKnownSheetDidEnd:returnCode:contextInfo:),
+						  NULL,
+						  driveOffset, 
+						  NSLocalizedString(@"Configuring a read offset will allow more accurate audio extraction.", @""));
+	else
+		NSBeginAlertSheet([NSString stringWithFormat:NSLocalizedString(@"The read offset for \u201c%@ %@\u201d is unknown.  Would you like to determine the drive's read offset now?", @""), self.driveInformation.vendorName, self.driveInformation.productName],
+						  NSLocalizedString(@"Yes", @""), 
+						  NSLocalizedString(@"No", @""),
+						  nil,
+						  self.window,
+						  self,
+						  @selector(readOffsetNotConfiguredSheetDidEnd:returnCode:contextInfo:),
+						  NULL,
+						  NULL, 
+						  NSLocalizedString(@"Configuring a read offset will allow more accurate audio extraction.", @""));
 }
 
 // ========================================
@@ -910,6 +927,53 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 @end
 
 @implementation CompactDiscWindowController (SheetCallbacks)
+
+- (void) readOffsetKnownSheetDidEnd:(NSWindow *)sheet returnCode:(NSInteger)returnCode contextInfo:(void *)contextInfo
+{	
+	NSParameterAssert(NULL != contextInfo);
+	
+	[sheet orderOut:self];
+	
+	// Default is YES, other is NO, alternate is CALCULATE
+	if(NSAlertOtherReturn == returnCode)
+		return;
+	
+	NSNumber *readOffset = (NSNumber *)contextInfo;
+	
+	if(NSAlertDefaultReturn == returnCode)
+		self.driveInformation.readOffset = readOffset;
+	else {
+		ReadOffsetCalculatorSheetController *sheetController = [[ReadOffsetCalculatorSheetController alloc] init];
+		
+		sheetController.disk = self.disk;
+		
+		[sheetController beginReadOffsetCalculatorSheetForWindow:self.window 
+												   modalDelegate:nil 
+												  didEndSelector:NULL 
+													 contextInfo:NULL];
+	}
+}
+
+- (void) readOffsetNotConfiguredSheetDidEnd:(NSWindow *)sheet returnCode:(NSInteger)returnCode contextInfo:(void *)contextInfo
+{
+	
+#pragma unused(contextInfo)
+	
+	[sheet orderOut:self];
+	
+	// Default is YES, alternate is NO
+	if(NSAlertAlternateReturn == returnCode)
+		return;
+	
+	ReadOffsetCalculatorSheetController *sheetController = [[ReadOffsetCalculatorSheetController alloc] init];
+	
+	sheetController.disk = self.disk;
+	
+	[sheetController beginReadOffsetCalculatorSheetForWindow:self.window 
+											   modalDelegate:nil 
+											  didEndSelector:NULL 
+												 contextInfo:NULL];
+}
 
 - (void) showMusicDatabaseMatchesSheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode contextInfo:(void *)contextInfo
 {

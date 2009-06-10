@@ -57,8 +57,6 @@
 - (BOOL) validateLicenseURL:(NSURL *)licenseURL error:(NSError **)error;
 - (void) displayNagDialog;
 - (void) handleGetURLAppleEvent:(NSAppleEventDescriptor *)event withReplyEvent:(NSAppleEventDescriptor *)replyEvent;
-- (void) readOffsetKnownSheetDidEnd:(NSWindow *)sheet returnCode:(NSInteger)returnCode contextInfo:(void *)contextInfo;
-- (void) readOffsetNotConfiguredSheetDidEnd:(NSWindow *)sheet returnCode:(NSInteger)returnCode contextInfo:(void *)contextInfo;
 @end
 
 
@@ -504,35 +502,8 @@ diskDisappearedCallback(DADiskRef disk, void *context)
 		[compactDiscWindow showWindow:self];
 
 	// If the read offset for the drive isn't configured, give the user the opportunity to configure it now
-	if(!compactDiscWindow.driveInformation.readOffset) {
-		// Check and see if this drive has a known read offset
-		NSString *driveOffsetsPath = [[NSBundle mainBundle] pathForResource:@"DriveOffsets" ofType:@"plist" inDirectory:nil];
-		NSDictionary *driveOffsets = [NSDictionary dictionaryWithContentsOfFile:driveOffsetsPath];
-
-		NSNumber *driveOffset = [driveOffsets objectForKey:compactDiscWindow.driveInformation.productName];
-		if(driveOffset)
-			NSBeginAlertSheet([NSString stringWithFormat:NSLocalizedString(@"The suggested read offset for \u201c%@ %@\u201d is %@ audio frames.  Would you like to use this read offset?", @""), compactDiscWindow.driveInformation.vendorName, compactDiscWindow.driveInformation.productName, driveOffset],
-							  NSLocalizedString(@"Yes", @""), 
-							  NSLocalizedString(@"Calculate", @""),
-							  NSLocalizedString(@"No", @""),
-							  compactDiscWindow.window,
-							  self,
-							  @selector(readOffsetKnownSheetDidEnd:returnCode:contextInfo:),
-							  NULL,
-							  [NSArray arrayWithObjects:compactDiscWindow, driveOffset, nil], 
-							  NSLocalizedString(@"Configuring a read offset will allow more accurate audio extraction by enabling use of the AccurateRip database.", @""));
-		else
-			NSBeginAlertSheet([NSString stringWithFormat:NSLocalizedString(@"The read offset for \u201c%@ %@\u201d is unknown.  Would you like to determine the drive's read offset now?", @""), compactDiscWindow.driveInformation.vendorName, compactDiscWindow.driveInformation.productName],
-							  NSLocalizedString(@"Yes", @""), 
-							  NSLocalizedString(@"No", @""),
-							  nil,
-							  compactDiscWindow.window,
-							  self,
-							  @selector(readOffsetNotConfiguredSheetDidEnd:returnCode:contextInfo:),
-							  NULL,
-							  compactDiscWindow, 
-							  NSLocalizedString(@"Configuring a read offset will allow more accurate audio extraction by enabling use of the AccurateRip database.", @""));
-	}
+	if(!compactDiscWindow.driveInformation.readOffset)
+		[compactDiscWindow determineDriveReadOffset:self];
 }
 
 - (void) diskDisappeared:(DADiskRef)disk
@@ -684,41 +655,6 @@ diskDisappearedCallback(DADiskRef disk, void *context)
 	
 	NSURL *url = [NSURL URLWithString:[[event paramDescriptorForKeyword:keyDirectObject] stringValue]];
 	NSLog(@"%@", url);
-}
-
-- (void) readOffsetKnownSheetDidEnd:(NSWindow *)sheet returnCode:(NSInteger)returnCode contextInfo:(void *)contextInfo
-{	
-	NSParameterAssert(NULL != contextInfo);
-	
-	[sheet orderOut:self];
-	
-	// Default is YES, other is NO, alternate is CALCULATE
-	if(NSAlertOtherReturn == returnCode)
-		return;
-	
-	NSArray *parameters = (NSArray *)contextInfo;
-	CompactDiscWindowController *compactDiscWindowController = [parameters objectAtIndex:0];
-	NSNumber *readOffset = [parameters objectAtIndex:1];
-	
-	if(NSAlertDefaultReturn == returnCode)
-		compactDiscWindowController.driveInformation.readOffset = readOffset;
-	else
-		[compactDiscWindowController determineDriveReadOffset:self];
-}
-
-- (void) readOffsetNotConfiguredSheetDidEnd:(NSWindow *)sheet returnCode:(NSInteger)returnCode contextInfo:(void *)contextInfo
-{	
-	NSParameterAssert(NULL != contextInfo);
-	
-	[sheet orderOut:self];
-	
-	// Default is YES, alternate is NO
-	if(NSAlertAlternateReturn == returnCode)
-		return;
-	
-	CompactDiscWindowController *compactDiscWindowController = (CompactDiscWindowController *)contextInfo;
-	
-	[compactDiscWindowController determineDriveReadOffset:self];
 }
 
 @end
