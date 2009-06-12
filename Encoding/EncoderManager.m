@@ -134,6 +134,8 @@ metadataForImageExtractionRecord(ImageExtractionRecord *imageExtractionRecord)
 		[metadata setObject:albumMetadata.isCompilation forKey:kMetadataCompilationKey];
 	if(albumMetadata.MCN)
 		[metadata setObject:albumMetadata.MCN forKey:kMetadataMCNKey];
+	if(albumMetadata.musicBrainzID)
+		[metadata setObject:albumMetadata.musicBrainzID forKey:kMetadataMusicBrainzAlbumIDKey];
 	if(albumMetadata.peak)
 		[metadata setObject:albumMetadata.peak forKey:kReplayGainAlbumPeakKey];
 	if(albumMetadata.replayGain)
