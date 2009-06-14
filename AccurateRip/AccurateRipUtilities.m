@@ -208,8 +208,7 @@ calculateAccurateRipChecksumForBlock(const void *block, NSUInteger blockNumber, 
 		uint32_t checksum = 0;
 		NSUInteger blockOffset = AUDIO_FRAMES_PER_CDDA_SECTOR * blockNumber;
 		
-		NSUInteger i;
-		for(i = 0; i < AUDIO_FRAMES_PER_CDDA_SECTOR; ++i)
+		for(NSUInteger i = 0; i < AUDIO_FRAMES_PER_CDDA_SECTOR; ++i)
 			checksum += OSSwapHostToLittleInt32(*buffer++) * ++blockOffset;
 
 		return checksum;
