@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2005 - 2007 Stephen F. Booth <me@sbooth.org>
+ *  Copyright (C) 2005 - 2009 Stephen F. Booth <me@sbooth.org>
  *  All Rights Reserved
  */
 
@@ -99,6 +99,25 @@
 {
 	for(TrackDescriptor *track in self.tracks) {
 		if(track.number.unsignedIntegerValue == number)
+			return track;
+	}
+	
+	return nil;
+}
+
+// ========================================
+
+- (TrackDescriptor *) trackContainingSector:(NSUInteger)sector
+{
+	return [self trackContainingSectorRange:[SectorRange sectorRangeWithSector:sector]];
+}
+
+- (TrackDescriptor *) trackContainingSectorRange:(SectorRange *)sectorRange
+{
+	NSParameterAssert(nil != sectorRange);
+	
+	for(TrackDescriptor *track in self.tracks) {
+		if([track.sectorRange containsSectorRange:sectorRange])
 			return track;
 	}
 	

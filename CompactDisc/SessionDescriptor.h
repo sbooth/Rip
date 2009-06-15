@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2005 - 2007 Stephen F. Booth <me@sbooth.org>
+ *  Copyright (C) 2005 - 2009 Stephen F. Booth <me@sbooth.org>
  *  All Rights Reserved
  */
 
@@ -42,6 +42,11 @@
 
 - (BOOL) containsTrackNumber:(NSUInteger)number;
 - (TrackDescriptor *) trackNumber:(NSUInteger)number;
+
+// ========================================
+
+- (TrackDescriptor *) trackContainingSector:(NSUInteger)sector;
+- (TrackDescriptor *) trackContainingSectorRange:(SectorRange *)sectorRange;
 
 @end
 
