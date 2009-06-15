@@ -219,7 +219,7 @@ calculateAccurateRipChecksumForBlock(const void *block, NSUInteger blockNumber, 
 // Calculate the AccurateRip checksums for the file at path
 // ========================================
 NSData * 
-calculateAccurateRipChecksumsForFile(NSURL *fileURL, NSRange trackSectors, BOOL isFirstTrack, BOOL isLastTrack, NSUInteger maximumOffsetInBlocks)
+calculateAccurateRipChecksumsForTrackInFile(NSURL *fileURL, NSRange trackSectors, BOOL isFirstTrack, BOOL isLastTrack, NSUInteger maximumOffsetInBlocks)
 {
 	NSCParameterAssert(nil != fileURL);
 	
@@ -319,7 +319,7 @@ calculateAccurateRipChecksumsForFile(NSURL *fileURL, NSRange trackSectors, BOOL 
 			}
 			
 			for(NSInteger offsetIndex = -maximumOffsetInFrames; offsetIndex <= (NSInteger)maximumOffsetInFrames; ++offsetIndex)
-				checksums[offsetIndex + maximumOffsetInFrames] += sumOfSamplesAndPositions + ((trackFrameNumber + offsetIndex) * sumOfSamples);
+				checksums[offsetIndex + maximumOffsetInFrames] += sumOfSamplesAndPositions + ((trackFrameNumber - offsetIndex) * sumOfSamples);
 		}
 		// Sectors at the beginning or end of the track or disc must be handled specially
 		// This could be optimized but for now it uses the normal method of Accurate Rip checksum calculation
@@ -329,7 +329,7 @@ calculateAccurateRipChecksumsForFile(NSURL *fileURL, NSRange trackSectors, BOOL 
 				
 				for(NSInteger offsetIndex = -maximumOffsetInFrames; offsetIndex <= (NSInteger)maximumOffsetInFrames; ++offsetIndex) {
 					// Current frame is the track's frame number in the context of the current offset
-					SInt64 currentFrame = trackFrameNumber + frameIndex - offsetIndex;
+					NSInteger currentFrame = trackFrameNumber + (NSInteger)frameIndex - offsetIndex;
 					
 					// The current frame is in the skipped area of the first track on the disc
 					if(isFirstTrack && ((4 * AUDIO_FRAMES_PER_CDDA_SECTOR) - 1) > currentFrame)
@@ -341,7 +341,7 @@ calculateAccurateRipChecksumsForFile(NSURL *fileURL, NSRange trackSectors, BOOL 
 					else if(0 > currentFrame)
 						;
 					// The current frame is in the next track
-					else if(currentFrame >= totalFramesInTrack)
+					else if(currentFrame >= (NSInteger)totalFramesInTrack)
 						;
 					// Process the sample
 					else
