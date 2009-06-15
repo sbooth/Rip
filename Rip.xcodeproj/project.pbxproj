@@ -122,13 +122,8 @@
 		32CE93870F5657E900AB328A /* WavPack.bundle in Copy PlugIns */ = {isa = PBXBuildFile; fileRef = 32CE936D0F56579900AB328A /* WavPack.bundle */; };
 		32E622CC0F74189600DC1A15 /* DriveOffsets.plist in Resources */ = {isa = PBXBuildFile; fileRef = 32E622CB0F74189600DC1A15 /* DriveOffsets.plist */; };
 		32E9F8300DD6C0FF00E8ACCA /* EncoderSettingsSheet.xib in Resources */ = {isa = PBXBuildFile; fileRef = 32E9F82E0DD6C0FF00E8ACCA /* EncoderSettingsSheet.xib */; };
-		32F6000A0FDA100600F68EAA /* ExtractionEngine+EncodingPreparation.m in Sources */ = {isa = PBXBuildFile; fileRef = 32F600090FDA100600F68EAA /* ExtractionEngine+EncodingPreparation.m */; };
-		32F600190FDA110200F68EAA /* ExtractionEngine+ExtractionRecordCreation.m in Sources */ = {isa = PBXBuildFile; fileRef = 32F600180FDA110200F68EAA /* ExtractionEngine+ExtractionRecordCreation.m */; };
 		32F602220FDCB24900F68EAA /* DriveOffsetQueryOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 32F602210FDCB24900F68EAA /* DriveOffsetQueryOperation.m */; };
 		32F602610FDCBAFA00F68EAA /* DiskUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 32F602600FDCBAFA00F68EAA /* DiskUtilities.m */; };
-		32F6FFD50FDA08FF00F68EAA /* ExtractionEngine.m in Sources */ = {isa = PBXBuildFile; fileRef = 32F6FFD40FDA08FF00F68EAA /* ExtractionEngine.m */; };
-		32F6FFE30FDA0C7600F68EAA /* ExtractionEngine+AudioExtraction.m in Sources */ = {isa = PBXBuildFile; fileRef = 32F6FFE20FDA0C7600F68EAA /* ExtractionEngine+AudioExtraction.m */; };
-		32F6FFF80FDA0E8600F68EAA /* ExtractionEngine+AccurateRip.m in Sources */ = {isa = PBXBuildFile; fileRef = 32F6FFF70FDA0E8600F68EAA /* ExtractionEngine+AccurateRip.m */; };
 		8C34BB0B0D761A99003F2953 /* ApplicationDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C34BB0A0D761A99003F2953 /* ApplicationDelegate.m */; };
 		8C34BB0E0D761AB7003F2953 /* PlugInManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C34BB0D0D761AB7003F2953 /* PlugInManager.m */; };
 		8C3C19470D73EA12001BAC88 /* EncoderInterface.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8C3C19460D73EA0B001BAC88 /* EncoderInterface.framework */; };
@@ -574,20 +569,10 @@
 		32DBCF750370BD2300C91783 /* Rip_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Rip_Prefix.pch; sourceTree = "<group>"; };
 		32E622CB0F74189600DC1A15 /* DriveOffsets.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = DriveOffsets.plist; sourceTree = "<group>"; };
 		32E9F82F0DD6C0FF00E8ACCA /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/EncoderSettingsSheet.xib; sourceTree = SOURCE_ROOT; };
-		32F600080FDA100600F68EAA /* ExtractionEngine+EncodingPreparation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "ExtractionEngine+EncodingPreparation.h"; sourceTree = "<group>"; };
-		32F600090FDA100600F68EAA /* ExtractionEngine+EncodingPreparation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "ExtractionEngine+EncodingPreparation.m"; sourceTree = "<group>"; };
-		32F600170FDA110200F68EAA /* ExtractionEngine+ExtractionRecordCreation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "ExtractionEngine+ExtractionRecordCreation.h"; sourceTree = "<group>"; };
-		32F600180FDA110200F68EAA /* ExtractionEngine+ExtractionRecordCreation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "ExtractionEngine+ExtractionRecordCreation.m"; sourceTree = "<group>"; };
 		32F602200FDCB24900F68EAA /* DriveOffsetQueryOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DriveOffsetQueryOperation.h; sourceTree = "<group>"; };
 		32F602210FDCB24900F68EAA /* DriveOffsetQueryOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DriveOffsetQueryOperation.m; sourceTree = "<group>"; };
 		32F6025F0FDCBAFA00F68EAA /* DiskUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DiskUtilities.h; sourceTree = "<group>"; };
 		32F602600FDCBAFA00F68EAA /* DiskUtilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DiskUtilities.m; sourceTree = "<group>"; };
-		32F6FFD30FDA08FF00F68EAA /* ExtractionEngine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExtractionEngine.h; sourceTree = "<group>"; };
-		32F6FFD40FDA08FF00F68EAA /* ExtractionEngine.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ExtractionEngine.m; sourceTree = "<group>"; };
-		32F6FFE10FDA0C7600F68EAA /* ExtractionEngine+AudioExtraction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "ExtractionEngine+AudioExtraction.h"; sourceTree = "<group>"; };
-		32F6FFE20FDA0C7600F68EAA /* ExtractionEngine+AudioExtraction.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "ExtractionEngine+AudioExtraction.m"; sourceTree = "<group>"; };
-		32F6FFF60FDA0E8600F68EAA /* ExtractionEngine+AccurateRip.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "ExtractionEngine+AccurateRip.h"; sourceTree = "<group>"; };
-		32F6FFF70FDA0E8600F68EAA /* ExtractionEngine+AccurateRip.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "ExtractionEngine+AccurateRip.m"; sourceTree = "<group>"; };
 		8C34BB090D761A99003F2953 /* ApplicationDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ApplicationDelegate.h; sourceTree = "<group>"; };
 		8C34BB0A0D761A99003F2953 /* ApplicationDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ApplicationDelegate.m; sourceTree = "<group>"; };
 		8C34BB0C0D761AB7003F2953 /* PlugInManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PlugInManager.h; sourceTree = "<group>"; };
@@ -1197,16 +1182,6 @@
 				8C4C8DFF0D5E2A0600DC0279 /* BitArray.m */,
 				8C4C8E000D5E2A0600DC0279 /* ExtractionOperation.h */,
 				8C4C8E010D5E2A0600DC0279 /* ExtractionOperation.m */,
-				32F6FFD30FDA08FF00F68EAA /* ExtractionEngine.h */,
-				32F6FFD40FDA08FF00F68EAA /* ExtractionEngine.m */,
-				32F6FFE10FDA0C7600F68EAA /* ExtractionEngine+AudioExtraction.h */,
-				32F6FFE20FDA0C7600F68EAA /* ExtractionEngine+AudioExtraction.m */,
-				32F6FFF60FDA0E8600F68EAA /* ExtractionEngine+AccurateRip.h */,
-				32F6FFF70FDA0E8600F68EAA /* ExtractionEngine+AccurateRip.m */,
-				32F600080FDA100600F68EAA /* ExtractionEngine+EncodingPreparation.h */,
-				32F600090FDA100600F68EAA /* ExtractionEngine+EncodingPreparation.m */,
-				32F600170FDA110200F68EAA /* ExtractionEngine+ExtractionRecordCreation.h */,
-				32F600180FDA110200F68EAA /* ExtractionEngine+ExtractionRecordCreation.m */,
 			);
 			path = Extraction;
 			sourceTree = "<group>";
@@ -1716,11 +1691,6 @@
 				3213B2E40FB9F9B000137097 /* ExtractionViewController.m in Sources */,
 				3213B2E50FB9F9B000137097 /* MetadataViewController.m in Sources */,
 				326AC2060FBFDB2D00110E77 /* ViewSelectorBarItem.m in Sources */,
-				32F6FFD50FDA08FF00F68EAA /* ExtractionEngine.m in Sources */,
-				32F6FFE30FDA0C7600F68EAA /* ExtractionEngine+AudioExtraction.m in Sources */,
-				32F6FFF80FDA0E8600F68EAA /* ExtractionEngine+AccurateRip.m in Sources */,
-				32F6000A0FDA100600F68EAA /* ExtractionEngine+EncodingPreparation.m in Sources */,
-				32F600190FDA110200F68EAA /* ExtractionEngine+ExtractionRecordCreation.m in Sources */,
 				32F602220FDCB24900F68EAA /* DriveOffsetQueryOperation.m in Sources */,
 				32F602610FDCBAFA00F68EAA /* DiskUtilities.m in Sources */,
 			);
