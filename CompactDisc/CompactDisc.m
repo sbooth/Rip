@@ -39,8 +39,7 @@ static NSUInteger calculateFreeDBDiscIDForCDTOC(CDTOC *toc)
 	// Iterate through each descriptor and extract the information we need
 	// For multi-session discs only the first session is used to generate the FreeDB ID
 	NSUInteger numDescriptors = CDTOCGetDescriptorCount(toc);
-	NSUInteger i;
-	for(i = 0; i < numDescriptors; ++i) {
+	for(NSUInteger i = 0; i < numDescriptors; ++i) {
 		CDTOCDescriptor *desc = &toc->descriptors[i];
 		
 		// For multi-session discs only the first session is used to generate the FreeDB ID
@@ -58,8 +57,7 @@ static NSUInteger calculateFreeDBDiscIDForCDTOC(CDTOC *toc)
 			leadOutMSF = desc->p;
 	}
 	
-	NSUInteger trackNumber;
-	for(trackNumber = firstTrackNumber; trackNumber <= lastTrackNumber; ++trackNumber) {
+	for(NSUInteger trackNumber = firstTrackNumber; trackNumber <= lastTrackNumber; ++trackNumber) {
 		CDMSF msf = CDConvertTrackNumberToMSF(trackNumber, toc);
 		sumOfTrackLengthDigits += sum_digits((msf.minute * 60) + msf.second);
 	}
@@ -90,8 +88,7 @@ static NSString * calculateMusicBrainzDiscIDForCDTOC(CDTOC *toc)
 
 	// Iterate through each descriptor and extract the information we need
 	NSUInteger numDescriptors = CDTOCGetDescriptorCount(toc);
-	NSUInteger i;
-	for(i = 0; i < numDescriptors; ++i) {
+	for(NSUInteger i = 0; i < numDescriptors; ++i) {
 		CDTOCDescriptor *desc = &toc->descriptors[i];
 
 		// For multi-session discs only the first session is used to generate the MusicBrainz ID
@@ -384,8 +381,7 @@ static NSString * calculateMusicBrainzDiscIDForCDTOC(CDTOC *toc)
 	NSParameterAssert(NULL != toc);
 
 	// Set up SessionDescriptor objects
-	NSUInteger sessionNumber;
-	for(sessionNumber = toc->sessionFirst; sessionNumber <= toc->sessionLast; ++sessionNumber) {
+	for(NSUInteger sessionNumber = toc->sessionFirst; sessionNumber <= toc->sessionLast; ++sessionNumber) {
 		SessionDescriptor *session = [NSEntityDescription insertNewObjectForEntityForName:@"SessionDescriptor"
 																   inManagedObjectContext:self.managedObjectContext];
 
@@ -395,8 +391,7 @@ static NSString * calculateMusicBrainzDiscIDForCDTOC(CDTOC *toc)
 	
 	// Iterate through each descriptor and extract the information we need
 	NSUInteger numDescriptors = CDTOCGetDescriptorCount(toc);
-	NSUInteger i;
-	for(i = 0; i < numDescriptors; ++i) {
+	for(NSUInteger i = 0; i < numDescriptors; ++i) {
 		CDTOCDescriptor *desc = &toc->descriptors[i];
 		
 		// This is a normal audio or data track
