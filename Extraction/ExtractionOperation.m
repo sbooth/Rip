@@ -287,7 +287,7 @@ zeroTrailingBitsOfBufferInPlace(void *buffer,
 			sectorsRead = [drive readAudioAndErrorFlags:buffer sectorRange:readRange];
 		else
 			sectorsRead = [drive readAudio:buffer sectorRange:readRange];
-		
+
 		// Verify the requested sectors were read
 		if(0 == sectorsRead) {
 			self.error = drive.error;
@@ -328,10 +328,10 @@ zeroTrailingBitsOfBufferInPlace(void *buffer,
 			if(self.useC2)
 				zeroLeadingBitsOfBufferInPlace(c2Buffer, readOffsetInFrames);
 		}
-		// If this is the last read, remove the last readOffset sample frames of data
+		// If this is the last read, remove the last frame of audio, excluding readOffset sample frames of data
 		else if(!sectorsOfSilenceToAppend && readRange.lastSector == self.sectorsRead.lastSector) {
 			audioData = [NSData dataWithBytesNoCopy:audioBuffer
-											 length:((kCDSectorSizeCDDA * sectorsRead) + readOffsetInBytes)
+											 length:((kCDSectorSizeCDDA * sectorsRead) - (kCDSectorSizeCDDA - readOffsetInBytes))
 									   freeWhenDone:NO];
 
 			// Discard any C2 error bits corresponding to discarded samples in the read offset
@@ -368,16 +368,16 @@ zeroTrailingBitsOfBufferInPlace(void *buffer,
 		if(self.isCancelled)
 			goto cleanup;
 	}
-	
+
 	// ========================================
 	// EXTRACTION PHASE 3: APPEND SILENCE AS NECESSARY
 
-	// Append silence, adjusted for the read offset, if required
+	// Append silence, with extra added for the read offset, if required
 	if(sectorsOfSilenceToAppend) {
-		memset(buffer, 0, sectorsOfSilenceToAppend * kCDSectorSizeCDDA);
+		memset(buffer, 0, (sectorsOfSilenceToAppend * kCDSectorSizeCDDA) + readOffsetInBytes);
 		
 		NSData *audioData = [NSData dataWithBytesNoCopy:buffer
-												 length:((kCDSectorSizeCDDA * sectorsOfSilenceToAppend) - readOffsetInBytes)
+												 length:((kCDSectorSizeCDDA * sectorsOfSilenceToAppend) + readOffsetInBytes)
 										   freeWhenDone:NO];
 		
 		// Write the silence to the output file
