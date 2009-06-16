@@ -349,13 +349,12 @@ NSArray * calculateMD5AndSHA1DigestsForURLRegion(NSURL *fileURL, NSUInteger star
 	
 	NSMutableString *tempString = [NSMutableString string];
 	
-	NSUInteger i;
-	for(i = 0; i < CC_MD5_DIGEST_LENGTH; ++i)
+	for(NSUInteger i = 0; i < CC_MD5_DIGEST_LENGTH; ++i)
 		[tempString appendFormat:@"%02x", md5Digest[i]];
 	[result addObject:[tempString copy]];
 	
 	tempString = [NSMutableString string];
-	for(i = 0; i < CC_SHA1_DIGEST_LENGTH; ++i)
+	for(NSUInteger i = 0; i < CC_SHA1_DIGEST_LENGTH; ++i)
 		[tempString appendFormat:@"%02x", sha1Digest[i]];
 	[result addObject:[tempString copy]];
 

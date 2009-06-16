@@ -56,8 +56,7 @@ enum {
 	
 	// Draw the images
 	NSUInteger itemCount = [_items count];
-	NSUInteger itemIndex;
-	for(itemIndex = 0; itemIndex < itemCount; ++itemIndex) {
+	for(NSUInteger itemIndex = 0; itemIndex < itemCount; ++itemIndex) {
 		NSInteger state = 0;
 		if(_selectedIndex == (NSInteger)itemIndex)
 			state = eCellSelectedState;
@@ -88,8 +87,7 @@ enum {
 	NSPoint point = [self convertPoint:[theEvent locationInWindow] fromView:nil];
 
 	NSUInteger itemCount = [_items count];
-	NSUInteger itemIndex;
-	for(itemIndex = 0; itemIndex < itemCount; ++itemIndex) {
+	for(NSUInteger itemIndex = 0; itemIndex < itemCount; ++itemIndex) {
 		NSRect cellRect = [self frameRectForCellAtIndex:itemIndex];
 		if(NSMouseInRect(point, cellRect, [self isFlipped])) {
 			_pressedIndex = itemIndex;
@@ -107,8 +105,7 @@ enum {
 	NSPoint point = [self convertPoint:[theEvent locationInWindow] fromView:nil];
 	
 	NSUInteger itemCount = [_items count];
-	NSUInteger itemIndex;
-	for(itemIndex = 0; itemIndex < itemCount; ++itemIndex) {
+	for(NSUInteger itemIndex = 0; itemIndex < itemCount; ++itemIndex) {
 		NSRect cellRect = [self frameRectForCellAtIndex:itemIndex];
 		if(NSMouseInRect(point, cellRect, [self isFlipped])) {
 			_pressedIndex = itemIndex;
@@ -143,8 +140,7 @@ enum {
 	[self removeAllToolTips];
 
 	NSUInteger itemCount = [_items count];
-	NSUInteger itemIndex;
-	for(itemIndex = 0; itemIndex < itemCount; ++itemIndex) {
+	for(NSUInteger itemIndex = 0; itemIndex < itemCount; ++itemIndex) {
 		NSRect cellRect = [self frameRectForCellAtIndex:itemIndex];
 		ViewSelectorBarItem *itemInfo = [_items objectAtIndex:itemIndex];
 		NSString *itemTooltip = [itemInfo tooltip];
@@ -247,8 +243,7 @@ enum {
 	if(1 >= itemCount)
 		return;
 	
-	NSUInteger currentIndex;
-	for(currentIndex = 1; currentIndex < itemCount; ++currentIndex) {
+	for(NSUInteger currentIndex = 1; currentIndex < itemCount; ++currentIndex) {
 		NSRect cellBorderRect;
 		
 		cellBorderRect.size.height = cellHeight;

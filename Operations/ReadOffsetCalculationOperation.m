@@ -76,8 +76,7 @@ NSString * const	kAccurateRipTrackIDKey					= @"accurateRipTrackID";
 	
 	NSInteger firstOffsetToTry = -1 * self.maximumOffsetToCheck;
 	NSInteger lastOffsetToTry = self.maximumOffsetToCheck;
-	NSInteger currentOffset;
-	for(currentOffset = firstOffsetToTry; currentOffset <= lastOffsetToTry; ++currentOffset) {
+	for(NSInteger currentOffset = firstOffsetToTry; currentOffset <= lastOffsetToTry; ++currentOffset) {
 
 		// Allow cancellation
 		if(self.isCancelled)

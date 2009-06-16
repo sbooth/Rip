@@ -139,13 +139,12 @@
 	NSUInteger lastArrayIndex = self.bitCount / (8 * sizeof(NSUInteger));
 	NSUInteger lastBitIndex = self.bitCount % (8 * sizeof(NSUInteger));
 	
-	NSUInteger i;
-	for(i = 0; i < lastArrayIndex; ++i) {
+	for(NSUInteger i = 0; i < lastArrayIndex; ++i) {
 		if(0 != _bits[i])
 			return NO;
 	}
 	
-	for(i = 0; i < lastBitIndex; ++i) {
+	for(NSUInteger i = 0; i < lastBitIndex; ++i) {
 		if(0 != (_bits[lastArrayIndex] & (1 << i)))
 			return NO;
 	}
@@ -159,17 +158,16 @@
 	NSUInteger lastBitIndex = self.bitCount % (8 * sizeof(NSUInteger));
 	NSUInteger result = 0;
 	
-	NSUInteger i, j;
-	for(i = 0; i < lastArrayIndex; ++i) {
+	for(NSUInteger i = 0; i < lastArrayIndex; ++i) {
 		if(!_bits[i]) {
-			for(j = 0; j < (8 * sizeof(NSUInteger)); ++j) {
+			for(NSUInteger j = 0; j < (8 * sizeof(NSUInteger)); ++j) {
 				if(!(_bits[i] & (1 << j)))
 					++result;
 			}
 		}
 	}
 	
-	for(i = 0; i < lastBitIndex; ++i) {
+	for(NSUInteger i = 0; i < lastBitIndex; ++i) {
 		if(!(_bits[lastArrayIndex] & (1 << i)))
 			++result;
 	}
@@ -182,11 +180,10 @@
 	NSUInteger lastArrayIndex = self.bitCount / (8 * sizeof(NSUInteger));
 	NSUInteger lastBitIndex = self.bitCount % (8 * sizeof(NSUInteger));
 	
-	NSUInteger i;
-	for(i = 0; i < lastArrayIndex; ++i)
+	for(NSUInteger i = 0; i < lastArrayIndex; ++i)
 		_bits[i] = 0;
 	
-	for(i = 0; i < lastBitIndex; ++i)
+	for(NSUInteger i = 0; i < lastBitIndex; ++i)
 		_bits[lastArrayIndex] &= ~(1 << i);
 }
 
@@ -197,17 +194,16 @@
 
 	NSMutableIndexSet *indexSet = [NSMutableIndexSet indexSet];
 	
-	NSUInteger i, j;
-	for(i = 0; i < lastArrayIndex; ++i) {
+	for(NSUInteger i = 0; i < lastArrayIndex; ++i) {
 		if(!_bits[i]) {
-			for(j = 0; j < (8 * sizeof(NSUInteger)); ++j) {
+			for(NSUInteger j = 0; j < (8 * sizeof(NSUInteger)); ++j) {
 				if(!(_bits[i] & (1 << j)))
 					[indexSet addIndex:((i * (8 * sizeof(NSUInteger))) + j)];
 			}
 		}
 	}
 	
-	for(i = 0; i < lastBitIndex; ++i) {
+	for(NSUInteger i = 0; i < lastBitIndex; ++i) {
 		if(!(_bits[lastArrayIndex] & (1 << i)))
 			[indexSet addIndex:((lastArrayIndex * (8 * sizeof(NSUInteger))) + i)];
 	}
@@ -222,13 +218,12 @@
 	NSUInteger lastArrayIndex = self.bitCount / (8 * sizeof(NSUInteger));
 	NSUInteger lastBitIndex = self.bitCount % (8 * sizeof(NSUInteger));
 	
-	NSUInteger i;
-	for(i = 0; i < lastArrayIndex; ++i) {
+	for(NSUInteger i = 0; i < lastArrayIndex; ++i) {
 		if(NSUIntegerMax != _bits[i])
 			return NO;
 	}
 	
-	for(i = 0; i < lastBitIndex; ++i) {
+	for(NSUInteger i = 0; i < lastBitIndex; ++i) {
 		if(0 == (_bits[lastArrayIndex] & (1 << i)))
 			return NO;
 	}
@@ -242,17 +237,16 @@
 	NSUInteger lastBitIndex = self.bitCount % (8 * sizeof(NSUInteger));
 	NSUInteger result = 0;
 	
-	NSUInteger i, j;
-	for(i = 0; i < lastArrayIndex; ++i) {
+	for(NSUInteger i = 0; i < lastArrayIndex; ++i) {
 		if(_bits[i]) {
-			for(j = 0; j < (8 * sizeof(NSUInteger)); ++j) {
+			for(NSUInteger j = 0; j < (8 * sizeof(NSUInteger)); ++j) {
 				if(_bits[i] & (1 << j)) 
 					++result;
 			}
 		}
 	}
 	
-	for(i = 0; i < lastBitIndex; ++i) {
+	for(NSUInteger i = 0; i < lastBitIndex; ++i) {
 		if(_bits[lastArrayIndex] & (1 << i))
 			++result;
 	}
@@ -265,11 +259,10 @@
 	NSUInteger lastArrayIndex = self.bitCount / (8 * sizeof(NSUInteger));
 	NSUInteger lastBitIndex = self.bitCount % (8 * sizeof(NSUInteger));
 
-	NSUInteger i;
-	for(i = 0; i < lastArrayIndex; ++i)
+	for(NSUInteger i = 0; i < lastArrayIndex; ++i)
 		_bits[i] = NSUIntegerMax;
 	
-	for(i = 0; i < lastBitIndex; ++i)
+	for(NSUInteger i = 0; i < lastBitIndex; ++i)
 		_bits[lastArrayIndex] |= 1 << i;
 }
 
@@ -280,17 +273,16 @@
 
 	NSMutableIndexSet *indexSet = [NSMutableIndexSet indexSet];
 	
-	NSUInteger i, j;
-	for(i = 0; i < lastArrayIndex; ++i) {
+	for(NSUInteger i = 0; i < lastArrayIndex; ++i) {
 		if(_bits[i]) {
-			for(j = 0; j < (8 * sizeof(NSUInteger)); ++j) {
+			for(NSUInteger j = 0; j < (8 * sizeof(NSUInteger)); ++j) {
 				if(_bits[i] & (1 << j)) 
 					[indexSet addIndex:((i * (8 * sizeof(NSUInteger))) + j)];
 			}
 		}
 	}
 	
-	for(i = 0; i < lastBitIndex; ++i) {
+	for(NSUInteger i = 0; i < lastBitIndex; ++i) {
 		if(_bits[lastArrayIndex] & (1 << i))
 			[indexSet addIndex:((lastArrayIndex * (8 * sizeof(NSUInteger))) + i)];
 	}
@@ -302,8 +294,7 @@
 {
 	NSMutableString *result = [NSMutableString string];
 
-	NSUInteger i;
-	for(i = 0; i < self.bitCount; ++i) {
+	for(NSUInteger i = 0; i < self.bitCount; ++i) {
 		[result appendString:([self valueAtIndex:i] ? @"1" : @"0")];
 		if(0 == i % 8)
 			[result appendString:@" "];

@@ -93,8 +93,7 @@
 
 	// Iterate through each drive record and attempt to find a match
 	NSUInteger driveRecordOffset = 0;
-	NSUInteger driveRecordIndex;
-	for(driveRecordIndex = 0; driveRecordIndex < numberOfDriveRecords; ++driveRecordIndex) {
+	for(NSUInteger driveRecordIndex = 0; driveRecordIndex < numberOfDriveRecords; ++driveRecordIndex) {
 		int16_t readOffset = 0;
 		[accurateRipOffsetsDBResponseData getBytes:&readOffset range:NSMakeRange(driveRecordOffset, 2)];
 		readOffset = OSSwapLittleToHostInt16(readOffset);

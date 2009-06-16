@@ -180,8 +180,7 @@ convertQSubChannelDataFromBCDToDecimal(struct QSubChannelData *qData)
 		}
 		
 		// Copy the q data to its buffer and convert from BCD representation to decimal
-		NSUInteger i;
-		for(i = 0; i < sectorsRead; ++i) {
+		for(NSUInteger i = 0; i < sectorsRead; ++i) {
 			alias = buffer + (i * (kCDSectorSizeCDDA + kCDSectorSizeQSubchannel));
 			
 			// Convert from BCD to decimal representation
@@ -191,7 +190,7 @@ convertQSubChannelDataFromBCDToDecimal(struct QSubChannelData *qData)
 		}
 		
 		// Loop through the Mode-1 Q and look for the start of the pregap
-		for(i = 0; i < sectorsRead; ++i) {
+		for(NSUInteger i = 0; i < sectorsRead; ++i) {
 			qData = (struct QSubChannelData *)(qBuffer + (i * kCDSectorSizeQSubchannel));
 			
 			// Ignore everything except Mode-1 Q in the program area (AKA current position Q)

@@ -308,8 +308,7 @@ zeroTrailingBitsOfBufferInPlace(void *buffer,
 
 		// Split the audio and C2 data to their respective buffers
 		if(self.useC2) {
-			NSUInteger i;
-			for(i = 0; i < sectorsRead; ++i) {
+			for(NSUInteger i = 0; i < sectorsRead; ++i) {
 				alias = buffer + (i * (kCDSectorSizeCDDA + kCDSectorSizeErrorFlags));
 				
 				memcpy(audioBuffer + (i * kCDSectorSizeCDDA), alias, kCDSectorSizeCDDA);
@@ -413,13 +412,12 @@ zeroTrailingBitsOfBufferInPlace(void *buffer,
 	
 	NSMutableString *tempString = [NSMutableString string];
 	
-	NSUInteger i;
-	for(i = 0; i < CC_MD5_DIGEST_LENGTH; ++i)
+	for(NSUInteger i = 0; i < CC_MD5_DIGEST_LENGTH; ++i)
 		[tempString appendFormat:@"%02x", md5Digest[i]];
 	self.fullMD5 = tempString;
 
 	tempString = [NSMutableString string];
-	for(i = 0; i < CC_SHA1_DIGEST_LENGTH; ++i)
+	for(NSUInteger i = 0; i < CC_SHA1_DIGEST_LENGTH; ++i)
 		[tempString appendFormat:@"%02x", sha1Digest[i]];
 	self.fullSHA1 = tempString;
 	
@@ -462,12 +460,12 @@ zeroTrailingBitsOfBufferInPlace(void *buffer,
 		CC_SHA1_Final(sha1Digest, &sha1);
 		
 		tempString = [NSMutableString string];
-		for(i = 0; i < CC_MD5_DIGEST_LENGTH; ++i)
+		for(NSUInteger i = 0; i < CC_MD5_DIGEST_LENGTH; ++i)
 			[tempString appendFormat:@"%02x", md5Digest[i]];
 		self.MD5 = tempString;
 		
 		tempString = [NSMutableString string];
-		for(i = 0; i < CC_SHA1_DIGEST_LENGTH; ++i)
+		for(NSUInteger i = 0; i < CC_SHA1_DIGEST_LENGTH; ++i)
 			[tempString appendFormat:@"%02x", sha1Digest[i]];
 		self.SHA1 = tempString;
 	}
@@ -507,8 +505,7 @@ cleanup:
 	uint8_t zeroErrorFlags [kCDSectorSizeErrorFlags];
 	memset(zeroErrorFlags, 0, kCDSectorSizeErrorFlags);
 	
-	NSUInteger sectorIndex;
-	for(sectorIndex = 0; sectorIndex < range.length; ++sectorIndex) {
+	for(NSUInteger sectorIndex = 0; sectorIndex < range.length; ++sectorIndex) {
 		const uint8_t *sectorErrorFlags = errorFlags + (kCDSectorSizeErrorFlags * sectorIndex);
 
 		if(memcmp(sectorErrorFlags, zeroErrorFlags, kCDSectorSizeErrorFlags)) {

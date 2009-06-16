@@ -124,8 +124,7 @@
 	NSUInteger accurateRipPressingCount = [accurateRipResponseData length] / accurateRipDiscDataSize;
 	
 	NSUInteger pressingDataOffset = 0;
-	NSUInteger pressingIndex;
-	for(pressingIndex = 0; pressingIndex < accurateRipPressingCount; ++pressingIndex) {
+	for(NSUInteger pressingIndex = 0; pressingIndex < accurateRipPressingCount; ++pressingIndex) {
 		uint8_t arTrackCount = 0;
 		[accurateRipResponseData getBytes:&arTrackCount range:NSMakeRange(pressingDataOffset, 1)];
 		
