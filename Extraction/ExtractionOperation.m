@@ -204,6 +204,11 @@ zeroTrailingBitsOfBufferInPlace(void *buffer,
 		++lastSectorToRead;
 	}
 	
+	// At this point readOffsetInFrames is either 0 or a positive value less than AUDIO_FRAMES_PER_CDDA_SECTOR
+	// One additional sector must be read so this data can be appended to the last full sector
+	if(readOffsetInFrames)
+		++lastSectorToRead;
+	
 	// Determine the number of bytes which should be skipped before the desired audio data is reached
 	NSUInteger readOffsetInBytes = 2 * sizeof(int16_t) * readOffsetInFrames;
 	
@@ -328,15 +333,16 @@ zeroTrailingBitsOfBufferInPlace(void *buffer,
 			if(self.useC2)
 				zeroLeadingBitsOfBufferInPlace(c2Buffer, readOffsetInFrames);
 		}
-		// If this is the last read, remove the last frame of audio, excluding readOffset sample frames of data
+		// If this is the last read, account for the read offset by discarding everything in the last sector
+		// except for that required by the read offset
 		else if(!sectorsOfSilenceToAppend && readRange.lastSector == self.sectorsRead.lastSector) {
 			audioData = [NSData dataWithBytesNoCopy:audioBuffer
 											 length:((kCDSectorSizeCDDA * sectorsRead) - (kCDSectorSizeCDDA - readOffsetInBytes))
 									   freeWhenDone:NO];
 
-			// Discard any C2 error bits corresponding to discarded samples in the read offset
+			// Discard any C2 error bits corresponding to discarded samples after the read offset
 			if(self.useC2)
-				zeroTrailingBitsOfBufferInPlace(c2Buffer, (kCDSectorSizeErrorFlags * sectorsRead), readOffsetInFrames);
+				zeroTrailingBitsOfBufferInPlace(c2Buffer, (kCDSectorSizeErrorFlags * sectorsRead), (AUDIO_FRAMES_PER_CDDA_SECTOR - readOffsetInFrames));
 		}
 		else
 			audioData = [NSData dataWithBytesNoCopy:audioBuffer 
