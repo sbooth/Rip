@@ -279,7 +279,7 @@ calculateAccurateRipChecksumsForTrackInFile(NSURL *fileURL, NSRange trackSectors
 	
 	NSUInteger lastFileBlockForFastProcessing;
 	if(isLastTrack)
-		lastFileBlockForFastProcessing = lastFileBlockForTrack - (6 > maximumOffsetInBlocks ? 6 : maximumOffsetInBlocks);
+		lastFileBlockForFastProcessing = lastFileBlockForTrack - (5 > maximumOffsetInBlocks ? 5 : maximumOffsetInBlocks);
 	else
 		lastFileBlockForFastProcessing = lastFileBlockForTrack - maximumOffsetInBlocks;
 	
@@ -332,10 +332,10 @@ calculateAccurateRipChecksumsForTrackInFile(NSURL *fileURL, NSRange trackSectors
 					NSInteger currentFrame = trackFrameNumber + (NSInteger)frameIndex - offsetIndex;
 					
 					// The current frame is in the skipped area of the first track on the disc
-					if(isFirstTrack && ((4 * AUDIO_FRAMES_PER_CDDA_SECTOR) - 1) > currentFrame)
+					if(isFirstTrack && ((5 * AUDIO_FRAMES_PER_CDDA_SECTOR) - 1) > currentFrame)
 						;
 					// The current frame is in the skipped area of the last track on the disc
-					else if(isLastTrack && (6 * AUDIO_FRAMES_PER_CDDA_SECTOR) > (totalFramesInTrack - currentFrame))
+					else if(isLastTrack && (5 * AUDIO_FRAMES_PER_CDDA_SECTOR) > (totalFramesInTrack - currentFrame))
 						;
 					// The current frame is in the previous track
 					else if(0 > currentFrame)
