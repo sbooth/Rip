@@ -1489,7 +1489,19 @@ accurateRipAlternatePressingOffset:(NSNumber *)accurateRipAlternatePressingOffse
 																						[self.compactDisc.firstSession.lastTrack.number isEqualToNumber:track.number],
 																						MAXIMUM_OFFSET_TO_CHECK_IN_SECTORS);
 
-
+	// This is a major error
+	if(!trackAccurateRipChecksumsData) {
+		NSError *error = [NSError errorWithDomain:NSCocoaErrorDomain code:1 userInfo:nil];
+		
+		[self presentError:error
+			modalForWindow:[[self view] window]
+				  delegate:self
+		didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:)
+			   contextInfo:NULL];
+		
+		return;
+	}
+	
 	const uint32_t *trackAccurateRipChecksums = [trackAccurateRipChecksumsData bytes];
 
 	// The checksums are arranged in the array from [-maximumOffsetInFrames, +maximumOffsetInFrames], so the item at
@@ -1561,7 +1573,6 @@ accurateRipAlternatePressingOffset:(NSNumber *)accurateRipAlternatePressingOffse
 				
 				return;
 			}
-		
 		}
 	}
 	
