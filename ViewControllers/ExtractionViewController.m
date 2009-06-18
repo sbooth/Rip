@@ -832,8 +832,11 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.Extractio
 	// Strip off the cushion sectors before encoding, if present
 	if(operation.cushionSectors) {
 		NSURL *outputURL = temporaryURLWithExtension(@"wav");
-		if(!copySectorsFromURLToURL(operation.URL, NSMakeRange(operation.cushionSectors, operation.sectors.length), outputURL, 0))
+		if(!copySectorsFromURLToURL(operation.URL, NSMakeRange(operation.cushionSectors, operation.sectors.length), outputURL, 0)) {
+			if(error)
+				*error = [NSError errorWithDomain:NSPOSIXErrorDomain code:EIO userInfo:nil];
 			return NO;
+		}
 
 		URL = outputURL;
 	}
