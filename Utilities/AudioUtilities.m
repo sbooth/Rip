@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2008 Stephen F. Booth <me@sbooth.org>
+ *  Copyright (C) 2008 - 2009 Stephen F. Booth <me@sbooth.org>
  *  All Rights Reserved
  */
 
@@ -9,6 +9,112 @@
 #include <CommonCrypto/CommonDigest.h>
 
 #import "CDDAUtilities.h"
+
+// ========================================
+// Keep file reads to approximately 2 MB in size (2352 bytes are necessary for each sector)
+// ========================================
+#define BUFFER_SIZE_IN_SECTORS 875u
+
+BOOL
+copySectorsFromURLToURL(NSURL *inputURL, NSRange sectorsToCopy, NSURL *outputURL, NSUInteger outputLocation)
+{
+	NSCParameterAssert(nil != inputURL);
+	NSCParameterAssert(nil != outputURL);
+	
+	AudioFileID inputFile = NULL;
+	AudioFileID outputFile = NULL;
+	BOOL copySuccessful = NO;
+	
+	// Open the files for reading
+	OSStatus status = AudioFileOpenURL((CFURLRef)inputURL, fsRdPerm, kAudioFileWAVEType, &inputFile);
+	if(noErr != status)
+		return NO;
+
+	status = AudioFileOpenURL((CFURLRef)outputURL, fsWrPerm, kAudioFileWAVEType, &outputFile);
+	if(noErr != status)
+		goto cleanup;
+	
+	// Determine the files' type
+	AudioStreamBasicDescription inputStreamDescription;
+	UInt32 dataSize = (UInt32)sizeof(inputStreamDescription);
+	status = AudioFileGetProperty(inputFile, kAudioFilePropertyDataFormat, &dataSize, &inputStreamDescription);
+	if(noErr != status)
+		goto cleanup;
+	
+	AudioStreamBasicDescription outputStreamDescription;
+	dataSize = (UInt32)sizeof(outputStreamDescription);
+	status = AudioFileGetProperty(outputFile, kAudioFilePropertyDataFormat, &dataSize, &outputStreamDescription);
+	if(noErr != status)
+		goto cleanup;
+	
+	// Make sure the files are the expected type (CDDA)
+	if(!streamDescriptionIsCDDA(&inputStreamDescription) || !streamDescriptionIsCDDA(&outputStreamDescription))
+		goto cleanup;
+	
+	// Ensure the input file contains an adequate number of frames
+	UInt64 packetsInInputFile;
+	dataSize = sizeof(packetsInInputFile);
+	status = AudioFileGetProperty(inputFile, kAudioFilePropertyAudioDataPacketCount, &dataSize, &packetsInInputFile);
+	if(noErr != status)
+		goto cleanup;
+	
+	NSUInteger sectorsInInputFile = (NSUInteger)(packetsInInputFile / AUDIO_FRAMES_PER_CDDA_SECTOR);
+	if(sectorsInInputFile < sectorsToCopy.length)
+		goto cleanup;
+	
+	// Allocate the transfer buffer
+	__strong int8_t *buffer = NSAllocateCollectable(BUFFER_SIZE_IN_SECTORS * kCDSectorSizeCDDA, 0);
+	
+	SInt64 inputFilePacket = sectorsToCopy.location * AUDIO_FRAMES_PER_CDDA_SECTOR;
+	SInt64 outputFilePacket = outputLocation * AUDIO_FRAMES_PER_CDDA_SECTOR;
+	
+	NSUInteger sectorsRemaining = sectorsToCopy.length;
+	while(0 < sectorsRemaining) {
+		// Set up the parameters for this read
+		NSUInteger sectorCount = MIN(BUFFER_SIZE_IN_SECTORS, sectorsRemaining);		
+		
+		// Read a chunk of input
+		UInt32 byteCount = 0;
+		UInt32 numPacketsRead = sectorCount * AUDIO_FRAMES_PER_CDDA_SECTOR;
+		status = AudioFileReadPackets(inputFile, false, &byteCount, NULL, inputFilePacket, &numPacketsRead, buffer);
+		if(noErr != status || 0 == numPacketsRead)
+			goto cleanup;
+		
+		// Write it to the output file
+		UInt32 numPacketsWritten = numPacketsRead;
+		status = AudioFileWritePackets(outputFile, false, byteCount, NULL, outputFilePacket, &numPacketsWritten, buffer);
+		if(noErr != status || 0 == numPacketsWritten)
+			goto cleanup;
+		
+		if(numPacketsRead != numPacketsWritten)
+			goto cleanup;
+		
+		// Housekeeping
+		inputFilePacket += numPacketsRead;
+		outputFilePacket += numPacketsWritten;
+		
+		sectorsRemaining -= sectorCount;
+	}
+	
+	// If we get here, things worked as expected
+	copySuccessful = YES;
+
+	// Cleanup
+cleanup:
+	if(inputFile) {
+		status = AudioFileClose(inputFile);
+		if(noErr != status)
+			;
+	}
+	
+	if(outputFile) {
+		status = AudioFileClose(outputFile);
+		if(noErr != status)
+			;
+	}
+	
+	return copySuccessful;
+}
 
 NSIndexSet *
 compareFilesForNonMatchingSectors(NSURL *leftFileURL, NSURL *rightFileURL)

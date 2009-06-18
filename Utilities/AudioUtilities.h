@@ -1,11 +1,16 @@
 /*
- *  Copyright (C) 2008 Stephen F. Booth <me@sbooth.org>
+ *  Copyright (C) 2008 - 2009 Stephen F. Booth <me@sbooth.org>
  *  All Rights Reserved
  */
 
 #pragma once
 
 #import <Cocoa/Cocoa.h>
+
+// ========================================
+// Copy a range of sectors from one file to another
+// ========================================
+BOOL copySectorsFromURLToURL(NSURL *inputURL, NSRange sectorsToCopy, NSURL *outputURL, NSUInteger outputLocation);
 
 // ========================================
 // Compare two files for differences
