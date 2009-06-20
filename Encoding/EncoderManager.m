@@ -757,8 +757,20 @@ static EncoderManager *sSharedEncoderManager				= nil;
 	if(nil == artist)
 		artist = NSLocalizedString(@"Unknown Artist", @"");
 	
+
 	// Build up the sanitized Artist/Album structure
-	NSArray *pathComponents = [NSArray arrayWithObjects:[artist stringByReplacingIllegalPathCharactersWithString:@"_"], [title stringByReplacingIllegalPathCharactersWithString:@"_"], nil];
+	NSArray *pathComponents = nil;
+	if(disc.metadata.isCompilation) {
+		pathComponents = [NSArray arrayWithObjects:NSLocalizedString(@"Compilations", @""),
+						  [title stringByReplacingIllegalPathCharactersWithString:@"_"],
+						  nil];
+	}
+	else {		
+		pathComponents = [NSArray arrayWithObjects:[artist stringByReplacingIllegalPathCharactersWithString:@"_"], 
+						  [title stringByReplacingIllegalPathCharactersWithString:@"_"], 
+						  nil];
+	}
+
 	return [NSString pathWithComponents:pathComponents];	
 }
 
