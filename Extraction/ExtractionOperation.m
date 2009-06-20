@@ -191,7 +191,11 @@ zeroTrailingBitsOfBufferInPlace(void *buffer,
 	NSInteger readOffsetInFrames = 0;
 	if(self.readOffset)
 		readOffsetInFrames = self.readOffset.integerValue;
-	
+
+	// Calculate the "read translation", to map between actual sector numbers on disc
+	// and logical sector numbers
+	NSInteger sectorDelta = 0;
+
 	// Negative read offsets can easily be transformed into positive read offsets
 	// For example, suppose the desired range is sectors 10 through 20 and the read offset is -600 frames.
 	// This is equivalent to requesting sectors 8 - 18 with a read offset of 576 frames
@@ -199,6 +203,7 @@ zeroTrailingBitsOfBufferInPlace(void *buffer,
 		readOffsetInFrames += AUDIO_FRAMES_PER_CDDA_SECTOR;
 		--firstSectorToRead;
 		--lastSectorToRead;
+		--sectorDelta;
 	}
 
 	// Adjust the sectors which will be read for read offsets equal to or larger than one sector
@@ -206,6 +211,7 @@ zeroTrailingBitsOfBufferInPlace(void *buffer,
 		readOffsetInFrames -= AUDIO_FRAMES_PER_CDDA_SECTOR;
 		++firstSectorToRead;
 		++lastSectorToRead;
+		++sectorDelta;
 	}
 	
 	// At this point readOffsetInFrames is either 0 or a positive value less than AUDIO_FRAMES_PER_CDDA_SECTOR
@@ -355,8 +361,11 @@ zeroTrailingBitsOfBufferInPlace(void *buffer,
 									   freeWhenDone:NO];
 
 		// Store the error flags
-		if(self.useC2)
-			[self setErrorFlags:c2Buffer forSectorRange:readRange];
+		if(self.useC2) {
+			// Translate the sector numbers from disc (physical) numbers to logical (physical adjusted for whole sectors of read offset)
+			NSInteger logicalFirstSector = startSector - sectorDelta;
+			[self setErrorFlags:c2Buffer forSectorRange:[SectorRange sectorRangeWithFirstSector:logicalFirstSector sectorCount:sectorCount]];
+		}
 
 		// Write the data to the output file
 		UInt32 packetCount = audioData.length / cddaASBD.mBytesPerPacket;
