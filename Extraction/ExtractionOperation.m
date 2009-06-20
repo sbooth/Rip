@@ -82,6 +82,8 @@ zeroTrailingBitsOfBufferInPlace(void *buffer,
 
 @interface ExtractionOperation ()
 @property (copy) SectorRange * sectorsRead;
+@property (assign) NSUInteger sectorsOfSilencePrepended;
+@property (assign) NSUInteger sectorsOfSilenceAppended;
 @property (copy) NSError * error;
 @property (copy) NSIndexSet * blockErrorFlags;
 @property (copy) NSDictionary * errorFlags;
@@ -103,6 +105,8 @@ zeroTrailingBitsOfBufferInPlace(void *buffer,
 @synthesize sectors = _sectors;
 @synthesize allowedSectors = _allowedSectors;
 @synthesize sectorsRead = _sectorsRead;
+@synthesize sectorsOfSilencePrepended = _sectorsOfSilencePrepended;
+@synthesize sectorsOfSilenceAppended = _sectorsOfSilenceAppended;
 @synthesize cushionSectors = _cushionSectors;
 @synthesize trackID = _trackID;
 @synthesize error = _error;
@@ -267,6 +271,8 @@ zeroTrailingBitsOfBufferInPlace(void *buffer,
 			goto cleanup;
 		}
 
+		self.sectorsOfSilencePrepended = sectorsOfSilenceToPrepend;
+		
 		// Update the MD5 and SHA1 digests
 		CC_MD5_Update(&md5, audioData.bytes, audioData.length);
 		CC_SHA1_Update(&sha1, audioData.bytes, audioData.length);
@@ -392,6 +398,8 @@ zeroTrailingBitsOfBufferInPlace(void *buffer,
 			self.error = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
 			goto cleanup;
 		}
+
+		self.sectorsOfSilenceAppended = sectorsOfSilenceToAppend;
 
 		// Update the MD5 and SHA1 digests
 		CC_MD5_Update(&md5, audioData.bytes, audioData.length);

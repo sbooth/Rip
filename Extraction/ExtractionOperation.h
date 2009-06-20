@@ -28,6 +28,8 @@
 	float _fractionComplete;		// A float [0, 1] indicating the extraction progress
 	
 	SectorRange *_sectorsRead;		// The sectors that were actually read (sectors adjusted for read offset)
+	NSUInteger _sectorsOfSilencePrepended; // Sectors of silence prepended (to accomodate cushion and allowedSectors)
+	NSUInteger _sectorsOfSilenceAppended; // Sectors of silence appended (to accomodate cushion and allowedSectors)
 	NSError *_error;				// Holds the first error (if any) occurring during extraction
 	NSString *_MD5;					// The MD5 sum of the extracted audio (not including cushion sectors)
 	NSString *_fullMD5;				// The MD5 sum of the extracted audio (including cushion sectors)
@@ -58,6 +60,8 @@
 // ========================================
 // Properties set after extraction is complete (or cancelled)
 @property (readonly, copy) SectorRange * sectorsRead;
+@property (readonly, assign) NSUInteger sectorsOfSilencePrepended;
+@property (readonly, assign) NSUInteger sectorsOfSilenceAppended;
 @property (readonly, copy) NSError * error;
 @property (readonly, copy) NSIndexSet * blockErrorFlags;
 @property (readonly, copy) NSDictionary * errorFlags;
