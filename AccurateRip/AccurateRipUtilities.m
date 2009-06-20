@@ -215,6 +215,35 @@ calculateAccurateRipChecksumForBlock(const void *block, NSUInteger blockNumber, 
 	}
 }
 
+/*
+ Special thanks to Gregory S. Chudov for the following:
+ 
+ AccurateRip CRC is linear. Here is what i mean by that: 
+ 
+ Let's say we have a block of data somewhere in the middle of the track, starting from sample #N;
+ Let's calculate what does it contrubute to a track ArCRC, and call it S[0]:
+ S[0] = sum ((i + N)*sample[i]);
+ 
+ Now we want to calculate what does the same block of data contribute to the ArCRC offsetted by X, and call it S[X]:
+ S[X] = sum ((i + N + X)*sample[i]);
+ 
+ Obviously, S[X] = S[0] + X * sum (sample[i]);
+ 
+ So in fact, we only need to calculate two base sums:
+ SA = sum (i * sample[i]);
+ SB = sum (sample[i]);
+ 
+ Then we can calculate all offsetted CRCs easily:
+ S[0] = SA + N * SB;
+ ...
+ S[X] = SA + (N+X) * SB;
+ 
+ So instead of double cycle (for each offset process each sample) you can have two consecutive cycles, first for samples, second for offsets.
+ You can calculate thousands of offsetted CRCs for the price of two.
+ 
+ The tricky part is when you process the samples which are close to the track boundaries.
+ For those samples you'll have to revert for the old algorithm. 
+ */
 // ========================================
 // Calculate the AccurateRip checksums for the file at path
 // ========================================
