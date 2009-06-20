@@ -157,17 +157,6 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.Extractio
 @end
 
 // ========================================
-// AccurateRip support
-// ========================================
-@interface ExtractionViewController (AccurateRip)
-- (NSUInteger) calculateAccurateRipChecksumForTrack:(TrackDescriptor *)track extractionOperation:(ExtractionOperation *)operation;
-- (NSUInteger) calculateAccurateRipChecksumForTrack:(TrackDescriptor *)track extractionOperation:(ExtractionOperation *)operation readOffsetAdjustment:(NSUInteger)readOffsetAdjustment;
-
-- (NSArray *) determinePossibleAccurateRipOffsetsForTrack:(TrackDescriptor *)track URL:(NSURL *)URL;
-- (NSArray *) determinePossibleAccurateRipOffsetsForTrack:(TrackDescriptor *)track URL:(NSURL *)URL startingSector:(NSUInteger)startingSector;
-@end
-
-// ========================================
 // The real work is done here
 // ========================================
 @interface ExtractionViewController (Private)
@@ -1162,65 +1151,6 @@ accurateRipAlternatePressingOffset:(NSNumber *)accurateRipAlternatePressingOffse
 @end
 
 
-@implementation ExtractionViewController (AccurateRip)
-
-- (NSUInteger) calculateAccurateRipChecksumForTrack:(TrackDescriptor *)track extractionOperation:(ExtractionOperation *)operation
-{
-	return [self calculateAccurateRipChecksumForTrack:track extractionOperation:operation readOffsetAdjustment:0];
-}
-
-- (NSUInteger) calculateAccurateRipChecksumForTrack:(TrackDescriptor *)track extractionOperation:(ExtractionOperation *)operation readOffsetAdjustment:(NSUInteger)readOffsetAdjustment
-{
-	NSParameterAssert(nil != track);
-	NSParameterAssert(nil != operation);
-	
-	[_detailedStatusTextField setStringValue:NSLocalizedString(@"Calculating AccurateRip checksum", @"")];
-	
-	return calculateAccurateRipChecksumForFileRegionUsingOffset(operation.URL, 
-																NSMakeRange(operation.cushionSectors, operation.sectors.length),
-																[self.compactDisc.firstSession.firstTrack.number isEqualToNumber:track.number],
-																[self.compactDisc.firstSession.lastTrack.number isEqualToNumber:track.number],
-																readOffsetAdjustment);
-}
-
-
-- (NSArray *) determinePossibleAccurateRipOffsetsForTrack:(TrackDescriptor *)track URL:(NSURL *)URL
-{
-	return [self determinePossibleAccurateRipOffsetsForTrack:track URL:URL startingSector:0];
-}
-
-- (NSArray *) determinePossibleAccurateRipOffsetsForTrack:(TrackDescriptor *)track URL:(NSURL *)URL startingSector:(NSUInteger)startingSector;
-{
-	NSParameterAssert(nil != track);
-	NSParameterAssert(nil != URL);
-	
-	// Scan the extracted file and determine possible AccurateRip offsets
-	ReadOffsetCalculationOperation *operation = [[ReadOffsetCalculationOperation alloc ] init];
-	
-	operation.URL = URL;
-	operation.trackID = [track objectID];
-	operation.sixSecondPointSector = (6 * CDDA_SECTORS_PER_SECOND) + startingSector;
-	operation.maximumOffsetToCheck = (MAXIMUM_OFFSET_TO_CHECK_IN_SECTORS * AUDIO_FRAMES_PER_CDDA_SECTOR);
-	
-	// Wait for the operation to be ready
-	while(![operation isReady])
-		[NSThread sleepForTimeInterval:0.25];
-	
-	// Run the operation in standalone mode
-	[_detailedStatusTextField setStringValue:NSLocalizedString(@"Calculating AccurateRip offsets", @"")];
-	[operation start];
-	
-	if(operation.error) {
-		[[Logger sharedLogger] logMessageWithLevel:eLogMessageLevelDebug format:@"Error calculating possible AccurateRip offsets: %@", operation.error];
-		return nil;
-	}
-	
-	return operation.possibleReadOffsets;
-}
-
-@end
-
-
 @implementation ExtractionViewController (Private)
 
 - (void) removeTemporaryFiles
@@ -1248,6 +1178,7 @@ accurateRipAlternatePressingOffset:(NSNumber *)accurateRipAlternatePressingOffse
 
 - (void) resetExtractionState
 {
+	_retryCount = 0;
 	_synthesizedTrack = nil;
 	_wholeExtractions = [NSMutableArray array];
 	_partialExtractions = [NSMutableArray array];
@@ -1258,8 +1189,13 @@ accurateRipAlternatePressingOffset:(NSNumber *)accurateRipAlternatePressingOffse
 
 - (void) startExtractingNextTrack
 {
+	// Clean up and reset in preparation for extraction
 	_currentTrack = nil;
-	
+
+	[self removeTemporaryFiles];
+	[self resetExtractionState];
+
+	// Get the next track to be extracted, if any remain
 	NSArray *tracks = self.orderedTracksRemaining;
 	
 	if(![tracks count])
@@ -1269,11 +1205,6 @@ accurateRipAlternatePressingOffset:(NSNumber *)accurateRipAlternatePressingOffse
 	[_trackIDsRemaining removeObject:[track objectID]];
 	
 	_currentTrack = track;
-
-	[self removeTemporaryFiles];
-	[self resetExtractionState];
-	
-	self.retryCount = 0;
 	
 	[[Logger sharedLogger] logMessageWithLevel:eLogMessageLevelDebug format:@"Beginning extraction for track %@", track.number];
 	
@@ -1528,22 +1459,6 @@ accurateRipAlternatePressingOffset:(NSNumber *)accurateRipAlternatePressingOffse
 	
 	// Re-rip only portions of the track if any C2 block error flags were returned
 	if(operation.useC2 && operation.blockErrorFlags.count) {
-//		// Determine the first and last sectors in the cushion range
-//		if(operation.cushionSectors) {
-//			NSInteger firstSectorIncludingCushion = [operation.sectors firstSector] - operation.cushionSectors;
-//			NSInteger lastSectorIncludingCushion = [operation.sectors lastSector] + operation.cushionSectors;
-//			
-//			SectorRange *legalSectors = self.compactDisc.firstSession.sectorRange;
-//			
-//			if(firstSectorIncludingCushion < [legalSectors firstSector]) {
-//				NSUInteger sectorsOfSilenceToPrepend = [legalSectors firstSector] - firstSectorIncludingCushion;
-//			}
-//
-//			if(lastSectorIncludingCushion > [legalSectors lastSector]) {
-//				NSUInteger sectorsOfSilenceToAppend = lastSectorIncludingCushion - [legalSectors lastSector];
-//			}
-//		}
-		
 		NSIndexSet *positionOfErrors = operation.blockErrorFlags;
 		
 		// Determine which sectors have no C2 errors
@@ -1696,37 +1611,25 @@ accurateRipAlternatePressingOffset:(NSNumber *)accurateRipAlternatePressingOffse
 		
 		[_synthesizedTrack closeFile], _synthesizedTrack = nil;
 		
+#if ENABLE_ACCURATERIP
+		
 		// Calculate the AccurateRip checksum
 		NSUInteger accurateRipChecksum = calculateAccurateRipChecksumForFile(fileURL,
 																			 [self.compactDisc.firstSession.firstTrack.number isEqualToNumber:track.number],
 																			 [self.compactDisc.firstSession.lastTrack.number isEqualToNumber:track.number]);
 		
-		// Determine the possible AccurateRip offsets for the extracted audio, if any
-		NSArray *possibleAccurateRipOffsets = [self determinePossibleAccurateRipOffsetsForTrack:track URL:fileURL];
-		
-		// Determine which pressings (if any) are the primary ones (offset checksum matches with a zero read offset)
-		NSPredicate *zeroOffsetPredicate = [NSPredicate predicateWithFormat:@"%K == 0", kReadOffsetKey];
-		NSArray *matchingPressingsWithZeroOffset = [possibleAccurateRipOffsets filteredArrayUsingPredicate:zeroOffsetPredicate];
-		
-#if ENABLE_ACCURATERIP
-		
-		// Iterate through each pressing and compare the track's AccurateRip checksums
-		if([matchingPressingsWithZeroOffset count]) {
-			
-			for(NSDictionary *matchingPressingInfo in matchingPressingsWithZeroOffset) {
-				NSManagedObjectID *accurateRipTrackID = [matchingPressingInfo objectForKey:kAccurateRipTrackIDKey];
+		// Iterate through each pressing and compare the track's AccurateRip checksum
+		if([self.compactDisc.accurateRipDiscs count]) {
+			for(AccurateRipDiscRecord *accurateRipDisc in self.compactDisc.accurateRipDiscs) {
+				AccurateRipTrackRecord *accurateRipTrack = [accurateRipDisc trackNumber:[track.number unsignedIntegerValue]];
 				
-				// Fetch the AccurateRipTrackRecord object from the context and ensure it is the correct class
-				NSManagedObject *managedObject = [self.managedObjectContext objectWithID:accurateRipTrackID];
-				if(![managedObject isKindOfClass:[AccurateRipTrackRecord class]])
+				if(!accurateRipTrack)
 					continue;
 				
-				AccurateRipTrackRecord *accurateRipTrack = (AccurateRipTrackRecord *)managedObject;
-				
-				[[Logger sharedLogger] logMessageWithLevel:eLogMessageLevelDebug format:@"Track AR checksum = %.8lx, checking against %.8lx", accurateRipChecksum, accurateRipTrack.checksum.unsignedIntegerValue];
-				
-				// If the track was accurately ripped, ship it off to the encoder
-				if([accurateRipTrack.checksum unsignedIntegerValue] == accurateRipChecksum) {					
+				// The track matches, so queue it for encoding
+				if([accurateRipTrack.checksum unsignedIntegerValue] == accurateRipChecksum) {
+					[[Logger sharedLogger] logMessageWithLevel:eLogMessageLevelDebug format:@"Primary Accurate Rip checksum (%.8x) matches", accurateRipChecksum];
+					
 					BOOL trackPrepared = [self prepareTrackForEncoding:track
 															   fileURL:fileURL
 																   MD5:MD5
@@ -1738,49 +1641,12 @@ accurateRipAlternatePressingOffset:(NSNumber *)accurateRipAlternatePressingOffse
 						[self startExtractingNextTrack];
 					
 					return;
-				}
-			}
-		}
-		else if([possibleAccurateRipOffsets count]) {
-			[[Logger sharedLogger] logMessage:@"Using alternate AccurateRip pressing"];
-			
-			for(NSDictionary *alternatePressingInfo in possibleAccurateRipOffsets) {
-				NSManagedObjectID *accurateRipTrackID = [alternatePressingInfo objectForKey:kAccurateRipTrackIDKey];
-				
-				// Fetch the AccurateRipTrackRecord object from the context and ensure it is the correct class
-				NSManagedObject *managedObject = [self.managedObjectContext objectWithID:accurateRipTrackID];
-				if(![managedObject isKindOfClass:[AccurateRipTrackRecord class]])
-					continue;
-				
-				AccurateRipTrackRecord *accurateRipTrack = (AccurateRipTrackRecord *)managedObject;
-				
-				// Calculate the AccurateRip checksum for the alternate pressing
-				NSNumber *alternatePressingOffset = [alternatePressingInfo objectForKey:kReadOffsetKey];
-				NSUInteger trackAlternateAccurateRipChecksum = [self calculateAccurateRipChecksumForTrack:track extractionOperation:operation readOffsetAdjustment:[alternatePressingOffset unsignedIntegerValue]];
-				
-				[[Logger sharedLogger] logMessageWithLevel:eLogMessageLevelDebug format:@"Track alternate pressing AR checksum = %.8lx, checking against %.8lx", trackAlternateAccurateRipChecksum, accurateRipTrack.checksum.unsignedIntegerValue];
-				
-				// If the track was accurately ripped, ship it off to the encoder
-				if([accurateRipTrack.checksum unsignedIntegerValue] == trackAlternateAccurateRipChecksum) {
 					
-					BOOL trackPrepared = [self prepareTrackForEncoding:track
-															   fileURL:fileURL
-																   MD5:MD5
-																  SHA1:SHA1
-												   accurateRipChecksum:accurateRipChecksum 
-											accurateRipConfidenceLevel:accurateRipTrack.confidenceLevel
-								  accurateRipAlternatePressingChecksum:trackAlternateAccurateRipChecksum 
-									accurateRipAlternatePressingOffset:alternatePressingOffset];
-					
-					if(trackPrepared)
-						[self startExtractingNextTrack];
-
-					return;
 				}
-			}
+			}			
 		}
-
-#endif /* ENABLE_ACCURATERIP */
+		
+#endif /* ENABLE_ACCURATERIP */		
 		
 		// Check to see if the enough matching extractions exist for this track for it to be encoded
 		NSURL *trackURL = [self outputURLForTrack:track];
