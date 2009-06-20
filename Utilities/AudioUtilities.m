@@ -30,7 +30,7 @@ copySectorsFromURLToURL(NSURL *inputURL, NSRange sectorsToCopy, NSURL *outputURL
 	if(noErr != status)
 		return NO;
 
-	status = AudioFileOpenURL((CFURLRef)outputURL, fsWrPerm, kAudioFileWAVEType, &outputFile);
+	status = AudioFileOpenURL((CFURLRef)outputURL, fsRdWrPerm, kAudioFileWAVEType, &outputFile);
 	if(noErr != status)
 		goto cleanup;
 	
