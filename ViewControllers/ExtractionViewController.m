@@ -784,7 +784,7 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.Extractio
 				if(NSNotFound != firstIndex) {
 					if(firstIndex == latestIndex)
 						[self extractPartialTrack:track sectorRange:[SectorRange sectorRangeWithSector:firstIndex] useC2:[self.driveInformation.useC2 boolValue] enforceMinimumReadSize:YES];
-					else
+					else /*if(firstIndex + 891 < latestIndex)*/
 						[self extractPartialTrack:track sectorRange:[SectorRange sectorRangeWithFirstSector:firstIndex lastSector:latestIndex] useC2:[self.driveInformation.useC2 boolValue] enforceMinimumReadSize:YES];
 				}
 				
@@ -821,6 +821,26 @@ static NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.Extractio
 	// Strip off the cushion sectors before encoding, if present
 	if(operation.cushionSectors) {
 		NSURL *outputURL = temporaryURLWithExtension(@"wav");
+		
+		// Set up the ASBD for CDDA audio
+		AudioStreamBasicDescription cddaASBD = getStreamDescriptionForCDDA();
+
+		// Create the output file
+		AudioFileID file = NULL;
+		OSStatus status = AudioFileCreateWithURL((CFURLRef)outputURL, kAudioFileWAVEType, &cddaASBD, kAudioFileFlags_EraseFile, &file);
+		if(noErr != status) {
+			if(error)
+				*error = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
+			return NO;
+		}
+		
+		status = AudioFileClose(file);
+		if(noErr != status) {
+			if(error)
+				*error = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
+			return NO;
+		}
+		
 		if(!copySectorsFromURLToURL(operation.URL, NSMakeRange(operation.cushionSectors, operation.sectors.length), outputURL, 0)) {
 			if(error)
 				*error = [NSError errorWithDomain:NSPOSIXErrorDomain code:EIO userInfo:nil];
