@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2005 - 2008 Stephen F. Booth <me@sbooth.org>
+ *  Copyright (C) 2005 - 2009 Stephen F. Booth <me@sbooth.org>
  *  All Rights Reserved
  */
 
@@ -38,6 +38,8 @@
 
 // ========================================
 // Utilities
+- (BOOL) isEqualToSectorRange:(SectorRange *)anotherSectorRange;
+
 - (NSUInteger) indexForSector:(NSUInteger)sector;
 - (NSUInteger) sectorForIndex:(NSUInteger)index;
 

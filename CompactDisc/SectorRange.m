@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2005 - 2008 Stephen F. Booth <me@sbooth.org>
+ *  Copyright (C) 2005 - 2009 Stephen F. Booth <me@sbooth.org>
  *  All Rights Reserved
  */
 
@@ -110,6 +110,11 @@
 	copy.lastSector = self.lastSector;
 	
 	return copy;
+}
+
+- (BOOL) isEqualToSectorRange:(SectorRange *)anotherSectorRange
+{
+	return (self.firstSector == anotherSectorRange.firstSector && self.lastSector == anotherSectorRange.lastSector);
 }
 
 - (NSUInteger)		length											{ return (self.lastSector - self.firstSector + 1); }
