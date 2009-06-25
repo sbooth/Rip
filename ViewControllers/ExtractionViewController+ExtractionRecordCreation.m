@@ -35,7 +35,7 @@
 	NSParameterAssert(nil != fileURL);
 	
 	// Nothing to do
-	if(!_sectorsOfSilenceToPrepend || !_sectorsOfSilenceToAppend)
+	if(!_sectorsOfSilenceToPrepend && !_sectorsOfSilenceToAppend)
 		return fileURL;
 	
 	[_detailedStatusTextField setStringValue:NSLocalizedString(@"Creating output file", @"")];	
