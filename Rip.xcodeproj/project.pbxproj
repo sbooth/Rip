@@ -96,6 +96,8 @@
 		32B8B3B50FB07F830028FE10 /* ChannelFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = 32B8B3B40FB07F830028FE10 /* ChannelFormatter.m */; };
 		32B8B41D0FB0AFB20028FE10 /* ViewSelectorBar.m in Sources */ = {isa = PBXBuildFile; fileRef = 32B8B3FD0FB0A9B00028FE10 /* ViewSelectorBar.m */; };
 		32B998F30FB12460005C8ACA /* ViewSelector.m in Sources */ = {isa = PBXBuildFile; fileRef = 32B998F20FB12460005C8ACA /* ViewSelector.m */; };
+		32BA15680FF3C07000AC695B /* ExtractionViewController+AudioExtraction.m in Sources */ = {isa = PBXBuildFile; fileRef = 32BA15670FF3C07000AC695B /* ExtractionViewController+AudioExtraction.m */; };
+		32BA15980FF3D97700AC695B /* ExtractionViewController+ExtractionRecordCreation.m in Sources */ = {isa = PBXBuildFile; fileRef = 32BA15970FF3D97700AC695B /* ExtractionViewController+ExtractionRecordCreation.m */; };
 		32BBEFD10EC63B4200EC2FBE /* CDDAUtilitiesTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 32BBEFD00EC63B4200EC2FBE /* CDDAUtilitiesTest.m */; };
 		32BBF08B0EC6B34A00EC2FBE /* ExtractedAudioFile.m in Sources */ = {isa = PBXBuildFile; fileRef = 32BBF08A0EC6B34A00EC2FBE /* ExtractedAudioFile.m */; };
 		32BBF1510EC8875100EC2FBE /* CopyImageToolbarIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 32BBF1480EC8875100EC2FBE /* CopyImageToolbarIcon.png */; };
@@ -536,6 +538,10 @@
 		32B8B3FD0FB0A9B00028FE10 /* ViewSelectorBar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViewSelectorBar.m; sourceTree = "<group>"; };
 		32B998F10FB12460005C8ACA /* ViewSelector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViewSelector.h; sourceTree = "<group>"; };
 		32B998F20FB12460005C8ACA /* ViewSelector.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViewSelector.m; sourceTree = "<group>"; };
+		32BA15660FF3C07000AC695B /* ExtractionViewController+AudioExtraction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "ExtractionViewController+AudioExtraction.h"; sourceTree = "<group>"; };
+		32BA15670FF3C07000AC695B /* ExtractionViewController+AudioExtraction.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "ExtractionViewController+AudioExtraction.m"; sourceTree = "<group>"; };
+		32BA15960FF3D97700AC695B /* ExtractionViewController+ExtractionRecordCreation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "ExtractionViewController+ExtractionRecordCreation.h"; sourceTree = "<group>"; };
+		32BA15970FF3D97700AC695B /* ExtractionViewController+ExtractionRecordCreation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "ExtractionViewController+ExtractionRecordCreation.m"; sourceTree = "<group>"; };
 		32BBEFCF0EC63B4200EC2FBE /* CDDAUtilitiesTest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CDDAUtilitiesTest.h; path = Tests/CDDAUtilitiesTest.h; sourceTree = "<group>"; };
 		32BBEFD00EC63B4200EC2FBE /* CDDAUtilitiesTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CDDAUtilitiesTest.m; path = Tests/CDDAUtilitiesTest.m; sourceTree = "<group>"; };
 		32BBF0890EC6B34A00EC2FBE /* ExtractedAudioFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExtractedAudioFile.h; sourceTree = "<group>"; };
@@ -1011,6 +1017,10 @@
 				3213B2E10FB9F9B000137097 /* ExtractionViewController.m */,
 				3213B2E20FB9F9B000137097 /* MetadataViewController.h */,
 				3213B2E30FB9F9B000137097 /* MetadataViewController.m */,
+				32BA15660FF3C07000AC695B /* ExtractionViewController+AudioExtraction.h */,
+				32BA15670FF3C07000AC695B /* ExtractionViewController+AudioExtraction.m */,
+				32BA15960FF3D97700AC695B /* ExtractionViewController+ExtractionRecordCreation.h */,
+				32BA15970FF3D97700AC695B /* ExtractionViewController+ExtractionRecordCreation.m */,
 			);
 			path = ViewControllers;
 			sourceTree = "<group>";
@@ -1693,6 +1703,8 @@
 				326AC2060FBFDB2D00110E77 /* ViewSelectorBarItem.m in Sources */,
 				32F602220FDCB24900F68EAA /* DriveOffsetQueryOperation.m in Sources */,
 				32F602610FDCBAFA00F68EAA /* DiskUtilities.m in Sources */,
+				32BA15680FF3C07000AC695B /* ExtractionViewController+AudioExtraction.m in Sources */,
+				32BA15980FF3D97700AC695B /* ExtractionViewController+ExtractionRecordCreation.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -8,10 +8,20 @@
 
 #include "replaygain_analysis.h"
 
-@class CompactDisc, DriveInformation, AccurateRipDiscRecord;
-@class ExtractionOperation, ExtractedAudioFile;
+@class SectorRange, CompactDisc, DriveInformation;
+@class ExtractionOperation;
 @class TrackDescriptor;
 @class ImageExtractionRecord;
+
+// ========================================
+// The number of sectors which will be scanned during offset verification
+// ========================================
+#define MAXIMUM_OFFSET_TO_CHECK_IN_SECTORS 3
+
+// ========================================
+// The minimum size (in bytes) of blocks to re-read from the disc
+// ========================================
+#define MINIMUM_DISC_READ_SIZE (2048 * 1024)
 
 // ========================================
 // Enum for extraction modes
@@ -23,12 +33,16 @@ enum _eExtractionMode {
 typedef enum _eExtractionMode eExtractionMode;
 
 // ========================================
+// Context objects for observeValueForKeyPath:ofObject:change:context:
+// ========================================
+extern NSString * const kMCNDetectionKVOContext;
+extern NSString * const kISRCDetectionKVOContext;
+extern NSString * const kPregapDetectionKVOContext;
+extern NSString * const kAudioExtractionKVOContext;
+
+// ========================================
 // An NSViewController subclass for customizing the extraction
 // of one or more tracks from a CD
-//
-// The general extraction strategy looks like:
-//  - Extract the entire track (copy)
-//  - Compare
 // ========================================
 @interface ExtractionViewController : NSViewController
 {
@@ -50,13 +64,17 @@ typedef enum _eExtractionMode eExtractionMode;
 	NSMutableArray *_activeTimers;
 	NSOperationQueue *_operationQueue;
 	
+	TrackDescriptor *_currentTrack;
 	NSMutableSet *_trackIDsRemaining;
 	
 	NSMutableArray *_wholeExtractions;
 	NSMutableArray *_partialExtractions;
 	NSMutableIndexSet *_sectorsNeedingVerification;
 
-	ExtractedAudioFile *_synthesizedTrack;
+	NSURL *_synthesizedTrackURL;
+	NSUInteger _sectorsOfSilenceToPrepend;
+	NSUInteger _sectorsOfSilenceToAppend;
+	SectorRange *_sectorsToExtract;
 	
 	NSMutableArray *_synthesizedTrackURLs;
 	NSMutableDictionary *_synthesizedTrackSHAs;
@@ -75,7 +93,6 @@ typedef enum _eExtractionMode eExtractionMode;
 	struct replaygain_t _rg;
 	
 	// Properties maintained for UI
-	TrackDescriptor *_currentTrack;
 	NSMutableSet *_tracks;
 	NSTimeInterval _secondsElapsed;
 	NSTimeInterval _estimatedSecondsRemaining;
@@ -87,11 +104,20 @@ typedef enum _eExtractionMode eExtractionMode;
 @property (assign) DADiskRef disk;
 @property (copy) NSSet * trackIDs;
 
+// TODO: currentTrackID??
+//@property (readonly, assign) TrackDescriptor * currentTrack;
+
 @property (assign) NSUInteger maxRetries;
 @property (assign) NSUInteger requiredSectorMatches;
 @property (assign) NSUInteger requiredTrackMatches;
 
 @property (assign) eExtractionMode extractionMode;
+
+@property (readonly, assign) CompactDisc * compactDisc;
+@property (readonly, assign) DriveInformation * driveInformation;
+@property (readonly, assign) NSManagedObjectContext * managedObjectContext;
+
+@property (readonly, assign) NSOperationQueue * operationQueue;
 
 @property (readonly) ImageExtractionRecord * imageExtractionRecord;
 @property (readonly) NSSet * trackExtractionRecords;
