@@ -8,8 +8,14 @@
 #import <Cocoa/Cocoa.h>
 
 // ========================================
-// Copy a range of sectors from one file to another
+// Create an audio file containing CDDA audio at the specified URL
 // ========================================
+BOOL createCDDAFileAtURL(NSURL *fileURL, NSError **error);
+
+// ========================================
+// Copy sectors from one file to another
+// ========================================
+BOOL copyAllSectorsFromURLToURL(NSURL *inputURL, NSURL *outputURL, NSUInteger outputLocation);
 BOOL copySectorsFromURLToURL(NSURL *inputURL, NSRange sectorsToCopy, NSURL *outputURL, NSUInteger outputLocation);
 
 // ========================================

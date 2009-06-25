@@ -15,6 +15,77 @@
 // ========================================
 #define BUFFER_SIZE_IN_SECTORS 875u
 
+BOOL 
+createCDDAFileAtURL(NSURL *fileURL, NSError **error)
+{
+	NSCParameterAssert(nil != fileURL);
+
+	// Set up the ASBD for CDDA audio
+	AudioStreamBasicDescription cddaASBD = getStreamDescriptionForCDDA();
+	
+	// Create the file at the specified URL
+	AudioFileID file = NULL;
+	OSStatus status = AudioFileCreateWithURL((CFURLRef)fileURL, kAudioFileWAVEType, &cddaASBD, kAudioFileFlags_EraseFile, &file);
+	if(noErr != status) {
+		if(error)
+			*error = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
+		return NO;
+	}
+	
+	status = AudioFileClose(file);
+	if(noErr != status) {
+		if(error)
+			*error = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
+		return NO;
+	}
+	
+	return YES;
+}
+
+BOOL
+copyAllSectorsFromURLToURL(NSURL *inputURL, NSURL *outputURL, NSUInteger outputLocation)
+{
+	NSCParameterAssert(nil != inputURL);
+
+	// Open the files for reading
+	AudioFileID inputFile = NULL;
+	OSStatus status = AudioFileOpenURL((CFURLRef)inputURL, fsRdPerm, kAudioFileWAVEType, &inputFile);
+	if(noErr != status)
+		return NO;
+	
+	// Determine the file's type
+	AudioStreamBasicDescription inputStreamDescription;
+	UInt32 dataSize = (UInt32)sizeof(inputStreamDescription);
+	status = AudioFileGetProperty(inputFile, kAudioFilePropertyDataFormat, &dataSize, &inputStreamDescription);
+	if(noErr != status) {
+		/*status =*/AudioFileClose(inputFile);
+		return NO;
+	}
+	
+	// Make sure the file is the expected type (CDDA)
+	if(!streamDescriptionIsCDDA(&inputStreamDescription)) {
+		/*status =*/AudioFileClose(inputFile);
+		return NO;
+	}
+	
+	// Determine the number of sectors in the input file
+	UInt64 packetsInInputFile;
+	dataSize = sizeof(packetsInInputFile);
+	status = AudioFileGetProperty(inputFile, kAudioFilePropertyAudioDataPacketCount, &dataSize, &packetsInInputFile);
+	if(noErr != status) {
+		/*status =*/AudioFileClose(inputFile);
+		return NO;
+	}
+
+	NSUInteger sectorsInInputFile = (NSUInteger)(packetsInInputFile / AUDIO_FRAMES_PER_CDDA_SECTOR);
+
+	// Close the file
+	/*status =*/AudioFileClose(inputFile);
+	
+	// Copy all the sectors	
+	return copySectorsFromURLToURL(inputURL, NSMakeRange(0, sectorsInInputFile), outputURL, outputLocation);
+}
+
 BOOL
 copySectorsFromURLToURL(NSURL *inputURL, NSRange sectorsToCopy, NSURL *outputURL, NSUInteger outputLocation)
 {
