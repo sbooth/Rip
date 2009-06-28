@@ -35,9 +35,12 @@
 	if(SCNetworkCheckReachabilityByName("www.accuraterip.com", &flags)) {
 		if(!(kSCNetworkFlagsReachable & flags && !(kSCNetworkFlagsConnectionRequired & flags))) {
 			NSMutableDictionary *errorDictionary = [NSMutableDictionary dictionary];
+			
+			[errorDictionary setObject:NSLocalizedString(@"A connection to AccurateRip could not be established.", @"") forKey:NSLocalizedDescriptionKey];
+			[errorDictionary setObject:NSLocalizedString(@"Please check your internet connection and try again.", @"") forKey:NSLocalizedRecoverySuggestionErrorKey];
 			[errorDictionary setObject:[NSURL URLWithString:@"www.accuraterip.com"] forKey:NSErrorFailingURLStringKey];
 			
-			self.error = [NSError errorWithDomain:NSURLErrorDomain code:NSURLErrorCannotConnectToHost userInfo:errorDictionary];
+			self.error = [NSError errorWithDomain:NSURLErrorDomain code:NSURLErrorNotConnectedToInternet userInfo:errorDictionary];
 			return;
 		}
 	}
