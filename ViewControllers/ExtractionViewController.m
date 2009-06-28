@@ -691,7 +691,7 @@ NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.ExtractionViewCo
 	NSInteger firstPermissibleSector = firstSessionSectors.firstSector;
 	NSInteger lastPermissibleSector = firstSessionSectors.lastSector;
 	
-	// To ensure the required number of sectors are saved, silence may be prepended or appended
+	// To calculate the offset AccurateRip checksums, silence may be prepended or appended to the extracted audio
 	_sectorsOfSilenceToPrepend = 0;
 	if(firstSectorToRead < firstPermissibleSector) {
 		_sectorsOfSilenceToPrepend = firstPermissibleSector - firstSectorToRead;
@@ -892,12 +892,8 @@ NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.ExtractionViewCo
 			[[Logger sharedLogger] logMessageWithLevel:eLogMessageLevelDebug format:@"Number of required track matches reached"];
 
 			BOOL trackSaved = [self saveTrackFromURL:trackURL];
-
-			
 			if(trackSaved)
 				[self startExtractingNextTrack];
-			else
-				;
 		}
 		// If not, determine any mismatched sectors and re-extract them
 		else {			
@@ -1011,9 +1007,7 @@ NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.ExtractionViewCo
 		if(trackURL) {
 			[[Logger sharedLogger] logMessageWithLevel:eLogMessageLevelDebug format:@"Number of required track matches reached"];
 
-			BOOL trackSaved = [self saveTrackFromURL:trackURL];
-			
-			
+			BOOL trackSaved = [self saveTrackFromURL:trackURL];			
 			if(trackSaved)
 				[self startExtractingNextTrack];
 		}
@@ -1688,13 +1682,12 @@ NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.ExtractionViewCo
 	NSError *error = nil;
 	
 	// Create an output file containing only the track audio (strip off the extra sectors used for AR calculations)
-	NSURL *trackURL = [self generateOutputFileForURL:trackWithCushionSectorsURL error:&error];
+	NSURL *trackURL = [self generateOutputFileForURL:trackWithCushionSectorsURL containsSilence:NO error:&error];
 	if(!trackURL)
 		return NO;
 	
 	// Create and save the track extraction record
 	TrackExtractionRecord *extractionRecord = [self createTrackExtractionRecordForFileURL:trackURL];
-
 	if(!extractionRecord)
 		return NO;
 	
@@ -1719,7 +1712,7 @@ accurateRipAlternatePressingOffset:nil];
 	NSError *error = nil;
 	
 	// Create an output file containing only the track audio (strip off the extra sectors used for AR calculations)
-	NSURL *trackURL = [self generateOutputFileForURL:trackWithCushionSectorsURL error:&error];
+	NSURL *trackURL = [self generateOutputFileForURL:trackWithCushionSectorsURL containsSilence:YES error:&error];
 	if(!trackURL)
 		return NO;
 	

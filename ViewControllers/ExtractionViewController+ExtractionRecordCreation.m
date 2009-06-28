@@ -95,7 +95,7 @@
 	return outputURL;
 }
 
-- (NSURL *) generateOutputFileForURL:(NSURL *)inputURL error:(NSError **)error
+- (NSURL *) generateOutputFileForURL:(NSURL *)inputURL containsSilence:(BOOL)containsSilence error:(NSError **)error
 {
 	NSParameterAssert(nil != inputURL);
 	
@@ -111,7 +111,11 @@
 		if(!createCDDAFileAtURL(outputURL, error))
 			return nil;
 		
-		if(!copySectorsFromURLToURL(inputURL, NSMakeRange(MAXIMUM_OFFSET_TO_CHECK_IN_SECTORS, _currentTrack.sectorCount), outputURL, 0)) {
+		// The inputURL may have silence prepended or appended for Accurate Rip calculations
+		// If it does, that silence needs to be skipped
+		NSUInteger sectorsToSkip = MAXIMUM_OFFSET_TO_CHECK_IN_SECTORS - (containsSilence ? 0 : _sectorsOfSilenceToPrepend);
+		
+		if(!copySectorsFromURLToURL(inputURL, NSMakeRange(sectorsToSkip, _currentTrack.sectorCount), outputURL, 0)) {
 			if(error)
 				*error = [NSError errorWithDomain:NSPOSIXErrorDomain code:EIO userInfo:nil];
 			return nil;

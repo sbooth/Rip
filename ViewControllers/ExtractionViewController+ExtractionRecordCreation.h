@@ -13,7 +13,7 @@
 // ========================================
 @interface ExtractionViewController (ExtractionRecordCreation)
 - (NSURL *) prependAndAppendSilenceForTrackURL:(NSURL *)fileURL error:(NSError **)error;
-- (NSURL *) generateOutputFileForURL:(NSURL *)inputURL error:(NSError **)error;
+- (NSURL *) generateOutputFileForURL:(NSURL *)inputURL containsSilence:(BOOL)containsSilence error:(NSError **)error;
 
 - (TrackExtractionRecord *) createTrackExtractionRecordForFileURL:(NSURL *)fileURL;
 - (TrackExtractionRecord *) createTrackExtractionRecordForFileURL:(NSURL *)fileURL accurateRipChecksum:(NSUInteger)accurateRipChecksum accurateRipConfidenceLevel:(NSNumber *)accurateRipConfidenceLevel;
