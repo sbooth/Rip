@@ -111,6 +111,16 @@ static NSString * const kCalculateOffsetsKVOContext		= @"org.sbooth.Rip.ReadOffs
 			[operation removeObserver:self forKeyPath:@"isExecuting"];
 			[operation removeObserver:self forKeyPath:@"isCancelled"];
 			[operation removeObserver:self forKeyPath:@"isFinished"];
+			
+			if(operation.error) {
+				[self.operationQueue cancelAllOperations];
+				
+				[self presentError:operation.error 
+					modalForWindow:self.window 
+						  delegate:self 
+				didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) 
+					   contextInfo:NULL];
+			}
 		}
 	}
 	else if(kExtractAudioKVOContext == context) {
