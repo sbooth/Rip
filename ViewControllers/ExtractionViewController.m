@@ -22,7 +22,6 @@
 #import "MCNDetectionOperation.h"
 #import "ISRCDetectionOperation.h"
 #import "PregapDetectionOperation.h"
-#import "ReadOffsetCalculationOperation.h"
 
 #import "TrackExtractionRecord.h"
 #import "ImageExtractionRecord.h"
