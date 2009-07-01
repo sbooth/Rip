@@ -248,7 +248,7 @@ calculateAccurateRipChecksumForBlock(const void *block, NSUInteger blockNumber, 
 // Calculate the AccurateRip checksums for the file at path
 // ========================================
 NSData * 
-calculateAccurateRipChecksumsForTrackInFile(NSURL *fileURL, NSRange trackSectors, BOOL isFirstTrack, BOOL isLastTrack, NSUInteger maximumOffsetInBlocks)
+calculateAccurateRipChecksumsForTrackInFile(NSURL *fileURL, NSRange trackSectors, BOOL isFirstTrack, BOOL isLastTrack, NSUInteger maximumOffsetInBlocks, BOOL assumeMissingSectorsAreSilence)
 {
 	NSCParameterAssert(nil != fileURL);
 	
@@ -284,15 +284,26 @@ calculateAccurateRipChecksumsForTrackInFile(NSURL *fileURL, NSRange trackSectors
 	// Convert the number of frames to the number of blocks (CDDA sectors)
 	NSUInteger totalBlocks = (NSUInteger)(totalPackets / AUDIO_FRAMES_PER_CDDA_SECTOR);
 	
+	// Determine if any sectors are missing at the beginning or end
+	NSUInteger missingSectorsAtStart = 0;
+	NSUInteger missingSectorsAtEnd = 0;
+	if(trackSectors.length + (2 * maximumOffsetInBlocks) > totalBlocks) {
+		NSUInteger missingSectors = trackSectors.length + (2 * maximumOffsetInBlocks) - totalBlocks;
+		
+		if(maximumOffsetInBlocks > trackSectors.location)
+			missingSectorsAtStart = maximumOffsetInBlocks - trackSectors.location;
+
+		missingSectorsAtEnd = missingSectors - missingSectorsAtStart;		
+	}
+	
 	// If there aren't enough sectors (blocks) in the file, it can't be processed
-	if(totalBlocks < trackSectors.length + (2 * maximumOffsetInBlocks))
+	if(totalBlocks < trackSectors.length)
 		goto cleanup;
-	
-	// Determine the range of offsets which will be checked
-	NSUInteger maximumOffsetWhichCanBeCheckedInBlocks = (totalBlocks - trackSectors.length) / 2;
-	if(maximumOffsetInBlocks > maximumOffsetWhichCanBeCheckedInBlocks)
-		maximumOffsetInBlocks = maximumOffsetWhichCanBeCheckedInBlocks;
-	
+
+	// Missing non-track sectors may be allowed
+	if(!assumeMissingSectorsAreSilence && (missingSectorsAtStart || missingSectorsAtEnd))
+		goto cleanup;
+
 	NSUInteger maximumOffsetInFrames = maximumOffsetInBlocks * AUDIO_FRAMES_PER_CDDA_SECTOR;
 	
 	// The inclusive range of blocks making up the track
@@ -319,7 +330,7 @@ calculateAccurateRipChecksumsForTrackInFile(NSURL *fileURL, NSRange trackSectors
 	int8_t buffer [kCDSectorSizeCDDA];
 	
 	// Iteratively process each CDDA sector of interest in the file
-	for(NSUInteger fileBlockNumber = firstFileBlockForTrack - maximumOffsetInBlocks; fileBlockNumber <= lastFileBlockForTrack + maximumOffsetInBlocks; ++fileBlockNumber) {
+	for(NSUInteger fileBlockNumber = firstFileBlockForTrack - maximumOffsetInBlocks + missingSectorsAtStart; fileBlockNumber <= lastFileBlockForTrack + maximumOffsetInBlocks - missingSectorsAtEnd; ++fileBlockNumber) {
 		UInt32 byteCount = kCDSectorSizeCDDA;
 		UInt32 packetCount = AUDIO_FRAMES_PER_CDDA_SECTOR;
 		SInt64 startingPacket = fileBlockNumber * AUDIO_FRAMES_PER_CDDA_SECTOR;

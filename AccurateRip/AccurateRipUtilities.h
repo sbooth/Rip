@@ -20,4 +20,4 @@ uint32_t calculateAccurateRipChecksumForFileRegionUsingOffset(NSURL *fileURL, NS
 uint32_t calculateAccurateRipChecksumForBlock(const void *block, NSUInteger blockNumber, NSUInteger totalBlocks, BOOL isFirstTrack, BOOL isLastTrack);
 
 // Calculate the AccurateRip checksums for the file at path
-NSData * calculateAccurateRipChecksumsForTrackInFile(NSURL *fileURL, NSRange trackSectors, BOOL isFirstTrack, BOOL isLastTrack, NSUInteger maximumOffsetInBlocks);
+NSData * calculateAccurateRipChecksumsForTrackInFile(NSURL *fileURL, NSRange trackSectors, BOOL isFirstTrack, BOOL isLastTrack, NSUInteger maximumOffsetInBlocks, BOOL assumeMissingSectorsAreSilence);
