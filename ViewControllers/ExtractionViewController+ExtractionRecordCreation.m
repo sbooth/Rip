@@ -30,72 +30,7 @@
 
 @implementation ExtractionViewController (ExtractionRecordCreation)
 
-- (NSURL *) prependAndAppendSilenceForTrackURL:(NSURL *)fileURL error:(NSError **)error
-{
-	NSParameterAssert(nil != fileURL);
-	
-	// Nothing to do
-	if(!_sectorsOfSilenceToPrepend && !_sectorsOfSilenceToAppend)
-		return fileURL;
-	
-	[_detailedStatusTextField setStringValue:NSLocalizedString(@"Creating output file", @"")];	
-	
-	// Create the output file
-	NSURL *outputURL = temporaryURLWithExtension(@"wav");
-	if(!createCDDAFileAtURL(outputURL, error))
-		return nil;
-	
-	// Prepend the silence
-	if(_sectorsOfSilenceToPrepend) {
-		ExtractedAudioFile *audioFile = [ExtractedAudioFile openFileForReadingAndWritingAtURL:outputURL error:error];
-		if(!audioFile)
-			return nil;
-		
-		int8_t *silence = NSAllocateCollectable(kCDSectorSizeCDDA * _sectorsOfSilenceToPrepend, 0);
-		memset(silence, 0, kCDSectorSizeCDDA * _sectorsOfSilenceToPrepend);
-		
-		// Write the silence
-		NSUInteger sectorsWritten = [audioFile setAudio:silence forSectors:NSMakeRange(0, _sectorsOfSilenceToPrepend) error:error];
-		
-		// Clean up
-		[audioFile closeFile];
-		silence = NULL;
-		
-		if(sectorsWritten != _sectorsOfSilenceToPrepend)
-			return nil;
-	}
-	
-	// Copy the audio
-	if(!copyAllSectorsFromURLToURL(fileURL, outputURL, _sectorsOfSilenceToPrepend)) {
-		if(error)
-			*error = [NSError errorWithDomain:NSPOSIXErrorDomain code:EIO userInfo:nil];
-		return nil;
-	}
-	
-	// Append the silence
-	if(_sectorsOfSilenceToAppend) {
-		ExtractedAudioFile *audioFile = [ExtractedAudioFile openFileForReadingAndWritingAtURL:outputURL error:error];
-		if(!audioFile)
-			return nil;
-		
-		int8_t *silence = NSAllocateCollectable(kCDSectorSizeCDDA * _sectorsOfSilenceToAppend, 0);
-		memset(silence, 0, kCDSectorSizeCDDA * _sectorsOfSilenceToAppend);
-		
-		// Write the silence
-		NSUInteger sectorsWritten = [audioFile setAudio:silence forSectors:NSMakeRange(_sectorsOfSilenceToPrepend + _sectorsToExtract.length, _sectorsOfSilenceToAppend) error:error];
-		
-		// Clean up
-		[audioFile closeFile];
-		silence = NULL;
-		
-		if(sectorsWritten != _sectorsOfSilenceToAppend)
-			return nil;
-	}
-	
-	return outputURL;
-}
-
-- (NSURL *) generateOutputFileForURL:(NSURL *)inputURL containsSilence:(BOOL)containsSilence error:(NSError **)error
+- (NSURL *) generateOutputFileForURL:(NSURL *)inputURL error:(NSError **)error
 {
 	NSParameterAssert(nil != inputURL);
 	
@@ -103,7 +38,7 @@
 	
 	NSURL *URL = inputURL;
 	
-	// Strip off the cushion sectors before encoding
+	// Strip off the extra audio before encoding
 	if(MAXIMUM_OFFSET_TO_CHECK_IN_SECTORS) {
 
 		// Create the output file
@@ -111,11 +46,9 @@
 		if(!createCDDAFileAtURL(outputURL, error))
 			return nil;
 		
-		// The inputURL may have silence prepended or appended for Accurate Rip calculations
-		// If it does, that silence needs to be skipped
-		NSUInteger sectorsToSkip = MAXIMUM_OFFSET_TO_CHECK_IN_SECTORS - (containsSilence ? 0 : _sectorsOfSilenceToPrepend);
-		
-		if(!copySectorsFromURLToURL(inputURL, NSMakeRange(sectorsToSkip, _currentTrack.sectorCount), outputURL, 0)) {
+		// The inputURL may have extra audio prepended for Accurate Rip calculations
+		// If so, it needs to be skipped
+		if(!copySectorsFromURLToURL(inputURL, NSMakeRange(MAXIMUM_OFFSET_TO_CHECK_IN_SECTORS - _sectorsOfSilenceToPrepend, _currentTrack.sectorCount), outputURL, 0)) {
 			if(error)
 				*error = [NSError errorWithDomain:NSPOSIXErrorDomain code:EIO userInfo:nil];
 			return nil;

@@ -859,9 +859,8 @@ NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.ExtractionViewCo
 	// Save this extraction operation
 	[_wholeExtractions addObject:operation];
 		
-	if(ENABLE_ACCURATERIP && [self verifyTrackWithAccurateRip:operation.URL]) {
+	if(ENABLE_ACCURATERIP && [self verifyTrackWithAccurateRip:operation.URL])
 		[self startExtractingNextTrack];
-	}
 	// Re-rip only portions of the track if any C2 block error flags were returned
 	else if(operation.useC2 && operation.blockErrorFlags.count) {
 		NSIndexSet *positionOfErrors = operation.blockErrorFlags;
@@ -1493,17 +1492,15 @@ NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.ExtractionViewCo
 {
 	NSParameterAssert(nil != inputURL);
 	
-	// Create an output file containing the prepended/appended silence, if required
-	NSError *error = nil;
-	NSURL *trackWithCushionSectorsURL = [self prependAndAppendSilenceForTrackURL:inputURL error:&error];
-	NSRange trackAudioRange = NSMakeRange(MAXIMUM_OFFSET_TO_CHECK_IN_SECTORS, _currentTrack.sectorCount);
+	NSRange trackAudioRange = NSMakeRange(MAXIMUM_OFFSET_TO_CHECK_IN_SECTORS - _sectorsOfSilenceToPrepend, _currentTrack.sectorCount);
 	
 	// Calculate the AccurateRip checksums for the track
-	NSData *trackAccurateRipChecksumsData = calculateAccurateRipChecksumsForTrackInFile(trackWithCushionSectorsURL, 
+	NSData *trackAccurateRipChecksumsData = calculateAccurateRipChecksumsForTrackInFile(inputURL, 
 																						trackAudioRange, 
 																						[self.compactDisc.firstSession.firstTrack.number isEqualToNumber:_currentTrack.number],
 																						[self.compactDisc.firstSession.lastTrack.number isEqualToNumber:_currentTrack.number],
-																						MAXIMUM_OFFSET_TO_CHECK_IN_SECTORS);
+																						MAXIMUM_OFFSET_TO_CHECK_IN_SECTORS,
+																						YES);
 	
 	// Only bother checking for AR matches if this disc is present in AR and checksum calculations were successful
 	if(trackAccurateRipChecksumsData && [self.compactDisc.accurateRipDiscs count]) {
@@ -1526,7 +1523,7 @@ NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.ExtractionViewCo
 			if([accurateRipTrack.checksum unsignedIntegerValue] == trackPrimaryAccurateRipChecksum) {
 				[[Logger sharedLogger] logMessageWithLevel:eLogMessageLevelDebug format:@"Primary Accurate Rip checksum (%.8x) matches", trackPrimaryAccurateRipChecksum];
 				
-				BOOL trackSaved = [self saveTrackFromURL:trackWithCushionSectorsURL 
+				BOOL trackSaved = [self saveTrackFromURL:inputURL
 									 accurateRipChecksum:trackPrimaryAccurateRipChecksum 
 							  accurateRipConfidenceLevel:accurateRipTrack.confidenceLevel];
 				
@@ -1548,7 +1545,7 @@ NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.ExtractionViewCo
 				if([accurateRipTrack.checksum unsignedIntegerValue] == trackOffsetAccurateRipChecksum) {
 					[[Logger sharedLogger] logMessageWithLevel:eLogMessageLevelDebug format:@"Alternate Accurate Rip checksum (%.8x) matches (offset %i)",trackOffsetAccurateRipChecksum, currentOffset];
 					
-					BOOL trackSaved = [self saveTrackFromURL:trackWithCushionSectorsURL 
+					BOOL trackSaved = [self saveTrackFromURL:inputURL 
 										 accurateRipChecksum:trackPrimaryAccurateRipChecksum 
 								  accurateRipConfidenceLevel:accurateRipTrack.confidenceLevel
 						accurateRipAlternatePressingChecksum:trackOffsetAccurateRipChecksum 
@@ -1681,7 +1678,7 @@ NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.ExtractionViewCo
 	NSError *error = nil;
 	
 	// Create an output file containing only the track audio (strip off the extra sectors used for AR calculations)
-	NSURL *trackURL = [self generateOutputFileForURL:trackWithCushionSectorsURL containsSilence:NO error:&error];
+	NSURL *trackURL = [self generateOutputFileForURL:trackWithCushionSectorsURL error:&error];
 	if(!trackURL)
 		return NO;
 	
@@ -1711,7 +1708,7 @@ accurateRipAlternatePressingOffset:nil];
 	NSError *error = nil;
 	
 	// Create an output file containing only the track audio (strip off the extra sectors used for AR calculations)
-	NSURL *trackURL = [self generateOutputFileForURL:trackWithCushionSectorsURL containsSilence:YES error:&error];
+	NSURL *trackURL = [self generateOutputFileForURL:trackWithCushionSectorsURL error:&error];
 	if(!trackURL)
 		return NO;
 	
