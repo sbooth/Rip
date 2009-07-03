@@ -61,7 +61,10 @@
 
 	[result appendString:@"\n"];
 
-	for(TrackExtractionRecord *extractionRecord in sortedExtractionRecords) {		
+	for(TrackExtractionRecord *extractionRecord in sortedExtractionRecords) {
+		NSPredicate *tracksPredicate = [NSPredicate predicateWithFormat:@"ANY tracks.number == %@", extractionRecord.track.number];
+		NSSet *accurateRipTracks = [extractionRecord.track.session.disc.accurateRipDiscs filteredSetUsingPredicate:tracksPredicate];
+		
 		[result appendFormat:@"Track %@ saved to %@\n", extractionRecord.track.number, [[extractionRecord.outputURL path] lastPathComponent]];
 		
 		[result appendString:@"\n"];
@@ -91,6 +94,10 @@
 			[result appendFormat:@"    C2 block error count:   %@\n", [numberFormatter stringForObjectValue:[NSNumber numberWithUnsignedInteger:[extractionRecord.blockErrorFlags count]]]];
 			
 //			NSIndexSet *onesIndexSet = [extractionRecord.errorFlags indexSetForOnes];
+		}
+		else if([accurateRipTracks count]) {
+			[result appendString:@"\n"];
+			[result appendString:@"    Copy verified, but may not be accurate (AccurateRip verification failed)\n"];
 		}
 		else {
 			[result appendString:@"\n"];
@@ -151,6 +158,9 @@
 	NSArray *sortedExtractionRecords = [[imageExtractionRecord.tracks allObjects] sortedArrayUsingDescriptors:[NSArray arrayWithObject:trackNumberSortDescriptor]];
 	
 	for(TrackExtractionRecord *extractionRecord in sortedExtractionRecords) {				
+		NSPredicate *tracksPredicate = [NSPredicate predicateWithFormat:@"ANY tracks.number == %@", extractionRecord.track.number];
+		NSSet *accurateRipTracks = [extractionRecord.track.session.disc.accurateRipDiscs filteredSetUsingPredicate:tracksPredicate];
+
 		[result appendFormat:@"Track %@ \n", extractionRecord.track.number];
 		
 		[result appendString:@"\n"];
@@ -179,7 +189,11 @@
 			[result appendString:@"\n"];
 			[result appendFormat:@"    C2 block error count:   %@\n", [numberFormatter stringForObjectValue:[NSNumber numberWithUnsignedInteger:[extractionRecord.blockErrorFlags count]]]];
 			
-			//			NSIndexSet *onesIndexSet = [extractionRecord.errorFlags indexSetForOnes];
+//			NSIndexSet *onesIndexSet = [extractionRecord.errorFlags indexSetForOnes];
+		}
+		else if([accurateRipTracks count]) {
+			[result appendString:@"\n"];
+			[result appendString:@"    Copy verified, but may not be accurate (AccurateRip verification failed)\n"];
 		}
 		else {
 			[result appendString:@"\n"];
