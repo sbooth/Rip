@@ -342,7 +342,6 @@ calculateAccurateRipChecksumsForTrackInFile(NSURL *fileURL, NSRange trackSectors
 		
 		NSInteger trackBlockNumber = fileBlockNumber - firstFileBlockForTrack;
 		NSInteger trackFrameNumber = trackBlockNumber * AUDIO_FRAMES_PER_CDDA_SECTOR;
-		
 		const uint32_t *sampleBuffer = (const uint32_t *)buffer;			
 		
 		// Sectors in the middle of the track can be processed quickly
@@ -375,7 +374,7 @@ calculateAccurateRipChecksumsForTrackInFile(NSURL *fileURL, NSRange trackSectors
 					if(isFirstTrack && ((5 * AUDIO_FRAMES_PER_CDDA_SECTOR) - 1) > currentFrame)
 						;
 					// The current frame is in the skipped area of the last track on the disc
-					else if(isLastTrack && (5 * AUDIO_FRAMES_PER_CDDA_SECTOR) > (totalFramesInTrack - currentFrame))
+					else if(isLastTrack && (5 * AUDIO_FRAMES_PER_CDDA_SECTOR) >= (totalFramesInTrack - currentFrame))
 						;
 					// The current frame is in the previous track
 					else if(0 > currentFrame)
