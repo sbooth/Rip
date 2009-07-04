@@ -29,6 +29,26 @@
 	return [result copy];
 }
 
+- (BOOL) hasDotPrefix
+{
+	return [self hasPrefix:@"."];
+}
+
+- (NSString *) stringByRemovingDotPrefix
+{
+	return [self stringByRemovingPrefix:@"."];
+}
+
+- (NSString *) stringByRemovingPrefix:(NSString *)prefix
+{
+	NSParameterAssert(nil != prefix);
+	
+	if(![self hasPrefix:prefix])
+		return self;
+	
+	return [self substringFromIndex:[prefix length]];
+}
+
 @end
 
 @implementation NSMutableString (PathSanitizationMethods)
@@ -50,6 +70,21 @@
 		[self replaceCharactersInRange:range withString:string];
 		range = [self rangeOfCharacterFromSet:illegalFilenameCharacters];		
 	}
+}
+
+- (void) removeDotPrefix
+{
+	[self removePrefix:@"."];
+}
+
+- (void) removePrefix:(NSString *)prefix
+{
+	NSParameterAssert(nil != prefix);
+	
+	if(![self hasPrefix:prefix])
+		return;
+	
+	[self deleteCharactersInRange:NSMakeRange(0, [prefix length])];
 }
 
 @end
