@@ -314,13 +314,13 @@
 					<object class="NSButton" id="758280851">
 						<reference key="NSNextResponder" ref="1005"/>
 						<int key="NSvFlags">268</int>
-						<string key="NSFrame">{{142, 18}, {308, 18}}</string>
+						<string key="NSFrame">{{142, 18}, {327, 18}}</string>
 						<reference key="NSSuperview" ref="1005"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSButtonCell" key="NSCell" id="897101012">
 							<int key="NSCellFlags">-2080244224</int>
 							<int key="NSCellFlags2">0</int>
-							<string key="NSContents">Allow extraction failure when criteria not met</string>
+							<string key="NSContents">Allow extraction failure when matches not made</string>
 							<reference key="NSSupport" ref="1038475392"/>
 							<reference key="NSControlView" ref="758280851"/>
 							<int key="NSButtonFlags">1211912703</int>
@@ -343,11 +343,6 @@
 				<string key="NSClassName">NSView</string>
 			</object>
 			<object class="NSUserDefaultsController" id="236891816">
-				<object class="NSMutableArray" key="NSDeclaredKeys">
-					<bool key="EncodedWithXMLCoder">YES</bool>
-					<string>allowExtractionFailures</string>
-					<string>allowExtractionFailure</string>
-				</object>
 				<bool key="NSSharedInstance">YES</bool>
 			</object>
 			<object class="NSArrayController" id="389836083">
