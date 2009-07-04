@@ -26,6 +26,8 @@
 
 	MetadataViewController *_metadataViewController;
 	ExtractionViewController *_extractionViewController;
+	
+	NSIndexSet *_savedSelection;
 }
 
 // ========================================

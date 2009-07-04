@@ -471,6 +471,9 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 
 - (void) metadataSourceViewController:(NSViewController *)viewController finishedWithReturnCode:(int)returnCode
 {
+	// Restore the selection
+	[(NSArrayController *)[_metadataViewController valueForKey:@"trackController"] setSelectionIndexes:_savedSelection];
+
 	// Replace the metadata source view with the metadata view
 	[self swapMainViewController:viewController withViewController:_metadataViewController];
 	
@@ -892,6 +895,10 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 	
 	[viewController setRepresentedObject:metadataSourceData];
 
+	// Save the selection and deselect any tracks
+	_savedSelection = [[_metadataViewController valueForKey:@"trackController"] selectionIndexes];
+	[(NSArrayController *)[_metadataViewController valueForKey:@"trackController"] setSelectionIndexes:nil];
+	
 	// Swap in the metadata view
 	[self swapMainViewController:_metadataViewController withViewController:viewController];
 }
@@ -1022,6 +1029,9 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 
 - (void) extractionFinishedWithReturnCode:(int)returnCode
 {	
+	// Restore the selection
+	[(NSArrayController *)[_metadataViewController valueForKey:@"trackController"] setSelectionIndexes:_savedSelection];
+	
 	// Replace the extraction view with the metadata view
 	[self swapMainViewController:_extractionViewController withViewController:_metadataViewController];
 	
@@ -1296,6 +1306,10 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 	if([self.managedObjectContext hasChanges] && ![self.managedObjectContext save:&error])
 		[self presentError:error modalForWindow:self.window delegate:nil didPresentSelector:NULL contextInfo:NULL];
 	
+	// Save the selection and deselect any tracks
+	_savedSelection = [[_metadataViewController valueForKey:@"trackController"] selectionIndexes];
+	[(NSArrayController *)[_metadataViewController valueForKey:@"trackController"] setSelectionIndexes:nil];
+
 	// Set the view's frame, so when added it will have the correct size (views are not auto-sized when added)
 	[self swapMainViewController:_metadataViewController withViewController:_extractionViewController];
 	
@@ -1307,6 +1321,7 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 	_extractionViewController.maxRetries = [[NSUserDefaults standardUserDefaults] integerForKey:@"maxRetries"];
 	_extractionViewController.requiredSectorMatches = [[NSUserDefaults standardUserDefaults] integerForKey:@"requiredSectorMatches"];
 	_extractionViewController.requiredTrackMatches = [[NSUserDefaults standardUserDefaults] integerForKey:@"requiredTrackMatches"];
+	_extractionViewController.allowExtractionFailure = [[NSUserDefaults standardUserDefaults] boolForKey:@"allowExtractionFailure"];
 	
 	// Start extracting
 	[_extractionViewController extract:self];
