@@ -163,7 +163,7 @@ static PreferencesWindowController *sSharedPreferencesWindowController = nil;
     else if([itemIdentifier isEqualToString:EncoderPreferencesToolbarItemIdentifier]) {
 		[toolbarItem setLabel:NSLocalizedString(@"Encoders", @"Encoders preference pane name")];
 		[toolbarItem setPaletteLabel:NSLocalizedString(@"Encoders", @"")];
-		[toolbarItem setToolTip:NSLocalizedString(@"Select and configure the encoder used for audio extraction", @"")];
+		[toolbarItem setToolTip:NSLocalizedString(@"Select and configure the encoder used for output files", @"")];
 		[toolbarItem setImage:[NSImage imageNamed:@"EncoderPreferencesToolbarIcon"]];
 	}
     else if([itemIdentifier isEqualToString:MusicDatabasePreferencesToolbarItemIdentifier]) {
