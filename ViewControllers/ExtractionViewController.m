@@ -140,6 +140,8 @@ NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.ExtractionViewCo
 - (BOOL) saveSectors:(NSIndexSet *)sectors fromOperation:(ExtractionOperation *)operation;
 
 - (BOOL) saveTrackFromURL:(NSURL *)trackWithCushionSectorsURL;
+- (BOOL) saveTrackFromURL:(NSURL *)trackWithCushionSectorsURL copyVerified:(BOOL)copyVerified;
+
 - (BOOL) saveTrackFromURL:(NSURL *)trackWithCushionSectorsURL accurateRipChecksum:(NSUInteger)accurateRipChecksum accurateRipConfidenceLevel:(NSNumber *)accurateRipConfidenceLevel;
 - (BOOL) saveTrackFromURL:(NSURL *)trackWithCushionSectorsURL accurateRipChecksum:(NSUInteger)accurateRipChecksum accurateRipConfidenceLevel:(NSNumber *)accurateRipConfidenceLevel accurateRipAlternatePressingChecksum:(NSUInteger)accurateRipAlternatePressingChecksum accurateRipAlternatePressingOffset:(NSNumber *)accurateRipAlternatePressingOffset;
 @end
@@ -1043,7 +1045,7 @@ NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.ExtractionViewCo
 				// Since the user doesn't want tracks to fail, just throw the best together we can
 				NSURL *bestGuessURL = [self bestGuessURL];
 				
-				BOOL trackSaved = [self saveTrackFromURL:bestGuessURL];			
+				BOOL trackSaved = [self saveTrackFromURL:bestGuessURL copyVerified:NO];
 				if(trackSaved)
 					[self startExtractingNextTrack];				
 			}
@@ -1755,6 +1757,11 @@ NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.ExtractionViewCo
 
 - (BOOL) saveTrackFromURL:(NSURL *)trackWithCushionSectorsURL
 {
+	return [self saveTrackFromURL:trackWithCushionSectorsURL copyVerified:YES];
+}
+
+- (BOOL) saveTrackFromURL:(NSURL *)trackWithCushionSectorsURL copyVerified:(BOOL)copyVerified
+{
 	NSParameterAssert(nil != trackWithCushionSectorsURL);
 	
 	NSError *error = nil;
@@ -1768,6 +1775,8 @@ NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.ExtractionViewCo
 	TrackExtractionRecord *extractionRecord = [self createTrackExtractionRecordForFileURL:trackURL];
 	if(!extractionRecord)
 		return NO;
+	
+	extractionRecord.copyVerified = [NSNumber numberWithBool:copyVerified];
 	
 	[self addTrackExtractionRecord:extractionRecord];
 	

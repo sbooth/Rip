@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2008 Stephen F. Booth <me@sbooth.org>
+ *  Copyright (C) 2008 - 2009 Stephen F. Booth <me@sbooth.org>
  *  All Rights Reserved
  */
 
@@ -21,6 +21,7 @@
 @property (assign) NSNumber * accurateRipAlternatePressingOffset;
 @property (assign) NSNumber * accurateRipConfidenceLevel;
 @property (assign) NSIndexSet * blockErrorFlags;
+@property (assign) NSNumber * copyVerified;
 @property (assign) NSDate * date;
 @property (assign) NSURL * inputURL;
 @property (assign) NSString * MD5;

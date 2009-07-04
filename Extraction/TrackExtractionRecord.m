@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2008 Stephen F. Booth <me@sbooth.org>
+ *  Copyright (C) 2008 - 2009 Stephen F. Booth <me@sbooth.org>
  *  All Rights Reserved
  */
 
@@ -14,6 +14,7 @@
 @dynamic accurateRipAlternatePressingOffset;
 @dynamic accurateRipConfidenceLevel;
 @dynamic blockErrorFlags;
+@dynamic copyVerified;
 @dynamic date;
 @dynamic inputURL;
 @dynamic MD5;

@@ -95,13 +95,19 @@
 			
 //			NSIndexSet *onesIndexSet = [extractionRecord.errorFlags indexSetForOnes];
 		}
-		else if([accurateRipTracks count]) {
+		else if([extractionRecord.copyVerified boolValue]){
 			[result appendString:@"\n"];
-			[result appendString:@"    Copy verified, but may not be accurate (AccurateRip verification failed)\n"];
+			if([accurateRipTracks count])
+				[result appendString:@"    Copy verified, but may not be accurate (AccurateRip verification failed)\n"];
+			else
+				[result appendString:@"    Copy verified\n"];
 		}
 		else {
 			[result appendString:@"\n"];
-			[result appendString:@"    Copy verified\n"];
+			if([accurateRipTracks count])
+				[result appendString:@"    Copy not verified, may not be accurate (Output forced and AccurateRip verification failed)\n"];
+			else
+				[result appendString:@"    Copy not verified, may not be accurate (Output forced)\n"];
 		}
 		
 		[result appendString:@"\n"];
@@ -191,13 +197,19 @@
 			
 //			NSIndexSet *onesIndexSet = [extractionRecord.errorFlags indexSetForOnes];
 		}
-		else if([accurateRipTracks count]) {
+		else if([extractionRecord.copyVerified boolValue]){
 			[result appendString:@"\n"];
-			[result appendString:@"    Copy verified, but may not be accurate (AccurateRip verification failed)\n"];
+			if([accurateRipTracks count])
+				[result appendString:@"    Copy verified, but may not be accurate (AccurateRip verification failed)\n"];
+			else
+				[result appendString:@"    Copy verified\n"];
 		}
 		else {
 			[result appendString:@"\n"];
-			[result appendString:@"    Copy verified\n"];
+			if([accurateRipTracks count])
+				[result appendString:@"    Copy not verified, may not be accurate (Output forced and AccurateRip verification failed)\n"];
+			else
+				[result appendString:@"    Copy not verified, may not be accurate (Output forced)\n"];
 		}
 		
 		[result appendString:@"\n"];
