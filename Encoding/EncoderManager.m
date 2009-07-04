@@ -232,8 +232,9 @@ customFilenameForTrackExtractionRecord(TrackExtractionRecord *trackExtractionRec
 	NSString *trackTotal = [trackExtractionRecord.track.session.tracks count] ? [NSString stringWithFormat:@"%02lu", [trackExtractionRecord.track.session.tracks count]] : @"";
 	[path replaceOccurrencesOfString:@"{trackTotal}" withString:trackTotal options:0 range:NSMakeRange(0, [path length])];
 	
-	// Don't allow any illegal characters
+	// Sanitize the path and ensure it will be visible
 	[path replaceIllegalPathCharactersWithString:@"_"];
+	[path removeDotPrefix];
 	
 	return [path copy];
 }
@@ -270,7 +271,8 @@ defaultFilenameForImageExtractionRecord(ImageExtractionRecord *imageExtractionRe
 	else
 		filename = [title stringByReplacingIllegalPathCharactersWithString:@"_"];
 	
-	return filename;
+	// Ensure the path will be visible
+	return [filename stringByRemovingDotPrefix];
 }
 
 static NSString *
@@ -299,8 +301,9 @@ customFilenameForImageExtractionRecord(ImageExtractionRecord *imageExtractionRec
 	NSString *discTotal = albumMetadata.discTotal ? [NSString stringWithFormat:@"%02lu", [albumMetadata.discTotal unsignedIntegerValue]] : @"";
 	[path replaceOccurrencesOfString:@"{discTotal}" withString:discTotal options:0 range:NSMakeRange(0, [path length])];
 		
-	// Don't allow any illegal characters
+	// Sanitize the path and ensure it will be visible
 	[path replaceIllegalPathCharactersWithString:@"_"];
+	[path removeDotPrefix];
 	
 	return [path copy];
 }
@@ -752,22 +755,21 @@ static EncoderManager *sSharedEncoderManager				= nil;
 	NSString *title = disc.metadata.title;
 	if(nil == title)
 		title = NSLocalizedString(@"Unknown Album", @"");
-	
+
 	NSString *artist = disc.metadata.artist;
 	if(nil == artist)
 		artist = NSLocalizedString(@"Unknown Artist", @"");
-	
 
 	// Build up the sanitized Artist/Album structure
 	NSArray *pathComponents = nil;
 	if(disc.metadata.isCompilation) {
 		pathComponents = [NSArray arrayWithObjects:NSLocalizedString(@"Compilations", @""),
-						  [title stringByReplacingIllegalPathCharactersWithString:@"_"],
+						  [[title stringByReplacingIllegalPathCharactersWithString:@"_"] stringByRemovingDotPrefix],
 						  nil];
 	}
 	else {		
-		pathComponents = [NSArray arrayWithObjects:[artist stringByReplacingIllegalPathCharactersWithString:@"_"], 
-						  [title stringByReplacingIllegalPathCharactersWithString:@"_"], 
+		pathComponents = [NSArray arrayWithObjects:[[artist stringByReplacingIllegalPathCharactersWithString:@"_"] stringByRemovingDotPrefix], 
+						  [[title stringByReplacingIllegalPathCharactersWithString:@"_"] stringByRemovingDotPrefix], 
 						  nil];
 	}
 
@@ -809,7 +811,9 @@ static EncoderManager *sSharedEncoderManager				= nil;
 		NSString *discTotal = albumMetadata.discTotal ? [NSString stringWithFormat:@"%02lu", [albumMetadata.discTotal unsignedIntegerValue]] : @"";
 		[partialPath replaceOccurrencesOfString:@"{discTotal}" withString:discTotal options:0 range:NSMakeRange(0, [partialPath length])];
 		
+		// Sanitize the path and ensure it will be visible
 		[partialPath replaceIllegalPathCharactersWithString:@"_"];
+		[partialPath removeDotPrefix];
 		
 		[replacedComponents addObject:partialPath];
 	}
