@@ -46,6 +46,7 @@
 - (IBAction) deselectAllTracks:(id)sender;
 
 - (IBAction) determineDriveReadOffset:(id)sender;
+- (IBAction) setDriveReadOffsetManually:(id)sender;
 
 - (IBAction) copySelectedTracks:(id)sender;
 - (IBAction) copyImage:(id)sender;

@@ -27,6 +27,8 @@
 		321CB2040FA9FB10009DBC39 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 32C9F23A0F7973790050F4B2 /* QuartzCore.framework */; };
 		322EB43F0F8C30020081A563 /* AquaticPrime.m in Sources */ = {isa = PBXBuildFile; fileRef = 322EB43E0F8C30020081A563 /* AquaticPrime.m */; };
 		322EB4430F8C30210081A563 /* ImageAndTextCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 322EB4420F8C30210081A563 /* ImageAndTextCell.m */; };
+		32495F2A0FFFE76800539E10 /* ManualReadOffsetSheetController.m in Sources */ = {isa = PBXBuildFile; fileRef = 32495F290FFFE76800539E10 /* ManualReadOffsetSheetController.m */; };
+		32495F3D0FFFEAC700539E10 /* ManualReadOffsetSheet.xib in Resources */ = {isa = PBXBuildFile; fileRef = 32495F3B0FFFEAC700539E10 /* ManualReadOffsetSheet.xib */; };
 		324EC6740DA2D411002A3CA7 /* Rip.icns in Resources */ = {isa = PBXBuildFile; fileRef = 324EC6730DA2D411002A3CA7 /* Rip.icns */; };
 		324F30C90E85CF47000E4E4E /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = 324F30C80E85CF47000E4E4E /* dsa_pub.pem */; };
 		324F31320E86B3E2000E4E4E /* ReadMCNSheet.xib in Resources */ = {isa = PBXBuildFile; fileRef = 324F31300E86B3E2000E4E4E /* ReadMCNSheet.xib */; };
@@ -435,6 +437,9 @@
 		322EB4420F8C30210081A563 /* ImageAndTextCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ImageAndTextCell.m; sourceTree = "<group>"; };
 		322EB4640F8C325B0081A563 /* AddressBook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AddressBook.framework; path = System/Library/Frameworks/AddressBook.framework; sourceTree = SDKROOT; };
 		32362B810EE4EC1C00001E58 /* Base.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Base.xcconfig; sourceTree = "<group>"; };
+		32495F280FFFE76800539E10 /* ManualReadOffsetSheetController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ManualReadOffsetSheetController.h; sourceTree = "<group>"; };
+		32495F290FFFE76800539E10 /* ManualReadOffsetSheetController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ManualReadOffsetSheetController.m; sourceTree = "<group>"; };
+		32495F3C0FFFEAC700539E10 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/ManualReadOffsetSheet.xib; sourceTree = "<group>"; };
 		324EC6730DA2D411002A3CA7 /* Rip.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = Rip.icns; sourceTree = "<group>"; };
 		324F30C80E85CF47000E4E4E /* dsa_pub.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = dsa_pub.pem; sourceTree = "<group>"; };
 		324F31310E86B3E2000E4E4E /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/ReadMCNSheet.xib; sourceTree = "<group>"; };
@@ -751,6 +756,7 @@
 				2A37F4C3FDCFA73011CA2CEA /* Frameworks */,
 				19C28FB0FE9D524F11CA2CBB /* Products */,
 				3268C3720EB04C9800FF62F8 /* Test Cases */,
+				32495F3B0FFFEAC700539E10 /* ManualReadOffsetSheet.xib */,
 			);
 			name = Rip;
 			sourceTree = "<group>";
@@ -758,6 +764,8 @@
 		2A37F4ABFDCFA73011CA2CEA /* WindowControllers */ = {
 			isa = PBXGroup;
 			children = (
+				32495F280FFFE76800539E10 /* ManualReadOffsetSheetController.h */,
+				32495F290FFFE76800539E10 /* ManualReadOffsetSheetController.m */,
 				324F32330E86FDAD000E4E4E /* DetectPregapsSheetController.h */,
 				324F32340E86FDAD000E4E4E /* DetectPregapsSheetController.m */,
 				324F31920E86E378000E4E4E /* ReadISRCsSheetController.h */,
@@ -1588,6 +1596,7 @@
 				321716550FBB4829004C5F28 /* LyricsMetadataEditorPaneIcon.png in Resources */,
 				321717E10FBF9EB9004C5F28 /* AlbumArtEditorPaneIcon.png in Resources */,
 				321717E60FBF9F14004C5F28 /* AlbumArtInspectorView.xib in Resources */,
+				32495F3D0FFFEAC700539E10 /* ManualReadOffsetSheet.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1705,6 +1714,7 @@
 				32F602610FDCBAFA00F68EAA /* DiskUtilities.m in Sources */,
 				32BA15680FF3C07000AC695B /* ExtractionViewController+AudioExtraction.m in Sources */,
 				32BA15980FF3D97700AC695B /* ExtractionViewController+ExtractionRecordCreation.m in Sources */,
+				32495F2A0FFFE76800539E10 /* ManualReadOffsetSheetController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1817,6 +1827,14 @@
 				321CB12E0FA8A29E009DBC39 /* English */,
 			);
 			name = InspectorPanel.xib;
+			sourceTree = "<group>";
+		};
+		32495F3B0FFFEAC700539E10 /* ManualReadOffsetSheet.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				32495F3C0FFFEAC700539E10 /* English */,
+			);
+			name = ManualReadOffsetSheet.xib;
 			sourceTree = "<group>";
 		};
 		324F31300E86B3E2000E4E4E /* ReadMCNSheet.xib */ = {

@@ -33,6 +33,7 @@
 #import "ReadMCNSheetController.h"
 #import "ReadISRCsSheetController.h"
 #import "DetectPregapsSheetController.h"
+#import "ManualReadOffsetSheetController.h"
 
 #import "EncoderManager.h"
 #import "MusicDatabaseManager.h"
@@ -632,6 +633,23 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 						  NULL,
 						  NULL, 
 						  NSLocalizedString(@"Configuring a read offset will allow more accurate audio extraction.", @""));
+}
+
+// ========================================
+// Allow the user the manually specify the drive's read offset
+- (IBAction) setDriveReadOffsetManually:(id)sender
+{
+
+#pragma unused(sender)
+
+	ManualReadOffsetSheetController *sheetController = [[ManualReadOffsetSheetController alloc] init];
+	
+	sheetController.disk = self.disk;
+	
+	[sheetController beginManualReadOffsetSheetForWindow:self.window
+										   modalDelegate:nil 
+										  didEndSelector:NULL 
+											 contextInfo:NULL];
 }
 
 // ========================================
