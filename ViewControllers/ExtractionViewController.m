@@ -115,18 +115,24 @@ NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.ExtractionViewCo
 
 - (NSData *) dataForSector:(NSUInteger)sector interpolate:(BOOL)interpolate;
 - (NSData *) dataForSector:(NSUInteger)sector interpolate:(BOOL)interpolate useC2:(BOOL)useC2;
+- (NSData *) dataForSector:(NSUInteger)sector interpolate:(BOOL)interpolate requiredMatches:(NSUInteger)requiredMatches useC2:(BOOL)useC2;
 
 - (NSData *) nonInterpolatedDataForSector:(NSUInteger)sector;
 - (NSData *) nonInterpolatedDataForSector:(NSUInteger)sector useC2:(BOOL)useC2;
+- (NSData *) nonInterpolatedDataForSector:(NSUInteger)sector requiredMatches:(NSUInteger)requiredMatches useC2:(BOOL)useC2;
 
 - (NSData *) interpolatedDataForSector:(NSUInteger)sector;
 - (NSData *) interpolatedDataForSector:(NSUInteger)sector useC2:(BOOL)useC2;
+- (NSData *) interpolatedDataForSector:(NSUInteger)sector requiredMatches:(NSUInteger)requiredMatches useC2:(BOOL)useC2;
 
 - (NSIndexSet *) mismatchedSectors;
 - (NSIndexSet *) mismatchedSectorsUsingC2:(BOOL)useC2;
 
 - (NSURL *) outputURL;
 - (NSURL *) outputURLUsingC2:(BOOL)useC2;
+
+- (NSURL *) bestGuessURL;
+- (NSURL *) bestGuessURLUsingC2:(BOOL)useC2;
 
 - (BOOL) verifyTrackWithAccurateRip:(NSURL *)inputURL;
 
@@ -1010,7 +1016,7 @@ NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.ExtractionViewCo
 				[self startExtractingNextTrack];
 		}
 		else {
-			[[Logger sharedLogger] logMessageWithLevel:eLogMessageLevelDebug format:@"Required number of track matches not reached, retrying"];
+			[[Logger sharedLogger] logMessageWithLevel:eLogMessageLevelDebug format:@"Required number of track matches not reached"];
 			
 			// Retry the track if the maximum retry count hasn't been exceeded
 			if(self.retryCount <= self.maxRetries) {
@@ -1030,6 +1036,16 @@ NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.ExtractionViewCo
 				
 				// Get (re)started on the track
 				[self extractSectorRange:_sectorsToExtract];
+			}
+			else if(![[NSUserDefaults standardUserDefaults] boolForKey:@"allowExtractionFailure"]) {
+				[[Logger sharedLogger] logMessage:@"Maximum retry count exceeded for track %@, using best guess", _currentTrack.number];
+			
+				// Since the user doesn't want tracks to fail, just throw the best together we can
+				NSURL *bestGuessURL = [self bestGuessURL];
+				
+				BOOL trackSaved = [self saveTrackFromURL:bestGuessURL];			
+				if(trackSaved)
+					[self startExtractingNextTrack];				
 			}
 			// Failure
 			else {
@@ -1061,7 +1077,12 @@ NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.ExtractionViewCo
 
 - (NSData *) dataForSector:(NSUInteger)sector interpolate:(BOOL)interpolate useC2:(BOOL)useC2
 {
-	return (interpolate ? [self interpolatedDataForSector:sector useC2:useC2] : [self nonInterpolatedDataForSector:sector useC2:useC2]);
+	return [self dataForSector:sector interpolate:interpolate requiredMatches:self.requiredSectorMatches useC2:useC2];
+}
+
+- (NSData *) dataForSector:(NSUInteger)sector interpolate:(BOOL)interpolate requiredMatches:(NSUInteger)requiredMatches useC2:(BOOL)useC2
+{
+	return (interpolate ? [self interpolatedDataForSector:sector requiredMatches:requiredMatches useC2:useC2] : [self nonInterpolatedDataForSector:sector requiredMatches:requiredMatches useC2:useC2]);
 }
 
 - (NSData *) nonInterpolatedDataForSector:(NSUInteger)sector
@@ -1071,12 +1092,17 @@ NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.ExtractionViewCo
 
 - (NSData *) nonInterpolatedDataForSector:(NSUInteger)sector useC2:(BOOL)useC2
 {
+	return [self nonInterpolatedDataForSector:sector requiredMatches:self.requiredSectorMatches useC2:useC2];
+}
+
+- (NSData *) nonInterpolatedDataForSector:(NSUInteger)sector requiredMatches:(NSUInteger)requiredMatches useC2:(BOOL)useC2
+{
 	// Iterate over all the whole and partial extraction operations
 	NSMutableArray *allOperations = [NSMutableArray arrayWithArray:_wholeExtractions];
 	[allOperations addObjectsFromArray:_partialExtractions];
 
 	// Insufficient extractions exist to verify this sector
-	if([allOperations count] < self.requiredSectorMatches)
+	if([allOperations count] < requiredMatches)
 		return nil;
 	
 	// Iterate through all the extractions and check the sector in question for matches
@@ -1139,7 +1165,7 @@ NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.ExtractionViewCo
 				++matchCount;
 		}
 		
-		if(matchCount >= self.requiredSectorMatches)
+		if(matchCount >= requiredMatches)
 			return sectorData;
 	}
 	
@@ -1153,6 +1179,11 @@ NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.ExtractionViewCo
 
 - (NSData *) interpolatedDataForSector:(NSUInteger)sector useC2:(BOOL)useC2
 {
+	return [self interpolatedDataForSector:sector requiredMatches:self.requiredSectorMatches useC2:useC2];
+}
+
+- (NSData *) interpolatedDataForSector:(NSUInteger)sector requiredMatches:(NSUInteger)requiredMatches useC2:(BOOL)useC2
+{
 	// This will (hopefully) contain an error-free version of the sector
 	int8_t synthesizedSector [kCDSectorSizeCDDA];
 
@@ -1163,7 +1194,7 @@ NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.ExtractionViewCo
 	[allOperations addObjectsFromArray:_partialExtractions];
 
 	// Insufficient extractions exist to verify this sector
-	if([allOperations count] < self.requiredSectorMatches)
+	if([allOperations count] < requiredMatches)
 		return nil;
 	
 	// Iterate through all the extractions and check the sector in each one for matching bytes
@@ -1281,7 +1312,7 @@ NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.ExtractionViewCo
 		
 		// If the required number of matches were made, save those sector positions
 		for(NSUInteger sectorPosition = 0; sectorPosition < kCDSectorSizeCDDA; ++sectorPosition) {
-			if(matchCounts[sectorPosition] >= self.requiredSectorMatches) {
+			if(matchCounts[sectorPosition] >= requiredMatches) {
 				synthesizedSector[sectorPosition] = rawSectorBytes[sectorPosition];
 				
 				[verifiedSectorPositions addIndex:sectorPosition];
@@ -1383,12 +1414,12 @@ NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.ExtractionViewCo
 		}
 	}
 	
-	NSMutableIndexSet *foo = [NSMutableIndexSet indexSet];
+	NSMutableIndexSet *nonMatchingSectors = [NSMutableIndexSet indexSet];
 	
 	for(NSIndexSet *mismatchedSectors in allMismatchedSectors)
-		[foo addIndexes:mismatchedSectors];
+		[nonMatchingSectors addIndexes:mismatchedSectors];
 	
-	return [foo copy];
+	return [nonMatchingSectors copy];
 }
 
 - (NSURL *) outputURL
@@ -1486,6 +1517,57 @@ NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.ExtractionViewCo
 
 	// The required number of matches was not reached
 	return nil;
+}
+
+- (NSURL *) bestGuessURL
+{
+	return [self bestGuessURLUsingC2:[self.driveInformation.useC2 boolValue]];
+}
+
+- (NSURL *) bestGuessURLUsingC2:(BOOL)useC2
+{
+	// Create the output file
+	NSURL *outputURL = temporaryURLWithExtension(@"wav");
+	
+	NSError *error = nil;
+	if(!createCDDAFileAtURL(outputURL, &error)) {
+		[self presentError:error 
+			modalForWindow:[[self view] window] 
+				  delegate:self 
+		didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) 
+			   contextInfo:NULL];
+		
+		return nil;
+	}
+
+	ExtractedAudioFile *outputFile = [ExtractedAudioFile openFileForReadingAndWritingAtURL:outputURL error:&error];
+	if(!outputFile)
+		return nil;
+	
+	// Iterate through each sector and save the audio
+	// This could probably be improved
+	for(NSUInteger sector = [_sectorsToExtract firstSector]; sector <= [_sectorsToExtract lastSector]; ++sector) {
+
+		// First try to honor the C2 error flags
+		NSData *sectorData = [self nonInterpolatedDataForSector:sector requiredMatches:0 useC2:useC2];
+		if(!sectorData)
+			sectorData = [self interpolatedDataForSector:sector requiredMatches:0 useC2:useC2];
+		
+		// If C2 is enabled and failed, try to get something without C2
+		if(useC2 && !sectorData)
+			sectorData = [self nonInterpolatedDataForSector:sector requiredMatches:0 useC2:NO];
+		if(useC2 && !sectorData)
+			sectorData = [self interpolatedDataForSector:sector requiredMatches:0 useC2:NO];
+		
+		if(!sectorData)
+			return nil;
+
+		[outputFile setAudioData:sectorData forSector:[_sectorsToExtract indexForSector:sector] error:&error];
+	}
+	
+	[outputFile closeFile];
+	
+	return outputURL;
 }
 
 - (BOOL) verifyTrackWithAccurateRip:(NSURL *)inputURL
