@@ -154,6 +154,7 @@ NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.ExtractionViewCo
 @synthesize maxRetries = _maxRetries;
 @synthesize requiredSectorMatches = _requiredSectorMatches;
 @synthesize requiredTrackMatches = _requiredTrackMatches;
+@synthesize allowExtractionFailure = _allowExtractionFailure;
 @synthesize extractionMode = _extractionMode;
 
 @synthesize imageExtractionRecord = _imageExtractionRecord;
@@ -1039,7 +1040,7 @@ NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.ExtractionViewCo
 				// Get (re)started on the track
 				[self extractSectorRange:_sectorsToExtract];
 			}
-			else if(![[NSUserDefaults standardUserDefaults] boolForKey:@"allowExtractionFailure"]) {
+			else if(!self.allowExtractionFailure) {
 				[[Logger sharedLogger] logMessage:@"Maximum retry count exceeded for track %@, using best guess", _currentTrack.number];
 			
 				// Since the user doesn't want tracks to fail, just throw the best together we can
@@ -1561,10 +1562,11 @@ NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.ExtractionViewCo
 		if(useC2 && !sectorData)
 			sectorData = [self interpolatedDataForSector:sector requiredMatches:0 useC2:NO];
 		
-		if(!sectorData)
-			return nil;
-
-		[outputFile setAudioData:sectorData forSector:[_sectorsToExtract indexForSector:sector] error:&error];
+		// Even if no audio was returned, don't fail
+		if(sectorData)
+			[outputFile setAudioData:sectorData forSector:[_sectorsToExtract indexForSector:sector] error:&error];
+		else
+			[[Logger sharedLogger] logMessageWithLevel:eLogMessageLevelDebug format:@"No audio returned for sector %i", sector];
 	}
 	
 	[outputFile closeFile];

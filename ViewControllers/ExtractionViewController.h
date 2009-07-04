@@ -83,6 +83,7 @@ extern NSString * const kAudioExtractionKVOContext;
 	NSUInteger _requiredTrackMatches;
 	NSUInteger _retryCount;
 	NSUInteger _maxRetries;
+	BOOL _allowExtractionFailure;
 	
 	eExtractionMode _extractionMode;
 		
@@ -110,6 +111,7 @@ extern NSString * const kAudioExtractionKVOContext;
 @property (assign) NSUInteger maxRetries;
 @property (assign) NSUInteger requiredSectorMatches;
 @property (assign) NSUInteger requiredTrackMatches;
+@property (assign) BOOL allowExtractionFailure;
 
 @property (assign) eExtractionMode extractionMode;
 
