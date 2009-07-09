@@ -61,9 +61,10 @@
 
 	[result appendString:@"\n"];
 
+	NSSet *allAccurateRipTracks = [self.compactDisc.accurateRipDiscs valueForKeyPath:@"@distinctUnionOfSets.tracks"];
 	for(TrackExtractionRecord *extractionRecord in sortedExtractionRecords) {
-		NSPredicate *tracksPredicate = [NSPredicate predicateWithFormat:@"ANY tracks.number == %@", extractionRecord.track.number];
-		NSSet *accurateRipTracks = [extractionRecord.track.session.disc.accurateRipDiscs filteredSetUsingPredicate:tracksPredicate];
+		NSPredicate *accurateRipTracksPredicate = [NSPredicate predicateWithFormat:@"number == %@", extractionRecord.track.number];
+		NSSet *potentialAccurateRipTrackMatches = [allAccurateRipTracks filteredSetUsingPredicate:accurateRipTracksPredicate];
 		
 		[result appendFormat:@"Track %@ saved to %@\n", extractionRecord.track.number, [[extractionRecord.outputURL path] lastPathComponent]];
 		
@@ -97,14 +98,14 @@
 		}
 		else if([extractionRecord.copyVerified boolValue]){
 			[result appendString:@"\n"];
-			if([accurateRipTracks count])
+			if([potentialAccurateRipTrackMatches count])
 				[result appendString:@"    Copy verified, but may not be accurate (AccurateRip verification failed)\n"];
 			else
 				[result appendString:@"    Copy verified\n"];
 		}
 		else {
 			[result appendString:@"\n"];
-			if([accurateRipTracks count])
+			if([potentialAccurateRipTrackMatches count])
 				[result appendString:@"    Copy not verified, may not be accurate (Output forced and AccurateRip verification failed)\n"];
 			else
 				[result appendString:@"    Copy not verified, may not be accurate (Output forced)\n"];
@@ -163,9 +164,10 @@
 	NSSortDescriptor *trackNumberSortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"track.number" ascending:YES];
 	NSArray *sortedExtractionRecords = [[imageExtractionRecord.tracks allObjects] sortedArrayUsingDescriptors:[NSArray arrayWithObject:trackNumberSortDescriptor]];
 	
+	NSSet *allAccurateRipTracks = [self.compactDisc.accurateRipDiscs valueForKeyPath:@"@distinctUnionOfSets.tracks"];
 	for(TrackExtractionRecord *extractionRecord in sortedExtractionRecords) {				
-		NSPredicate *tracksPredicate = [NSPredicate predicateWithFormat:@"ANY tracks.number == %@", extractionRecord.track.number];
-		NSSet *accurateRipTracks = [extractionRecord.track.session.disc.accurateRipDiscs filteredSetUsingPredicate:tracksPredicate];
+		NSPredicate *accurateRipTracksPredicate = [NSPredicate predicateWithFormat:@"number == %@", extractionRecord.track.number];
+		NSSet *potentialAccurateRipTrackMatches = [allAccurateRipTracks filteredSetUsingPredicate:accurateRipTracksPredicate];
 
 		[result appendFormat:@"Track %@ \n", extractionRecord.track.number];
 		
@@ -199,14 +201,14 @@
 		}
 		else if([extractionRecord.copyVerified boolValue]){
 			[result appendString:@"\n"];
-			if([accurateRipTracks count])
+			if([potentialAccurateRipTrackMatches count])
 				[result appendString:@"    Copy verified, but may not be accurate (AccurateRip verification failed)\n"];
 			else
 				[result appendString:@"    Copy verified\n"];
 		}
 		else {
 			[result appendString:@"\n"];
-			if([accurateRipTracks count])
+			if([potentialAccurateRipTrackMatches count])
 				[result appendString:@"    Copy not verified, may not be accurate (Output forced and AccurateRip verification failed)\n"];
 			else
 				[result appendString:@"    Copy not verified, may not be accurate (Output forced)\n"];

@@ -474,8 +474,10 @@ NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.ExtractionViewCo
 				NSString *description = nil;
 				if([accurateRipConfidenceLevel unsignedIntegerValue])
 					description = [NSString stringWithFormat:NSLocalizedString(@"Accurate (%@)", @""), accurateRipConfidenceLevel];
-				else
+				else if([extractionRecord.copyVerified boolValue])
 					description = NSLocalizedString(@"Copy Verified", @"");
+				else
+					description = NSLocalizedString(@"Copy Not Verified", @"");
 
 //				NSColor *successColor = [NSColor colorWithDeviceRed:0 green:(116.0f / 255.0f) blue:0 alpha:1.0f];
 //				NSDictionary *attributes = [NSDictionary dictionaryWithObject:successColor forKey:NSForegroundColorAttributeName];
