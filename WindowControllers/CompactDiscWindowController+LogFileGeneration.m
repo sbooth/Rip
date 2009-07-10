@@ -156,9 +156,17 @@
 	[result appendString:@"========================================\n"];
 	
 	[result appendFormat:@"Image saved to %@\n", [[imageExtractionRecord.outputURL path] lastPathComponent]];
+	
 	[result appendString:@"\n"];
+	
 	[result appendFormat:@"Audio MD5 hash:     %@\n", imageExtractionRecord.MD5];
 	[result appendFormat:@"Audio SHA1 hash:    %@\n", imageExtractionRecord.SHA1];
+	
+	[result appendString:@"\n"];
+
+	[result appendFormat:@"Album replay gain:  %+.2f dB\n", [self.compactDisc.metadata.replayGain floatValue]];
+	[result appendFormat:@"Album peak level:   %1.8f\n", [self.compactDisc.metadata.peak floatValue]];
+	
 	[result appendString:@"\n"];
 
 	NSSortDescriptor *trackNumberSortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"track.number" ascending:YES];
