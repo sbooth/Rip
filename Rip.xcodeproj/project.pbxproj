@@ -756,7 +756,6 @@
 				2A37F4C3FDCFA73011CA2CEA /* Frameworks */,
 				19C28FB0FE9D524F11CA2CBB /* Products */,
 				3268C3720EB04C9800FF62F8 /* Test Cases */,
-				32495F3B0FFFEAC700539E10 /* ManualReadOffsetSheet.xib */,
 			);
 			name = Rip;
 			sourceTree = "<group>";
@@ -796,6 +795,7 @@
 		2A37F4B8FDCFA73011CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				32495F3B0FFFEAC700539E10 /* ManualReadOffsetSheet.xib */,
 				321717E40FBF9F14004C5F28 /* AlbumArtInspectorView.xib */,
 				3213B2B60FB9EF0B00137097 /* TrackLyricsInspectorView.xib */,
 				32B42B0F0FB1489200AA4EDF /* AlbumMetadataInspectorView.xib */,
