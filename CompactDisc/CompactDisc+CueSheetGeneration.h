@@ -6,7 +6,10 @@
 #import <Cocoa/Cocoa.h>
 #import "CompactDisc.h"
 
+@class ImageExtractionRecord;
+
 @interface CompactDisc (CueSheetGeneration)
 - (NSString *) cueSheetString;
-- (BOOL) writeCueSheetToURL:(NSURL *)cueSheetURL error:(NSError **)error;
+- (NSString *) cueSheetStringForImageExtractionRecord:(ImageExtractionRecord *)imageExtractionRecord;
+- (NSString *) cueSheetStringForTrackExtractionRecords:(NSSet *)trackExtractionRecords;
 @end

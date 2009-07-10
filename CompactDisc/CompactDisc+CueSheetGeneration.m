@@ -10,12 +10,45 @@
 #import "AlbumMetadata.h"
 #import "TrackMetadata.h"
 
+#import "ImageExtractionRecord.h"
+#import "TrackExtractionRecord.h"
+
 #import "CDDAUtilities.h"
+
+@interface CompactDisc (CueSheetGenerationPrivate)
+- (NSString *) cueSheetStringForImageExtractionRecord:(ImageExtractionRecord *)imageExtractionRecord orTrackExtractionRecords:(NSSet *)trackExtractionRecords;
+@end
 
 @implementation CompactDisc (CueSheetGeneration)
 
 - (NSString *) cueSheetString
 {
+	return [self cueSheetStringForImageExtractionRecord:nil orTrackExtractionRecords:nil];
+}
+
+- (NSString *) cueSheetStringForImageExtractionRecord:(ImageExtractionRecord *)imageExtractionRecord
+{
+	NSParameterAssert(nil != imageExtractionRecord);
+	
+	return [self cueSheetStringForImageExtractionRecord:imageExtractionRecord orTrackExtractionRecords:nil];
+}
+
+- (NSString *) cueSheetStringForTrackExtractionRecords:(NSSet *)trackExtractionRecords
+{
+	NSParameterAssert(nil != trackExtractionRecords);
+	NSParameterAssert([trackExtractionRecords count] == [self.firstSession.tracks count]);
+
+	return [self cueSheetStringForImageExtractionRecord:nil orTrackExtractionRecords:trackExtractionRecords];
+}
+
+@end
+
+@implementation CompactDisc (CueSheetGenerationPrivate)
+
+- (NSString *) cueSheetStringForImageExtractionRecord:(ImageExtractionRecord *)imageExtractionRecord orTrackExtractionRecords:(NSSet *)trackExtractionRecords
+{
+	NSParameterAssert(!(imageExtractionRecord && trackExtractionRecords));
+	
 	NSMutableString *cueSheetString = [NSMutableString string];
 	
 	// For proper cue sheet generation, only strings with spaces are enclosed in quotes
@@ -66,12 +99,22 @@
 			[cueSheetString appendFormat:@"PERFORMER \"%@\"\n", artist];
 	}
 	
+	if(imageExtractionRecord)
+		[cueSheetString appendFormat:@"FILE \"%@\" WAVE\n", [[imageExtractionRecord.outputURL path] lastPathComponent]];		
+	
 	[cueSheetString appendString:@"\n"];
 	
 	for(TrackDescriptor *trackDescriptor in self.firstSession.orderedTracks) {
 		// Track number
 		[cueSheetString appendFormat:@"TRACK %02i AUDIO\n", trackDescriptor.number.integerValue];
-		
+
+		if(trackExtractionRecords) {
+			for(TrackExtractionRecord *trackExtractionRecord in trackExtractionRecords) {
+				if([trackExtractionRecord.track.number isEqualToNumber:trackDescriptor.number])
+					[cueSheetString appendFormat:@"  FILE \"%@\" WAVE\n", [[trackExtractionRecord.outputURL path] lastPathComponent]];
+			}
+		}
+				
 		// ISRC
 		if(trackDescriptor.metadata.ISRC)
 			[cueSheetString appendFormat:@"  ISRC %@\n", trackDescriptor.metadata.ISRC];
@@ -142,13 +185,6 @@
 	}
 	
 	return [cueSheetString copy];
-}
-
-- (BOOL) writeCueSheetToURL:(NSURL *)cueSheetURL error:(NSError **)error
-{
-	NSParameterAssert(nil != cueSheetURL);
-	
-	return [[self cueSheetString] writeToURL:cueSheetURL atomically:YES encoding:NSUTF8StringEncoding error:error];
 }
 
 @end

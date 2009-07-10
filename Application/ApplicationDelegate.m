@@ -107,6 +107,8 @@ diskDisappearedCallback(DADiskRef disk, void *context)
 	
 	[defaultsDictionary setObject:[NSNumber numberWithBool:YES] forKey:@"automaticallyQueryAccurateRip"];
 	[defaultsDictionary setObject:[NSNumber numberWithBool:YES] forKey:@"automaticallyQueryMusicDatabase"];
+
+	[defaultsDictionary setObject:[NSNumber numberWithBool:YES] forKey:@"automaticallySaveCueSheetAfterEncoding"];
 	
 	[defaultsDictionary setObject:@"org.sbooth.Rip.MusicDatabase.MusicBrainz" forKey:@"defaultMusicDatabase"];
 	[defaultsDictionary setObject:@"org.sbooth.Rip.Encoder.FLAC" forKey:@"defaultEncoder"];

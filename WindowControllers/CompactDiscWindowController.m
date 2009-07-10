@@ -1024,7 +1024,8 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 	NSURL *cueSheetURL = [sheet URL];
 	
 	NSError *error = nil;
-	if(![self.compactDisc writeCueSheetToURL:cueSheetURL error:&error])
+	NSString *cueSheetString = [self.compactDisc cueSheetString];
+	if(![cueSheetString writeToURL:cueSheetURL atomically:NO encoding:NSUTF8StringEncoding error:&error])
 		[self presentError:error modalForWindow:self.window delegate:nil didPresentSelector:NULL contextInfo:NULL];
 }
 
@@ -1141,12 +1142,23 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 	}
 	
 	// Save a cue sheet
-//	pathname = [filename stringByAppendingPathExtension:@"cue"];
-//	outputPath = [[baseURL path] stringByAppendingPathComponent:pathname];
-//	NSURL *cueSheetURL = [NSURL fileURLWithPath:outputPath];
-//	
-//	if(![self.compactDisc writeCueSheetToURL:cueSheetURL error:&error])
-//		[self presentError:error modalForWindow:self.window delegate:nil didPresentSelector:NULL contextInfo:NULL];
+	if([[NSUserDefaults standardUserDefaults] boolForKey:@"automaticallySaveCueSheetAfterEncoding"]) {
+		pathname = [filename stringByAppendingPathExtension:@"cue"];
+		outputPath = [[baseURL path] stringByAppendingPathComponent:pathname];
+		NSURL *cueSheetURL = [NSURL fileURLWithPath:outputPath];
+		NSString *cueSheetString = nil;
+	
+		if(eExtractionModeImage == _extractionViewController.extractionMode)
+			cueSheetString = [self.compactDisc cueSheetStringForImageExtractionRecord:_extractionViewController.imageExtractionRecord];
+		// FILE information should only be saved if all tracks were extracted
+		else if([_extractionViewController.trackExtractionRecords count] == [self.compactDisc.firstSession.tracks count])
+			cueSheetString = [self.compactDisc cueSheetStringForTrackExtractionRecords:_extractionViewController.trackExtractionRecords];
+		else
+			cueSheetString = [self.compactDisc cueSheetString];
+		
+		if(cueSheetString && ![cueSheetString writeToURL:cueSheetURL atomically:NO encoding:NSUTF8StringEncoding error:&error])
+			[self presentError:error modalForWindow:self.window delegate:nil didPresentSelector:NULL contextInfo:NULL];
+	}
 	
 	if(![_extractionViewController.failedTrackIDs count]) {
 		// Create a sheet that will auto-dismiss notifying the user that the extraction was successful
