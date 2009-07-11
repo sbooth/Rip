@@ -477,6 +477,20 @@ static NSString * const kCalculateOffsetsKVOContext		= @"org.sbooth.Rip.ReadOffs
 {
 	NSParameterAssert(nil != operation);
 	
+	// If the operation didn't succeed, it isn't worthwhile to continue
+	if(![operation.possibleReadOffsets count]) {
+		NSMutableDictionary *errorDictionary = [NSMutableDictionary dictionary];
+		
+		[errorDictionary setObject:NSLocalizedString(@"Unable to determine any potential read offsets.", @"") forKey:NSLocalizedDescriptionKey];
+		[errorDictionary setObject:NSLocalizedString(@"Please try again using a different compact disc or set the drive's read offset manually.", @"") forKey:NSLocalizedRecoverySuggestionErrorKey];
+		
+		NSError *error = [NSError errorWithDomain:NSURLErrorDomain code:NSURLErrorNotConnectedToInternet userInfo:errorDictionary];
+		
+		[self presentError:error modalForWindow:self.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
+		
+		return;
+	}
+	
 	[_possibleOffsetsArrayController addObjects:operation.possibleReadOffsets];
 	
 	[_statusTextField setStringValue:[NSString stringWithFormat:NSLocalizedString(@"Detected %i possible read offsets", @""), [[_possibleOffsetsArrayController arrangedObjects] count]]];
