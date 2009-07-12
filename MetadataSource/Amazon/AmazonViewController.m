@@ -6,6 +6,7 @@
 #import "AmazonViewController.h"
 #import "AmazonInterface.h"
 #import "AmazonItem.h"
+#import "NSString+URLEscapingMethods.h"
 
 #import <MetadataSourceInterface/MetadataSourceData.h>
 #import <MetadataSourceInterface/MetadataSourceDelegate.h>
@@ -21,7 +22,7 @@ queryStringComponentFromPair(NSString *field, NSString *value)
 	NSCParameterAssert(nil != field);
 	NSCParameterAssert(nil != value);
 	
-	return [field stringByAppendingFormat:@"=%@", [value stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
+	return [NSString stringWithFormat:@"%@=%@", [field URLEscapedString], [value URLEscapedString]];
 }
 
 @interface AmazonViewController (Private)
@@ -99,10 +100,47 @@ queryStringComponentFromPair(NSString *field, NSString *value)
 	[queryComponents addObject:queryStringComponentFromPair(@"ResponseGroup", @"Small,Images")];
 	[queryComponents addObject:queryStringComponentFromPair(@"Keywords", self.query)];
 
+	// Create the timestamp in XML dateTime format (omit milliseconds)
+	NSCalendarDate *now = [NSCalendarDate calendarDate];
+	[now setTimeZone:[NSTimeZone timeZoneWithName:@"GMT"]];
+	[queryComponents addObject:queryStringComponentFromPair(@"Timestamp", [now descriptionWithCalendarFormat:@"%Y-%m-%dT%H:%M:%S.000Z"])];
+
+	// Sort the parameters and form the canonical AWS query string
+	[queryComponents sortUsingSelector:@selector(caseInsensitiveCompare:)];
+	NSString *canonicalizedQueryString = [queryComponents componentsJoinedByString:@"&"];
+
+	// Build the string which will be signed
+	NSString *stringToSign = [NSString stringWithFormat:@"GET\necs.amazonaws.com\n/onca/xml\n%@", canonicalizedQueryString];
+	
+	// Calculate the HMAC for the string
+	// This is done on a server to avoid revealing the secret key
+	NSURL *signerURL = [NSURL URLWithString:@"http://sbooth.org/Rip/sign_aws_query.php"];
+	NSMutableURLRequest *signerURLRequest = [NSMutableURLRequest requestWithURL:signerURL];
+	[signerURLRequest setHTTPMethod:@"POST"];
+	[signerURLRequest setValue:[[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleName"] forHTTPHeaderField:@"User-Agent"];
+	[signerURLRequest setValue:@"application/x-www-form-urlencoded; charset=utf-8" forHTTPHeaderField:@"Content-Type"];
+
+	NSString *postBody = [NSString stringWithFormat:@"string_to_sign=%@", [stringToSign URLEscapedString]];	
+	[signerURLRequest setValue:[NSString stringWithFormat:@"%ld", [postBody length]] forHTTPHeaderField:@"Content-Length"];
+	[signerURLRequest setHTTPBody:[postBody dataUsingEncoding:NSUTF8StringEncoding]];	
+	
+	NSHTTPURLResponse *signerResponse = nil;
+	NSError *error = nil;
+	NSData *digestData = [NSURLConnection sendSynchronousRequest:signerURLRequest returningResponse:&signerResponse error:&error];
+	if(!digestData) {
+		[self.view.window presentError:error modalForWindow:self.view.window delegate:nil didPresentSelector:NULL contextInfo:NULL];
+		return;
+	}
+	
+	NSString *digestString = [[NSString alloc] initWithData:digestData encoding:NSUTF8StringEncoding];
+	
+	// Append the signature to the request
+	[queryComponents addObject:queryStringComponentFromPair(@"Signature", digestString)];
+
+	// Build the query string and search URL
 	NSString *queryString = [queryComponents componentsJoinedByString:@"&"];
-	
 	NSURL *searchURL = [NSURL URLWithString:[NSString stringWithFormat:@"%@?%@", urlBase, queryString]];
-	
+
 	// Set up the URL request
 	NSURLRequest *request = [NSURLRequest requestWithURL:searchURL];
 	

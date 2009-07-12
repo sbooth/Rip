@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		324066BB100A38B60004B1A5 /* NSString+URLEscapingMethods.m in Sources */ = {isa = PBXBuildFile; fileRef = 324066BA100A38B60004B1A5 /* NSString+URLEscapingMethods.m */; };
 		325B5CFF0F89306600E9CE97 /* AmazonView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 325B5CFD0F89306600E9CE97 /* AmazonView.xib */; };
 		325B5DEF0F895B6300E9CE97 /* AmazonItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 3253B4C90F81D7FE00A0EADF /* AmazonItem.m */; };
 		325E2D5A0F85CF87001E7495 /* IncreaseThumbnailSize.png in Resources */ = {isa = PBXBuildFile; fileRef = 325E2D580F85CF87001E7495 /* IncreaseThumbnailSize.png */; };
@@ -48,6 +49,8 @@
 		089C167EFE841241C02AAC07 /* English */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		089C167FFE841241C02AAC07 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		1058C7ADFEA557BF11CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
+		324066B9100A38B60004B1A5 /* NSString+URLEscapingMethods.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+URLEscapingMethods.h"; sourceTree = "<group>"; };
+		324066BA100A38B60004B1A5 /* NSString+URLEscapingMethods.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+URLEscapingMethods.m"; sourceTree = "<group>"; };
 		3253B4C80F81D7FE00A0EADF /* AmazonItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AmazonItem.h; sourceTree = "<group>"; };
 		3253B4C90F81D7FE00A0EADF /* AmazonItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AmazonItem.m; sourceTree = "<group>"; };
 		325B5CFE0F89306600E9CE97 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/AmazonView.xib; sourceTree = "<group>"; };
@@ -123,6 +126,8 @@
 				32AC71250E7191DF009A5E1B /* AmazonViewController.m */,
 				3253B4C80F81D7FE00A0EADF /* AmazonItem.h */,
 				3253B4C90F81D7FE00A0EADF /* AmazonItem.m */,
+				324066B9100A38B60004B1A5 /* NSString+URLEscapingMethods.h */,
+				324066BA100A38B60004B1A5 /* NSString+URLEscapingMethods.m */,
 			);
 			name = Classes;
 			sourceTree = "<group>";
@@ -249,6 +254,7 @@
 				328DE6630E5FDB8000F5BD13 /* AmazonInterface.m in Sources */,
 				32AC71260E7191DF009A5E1B /* AmazonViewController.m in Sources */,
 				325B5DEF0F895B6300E9CE97 /* AmazonItem.m in Sources */,
+				324066BB100A38B60004B1A5 /* NSString+URLEscapingMethods.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
