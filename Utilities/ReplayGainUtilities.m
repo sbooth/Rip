@@ -14,7 +14,7 @@
 
 BOOL addReplayGainDataForTrack(struct replaygain_t *rg, NSURL *fileURL)
 {
-	NSCParameterAssert(NULL !=rg);
+	NSCParameterAssert(NULL != rg);
 	NSCParameterAssert(nil != fileURL);
 	NSCParameterAssert([fileURL isFileURL]);
 	
