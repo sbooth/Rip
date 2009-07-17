@@ -429,9 +429,10 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 
 - (void) windowWillClose:(NSNotification *)notification
 {
-	
+
 #pragma unused(notification)
-	
+
+	// Setting disk to NULL allows resources to be garbage collected
 	self.disk = NULL;
 }
 
@@ -1189,9 +1190,9 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 
 @implementation CompactDiscWindowController (Private)
 
+// For now, this method does nothing, since unmounts are handled by the ApplicationDelegate
 - (void) diskWasEjected
 {
-	[self.window performClose:nil];
 }
 
 - (void) updateMetadataWithMusicDatabaseEntry:(id)musicDatabaseEntry

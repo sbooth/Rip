@@ -513,22 +513,21 @@ diskDisappearedCallback(DADiskRef disk, void *context)
 {
 	NSParameterAssert(NULL != disk);
 
-	CompactDiscWindowController *matchingWindowController = nil;
-	
 	// Iterate through open windows and determine which one matches this disk
 	for(NSWindow *window in [[NSApplication sharedApplication] windows]) {
 		NSWindowController *windowController = window.windowController;
-		if(windowController && [windowController isKindOfClass:[CompactDiscWindowController class]] && CFEqual(((CompactDiscWindowController *)windowController).disk, disk)) {
-			matchingWindowController = (CompactDiscWindowController *)windowController;
-			break;
-		}
-	}
-	
-	// Set the disk to NULL, to allow the window's resources to be garbage collected
-	if(matchingWindowController) {
-		matchingWindowController.disk = NULL;
-		[matchingWindowController close];
-	}
+		
+		if(windowController && [windowController isKindOfClass:[CompactDiscWindowController class]]) {
+			CompactDiscWindowController *compactDiscWindowController = (CompactDiscWindowController *)windowController;
+			DADiskRef compactDiscWindowControllerDADisk = compactDiscWindowController.disk;
+			
+			// Disks ejected using the toolbar will already be set to NULL, which causes a crash in CFEqual
+			if(compactDiscWindowControllerDADisk && CFEqual(compactDiscWindowControllerDADisk, disk)) {
+				[compactDiscWindowController close];
+				return;
+			}
+		} 
+	}	
 }
 
 - (NSURL *) locateLicenseURL
