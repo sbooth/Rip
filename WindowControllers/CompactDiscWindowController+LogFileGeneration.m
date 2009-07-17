@@ -56,8 +56,10 @@
 	[result appendString:@"Extracted Audio\n"];
 	[result appendString:@"========================================\n"];
 
-	[result appendFormat:@"Album replay gain:  %+.2f dB\n", [self.compactDisc.metadata.replayGain floatValue]];
-	[result appendFormat:@"Album peak level:   %1.8f\n", [self.compactDisc.metadata.peak floatValue]];
+	if(self.compactDisc.metadata.replayGain) {
+		[result appendFormat:@"Album replay gain:  %+.2f dB\n", [self.compactDisc.metadata.replayGain floatValue]];
+		[result appendFormat:@"Album peak level:   %1.8f\n", [self.compactDisc.metadata.peak floatValue]];
+	}
 
 	[result appendString:@"\n"];
 
@@ -74,10 +76,12 @@
 		[result appendFormat:@"    Audio SHA1 hash:        %@\n", extractionRecord.SHA1];
 		[result appendFormat:@"    AccurateRip checksum:   %08lx\n", extractionRecord.accurateRipChecksum.unsignedIntegerValue];
 
-		[result appendString:@"\n"];
-
-		[result appendFormat:@"    Replay gain:            %+2.2f dB\n", [extractionRecord.track.metadata.replayGain floatValue]];
-		[result appendFormat:@"    Peak level:             %1.8f\n", [extractionRecord.track.metadata.peak floatValue]];
+		if(extractionRecord.track.metadata.replayGain) {
+			[result appendString:@"\n"];
+			
+			[result appendFormat:@"    Replay gain:            %+2.2f dB\n", [extractionRecord.track.metadata.replayGain floatValue]];
+			[result appendFormat:@"    Peak level:             %1.8f\n", [extractionRecord.track.metadata.peak floatValue]];
+		}
 
 		if(extractionRecord.accurateRipConfidenceLevel) {
 			[result appendString:@"\n"];
@@ -162,10 +166,12 @@
 	[result appendFormat:@"Audio MD5 hash:     %@\n", imageExtractionRecord.MD5];
 	[result appendFormat:@"Audio SHA1 hash:    %@\n", imageExtractionRecord.SHA1];
 	
-	[result appendString:@"\n"];
-
-	[result appendFormat:@"Album replay gain:  %+.2f dB\n", [self.compactDisc.metadata.replayGain floatValue]];
-	[result appendFormat:@"Album peak level:   %1.8f\n", [self.compactDisc.metadata.peak floatValue]];
+	if(self.compactDisc.metadata.replayGain) {
+		[result appendString:@"\n"];
+		
+		[result appendFormat:@"Album replay gain:  %+.2f dB\n", [self.compactDisc.metadata.replayGain floatValue]];
+		[result appendFormat:@"Album peak level:   %1.8f\n", [self.compactDisc.metadata.peak floatValue]];
+	}
 	
 	[result appendString:@"\n"];
 
@@ -185,10 +191,12 @@
 		[result appendFormat:@"    Audio SHA1 hash:        %@\n", extractionRecord.SHA1];
 		[result appendFormat:@"    AccurateRip checksum:   %08lx\n", extractionRecord.accurateRipChecksum.unsignedIntegerValue];
 		
-		[result appendString:@"\n"];
-		
-		[result appendFormat:@"    Replay gain:            %+2.2f dB\n", [extractionRecord.track.metadata.replayGain floatValue]];
-		[result appendFormat:@"    Peak level:             %1.8f\n", [extractionRecord.track.metadata.peak floatValue]];
+		if(extractionRecord.track.metadata.replayGain) {
+			[result appendString:@"\n"];
+			
+			[result appendFormat:@"    Replay gain:            %+2.2f dB\n", [extractionRecord.track.metadata.replayGain floatValue]];
+			[result appendFormat:@"    Peak level:             %1.8f\n", [extractionRecord.track.metadata.peak floatValue]];
+		}
 		
 		if(extractionRecord.accurateRipConfidenceLevel) {
 			[result appendString:@"\n"];
