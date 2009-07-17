@@ -145,12 +145,14 @@
 	NSParameterAssert(nil != extractionRecord);
 	
 	// Calculate the track's replay gain
-	if(addReplayGainDataForTrack(&_rg, extractionRecord.inputURL)) {
-		extractionRecord.track.metadata.replayGain = [NSNumber numberWithFloat:replaygain_analysis_get_title_gain(&_rg)];
-		extractionRecord.track.metadata.peak = [NSNumber numberWithFloat:replaygain_analysis_get_title_peak(&_rg)];
+	if([[NSUserDefaults standardUserDefaults] boolForKey:@"calculateReplayGain"]) {
+		if(addReplayGainDataForTrack(&_rg, extractionRecord.inputURL)) {
+			extractionRecord.track.metadata.replayGain = [NSNumber numberWithFloat:replaygain_analysis_get_title_gain(&_rg)];
+			extractionRecord.track.metadata.peak = [NSNumber numberWithFloat:replaygain_analysis_get_title_peak(&_rg)];
+		}
+		else
+			[[Logger sharedLogger] logMessageWithLevel:eLogMessageLevelDebug format:@"Unable to calculate replay gain"];
 	}
-	else
-		[[Logger sharedLogger] logMessageWithLevel:eLogMessageLevelDebug format:@"Unable to calculate replay gain"];
 	
 	[_trackExtractionRecords addObject:extractionRecord];
 	[_tracksTable reloadData];

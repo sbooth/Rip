@@ -99,6 +99,8 @@ diskDisappearedCallback(DADiskRef disk, void *context)
 	[defaultsDictionary setObject:[NSNumber numberWithBool:NO] forKey:@"useCustomOutputFileNaming"];
 	[defaultsDictionary setObject:[NSNumber numberWithBool:YES] forKey:@"allowExtractionFailure"];
 
+	[defaultsDictionary setObject:[NSNumber numberWithBool:YES] forKey:@"calculateReplayGain"];
+
 	NSURL *musicFolderURL = [NSURL URLWithString:[@"~/Music" stringByExpandingTildeInPath]];
 	[defaultsDictionary setObject:[NSArchiver archivedDataWithRootObject:musicFolderURL] forKey:@"outputDirectory"];
 	
