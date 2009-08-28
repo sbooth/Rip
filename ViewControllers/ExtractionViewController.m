@@ -794,7 +794,7 @@ NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.ExtractionViewCo
 		[[Logger sharedLogger] logMessageWithLevel:eLogMessageLevelDebug format:@"Extraction finished"];
 		
 		// Calculate the album replay gain if any tracks were successfully extracted
-		if([[NSUserDefaults standardUserDefaults] boolForKey:@"calculateReplayGain"] && [_trackExtractionRecords count]) {
+		if([[NSUserDefaults standardUserDefaults] boolForKey:@"calculateReplayGain"] && [_trackExtractionRecords count] == [self.compactDisc.firstSession.tracks count]) {
 			self.compactDisc.metadata.replayGain = [NSNumber numberWithFloat:replaygain_analysis_get_album_gain(&_rg)];
 			self.compactDisc.metadata.peak = [NSNumber numberWithFloat:replaygain_analysis_get_album_peak(&_rg)];
 		}
