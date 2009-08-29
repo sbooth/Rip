@@ -324,6 +324,9 @@
 	if(kCDSectorAreaErrorFlags & sectorAreas)		blockSize += kCDSectorSizeErrorFlags;
 	if(kCDSectorAreaSubChannelQ & sectorAreas)		blockSize += kCDSectorSizeQSubchannel;
 
+	if(0 == blockSize)
+		return 0;
+	
 	bzero(&cd_read, sizeof(cd_read));
 	bzero(buffer, blockSize * sectorCount);
 
