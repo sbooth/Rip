@@ -107,7 +107,7 @@ static Logger *sSharedLogger				= nil;
 	NSParameterAssert(nil != message);
 	
 #if DEBUG
-	NSLog(message);
+	NSLog(@"%@", message);
 #endif
 	
 	// Only log messages with the specified log level or less
