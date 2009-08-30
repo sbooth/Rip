@@ -53,6 +53,11 @@
 	[super windowDidLoad];
 }
 
+- (NSString *) windowFrameAutosaveName
+{
+	return @"Inspector Panel";
+}
+
 - (void) observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
 {
 	if(context == [self class])

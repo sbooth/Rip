@@ -121,6 +121,11 @@
 	[super windowDidLoad];
 }
 
+- (NSString *) windowFrameAutosaveName
+{
+	return @"Metadata Editor Panel";
+}
+
 - (void) observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
 {
 	if(context == [self class])
