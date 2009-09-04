@@ -5,11 +5,11 @@
 
 #import <Cocoa/Cocoa.h>
 
-@class InspectorView;
+@class SFBInspectorView;
 
 @interface InspectorPanelController : NSWindowController
 {
-	IBOutlet InspectorView * _inspectorView;
+	IBOutlet SFBInspectorView * _inspectorView;
 
 @private
 	id _inspectedDocument;

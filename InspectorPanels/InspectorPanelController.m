@@ -5,7 +5,8 @@
 
 #import "InspectorPanelController.h"
 #import "CompactDiscWindowController.h"
-#import "InspectorView.h"
+
+#import <SFBInspectors/SFBInspectorView.h>
 
 @interface InspectorPanelController ()
 @property (assign) id inspectedDocument;

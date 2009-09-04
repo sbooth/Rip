@@ -20,10 +20,6 @@
 		321717E60FBF9F14004C5F28 /* AlbumArtInspectorView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 321717E40FBF9F14004C5F28 /* AlbumArtInspectorView.xib */; };
 		321CB1280FA8A23C009DBC39 /* InspectorPanelController.m in Sources */ = {isa = PBXBuildFile; fileRef = 321CB1270FA8A23C009DBC39 /* InspectorPanelController.m */; };
 		321CB1310FA8A2A4009DBC39 /* InspectorPanel.xib in Resources */ = {isa = PBXBuildFile; fileRef = 321CB1300FA8A2A4009DBC39 /* InspectorPanel.xib */; };
-		321CB15B0FA901CB009DBC39 /* InspectorView.m in Sources */ = {isa = PBXBuildFile; fileRef = 321CB15A0FA901CB009DBC39 /* InspectorView.m */; };
-		321CB16B0FA9058E009DBC39 /* InspectorPane.m in Sources */ = {isa = PBXBuildFile; fileRef = 321CB16A0FA9058E009DBC39 /* InspectorPane.m */; };
-		321CB1740FA90636009DBC39 /* InspectorPaneHeader.m in Sources */ = {isa = PBXBuildFile; fileRef = 321CB1730FA90636009DBC39 /* InspectorPaneHeader.m */; };
-		321CB1770FA90645009DBC39 /* InspectorPaneBody.m in Sources */ = {isa = PBXBuildFile; fileRef = 321CB1760FA90645009DBC39 /* InspectorPaneBody.m */; };
 		321CB2040FA9FB10009DBC39 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 32C9F23A0F7973790050F4B2 /* QuartzCore.framework */; };
 		322EB43F0F8C30020081A563 /* AquaticPrime.m in Sources */ = {isa = PBXBuildFile; fileRef = 322EB43E0F8C30020081A563 /* AquaticPrime.m */; };
 		322EB4430F8C30210081A563 /* ImageAndTextCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 322EB4420F8C30210081A563 /* ImageAndTextCell.m */; };
@@ -41,13 +37,14 @@
 		324F324A0E87007A000E4E4E /* DetectPregapsSheet.xib in Resources */ = {isa = PBXBuildFile; fileRef = 324F32480E87007A000E4E4E /* DetectPregapsSheet.xib */; };
 		324F325D0E870269000E4E4E /* PregapDetectionOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 324F325C0E870269000E4E4E /* PregapDetectionOperation.m */; };
 		3252C1E50DD239C500856BFE /* FLAC.bundle in Copy PlugIns */ = {isa = PBXBuildFile; fileRef = 3252C1820DD237C500856BFE /* FLAC.bundle */; };
+		325925751051C57500A74D37 /* SFBInspectors.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 325925741051C57500A74D37 /* SFBInspectors.framework */; };
+		325925781051C58200A74D37 /* SFBInspectors.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 325925741051C57500A74D37 /* SFBInspectors.framework */; };
 		325B2FDD0E7B6B4300696A1A /* ReadOffsetCalculatorSheet.xib in Resources */ = {isa = PBXBuildFile; fileRef = 325B2FDB0E7B6B4300696A1A /* ReadOffsetCalculatorSheet.xib */; };
 		325B5D640F89437900E9CE97 /* Amazon.bundle in Copy PlugIns */ = {isa = PBXBuildFile; fileRef = 325B5D490F89434100E9CE97 /* Amazon.bundle */; };
 		326558E90F99550D00403217 /* SFBCrashReporter.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 326558E80F99550D00403217 /* SFBCrashReporter.framework */; };
 		326558EC0F99551900403217 /* SFBCrashReporter.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 326558E80F99550D00403217 /* SFBCrashReporter.framework */; };
 		3268C3760EB04CC500FF62F8 /* BitArrayTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 3268C3750EB04CC500FF62F8 /* BitArrayTest.m */; };
 		3268C3830EB04D3B00FF62F8 /* BitArray.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C4C8DFF0D5E2A0600DC0279 /* BitArray.m */; };
-		326AC2060FBFDB2D00110E77 /* ViewSelectorBarItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 326AC2050FBFDB2D00110E77 /* ViewSelectorBarItem.m */; };
 		3274C2DA0F171827005B28BB /* Version.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 3274C2D90F171827005B28BB /* Version.xcconfig */; };
 		328371610EA7DCFB0011EB44 /* EncoderWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 328371600EA7DCFB0011EB44 /* EncoderWindowController.m */; };
 		328371680EA7DD650011EB44 /* EncoderWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 328371660EA7DD650011EB44 /* EncoderWindow.xib */; };
@@ -96,8 +93,6 @@
 		32B42B160FB1491600AA4EDF /* AdditionalAlbumMetadataInspectorView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 32B42B140FB1491600AA4EDF /* AdditionalAlbumMetadataInspectorView.xib */; };
 		32B42B210FB14B6300AA4EDF /* AdditionalTrackMetadataInspectorView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 32B42B1F0FB14B6300AA4EDF /* AdditionalTrackMetadataInspectorView.xib */; };
 		32B8B3B50FB07F830028FE10 /* ChannelFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = 32B8B3B40FB07F830028FE10 /* ChannelFormatter.m */; };
-		32B8B41D0FB0AFB20028FE10 /* ViewSelectorBar.m in Sources */ = {isa = PBXBuildFile; fileRef = 32B8B3FD0FB0A9B00028FE10 /* ViewSelectorBar.m */; };
-		32B998F30FB12460005C8ACA /* ViewSelector.m in Sources */ = {isa = PBXBuildFile; fileRef = 32B998F20FB12460005C8ACA /* ViewSelector.m */; };
 		32BA15680FF3C07000AC695B /* ExtractionViewController+AudioExtraction.m in Sources */ = {isa = PBXBuildFile; fileRef = 32BA15670FF3C07000AC695B /* ExtractionViewController+AudioExtraction.m */; };
 		32BA15980FF3D97700AC695B /* ExtractionViewController+ExtractionRecordCreation.m in Sources */ = {isa = PBXBuildFile; fileRef = 32BA15970FF3D97700AC695B /* ExtractionViewController+ExtractionRecordCreation.m */; };
 		32BBEFD10EC63B4200EC2FBE /* CDDAUtilitiesTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 32BBEFD00EC63B4200EC2FBE /* CDDAUtilitiesTest.m */; };
@@ -387,6 +382,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				325925781051C58200A74D37 /* SFBInspectors.framework in Copy Frameworks */,
 				326558EC0F99551900403217 /* SFBCrashReporter.framework in Copy Frameworks */,
 				8C3C194A0D73EA35001BAC88 /* EncoderInterface.framework in Copy Frameworks */,
 				328DE5150E5FC69600F5BD13 /* MusicDatabaseInterface.framework in Copy Frameworks */,
@@ -423,14 +419,6 @@
 		321CB1260FA8A23C009DBC39 /* InspectorPanelController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InspectorPanelController.h; sourceTree = "<group>"; };
 		321CB1270FA8A23C009DBC39 /* InspectorPanelController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = InspectorPanelController.m; sourceTree = "<group>"; };
 		321CB12E0FA8A29E009DBC39 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/InspectorPanel.xib; sourceTree = "<group>"; };
-		321CB1590FA901CB009DBC39 /* InspectorView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InspectorView.h; sourceTree = "<group>"; };
-		321CB15A0FA901CB009DBC39 /* InspectorView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = InspectorView.m; sourceTree = "<group>"; };
-		321CB1690FA9058E009DBC39 /* InspectorPane.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InspectorPane.h; sourceTree = "<group>"; };
-		321CB16A0FA9058E009DBC39 /* InspectorPane.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = InspectorPane.m; sourceTree = "<group>"; };
-		321CB1720FA90636009DBC39 /* InspectorPaneHeader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InspectorPaneHeader.h; sourceTree = "<group>"; };
-		321CB1730FA90636009DBC39 /* InspectorPaneHeader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = InspectorPaneHeader.m; sourceTree = "<group>"; };
-		321CB1750FA90645009DBC39 /* InspectorPaneBody.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InspectorPaneBody.h; sourceTree = "<group>"; };
-		321CB1760FA90645009DBC39 /* InspectorPaneBody.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = InspectorPaneBody.m; sourceTree = "<group>"; };
 		322EB43D0F8C30020081A563 /* AquaticPrime.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AquaticPrime.h; sourceTree = "<group>"; };
 		322EB43E0F8C30020081A563 /* AquaticPrime.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AquaticPrime.m; sourceTree = "<group>"; };
 		322EB4410F8C30210081A563 /* ImageAndTextCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImageAndTextCell.h; sourceTree = "<group>"; };
@@ -458,6 +446,7 @@
 		324F325B0E870269000E4E4E /* PregapDetectionOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PregapDetectionOperation.h; sourceTree = "<group>"; };
 		324F325C0E870269000E4E4E /* PregapDetectionOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PregapDetectionOperation.m; sourceTree = "<group>"; };
 		3252C1790DD237C500856BFE /* FLAC.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = FLAC.xcodeproj; path = FLAC/FLAC.xcodeproj; sourceTree = "<group>"; };
+		325925741051C57500A74D37 /* SFBInspectors.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SFBInspectors.framework; path = Frameworks/SFBInspectors.framework; sourceTree = "<group>"; };
 		325B2FDC0E7B6B4300696A1A /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/ReadOffsetCalculatorSheet.xib; sourceTree = "<group>"; };
 		325B5D400F89434100E9CE97 /* Amazon.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Amazon.xcodeproj; path = Amazon/Amazon.xcodeproj; sourceTree = "<group>"; };
 		326558E80F99550D00403217 /* SFBCrashReporter.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SFBCrashReporter.framework; path = Frameworks/SFBCrashReporter.framework; sourceTree = "<group>"; };
@@ -465,8 +454,6 @@
 		3268C35B0EB04C2300FF62F8 /* Tests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Tests-Info.plist"; sourceTree = "<group>"; };
 		3268C3740EB04CC500FF62F8 /* BitArrayTest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BitArrayTest.h; path = Tests/BitArrayTest.h; sourceTree = "<group>"; };
 		3268C3750EB04CC500FF62F8 /* BitArrayTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BitArrayTest.m; path = Tests/BitArrayTest.m; sourceTree = "<group>"; };
-		326AC2040FBFDB2D00110E77 /* ViewSelectorBarItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViewSelectorBarItem.h; sourceTree = "<group>"; };
-		326AC2050FBFDB2D00110E77 /* ViewSelectorBarItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViewSelectorBarItem.m; sourceTree = "<group>"; };
 		3274C2D90F171827005B28BB /* Version.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Version.xcconfig; sourceTree = "<group>"; };
 		3283715F0EA7DCFB0011EB44 /* EncoderWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EncoderWindowController.h; sourceTree = "<group>"; };
 		328371600EA7DCFB0011EB44 /* EncoderWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EncoderWindowController.m; sourceTree = "<group>"; };
@@ -539,10 +526,6 @@
 		32B42B200FB14B6300AA4EDF /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/AdditionalTrackMetadataInspectorView.xib; sourceTree = "<group>"; };
 		32B8B3B30FB07F830028FE10 /* ChannelFormatter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChannelFormatter.h; sourceTree = "<group>"; };
 		32B8B3B40FB07F830028FE10 /* ChannelFormatter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ChannelFormatter.m; sourceTree = "<group>"; };
-		32B8B3FC0FB0A9B00028FE10 /* ViewSelectorBar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViewSelectorBar.h; sourceTree = "<group>"; };
-		32B8B3FD0FB0A9B00028FE10 /* ViewSelectorBar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViewSelectorBar.m; sourceTree = "<group>"; };
-		32B998F10FB12460005C8ACA /* ViewSelector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViewSelector.h; sourceTree = "<group>"; };
-		32B998F20FB12460005C8ACA /* ViewSelector.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViewSelector.m; sourceTree = "<group>"; };
 		32BA15660FF3C07000AC695B /* ExtractionViewController+AudioExtraction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "ExtractionViewController+AudioExtraction.h"; sourceTree = "<group>"; };
 		32BA15670FF3C07000AC695B /* ExtractionViewController+AudioExtraction.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "ExtractionViewController+AudioExtraction.m"; sourceTree = "<group>"; };
 		32BA15960FF3D97700AC695B /* ExtractionViewController+ExtractionRecordCreation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "ExtractionViewController+ExtractionRecordCreation.h"; sourceTree = "<group>"; };
@@ -683,6 +666,7 @@
 				328AB1DB0F8074E4001F1C78 /* MetadataSourceInterface.framework in Frameworks */,
 				326558E90F99550D00403217 /* SFBCrashReporter.framework in Frameworks */,
 				321CB2040FA9FB10009DBC39 /* QuartzCore.framework in Frameworks */,
+				325925751051C57500A74D37 /* SFBInspectors.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -692,6 +676,7 @@
 		1058C7A6FEA54F5311CA2CBB /* Linked Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				325925741051C57500A74D37 /* SFBInspectors.framework */,
 				326558E80F99550D00403217 /* SFBCrashReporter.framework */,
 				322EB4640F8C325B0081A563 /* AddressBook.framework */,
 				32C9F23A0F7973790050F4B2 /* QuartzCore.framework */,
@@ -1257,20 +1242,6 @@
 				32CA7D680F0D57B500771028 /* MetadataEditorPanelController.m */,
 				321CB1260FA8A23C009DBC39 /* InspectorPanelController.h */,
 				321CB1270FA8A23C009DBC39 /* InspectorPanelController.m */,
-				321CB1590FA901CB009DBC39 /* InspectorView.h */,
-				321CB15A0FA901CB009DBC39 /* InspectorView.m */,
-				321CB1690FA9058E009DBC39 /* InspectorPane.h */,
-				321CB16A0FA9058E009DBC39 /* InspectorPane.m */,
-				321CB1720FA90636009DBC39 /* InspectorPaneHeader.h */,
-				321CB1730FA90636009DBC39 /* InspectorPaneHeader.m */,
-				321CB1750FA90645009DBC39 /* InspectorPaneBody.h */,
-				321CB1760FA90645009DBC39 /* InspectorPaneBody.m */,
-				32B8B3FC0FB0A9B00028FE10 /* ViewSelectorBar.h */,
-				32B8B3FD0FB0A9B00028FE10 /* ViewSelectorBar.m */,
-				32B998F10FB12460005C8ACA /* ViewSelector.h */,
-				32B998F20FB12460005C8ACA /* ViewSelector.m */,
-				326AC2040FBFDB2D00110E77 /* ViewSelectorBarItem.h */,
-				326AC2050FBFDB2D00110E77 /* ViewSelectorBarItem.m */,
 			);
 			name = InspectorPanel;
 			path = InspectorPanels;
@@ -1703,16 +1674,9 @@
 				32A5F8DE0FA4B862009AD850 /* replaygain_analysis.c in Sources */,
 				32A5F9B40FA4E780009AD850 /* ReplayGainUtilities.m in Sources */,
 				321CB1280FA8A23C009DBC39 /* InspectorPanelController.m in Sources */,
-				321CB15B0FA901CB009DBC39 /* InspectorView.m in Sources */,
-				321CB16B0FA9058E009DBC39 /* InspectorPane.m in Sources */,
-				321CB1740FA90636009DBC39 /* InspectorPaneHeader.m in Sources */,
-				321CB1770FA90645009DBC39 /* InspectorPaneBody.m in Sources */,
 				32B8B3B50FB07F830028FE10 /* ChannelFormatter.m in Sources */,
-				32B8B41D0FB0AFB20028FE10 /* ViewSelectorBar.m in Sources */,
-				32B998F30FB12460005C8ACA /* ViewSelector.m in Sources */,
 				3213B2E40FB9F9B000137097 /* ExtractionViewController.m in Sources */,
 				3213B2E50FB9F9B000137097 /* MetadataViewController.m in Sources */,
-				326AC2060FBFDB2D00110E77 /* ViewSelectorBarItem.m in Sources */,
 				32F602220FDCB24900F68EAA /* DriveOffsetQueryOperation.m in Sources */,
 				32F602610FDCBAFA00F68EAA /* DiskUtilities.m in Sources */,
 				32BA15680FF3C07000AC695B /* ExtractionViewController+AudioExtraction.m in Sources */,
@@ -2047,10 +2011,12 @@
 		32362AFD0EE4E93200001E58 /* Debug64 */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_ENABLE_OBJC_GC = required;
 				GCC_TREAT_IMPLICIT_FUNCTION_DECLARATIONS_AS_ERRORS = YES;
-				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_MISSING_FIELD_INITIALIZERS = YES;
 				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
@@ -2062,7 +2028,9 @@
 				GCC_WARN_NON_VIRTUAL_DESTRUCTOR = YES;
 				GCC_WARN_SHADOW = YES;
 				GCC_WARN_SIGN_COMPARE = YES;
+				GCC_WARN_STRICT_SELECTOR_MATCH = YES;
 				GCC_WARN_TYPECHECK_CALLS_TO_PRINTF = YES;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNKNOWN_PRAGMAS = YES;
 				GCC_WARN_UNUSED_FUNCTION = YES;
@@ -2077,7 +2045,7 @@
 		};
 		32362AFF0EE4E93200001E58 /* Debug64 */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 32362B810EE4EC1C00001E58 /* Base.xcconfig */;
+			baseConfigurationReference = 3274C2D90F171827005B28BB /* Version.xcconfig */;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = NO;
@@ -2085,10 +2053,8 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/Frameworks\"",
 				);
-				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = Rip_Prefix.pch;
@@ -2132,10 +2098,12 @@
 		32362B010EE4E93900001E58 /* Release64 */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_ENABLE_OBJC_GC = required;
 				GCC_TREAT_IMPLICIT_FUNCTION_DECLARATIONS_AS_ERRORS = YES;
-				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_MISSING_FIELD_INITIALIZERS = YES;
 				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
@@ -2147,7 +2115,9 @@
 				GCC_WARN_NON_VIRTUAL_DESTRUCTOR = YES;
 				GCC_WARN_SHADOW = YES;
 				GCC_WARN_SIGN_COMPARE = YES;
+				GCC_WARN_STRICT_SELECTOR_MATCH = YES;
 				GCC_WARN_TYPECHECK_CALLS_TO_PRINTF = YES;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNKNOWN_PRAGMAS = YES;
 				GCC_WARN_UNUSED_FUNCTION = YES;
@@ -2162,7 +2132,7 @@
 		};
 		32362B030EE4E93900001E58 /* Release64 */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 32362B810EE4EC1C00001E58 /* Base.xcconfig */;
+			baseConfigurationReference = 3274C2D90F171827005B28BB /* Version.xcconfig */;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -2170,8 +2140,6 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/Frameworks\"",
 				);
-				GCC_C_LANGUAGE_STANDARD = c99;
-				GCC_MODEL_TUNING = G5;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = Rip_Prefix.pch;
 				INFOPLIST_FILE = Info.plist;
@@ -2265,17 +2233,15 @@
 		};
 		C05733C808A9546B00998B17 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 32362B810EE4EC1C00001E58 /* Base.xcconfig */;
+			baseConfigurationReference = 3274C2D90F171827005B28BB /* Version.xcconfig */;
 			buildSettings = {
 				COPY_PHASE_STRIP = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/Frameworks\"",
 				);
-				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = Rip_Prefix.pch;
@@ -2291,7 +2257,7 @@
 		};
 		C05733C908A9546B00998B17 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 32362B810EE4EC1C00001E58 /* Base.xcconfig */;
+			baseConfigurationReference = 3274C2D90F171827005B28BB /* Version.xcconfig */;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -2299,8 +2265,6 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/Frameworks\"",
 				);
-				GCC_C_LANGUAGE_STANDARD = c99;
-				GCC_MODEL_TUNING = G5;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = Rip_Prefix.pch;
 				INFOPLIST_FILE = Info.plist;
@@ -2314,10 +2278,12 @@
 		C05733CC08A9546B00998B17 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_ENABLE_OBJC_GC = required;
 				GCC_TREAT_IMPLICIT_FUNCTION_DECLARATIONS_AS_ERRORS = YES;
-				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_MISSING_FIELD_INITIALIZERS = YES;
 				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
@@ -2329,7 +2295,9 @@
 				GCC_WARN_NON_VIRTUAL_DESTRUCTOR = YES;
 				GCC_WARN_SHADOW = YES;
 				GCC_WARN_SIGN_COMPARE = YES;
+				GCC_WARN_STRICT_SELECTOR_MATCH = YES;
 				GCC_WARN_TYPECHECK_CALLS_TO_PRINTF = YES;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNKNOWN_PRAGMAS = YES;
 				GCC_WARN_UNUSED_FUNCTION = YES;
@@ -2345,10 +2313,12 @@
 		C05733CD08A9546B00998B17 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_ENABLE_OBJC_GC = required;
 				GCC_TREAT_IMPLICIT_FUNCTION_DECLARATIONS_AS_ERRORS = YES;
-				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_MISSING_FIELD_INITIALIZERS = YES;
 				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
@@ -2360,7 +2330,9 @@
 				GCC_WARN_NON_VIRTUAL_DESTRUCTOR = YES;
 				GCC_WARN_SHADOW = YES;
 				GCC_WARN_SIGN_COMPARE = YES;
+				GCC_WARN_STRICT_SELECTOR_MATCH = YES;
 				GCC_WARN_TYPECHECK_CALLS_TO_PRINTF = YES;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNKNOWN_PRAGMAS = YES;
 				GCC_WARN_UNUSED_FUNCTION = YES;

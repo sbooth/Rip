@@ -5,9 +5,10 @@
 
 #import "MetadataEditorPanelController.h"
 #import "CompactDiscWindowController.h"
-#import "ViewSelector.h"
-#import "ViewSelectorBar.h"
-#import "ViewSelectorBarItem.h"
+
+#import <SFBInspectors/SFBViewSelector.h>
+#import <SFBInspectors/SFBViewSelectorBar.h>
+#import <SFBInspectors/SFBViewSelectorBarItem.h>
 
 @interface MetadataEditorPanelController ()
 @property (readonly) NSManagedObjectContext * managedObjectContext;
@@ -37,66 +38,66 @@
 	NSViewController *viewController = [[NSViewController alloc] initWithNibName:@"AlbumMetadataInspectorView" bundle:nil];
 	[viewController bind:@"representedObject" toObject:self withKeyPath:@"inspectedDocument" options:nil];
 	
-	ViewSelectorBarItem *item = [ViewSelectorBarItem itemWithIdentifier:@"org.sbooth.Rip.MetadataEditor.AlbumMetadata" 
-																  label:NSLocalizedString(@"Album Metadata", @"")
-																tooltip:NSLocalizedString(@"Album Metadata", @"")
-																  image:[NSImage imageNamed:@"AlbumMetadataEditorPaneIcon"]
-																   view:[viewController view]];
+	SFBViewSelectorBarItem *item = [SFBViewSelectorBarItem itemWithIdentifier:@"org.sbooth.Rip.MetadataEditor.AlbumMetadata" 
+																		label:NSLocalizedString(@"Album Metadata", @"")
+																	  tooltip:NSLocalizedString(@"Album Metadata", @"")
+																		image:[NSImage imageNamed:@"AlbumMetadataEditorPaneIcon"]
+																		 view:[viewController view]];
 	
 	[[_viewSelector selectorBar] addItem:item];
 
 	viewController = [[NSViewController alloc] initWithNibName:@"TrackMetadataInspectorView" bundle:nil];
 	[viewController bind:@"representedObject" toObject:self withKeyPath:@"inspectedDocument" options:nil];
 	
-	item = [ViewSelectorBarItem itemWithIdentifier:@"org.sbooth.Rip.MetadataEditor.TrackMetadata" 
-											 label:NSLocalizedString(@"Track Metadata", @"")
-										   tooltip:NSLocalizedString(@"Track Metadata", @"")
-											 image:[NSImage imageNamed:@"TrackMetadataEditorPaneIcon"]
-											  view:[viewController view]];
+	item = [SFBViewSelectorBarItem itemWithIdentifier:@"org.sbooth.Rip.MetadataEditor.TrackMetadata" 
+												label:NSLocalizedString(@"Track Metadata", @"")
+											  tooltip:NSLocalizedString(@"Track Metadata", @"")
+												image:[NSImage imageNamed:@"TrackMetadataEditorPaneIcon"]
+												 view:[viewController view]];
 	
 	[[_viewSelector selectorBar] addItem:item];
 	
 	viewController = [[NSViewController alloc] initWithNibName:@"AlbumArtInspectorView" bundle:nil];
 	[viewController bind:@"representedObject" toObject:self withKeyPath:@"inspectedDocument" options:nil];
 	
-	item = [ViewSelectorBarItem itemWithIdentifier:@"org.sbooth.Rip.MetadataEditor.AlbumArt" 
-											 label:NSLocalizedString(@"Album Art", @"")
-										   tooltip:NSLocalizedString(@"Album Art", @"")
-											 image:[NSImage imageNamed:@"AlbumArtEditorPaneIcon"]
-											  view:[viewController view]];
+	item = [SFBViewSelectorBarItem itemWithIdentifier:@"org.sbooth.Rip.MetadataEditor.AlbumArt" 
+												label:NSLocalizedString(@"Album Art", @"")
+											  tooltip:NSLocalizedString(@"Album Art", @"")
+												image:[NSImage imageNamed:@"AlbumArtEditorPaneIcon"]
+												 view:[viewController view]];
 	
 	[[_viewSelector selectorBar] addItem:item];
 
 	viewController = [[NSViewController alloc] initWithNibName:@"TrackLyricsInspectorView" bundle:nil];
 	[viewController bind:@"representedObject" toObject:self withKeyPath:@"inspectedDocument" options:nil];
 	
-	item = [ViewSelectorBarItem itemWithIdentifier:@"org.sbooth.Rip.MetadataEditor.Lyrics" 
-											 label:NSLocalizedString(@"Lyrics", @"")
-										   tooltip:NSLocalizedString(@"Lyrics", @"")
-											 image:[NSImage imageNamed:@"LyricsMetadataEditorPaneIcon"]
-											  view:[viewController view]];
+	item = [SFBViewSelectorBarItem itemWithIdentifier:@"org.sbooth.Rip.MetadataEditor.Lyrics" 
+												label:NSLocalizedString(@"Lyrics", @"")
+											  tooltip:NSLocalizedString(@"Lyrics", @"")
+												image:[NSImage imageNamed:@"LyricsMetadataEditorPaneIcon"]
+												 view:[viewController view]];
 	
 	[[_viewSelector selectorBar] addItem:item];
 
 	viewController = [[NSViewController alloc] initWithNibName:@"AdditionalAlbumMetadataInspectorView" bundle:nil];
 	[viewController bind:@"representedObject" toObject:self withKeyPath:@"inspectedDocument" options:nil];
 	
-	item = [ViewSelectorBarItem itemWithIdentifier:@"org.sbooth.Rip.MetadataEditor.AdditionalAlbumMetadata" 
-											 label:NSLocalizedString(@"Additional Album Metadata", @"")
-										   tooltip:NSLocalizedString(@"Additional Album Metadata", @"")
-											 image:[NSImage imageNamed:@"AdditionalAlbumMetadataEditorPaneIcon"]
-											  view:[viewController view]];
+	item = [SFBViewSelectorBarItem itemWithIdentifier:@"org.sbooth.Rip.MetadataEditor.AdditionalAlbumMetadata" 
+												label:NSLocalizedString(@"Additional Album Metadata", @"")
+											  tooltip:NSLocalizedString(@"Additional Album Metadata", @"")
+												image:[NSImage imageNamed:@"AdditionalAlbumMetadataEditorPaneIcon"]
+												 view:[viewController view]];
 	
 	[[_viewSelector selectorBar] addItem:item];
 
 	viewController = [[NSViewController alloc] initWithNibName:@"AdditionalTrackMetadataInspectorView" bundle:nil];
 	[viewController bind:@"representedObject" toObject:self withKeyPath:@"inspectedDocument" options:nil];
 	
-	item = [ViewSelectorBarItem itemWithIdentifier:@"org.sbooth.Rip.MetadataEditor.AdditionalTrackMetadata" 
-											 label:NSLocalizedString(@"Additional Track Metadata", @"")
-										   tooltip:NSLocalizedString(@"Additional Track Metadata", @"")
-											 image:[NSImage imageNamed:@"AdditionalTrackMetadataEditorPaneIcon"]
-											  view:[viewController view]];
+	item = [SFBViewSelectorBarItem itemWithIdentifier:@"org.sbooth.Rip.MetadataEditor.AdditionalTrackMetadata" 
+												label:NSLocalizedString(@"Additional Track Metadata", @"")
+											  tooltip:NSLocalizedString(@"Additional Track Metadata", @"")
+												image:[NSImage imageNamed:@"AdditionalTrackMetadataEditorPaneIcon"]
+												 view:[viewController view]];
 	
 	[[_viewSelector selectorBar] addItem:item];
 
