@@ -177,8 +177,8 @@ calculateAccurateRipChecksumForFileRegionUsingOffset(NSURL *fileURL, NSRange sec
 	
 	// Append silence, if required
 	// Since the AccurateRip checksum for silence is zero, nothing need be done here
-	if(sectorsOfSilenceToAppend)
-		;
+//	if(sectorsOfSilenceToAppend)
+//		;
 
 cleanup:
 	/*status = */AudioFileClose(file);
