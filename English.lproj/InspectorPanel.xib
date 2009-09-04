@@ -115,7 +115,7 @@
 							<string key="NSFrameSize">{250, 145}</string>
 							<reference key="NSSuperview" ref="465339717"/>
 							<reference key="NSWindow"/>
-							<string key="NSClassName">InspectorView</string>
+							<string key="NSClassName">SFBInspectorView</string>
 						</object>
 					</object>
 					<string key="NSFrameSize">{250, 197}</string>
@@ -358,19 +358,11 @@
 					</object>
 					<object class="NSMutableDictionary" key="outlets">
 						<string key="NS.key.0">_inspectorView</string>
-						<string key="NS.object.0">InspectorView</string>
+						<string key="NS.object.0">SFBInspectorView</string>
 					</object>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
 						<string key="minorKey">InspectorPanels/InspectorPanelController.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className">InspectorView</string>
-					<string key="superclassName">NSView</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">InspectorPanels/InspectorView.h</string>
 					</object>
 				</object>
 			</object>
@@ -929,6 +921,14 @@
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBFrameworkSource</string>
 						<string key="minorKey">AppKit.framework/Headers/NSWindowController.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">SFBInspectorView</string>
+					<string key="superclassName">NSView</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBFrameworkSource</string>
+						<string key="minorKey">SFBInspectors.framework/Headers/SFBInspectorView.h</string>
 					</object>
 				</object>
 			</object>
