@@ -25,29 +25,26 @@
 	return [super initWithWindowNibName:@"InspectorPanel"];
 }
 
-- (void) awakeFromNib
+- (void) windowDidLoad
 {
+	[[self window] setMovableByWindowBackground:YES];
+
 	// Create the various inspector panels
 	NSViewController *viewController = [[NSViewController alloc] initWithNibName:@"TrackInspectorView" bundle:nil];
 	viewController.title = NSLocalizedString(@"Track Information", @"The name of the track inspector panel");
 	[viewController bind:@"representedObject" toObject:self withKeyPath:@"inspectedDocument" options:nil];
 	[_inspectorView addInspectorPaneController:viewController];
-
+	
 	viewController = [[NSViewController alloc] initWithNibName:@"DiscInspectorView" bundle:nil];
 	viewController.title = NSLocalizedString(@"Disc Information", @"The name of the disc inspector panel");
 	[viewController bind:@"representedObject" toObject:self withKeyPath:@"inspectedDocument" options:nil];
 	[_inspectorView addInspectorPaneController:viewController];
-
+	
 	viewController = [[NSViewController alloc] initWithNibName:@"DriveInspectorView" bundle:nil];
 	viewController.title = NSLocalizedString(@"Drive Information", @"The name of the drive inspector panel");
 	[viewController bind:@"representedObject" toObject:self withKeyPath:@"inspectedDocument" options:nil];
 	[_inspectorView addInspectorPaneController:viewController];
-}
 
-- (void) windowDidLoad
-{
-	[[self window] setMovableByWindowBackground:YES];
-	
 	[self activeDocumentChanged];
 	[[NSApplication sharedApplication] addObserver:self forKeyPath:@"mainWindow.windowController" options:0 context:[self class]];
 	

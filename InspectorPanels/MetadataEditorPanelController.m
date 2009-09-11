@@ -31,10 +31,12 @@
 	return [super initWithWindowNibName:@"MetadataEditorPanel"];
 }
 
-- (void) awakeFromNib
+- (void) windowDidLoad
 {
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillTerminate:) name:NSApplicationWillTerminateNotification object:nil];
+	[[self window] setMovableByWindowBackground:YES];
 
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillTerminate:) name:NSApplicationWillTerminateNotification object:nil];
+	
 	NSViewController *viewController = [[NSViewController alloc] initWithNibName:@"AlbumMetadataInspectorView" bundle:nil];
 	[viewController bind:@"representedObject" toObject:self withKeyPath:@"inspectedDocument" options:nil];
 	
@@ -45,7 +47,7 @@
 																		 view:[viewController view]];
 	
 	[[_viewSelector selectorBar] addItem:item];
-
+	
 	viewController = [[NSViewController alloc] initWithNibName:@"TrackMetadataInspectorView" bundle:nil];
 	[viewController bind:@"representedObject" toObject:self withKeyPath:@"inspectedDocument" options:nil];
 	
@@ -67,7 +69,7 @@
 												 view:[viewController view]];
 	
 	[[_viewSelector selectorBar] addItem:item];
-
+	
 	viewController = [[NSViewController alloc] initWithNibName:@"TrackLyricsInspectorView" bundle:nil];
 	[viewController bind:@"representedObject" toObject:self withKeyPath:@"inspectedDocument" options:nil];
 	
@@ -78,7 +80,7 @@
 												 view:[viewController view]];
 	
 	[[_viewSelector selectorBar] addItem:item];
-
+	
 	viewController = [[NSViewController alloc] initWithNibName:@"AdditionalAlbumMetadataInspectorView" bundle:nil];
 	[viewController bind:@"representedObject" toObject:self withKeyPath:@"inspectedDocument" options:nil];
 	
@@ -89,7 +91,7 @@
 												 view:[viewController view]];
 	
 	[[_viewSelector selectorBar] addItem:item];
-
+	
 	viewController = [[NSViewController alloc] initWithNibName:@"AdditionalTrackMetadataInspectorView" bundle:nil];
 	[viewController bind:@"representedObject" toObject:self withKeyPath:@"inspectedDocument" options:nil];
 	
@@ -100,7 +102,7 @@
 												 view:[viewController view]];
 	
 	[[_viewSelector selectorBar] addItem:item];
-
+	
 	// Restore the selected pane
 	NSString *autosaveName = [[self window] frameAutosaveName];
 	if(autosaveName) {
@@ -109,13 +111,8 @@
 		
 		if(selectedIdentifier)
 			[[_viewSelector selectorBar] selectItemWithIdentifer:selectedIdentifier];
-	}	
-}
-
-- (void) windowDidLoad
-{
-	[[self window] setMovableByWindowBackground:YES];
-
+	}
+	
 	[self activeDocumentChanged];
 	[[NSApplication sharedApplication] addObserver:self forKeyPath:@"mainWindow.windowController" options:0 context:[self class]];
 	
