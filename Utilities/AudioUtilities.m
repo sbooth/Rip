@@ -173,13 +173,13 @@ copySectorsFromURLToURL(NSURL *inputURL, NSRange sectorsToCopy, NSURL *outputURL
 	// Cleanup
 cleanup:
 	if(inputFile) {
-		status = AudioFileClose(inputFile);
+		/*status = */AudioFileClose(inputFile);
 //		if(noErr != status)
 //			;
 	}
 	
 	if(outputFile) {
-		status = AudioFileClose(outputFile);
+		/*status = */AudioFileClose(outputFile);
 //		if(noErr != status)
 //			;
 	}
@@ -282,13 +282,13 @@ compareFilesForNonMatchingSectors(NSURL *leftFileURL, NSURL *rightFileURL)
 	// Cleanup
 cleanup:
 	if(leftFile) {
-		status = AudioFileClose(leftFile);
+		/*status = */AudioFileClose(leftFile);
 //		if(noErr != status)
 //			;
 	}
 	
 	if(rightFile) {
-		status = AudioFileClose(rightFile);
+		/*status = */AudioFileClose(rightFile);
 //		if(noErr != status)
 //			;
 	}
@@ -402,13 +402,13 @@ compareFileRegionsForNonMatchingSectors(NSURL *leftFileURL,
 	// Cleanup
 cleanup:
 	if(leftFile) {
-		status = AudioFileClose(leftFile);
+		/*status = */AudioFileClose(leftFile);
 //		if(noErr != status)
 //			;
 	}
 	
 	if(rightFile) {
-		status = AudioFileClose(rightFile);
+		/*status = */AudioFileClose(rightFile);
 //		if(noErr != status)
 //			;
 	}
@@ -536,7 +536,7 @@ NSArray * calculateMD5AndSHA1DigestsForURLRegion(NSURL *fileURL, NSUInteger star
 	[result addObject:[tempString copy]];
 
 cleanup:
-	status = AudioFileClose(file);
+	/*status = */AudioFileClose(file);
 //	if(noErr != status)
 //		;
 	
