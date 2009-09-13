@@ -8,38 +8,43 @@
 
 @class iTunesPrintSettings, iTunesApplication, iTunesItem, iTunesArtwork, iTunesEncoder, iTunesEQPreset, iTunesPlaylist, iTunesAudioCDPlaylist, iTunesDevicePlaylist, iTunesLibraryPlaylist, iTunesRadioTunerPlaylist, iTunesSource, iTunesTrack, iTunesAudioCDTrack, iTunesDeviceTrack, iTunesFileTrack, iTunesSharedTrack, iTunesURLTrack, iTunesUserPlaylist, iTunesFolderPlaylist, iTunesVisual, iTunesWindow, iTunesBrowserWindow, iTunesEQWindow, iTunesPlaylistWindow;
 
-typedef enum {
+enum iTunesEKnd {
 	iTunesEKndTrackListing = 'kTrk' /* a basic listing of tracks within a playlist */,
 	iTunesEKndAlbumListing = 'kAlb' /* a listing of a playlist grouped by album */,
 	iTunesEKndCdInsert = 'kCDi' /* a printout of the playlist for jewel case inserts */
-} iTunesEKnd;
+};
+typedef enum iTunesEKnd iTunesEKnd;
 
-typedef enum {
+enum iTunesEnum {
 	iTunesEnumStandard = 'lwst' /* Standard PostScript error handling */,
 	iTunesEnumDetailed = 'lwdt' /* print a detailed report of PostScript errors */
-} iTunesEnum;
+};
+typedef enum iTunesEnum iTunesEnum;
 
-typedef enum {
+enum iTunesEPlS {
 	iTunesEPlSStopped = 'kPSS',
 	iTunesEPlSPlaying = 'kPSP',
 	iTunesEPlSPaused = 'kPSp',
 	iTunesEPlSFastForwarding = 'kPSF',
 	iTunesEPlSRewinding = 'kPSR'
-} iTunesEPlS;
+};
+typedef enum iTunesEPlS iTunesEPlS;
 
-typedef enum {
+enum iTunesERpt {
 	iTunesERptOff = 'kRpO',
 	iTunesERptOne = 'kRp1',
-	iTunesERptAll = 'kRpA'
-} iTunesERpt;
+	iTunesERptAll = 'kAll'
+};
+typedef enum iTunesERpt iTunesERpt;
 
-typedef enum {
+enum iTunesEVSz {
 	iTunesEVSzSmall = 'kVSS',
 	iTunesEVSzMedium = 'kVSM',
 	iTunesEVSzLarge = 'kVSL'
-} iTunesEVSz;
+};
+typedef enum iTunesEVSz iTunesEVSz;
 
-typedef enum {
+enum iTunesESrc {
 	iTunesESrcLibrary = 'kLib',
 	iTunesESrcIPod = 'kPod',
 	iTunesESrcAudioCD = 'kACD',
@@ -48,19 +53,21 @@ typedef enum {
 	iTunesESrcRadioTuner = 'kTun',
 	iTunesESrcSharedLibrary = 'kShd',
 	iTunesESrcUnknown = 'kUnk'
-} iTunesESrc;
+};
+typedef enum iTunesESrc iTunesESrc;
 
-typedef enum {
+enum iTunesESrA {
 	iTunesESrAAlbums = 'kSrL' /* albums only */,
-	iTunesESrAAll = 'kSrA' /* all text fields */,
+	iTunesESrAAll = 'kAll' /* all text fields */,
 	iTunesESrAArtists = 'kSrR' /* artists only */,
 	iTunesESrAComposers = 'kSrC' /* composers only */,
 	iTunesESrADisplayed = 'kSrV' /* visible text fields */,
 	iTunesESrASongs = 'kSrS' /* song names only */
-} iTunesESrA;
+};
+typedef enum iTunesESrA iTunesESrA;
 
-typedef enum {
-	iTunesESpKNone = 'kSpN',
+enum iTunesESpK {
+	iTunesESpKNone = 'kNon',
 	iTunesESpKAudiobooks = 'kSpA',
 	iTunesESpKFolder = 'kSpF',
 	iTunesESpKMovies = 'kSpI',
@@ -70,19 +77,22 @@ typedef enum {
 	iTunesESpKPurchasedMusic = 'kSpM',
 	iTunesESpKTVShows = 'kSpT',
 	iTunesESpKVideos = 'kSpV'
-} iTunesESpK;
+};
+typedef enum iTunesESpK iTunesESpK;
 
-typedef enum {
-	iTunesEVdKNone = 'kVdN' /* not a video or unknown video kind */,
+enum iTunesEVdK {
+	iTunesEVdKNone = 'kNon' /* not a video or unknown video kind */,
 	iTunesEVdKMovie = 'kVdM' /* movie track */,
 	iTunesEVdKMusicVideo = 'kVdV' /* music video track */,
 	iTunesEVdKTVShow = 'kVdT' /* TV show track */
-} iTunesEVdK;
+};
+typedef enum iTunesEVdK iTunesEVdK;
 
-typedef enum {
+enum iTunesERtK {
 	iTunesERtKUser = 'kRtU' /* user-specified rating */,
 	iTunesERtKComputed = 'kRtC' /* iTunes-computed rating */
-} iTunesERtK;
+};
+typedef enum iTunesERtK iTunesERtK;
 
 
 
@@ -205,7 +215,7 @@ typedef enum {
 @property (readonly) BOOL downloaded;  // was this artwork downloaded by iTunes?
 @property (copy, readonly) NSNumber *format;  // the data format for this piece of artwork
 @property NSInteger kind;  // kind or purpose of this piece of artwork
-@property (copy) id rawData;  // data for this artwork, in original format
+@property (copy) NSData *rawData;  // data for this artwork, in original format
 
 
 @end
