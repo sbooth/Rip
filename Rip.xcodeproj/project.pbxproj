@@ -7,8 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		32009532105D75DE0055BE17 /* Debug.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 32009530105D75DE0055BE17 /* Debug.xcconfig */; };
-		32009533105D75DE0055BE17 /* Release.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 32009531105D75DE0055BE17 /* Release.xcconfig */; };
 		3213B2A80FB9DC1A00137097 /* AlbumMetadataEditorPaneIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 3213B2A60FB9DC1A00137097 /* AlbumMetadataEditorPaneIcon.png */; };
 		3213B2A90FB9DC1A00137097 /* TrackMetadataEditorPaneIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 3213B2A70FB9DC1A00137097 /* TrackMetadataEditorPaneIcon.png */; };
 		3213B2AF0FB9DC8200137097 /* AdditionalAlbumMetadataEditorPaneIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 3213B2AD0FB9DC8200137097 /* AdditionalAlbumMetadataEditorPaneIcon.png */; };
@@ -47,7 +45,6 @@
 		326558EC0F99551900403217 /* SFBCrashReporter.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 326558E80F99550D00403217 /* SFBCrashReporter.framework */; };
 		3268C3760EB04CC500FF62F8 /* BitArrayTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 3268C3750EB04CC500FF62F8 /* BitArrayTest.m */; };
 		3268C3830EB04D3B00FF62F8 /* BitArray.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C4C8DFF0D5E2A0600DC0279 /* BitArray.m */; };
-		3274C2DA0F171827005B28BB /* Version.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 3274C2D90F171827005B28BB /* Version.xcconfig */; };
 		328371610EA7DCFB0011EB44 /* EncoderWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 328371600EA7DCFB0011EB44 /* EncoderWindowController.m */; };
 		328371680EA7DD650011EB44 /* EncoderWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 328371660EA7DD650011EB44 /* EncoderWindow.xib */; };
 		328374400EAA691D0011EB44 /* TrackExtractionRecord.m in Sources */ = {isa = PBXBuildFile; fileRef = 3283743F0EAA691D0011EB44 /* TrackExtractionRecord.m */; };
@@ -406,6 +403,9 @@
 		2A37F4C5FDCFA73011CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		32009530105D75DE0055BE17 /* Debug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
 		32009531105D75DE0055BE17 /* Release.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Release.xcconfig; sourceTree = "<group>"; };
+		3200988F105D9B350055BE17 /* Rip-Debug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = "Rip-Debug.xcconfig"; sourceTree = "<group>"; };
+		32009890105D9B350055BE17 /* Rip-Release.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = "Rip-Release.xcconfig"; sourceTree = "<group>"; };
+		32009891105D9B350055BE17 /* Rip-Version.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = "Rip-Version.xcconfig"; sourceTree = "<group>"; };
 		3213B2A60FB9DC1A00137097 /* AlbumMetadataEditorPaneIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = AlbumMetadataEditorPaneIcon.png; sourceTree = "<group>"; };
 		3213B2A70FB9DC1A00137097 /* TrackMetadataEditorPaneIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = TrackMetadataEditorPaneIcon.png; sourceTree = "<group>"; };
 		3213B2AD0FB9DC8200137097 /* AdditionalAlbumMetadataEditorPaneIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = AdditionalAlbumMetadataEditorPaneIcon.png; sourceTree = "<group>"; };
@@ -457,7 +457,6 @@
 		3268C35B0EB04C2300FF62F8 /* Tests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Tests-Info.plist"; sourceTree = "<group>"; };
 		3268C3740EB04CC500FF62F8 /* BitArrayTest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BitArrayTest.h; path = Tests/BitArrayTest.h; sourceTree = "<group>"; };
 		3268C3750EB04CC500FF62F8 /* BitArrayTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BitArrayTest.m; path = Tests/BitArrayTest.m; sourceTree = "<group>"; };
-		3274C2D90F171827005B28BB /* Version.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Version.xcconfig; sourceTree = "<group>"; };
 		3283715F0EA7DCFB0011EB44 /* EncoderWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EncoderWindowController.h; sourceTree = "<group>"; };
 		328371600EA7DCFB0011EB44 /* EncoderWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EncoderWindowController.m; sourceTree = "<group>"; };
 		328371670EA7DD650011EB44 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/EncoderWindow.xib; sourceTree = "<group>"; };
@@ -868,9 +867,11 @@
 		32362B800EE4EBFC00001E58 /* Configs */ = {
 			isa = PBXGroup;
 			children = (
+				3200988F105D9B350055BE17 /* Rip-Debug.xcconfig */,
+				32009890105D9B350055BE17 /* Rip-Release.xcconfig */,
+				32009891105D9B350055BE17 /* Rip-Version.xcconfig */,
 				32009530105D75DE0055BE17 /* Debug.xcconfig */,
 				32009531105D75DE0055BE17 /* Release.xcconfig */,
-				3274C2D90F171827005B28BB /* Version.xcconfig */,
 				32362B810EE4EC1C00001E58 /* Base.xcconfig */,
 			);
 			path = Configs;
@@ -1552,7 +1553,6 @@
 				32BBF1580EC8875100EC2FBE /* MetadataPreferencesToolbarIcon.png in Resources */,
 				32BBF1590EC8875100EC2FBE /* QueryAccurateRipToolbarIcon.png in Resources */,
 				32CA7D990F0D5FC300771028 /* MetadataEditorPanel.xib in Resources */,
-				3274C2DA0F171827005B28BB /* Version.xcconfig in Resources */,
 				32E622CC0F74189600DC1A15 /* DriveOffsets.plist in Resources */,
 				32C9F2C20F7B1B5D0050F4B2 /* ExtractionView.xib in Resources */,
 				32C9F2C70F7B1B940050F4B2 /* MetadataView.xib in Resources */,
@@ -1575,8 +1575,6 @@
 				321717E10FBF9EB9004C5F28 /* AlbumArtEditorPaneIcon.png in Resources */,
 				321717E60FBF9F14004C5F28 /* AlbumArtInspectorView.xib in Resources */,
 				32495F3D0FFFEAC700539E10 /* ManualReadOffsetSheet.xib in Resources */,
-				32009532105D75DE0055BE17 /* Debug.xcconfig in Resources */,
-				32009533105D75DE0055BE17 /* Release.xcconfig in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2070,7 +2068,7 @@
 		};
 		C05733C808A9546B00998B17 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 32009530105D75DE0055BE17 /* Debug.xcconfig */;
+			baseConfigurationReference = 3200988F105D9B350055BE17 /* Rip-Debug.xcconfig */;
 			buildSettings = {
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -2088,7 +2086,7 @@
 		};
 		C05733C908A9546B00998B17 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 32009531105D75DE0055BE17 /* Release.xcconfig */;
+			baseConfigurationReference = 32009890105D9B350055BE17 /* Rip-Release.xcconfig */;
 			buildSettings = {
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
