@@ -16,7 +16,6 @@
 		32AC71740E71934C009A5E1B /* MusicBrainzSettings.xib in Resources */ = {isa = PBXBuildFile; fileRef = 32AC71720E71934C009A5E1B /* MusicBrainzSettings.xib */; };
 		32AC721F0E71AFC2009A5E1B /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 32AC721E0E71AFC2009A5E1B /* Security.framework */; };
 		32CA7C7A0F0D2EB800771028 /* MusicBrainzSubmissionOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 32CA7C790F0D2EB800771028 /* MusicBrainzSubmissionOperation.m */; };
-		32CA7D240F0D3B4F00771028 /* discid.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 32CA7D230F0D3B4F00771028 /* discid.framework */; };
 		8D5B49B0048680CD000E48DA /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C167DFE841241C02AAC07 /* InfoPlist.strings */; };
 		8D5B49B4048680CD000E48DA /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7ADFEA557BF11CA2CBB /* Cocoa.framework */; };
 /* End PBXBuildFile section */
@@ -69,7 +68,6 @@
 		32AC721E0E71AFC2009A5E1B /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		32CA7C780F0D2EB800771028 /* MusicBrainzSubmissionOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MusicBrainzSubmissionOperation.h; sourceTree = "<group>"; };
 		32CA7C790F0D2EB800771028 /* MusicBrainzSubmissionOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MusicBrainzSubmissionOperation.m; sourceTree = "<group>"; };
-		32CA7D230F0D3B4F00771028 /* discid.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = discid.framework; path = ../../Frameworks/discid.framework; sourceTree = SOURCE_ROOT; };
 		32DBCF630370AF2F00C91783 /* MusicBrainz_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MusicBrainz_Prefix.pch; sourceTree = "<group>"; };
 		8D5B49B6048680CD000E48DA /* MusicBrainz.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MusicBrainz.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
 		8D5B49B7048680CD000E48DA /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -85,7 +83,6 @@
 				8D5B49B4048680CD000E48DA /* Cocoa.framework in Frameworks */,
 				328DEA620E607C7D00F5BD13 /* musicbrainz3.framework in Frameworks */,
 				32AC721F0E71AFC2009A5E1B /* Security.framework in Frameworks */,
-				32CA7D240F0D3B4F00771028 /* discid.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -107,8 +104,6 @@
 		089C1671FE841209C02AAC07 /* Frameworks and Libraries */ = {
 			isa = PBXGroup;
 			children = (
-				32CA7D230F0D3B4F00771028 /* discid.framework */,
-				328DEA600E607C7D00F5BD13 /* musicbrainz3.framework */,
 				1058C7ACFEA557BF11CA2CBB /* Linked Frameworks */,
 				1058C7AEFEA557BF11CA2CBB /* Other Frameworks */,
 			);
@@ -143,6 +138,7 @@
 		1058C7ACFEA557BF11CA2CBB /* Linked Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				328DEA600E607C7D00F5BD13 /* musicbrainz3.framework */,
 				32AC721E0E71AFC2009A5E1B /* Security.framework */,
 				1058C7ADFEA557BF11CA2CBB /* Cocoa.framework */,
 			);
@@ -314,7 +310,7 @@
 				GCC_PREFIX_HEADER = MusicBrainz_Prefix.pch;
 				GCC_WARN_UNINITIALIZED_AUTOS = NO;
 				INFOPLIST_FILE = Info.plist;
-				INSTALL_PATH = "$(HOME)/Library/Bundles";
+				INSTALL_PATH = "@executable_path/../PlugIns";
 				PRODUCT_NAME = MusicBrainz;
 				WRAPPER_EXTENSION = bundle;
 			};
@@ -334,7 +330,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = MusicBrainz_Prefix.pch;
 				INFOPLIST_FILE = Info.plist;
-				INSTALL_PATH = "$(HOME)/Library/Bundles";
+				INSTALL_PATH = "@executable_path/../PlugIns";
 				PRODUCT_NAME = MusicBrainz;
 				WRAPPER_EXTENSION = bundle;
 			};
@@ -465,7 +461,7 @@
 				GCC_PREFIX_HEADER = MusicBrainz_Prefix.pch;
 				GCC_WARN_UNINITIALIZED_AUTOS = NO;
 				INFOPLIST_FILE = Info.plist;
-				INSTALL_PATH = "$(HOME)/Library/Bundles";
+				INSTALL_PATH = "@executable_path/../PlugIns";
 				PRODUCT_NAME = MusicBrainz;
 				WRAPPER_EXTENSION = bundle;
 			};
@@ -520,7 +516,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = MusicBrainz_Prefix.pch;
 				INFOPLIST_FILE = Info.plist;
-				INSTALL_PATH = "$(HOME)/Library/Bundles";
+				INSTALL_PATH = "@executable_path/../PlugIns";
 				PRODUCT_NAME = MusicBrainz;
 				WRAPPER_EXTENSION = bundle;
 			};
