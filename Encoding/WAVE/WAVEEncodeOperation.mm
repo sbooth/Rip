@@ -108,7 +108,7 @@ getID3v2Timestamp()
 		if(releaseDate) {
 			NSCalendar *gregorianCalendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
 			NSDateComponents *releaseDateComponents = [gregorianCalendar components:NSYearCalendarUnit fromDate:releaseDate];
-			fileRef.tag()->setYear([releaseDateComponents year]);
+			fileRef.tag()->setYear((TagLib::uint)[releaseDateComponents year]);
 		}		
 	}
 	
@@ -341,7 +341,7 @@ getID3v2Timestamp()
 		TagLib::ID3v2::AttachedPictureFrame *pictureFrame = new TagLib::ID3v2::AttachedPictureFrame();
 		
 		pictureFrame->setMimeType(TagLib::String("image/png", TagLib::String::Latin1));
-		pictureFrame->setPicture(TagLib::ByteVector((const char *)[imageData bytes], [imageData length]));
+		pictureFrame->setPicture(TagLib::ByteVector((const char *)[imageData bytes], (TagLib::uint)[imageData length]));
 
 		fileRef.tag()->addFrame(pictureFrame);
 	}

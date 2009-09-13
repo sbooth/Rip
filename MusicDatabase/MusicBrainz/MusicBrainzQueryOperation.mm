@@ -54,9 +54,9 @@
 		
 		// Search for the item in the keychain
 		OSStatus status = SecKeychainFindGenericPassword(NULL,
-														 strlen(serviceNameUTF8),
+														 (UInt32)strlen(serviceNameUTF8),
 														 serviceNameUTF8,
-														 strlen(usernameUTF8),
+														 (UInt32)strlen(usernameUTF8),
 														 usernameUTF8,
 														 &passwordLength,
 														 &passwordData,
@@ -176,7 +176,7 @@
 			NSString	*currentCountry		= [localeElements objectAtIndex:1];
 			
 			// Try to match based on the assumption that the disc is from the user's own locale
-			for(NSInteger k = 0; k < release->getNumReleaseEvents(); ++k) {
+			for(int k = 0; k < release->getNumReleaseEvents(); ++k) {
 				MusicBrainz::ReleaseEvent *releaseEvent = release->getReleaseEvent(k);
 				NSString *releaseEventCountry = [NSString stringWithCString:releaseEvent->getCountry().c_str() encoding:NSASCIIStringEncoding];
 				if(NSOrderedSame == [releaseEventCountry caseInsensitiveCompare:currentCountry])
