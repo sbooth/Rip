@@ -7,9 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		32009645105D8CE40055BE17 /* Base.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 32009642105D8CE40055BE17 /* Base.xcconfig */; };
-		32009646105D8CE40055BE17 /* Debug.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 32009643105D8CE40055BE17 /* Debug.xcconfig */; };
-		32009647105D8CE40055BE17 /* Release.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 32009644105D8CE40055BE17 /* Release.xcconfig */; };
 		3215E7E00F88491800F84429 /* AIFFSettings.xib in Resources */ = {isa = PBXBuildFile; fileRef = 3215E7DE0F88491800F84429 /* AIFFSettings.xib */; };
 		3215E7E50F88493700F84429 /* AIFFEncoderInterface.m in Sources */ = {isa = PBXBuildFile; fileRef = 3215E7E20F88493700F84429 /* AIFFEncoderInterface.m */; };
 		3215E7E60F88493700F84429 /* AIFFSettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3215E7E40F88493700F84429 /* AIFFSettingsViewController.m */; };
@@ -268,9 +265,6 @@
 			files = (
 				8D5B49B0048680CD000E48DA /* InfoPlist.strings in Resources */,
 				3215E7E00F88491800F84429 /* AIFFSettings.xib in Resources */,
-				32009645105D8CE40055BE17 /* Base.xcconfig in Resources */,
-				32009646105D8CE40055BE17 /* Debug.xcconfig in Resources */,
-				32009647105D8CE40055BE17 /* Release.xcconfig in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

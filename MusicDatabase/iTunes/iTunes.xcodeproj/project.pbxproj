@@ -7,9 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		32009683105D8DD00055BE17 /* Base.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 32009680105D8DD00055BE17 /* Base.xcconfig */; };
-		32009684105D8DD00055BE17 /* Debug.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 32009681105D8DD00055BE17 /* Debug.xcconfig */; };
-		32009685105D8DD00055BE17 /* Release.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 32009682105D8DD00055BE17 /* Release.xcconfig */; };
 		328DE3F00E5F917300F5BD13 /* MusicDatabaseInterface.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 328DE36D0E5F8C3100F5BD13 /* MusicDatabaseInterface.framework */; };
 		328DE61D0E5FD89A00F5BD13 /* iTunesDatabaseInterface.m in Sources */ = {isa = PBXBuildFile; fileRef = 328DE61A0E5FD89A00F5BD13 /* iTunesDatabaseInterface.m */; };
 		328DE61E0E5FD89A00F5BD13 /* iTunesQueryOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 328DE61C0E5FD89A00F5BD13 /* iTunesQueryOperation.m */; };
@@ -240,9 +237,6 @@
 			files = (
 				8D5B49B0048680CD000E48DA /* InfoPlist.strings in Resources */,
 				32AC710C0E719109009A5E1B /* iTunesSettings.xib in Resources */,
-				32009683105D8DD00055BE17 /* Base.xcconfig in Resources */,
-				32009684105D8DD00055BE17 /* Debug.xcconfig in Resources */,
-				32009685105D8DD00055BE17 /* Release.xcconfig in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

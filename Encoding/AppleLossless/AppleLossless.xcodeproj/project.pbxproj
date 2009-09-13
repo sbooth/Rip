@@ -7,9 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		32009630105D8C9C0055BE17 /* Base.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 3200962D105D8C9C0055BE17 /* Base.xcconfig */; };
-		32009631105D8C9C0055BE17 /* Debug.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 3200962E105D8C9C0055BE17 /* Debug.xcconfig */; };
-		32009632105D8C9C0055BE17 /* Release.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 3200962F105D8C9C0055BE17 /* Release.xcconfig */; };
 		324529690F6A0D0600CC2341 /* FileUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 324529680F6A0D0600CC2341 /* FileUtilities.m */; };
 		328378360EAEDEF50011EB44 /* AppleLosslessEncodeOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 328378350EAEDEF50011EB44 /* AppleLosslessEncodeOperation.m */; };
 		328378530EAEE2EB0011EB44 /* AtomicParsley in Resources */ = {isa = PBXBuildFile; fileRef = 328378520EAEE2EB0011EB44 /* AtomicParsley */; };
@@ -257,9 +254,6 @@
 				8D5B49B0048680CD000E48DA /* InfoPlist.strings in Resources */,
 				32C5ABCC0E6D1A27007C1E7A /* AppleLosslessSettings.xib in Resources */,
 				328378530EAEE2EB0011EB44 /* AtomicParsley in Resources */,
-				32009630105D8C9C0055BE17 /* Base.xcconfig in Resources */,
-				32009631105D8C9C0055BE17 /* Debug.xcconfig in Resources */,
-				32009632105D8C9C0055BE17 /* Release.xcconfig in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

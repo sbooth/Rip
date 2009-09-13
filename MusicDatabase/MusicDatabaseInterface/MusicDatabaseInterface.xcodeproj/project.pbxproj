@@ -7,9 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		3200966C105D8D720055BE17 /* Base.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 32009669105D8D720055BE17 /* Base.xcconfig */; };
-		3200966D105D8D720055BE17 /* Debug.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 3200966A105D8D720055BE17 /* Debug.xcconfig */; };
-		3200966E105D8D720055BE17 /* Release.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 3200966B105D8D720055BE17 /* Release.xcconfig */; };
 		3239E1710DCAA6A100172C54 /* MusicDatabaseQueryOperation.h in Headers */ = {isa = PBXBuildFile; fileRef = 3239E16F0DCAA6A100172C54 /* MusicDatabaseQueryOperation.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3239E1720DCAA6A100172C54 /* MusicDatabaseQueryOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 3239E1700DCAA6A100172C54 /* MusicDatabaseQueryOperation.m */; };
 		328DE29E0E5F849F00F5BD13 /* MusicDatabaseInterface.h in Headers */ = {isa = PBXBuildFile; fileRef = 328DE29C0E5F849F00F5BD13 /* MusicDatabaseInterface.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -199,9 +196,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				8DC2EF530486A6940098B216 /* InfoPlist.strings in Resources */,
-				3200966C105D8D720055BE17 /* Base.xcconfig in Resources */,
-				3200966D105D8D720055BE17 /* Debug.xcconfig in Resources */,
-				3200966E105D8D720055BE17 /* Release.xcconfig in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

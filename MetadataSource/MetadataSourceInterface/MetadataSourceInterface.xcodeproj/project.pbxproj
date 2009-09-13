@@ -7,9 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		320096FB105D8F7E0055BE17 /* Base.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 320096F8105D8F7E0055BE17 /* Base.xcconfig */; };
-		320096FC105D8F7E0055BE17 /* Debug.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 320096F9105D8F7E0055BE17 /* Debug.xcconfig */; };
-		320096FD105D8F7E0055BE17 /* Release.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 320096FA105D8F7E0055BE17 /* Release.xcconfig */; };
 		327EA9900F82CEC600E744EC /* MetadataSourceDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 327EA9730F82CE0700E744EC /* MetadataSourceDelegate.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		328DE29E0E5F849F00F5BD13 /* MetadataSourceInterface.h in Headers */ = {isa = PBXBuildFile; fileRef = 328DE29C0E5F849F00F5BD13 /* MetadataSourceInterface.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		32F0D2A70F82ABA000643A32 /* MetadataSourceData.h in Headers */ = {isa = PBXBuildFile; fileRef = 32F0D2A50F82ABA000643A32 /* MetadataSourceData.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -196,9 +193,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				8DC2EF530486A6940098B216 /* InfoPlist.strings in Resources */,
-				320096FB105D8F7E0055BE17 /* Base.xcconfig in Resources */,
-				320096FC105D8F7E0055BE17 /* Debug.xcconfig in Resources */,
-				320096FD105D8F7E0055BE17 /* Release.xcconfig in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

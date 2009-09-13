@@ -7,9 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		320096EA105D8F350055BE17 /* Base.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 320096E7105D8F350055BE17 /* Base.xcconfig */; };
-		320096EB105D8F350055BE17 /* Debug.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 320096E8105D8F350055BE17 /* Debug.xcconfig */; };
-		320096EC105D8F350055BE17 /* Release.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 320096E9105D8F350055BE17 /* Release.xcconfig */; };
 		324066BB100A38B60004B1A5 /* NSString+URLEscapingMethods.m in Sources */ = {isa = PBXBuildFile; fileRef = 324066BA100A38B60004B1A5 /* NSString+URLEscapingMethods.m */; };
 		325B5CFF0F89306600E9CE97 /* AmazonView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 325B5CFD0F89306600E9CE97 /* AmazonView.xib */; };
 		325B5DEF0F895B6300E9CE97 /* AmazonItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 3253B4C90F81D7FE00A0EADF /* AmazonItem.m */; };
@@ -261,9 +258,6 @@
 				325E2D5A0F85CF87001E7495 /* IncreaseThumbnailSize.png in Resources */,
 				325E2D5B0F85CF87001E7495 /* DecreaseThumbnailSize.png in Resources */,
 				325B5CFF0F89306600E9CE97 /* AmazonView.xib in Resources */,
-				320096EA105D8F350055BE17 /* Base.xcconfig in Resources */,
-				320096EB105D8F350055BE17 /* Debug.xcconfig in Resources */,
-				320096EC105D8F350055BE17 /* Release.xcconfig in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

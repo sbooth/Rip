@@ -7,9 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		320095F7105D8BBB0055BE17 /* Base.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 320095F4105D8BBB0055BE17 /* Base.xcconfig */; };
-		320095F8105D8BBB0055BE17 /* Debug.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 320095F5105D8BBB0055BE17 /* Debug.xcconfig */; };
-		320095F9105D8BBB0055BE17 /* Release.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 320095F6105D8BBB0055BE17 /* Release.xcconfig */; };
 		3252C1080DD2309D00856BFE /* WavPackEncodeOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 3252C1050DD2309D00856BFE /* WavPackEncodeOperation.m */; };
 		3252C1090DD2309D00856BFE /* WavPackEncoderInterface.m in Sources */ = {isa = PBXBuildFile; fileRef = 3252C1070DD2309D00856BFE /* WavPackEncoderInterface.m */; };
 		3252C1160DD2318200856BFE /* EncoderInterface.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3252C0F70DD2302100856BFE /* EncoderInterface.framework */; };
@@ -242,9 +239,6 @@
 				32CE93310F56527800AB328A /* wavpack in Resources */,
 				32CE93320F56527800AB328A /* WavPackLogo.gif in Resources */,
 				32CE933C0F5652BB00AB328A /* WavPackSettings.xib in Resources */,
-				320095F7105D8BBB0055BE17 /* Base.xcconfig in Resources */,
-				320095F8105D8BBB0055BE17 /* Debug.xcconfig in Resources */,
-				320095F9105D8BBB0055BE17 /* Release.xcconfig in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

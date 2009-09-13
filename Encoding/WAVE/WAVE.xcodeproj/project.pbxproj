@@ -7,9 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		32009606105D8BF50055BE17 /* Base.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 32009603105D8BF50055BE17 /* Base.xcconfig */; };
-		32009607105D8BF50055BE17 /* Debug.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 32009604105D8BF50055BE17 /* Debug.xcconfig */; };
-		32009608105D8BF50055BE17 /* Release.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 32009605105D8BF50055BE17 /* Release.xcconfig */; };
 		325B5C710F89207B00E9CE97 /* WAVEEncodeOperation.mm in Sources */ = {isa = PBXBuildFile; fileRef = 325B5C700F89207B00E9CE97 /* WAVEEncodeOperation.mm */; };
 		325B5C7F0F8920CB00E9CE97 /* taglib.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 325B5C7E0F8920CB00E9CE97 /* taglib.framework */; };
 		325B5CCF0F8920EF00E9CE97 /* taglib.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 325B5C7E0F8920CB00E9CE97 /* taglib.framework */; };
@@ -267,9 +264,6 @@
 			files = (
 				8D5B49B0048680CD000E48DA /* InfoPlist.strings in Resources */,
 				32C5AC7C0E6D2111007C1E7A /* WAVESettings.xib in Resources */,
-				32009606105D8BF50055BE17 /* Base.xcconfig in Resources */,
-				32009607105D8BF50055BE17 /* Debug.xcconfig in Resources */,
-				32009608105D8BF50055BE17 /* Release.xcconfig in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

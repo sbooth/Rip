@@ -7,9 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		320096AD105D8E8B0055BE17 /* Base.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 320096AA105D8E8B0055BE17 /* Base.xcconfig */; };
-		320096AE105D8E8B0055BE17 /* Debug.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 320096AB105D8E8B0055BE17 /* Debug.xcconfig */; };
-		320096AF105D8E8B0055BE17 /* Release.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 320096AC105D8E8B0055BE17 /* Release.xcconfig */; };
 		328DE35F0E5F8C0300F5BD13 /* MusicBrainzQueryOperation.mm in Sources */ = {isa = PBXBuildFile; fileRef = 328DE35E0E5F8C0300F5BD13 /* MusicBrainzQueryOperation.mm */; };
 		328DE3F00E5F917300F5BD13 /* MusicDatabaseInterface.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 328DE36D0E5F8C3100F5BD13 /* MusicDatabaseInterface.framework */; };
 		328DE4A50E5FBED700F5BD13 /* MusicBrainzDatabaseInterface.m in Sources */ = {isa = PBXBuildFile; fileRef = 328DE4A40E5FBED700F5BD13 /* MusicBrainzDatabaseInterface.m */; };
@@ -263,9 +260,6 @@
 			files = (
 				8D5B49B0048680CD000E48DA /* InfoPlist.strings in Resources */,
 				32AC71740E71934C009A5E1B /* MusicBrainzSettings.xib in Resources */,
-				320096AD105D8E8B0055BE17 /* Base.xcconfig in Resources */,
-				320096AE105D8E8B0055BE17 /* Debug.xcconfig in Resources */,
-				320096AF105D8E8B0055BE17 /* Release.xcconfig in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

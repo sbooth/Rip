@@ -7,9 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		320096DB105D8EE60055BE17 /* Base.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 320096D8105D8EE60055BE17 /* Base.xcconfig */; };
-		320096DC105D8EE60055BE17 /* Debug.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 320096D9105D8EE60055BE17 /* Debug.xcconfig */; };
-		320096DD105D8EE60055BE17 /* Release.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 320096DA105D8EE60055BE17 /* Release.xcconfig */; };
 		3253B4CA0F81D7FE00A0EADF /* AlbumArtExchangeImage.m in Sources */ = {isa = PBXBuildFile; fileRef = 3253B4C90F81D7FE00A0EADF /* AlbumArtExchangeImage.m */; };
 		325E2D5A0F85CF87001E7495 /* IncreaseThumbnailSize.png in Resources */ = {isa = PBXBuildFile; fileRef = 325E2D580F85CF87001E7495 /* IncreaseThumbnailSize.png */; };
 		325E2D5B0F85CF87001E7495 /* DecreaseThumbnailSize.png in Resources */ = {isa = PBXBuildFile; fileRef = 325E2D590F85CF87001E7495 /* DecreaseThumbnailSize.png */; };
@@ -256,9 +253,6 @@
 				328AB31D0F80859D001F1C78 /* AlbumArtExchangeView.xib in Resources */,
 				325E2D5A0F85CF87001E7495 /* IncreaseThumbnailSize.png in Resources */,
 				325E2D5B0F85CF87001E7495 /* DecreaseThumbnailSize.png in Resources */,
-				320096DB105D8EE60055BE17 /* Base.xcconfig in Resources */,
-				320096DC105D8EE60055BE17 /* Debug.xcconfig in Resources */,
-				320096DD105D8EE60055BE17 /* Release.xcconfig in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

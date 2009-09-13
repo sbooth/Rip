@@ -7,9 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		3200969B105D8E3C0055BE17 /* Base.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 32009698105D8E3C0055BE17 /* Base.xcconfig */; };
-		3200969C105D8E3C0055BE17 /* Debug.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 32009699105D8E3C0055BE17 /* Debug.xcconfig */; };
-		3200969D105D8E3C0055BE17 /* Release.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 3200969A105D8E3C0055BE17 /* Release.xcconfig */; };
 		324FCD610EE3399E00784FAA /* AddressBook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 324FCD600EE3399E00784FAA /* AddressBook.framework */; };
 		324FCD730EE33B2100784FAA /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 324FCD720EE33B2100784FAA /* Security.framework */; };
 		328DE3F00E5F917300F5BD13 /* MusicDatabaseInterface.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 328DE36D0E5F8C3100F5BD13 /* MusicDatabaseInterface.framework */; };
@@ -267,9 +264,6 @@
 			files = (
 				8D5B49B0048680CD000E48DA /* InfoPlist.strings in Resources */,
 				32AC71350E719246009A5E1B /* FreeDBSettings.xib in Resources */,
-				3200969B105D8E3C0055BE17 /* Base.xcconfig in Resources */,
-				3200969C105D8E3C0055BE17 /* Debug.xcconfig in Resources */,
-				3200969D105D8E3C0055BE17 /* Release.xcconfig in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
