@@ -554,7 +554,6 @@
 		32C7B61C0EBD61AC00D1A722 /* AdvancedPreferencesViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AdvancedPreferencesViewController.h; sourceTree = "<group>"; };
 		32C7B61D0EBD61AC00D1A722 /* AdvancedPreferencesViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AdvancedPreferencesViewController.m; sourceTree = "<group>"; };
 		32C7B6350EBD61E900D1A722 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/AdvancedPreferencesView.xib; sourceTree = "<group>"; };
-		32C7B6820EBE1AFA00D1A722 /* Growl Registration Ticket.growlRegDict */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = "Growl Registration Ticket.growlRegDict"; sourceTree = "<group>"; };
 		32C9F23A0F7973790050F4B2 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		32C9F2C10F7B1B5D0050F4B2 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/ExtractionView.xib; sourceTree = "<group>"; };
 		32C9F2C60F7B1B940050F4B2 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/MetadataView.xib; sourceTree = "<group>"; };
@@ -811,7 +810,6 @@
 				8D15AC360486D014006FF6A4 /* Info.plist */,
 				089C165FFE840EACC02AAC07 /* InfoPlist.strings */,
 				328DEDD90E61274E00F5BD13 /* MusicDatabasePreferencesView.xib */,
-				32C7B6820EBE1AFA00D1A722 /* Growl Registration Ticket.growlRegDict */,
 				32C9F2C00F7B1B5D0050F4B2 /* ExtractionView.xib */,
 				321CB1300FA8A2A4009DBC39 /* InspectorPanel.xib */,
 				32B42AFE0FB1465F00AA4EDF /* TrackMetadataInspectorView.xib */,
