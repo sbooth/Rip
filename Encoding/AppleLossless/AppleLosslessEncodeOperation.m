@@ -4,8 +4,9 @@
  */
 
 #import "AppleLosslessEncodeOperation.h"
-#import "FileUtilities.h"
 #import "NSImage+BitmapRepresentationMethods.h"
+
+#include <mp4v2/mp4v2.h>
 
 @implementation AppleLosslessEncodeOperation
 
@@ -22,157 +23,95 @@
 	// Stop now if the operation was cancelled or any errors occurred
 	if(self.isCancelled || self.error)
 		return;
-	
-	// Locate the AtomicParsley executable
-	NSString *apPath = [[NSBundle bundleWithIdentifier:@"org.sbooth.Rip.Encoder.CoreAudio.AppleLossless"] pathForResource:@"AtomicParsley" ofType:nil];
-	if(nil == apPath) {
-		self.error = [NSError errorWithDomain:NSOSStatusErrorDomain code:fnfErr userInfo:nil];
-		return;
-	}
-	
+
 	// ========================================
 	// TAGGING
 	
-	// Create the task
-	NSTask *task = [[NSTask alloc] init];
-	NSMutableArray *arguments = [NSMutableArray array];
+	// Open the file for modification
+	MP4FileHandle file = MP4Modify([[self.outputURL path] fileSystemRepresentation], MP4_DETAILS_ERROR, 0);
+	if(MP4_INVALID_FILE_HANDLE == file) {
+		self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:EIO userInfo:nil];
+		return;
+	}
+
+	// Read the tags
+	const MP4Tags *tags = MP4TagsAlloc();
+	if(NULL == tags) {
+		MP4Close(file);
+		
+		self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:ENOMEM userInfo:nil];
+		return;
+	}
 	
-	// The file to tag
-	[arguments addObject:[self.outputURL path]];
-
-	// Don't overwrite the original file- save to a temp file and then rename it
-	NSURL *taggedURL = temporaryURLWithExtension(@"m4a");
-
-	[arguments addObject:@"-o"];
-	[arguments addObject:[taggedURL path]];
-
+	MP4TagsFetch(tags, file);
+	
 	// Metadata
-	if([self.metadata objectForKey:kMetadataTitleKey]) {
-		[arguments addObject:@"--title"];
-		[arguments addObject:[self.metadata objectForKey:kMetadataTitleKey]];
-	}
-	if([self.metadata objectForKey:kMetadataAlbumTitleKey]) {
-		[arguments addObject:@"--album"];
-		[arguments addObject:[self.metadata objectForKey:kMetadataAlbumTitleKey]];
-	}
-	if([self.metadata objectForKey:kMetadataArtistKey]) {
-		[arguments addObject:@"--artist"];
-		[arguments addObject:[self.metadata objectForKey:kMetadataArtistKey]];
-	}
-	if([self.metadata objectForKey:kMetadataAlbumArtistKey]) {
-		[arguments addObject:@"--albumArtist"];
-		[arguments addObject:[self.metadata objectForKey:kMetadataAlbumArtistKey]];
-	}
-	if([self.metadata objectForKey:kMetadataGenreKey]) {
-		[arguments addObject:@"--genre"];
-		[arguments addObject:[self.metadata objectForKey:kMetadataGenreKey]];
-	}
-	if([self.metadata objectForKey:kMetadataComposerKey]) {
-		[arguments addObject:@"--composer"];
-		[arguments addObject:[self.metadata objectForKey:kMetadataComposerKey]];
-	}
-	if([self.metadata objectForKey:kMetadataReleaseDateKey]) {
-		// Attempt to parse the release date
-		NSDate *releaseDate = [NSDate dateWithNaturalLanguageString:[self.metadata objectForKey:kMetadataReleaseDateKey]];
-		if(releaseDate) {
-			NSCalendar *gregorianCalendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
-			NSDateComponents *releaseDateComponents = [gregorianCalendar components:NSYearCalendarUnit fromDate:releaseDate];
-
-			[arguments addObject:@"--year"];
-			[arguments addObject:[[NSNumber numberWithInt:[releaseDateComponents year]] stringValue]];
-		}		
-	}
+	if([self.metadata objectForKey:kMetadataTitleKey])
+		MP4TagsSetName(tags, [[self.metadata objectForKey:kMetadataTitleKey] UTF8String]);
+	if([self.metadata objectForKey:kMetadataAlbumTitleKey])
+		MP4TagsSetAlbum(tags, [[self.metadata objectForKey:kMetadataAlbumTitleKey] UTF8String]);
+	if([self.metadata objectForKey:kMetadataArtistKey])
+		MP4TagsSetArtist(tags, [[self.metadata objectForKey:kMetadataArtistKey] UTF8String]);
+	if([self.metadata objectForKey:kMetadataAlbumArtistKey])
+		MP4TagsSetAlbumArtist(tags, [[self.metadata objectForKey:kMetadataAlbumArtistKey] UTF8String]);
+	if([self.metadata objectForKey:kMetadataGenreKey])
+		MP4TagsSetGenre(tags, [[self.metadata objectForKey:kMetadataGenreKey] UTF8String]);
+	if([self.metadata objectForKey:kMetadataComposerKey])
+		MP4TagsSetComposer(tags, [[self.metadata objectForKey:kMetadataComposerKey] UTF8String]);
+	if([self.metadata objectForKey:kMetadataReleaseDateKey])
+		MP4TagsSetReleaseDate(tags, [[self.metadata objectForKey:kMetadataReleaseDateKey] UTF8String]);
 	if([self.metadata objectForKey:kMetadataCompilationKey]) {
-		[arguments addObject:@"--compilation"];
-		if([[self.metadata objectForKey:kMetadataCompilationKey] boolValue])
-			[arguments addObject:@"true"];
-		else
-			[arguments addObject:@"false"];
+		uint8_t isCompilation = [[self.metadata objectForKey:kMetadataCompilationKey] boolValue];
+		MP4TagsSetCompilation(tags, &isCompilation);
 	}
 	if([self.metadata objectForKey:kMetadataTrackNumberKey]) {
-		[arguments addObject:@"--tracknum"];
+		MP4TagTrack trackInfo;
+		
+		trackInfo.index = [[self.metadata objectForKey:kMetadataTrackNumberKey] unsignedShortValue];
 		if([self.metadata objectForKey:kMetadataTrackTotalKey])
-			[arguments addObject:[NSString stringWithFormat:@"%@/%@", [[self.metadata objectForKey:kMetadataTrackNumberKey] stringValue], [[self.metadata objectForKey:kMetadataTrackTotalKey] stringValue]]];
+			trackInfo.total = [[self.metadata objectForKey:kMetadataTrackTotalKey] unsignedShortValue];
 		else
-			[arguments addObject:[[self.metadata objectForKey:kMetadataTrackNumberKey] stringValue]];
+			trackInfo.total = 0;
+		
+		MP4TagsSetTrack(tags, &trackInfo);
 	}
 	if([self.metadata objectForKey:kMetadataDiscNumberKey]) {
-		[arguments addObject:@"--disk"];
-		if([self.metadata objectForKey:kMetadataDiscTotalKey])
-			[arguments addObject:[NSString stringWithFormat:@"%@/%@", [[self.metadata objectForKey:kMetadataDiscNumberKey] stringValue], [[self.metadata objectForKey:kMetadataDiscTotalKey] stringValue]]];
+		MP4TagDisk discInfo;
+		
+		discInfo.index = [[self.metadata objectForKey:kMetadataDiscNumberKey] unsignedShortValue];
+		if([self.metadata objectForKey:kMetadataTrackTotalKey])
+			discInfo.total = [[self.metadata objectForKey:kMetadataDiscTotalKey] unsignedShortValue];
 		else
-			[arguments addObject:[[self.metadata objectForKey:kMetadataDiscNumberKey] stringValue]];
+			discInfo.total = 0;
+		
+		MP4TagsSetDisk(tags, &discInfo);
 	}			
-	if([self.metadata objectForKey:kMetadataCommentKey]) {
-		[arguments addObject:@"--comment"];
-		[arguments addObject:[self.metadata objectForKey:kMetadataCommentKey]];
-	}
-	NSURL *frontCoverURL = nil;
+	if([self.metadata objectForKey:kMetadataCommentKey])
+		MP4TagsSetComments(tags, [[self.metadata objectForKey:kMetadataCommentKey] UTF8String]);
+	
 	if([self.metadata objectForKey:kAlbumArtFrontCoverKey]) {
 		NSImage *frontCoverImage = [self.metadata objectForKey:kAlbumArtFrontCoverKey];
-		frontCoverURL = temporaryURLWithExtension(@"png");
 		NSData *frontCoverPNGData = [frontCoverImage PNGData];
-		[frontCoverPNGData writeToURL:frontCoverURL atomically:NO];
 		
-		[arguments addObject:@"--artwork"];
-		[arguments addObject:[frontCoverURL path]];
+		MP4TagArtwork artwork;
+		
+		artwork.data = (void *)[frontCoverPNGData bytes];
+		artwork.size = [frontCoverPNGData length];
+		artwork.type = MP4_ART_PNG;
+
+		MP4TagsAddArtwork(tags, &artwork);
 	}
 	
 	// Application version
 	NSString *appName = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleName"];
 	NSString *shortVersionNumber = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
 	NSString *versionNumber = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"];	
-	
-	[arguments addObject:@"--encodingTool"];
-	[arguments addObject:[NSString stringWithFormat:@"%@ %@ (%@)", appName, shortVersionNumber, versionNumber]];
 
-	// Task setup
-	[task setCurrentDirectoryPath:[[self.outputURL path] stringByDeletingLastPathComponent]];
-	[task setLaunchPath:apPath];
-	[task setArguments:arguments];
+	MP4TagsSetEncodingTool(tags, [[NSString stringWithFormat:@"%@ %@ (%@)", appName, shortVersionNumber, versionNumber] UTF8String]);
 	
-	// Redirect input and output to /dev/null
-#if (!DEBUG)
-	[task setStandardOutput:[NSFileHandle fileHandleWithNullDevice]];
-	[task setStandardError:[NSFileHandle fileHandleWithNullDevice]];
-#endif
-	
-	// Run the task
-	[task launch];
-	
-	while([task isRunning]) {
-		
-		// Allow the task to be cancelled
-		if(self.isCancelled)
-			[task terminate];
-		
-		// Sleep to avoid spinning
-		[NSThread sleepForTimeInterval:SLEEP_TIME_INTERVAL];
-	}
-	
-	// Get the result
-	int terminationStatus = [task terminationStatus];
-	if(EXIT_SUCCESS != terminationStatus)
-		self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:terminationStatus userInfo:nil];
-	// If successful, delete the untagged file and replace it with the tagged version
-	else {
-		NSError *error = nil;
-		BOOL removeSuccessful = [[NSFileManager defaultManager] removeItemAtPath:[self.outputURL path] error:&error];
-		if(removeSuccessful) {
-			BOOL renameSuccessful = [[NSFileManager defaultManager] moveItemAtPath:[taggedURL path] toPath:[self.outputURL path] error:&error];
-			if(!renameSuccessful)
-				self.error = error;
-		}
-		else
-			self.error = error;
-	}
-	
-	// Delete the temporary album art
-	NSError *error = nil;
-	if(frontCoverURL) {
-		if(![[NSFileManager defaultManager] removeItemAtPath:[frontCoverURL path] error:&error])
-			self.error = error;
-	}
+	// Save our changes
+	MP4TagsStore(tags, file);
+	MP4Close(file);	
 }
 
 @end

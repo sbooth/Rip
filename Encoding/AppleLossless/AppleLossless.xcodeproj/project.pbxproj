@@ -7,13 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		324529690F6A0D0600CC2341 /* FileUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 324529680F6A0D0600CC2341 /* FileUtilities.m */; };
 		328378360EAEDEF50011EB44 /* AppleLosslessEncodeOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 328378350EAEDEF50011EB44 /* AppleLosslessEncodeOperation.m */; };
-		328378530EAEE2EB0011EB44 /* AtomicParsley in Resources */ = {isa = PBXBuildFile; fileRef = 328378520EAEE2EB0011EB44 /* AtomicParsley */; };
 		32A5FB790FA565C3009AD850 /* NSImage+BitmapRepresentationMethods.m in Sources */ = {isa = PBXBuildFile; fileRef = 32A5FB780FA565C3009AD850 /* NSImage+BitmapRepresentationMethods.m */; };
 		32C5ABCC0E6D1A27007C1E7A /* AppleLosslessSettings.xib in Resources */ = {isa = PBXBuildFile; fileRef = 32C5ABCA0E6D1A27007C1E7A /* AppleLosslessSettings.xib */; };
 		32C5ABD00E6D1A9B007C1E7A /* CoreAudioEncodeOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 32C5ABCF0E6D1A9B007C1E7A /* CoreAudioEncodeOperation.m */; };
 		32E9F8F90DD7584500E8ACCA /* AppleLosslessSettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 32E9F8F80DD7584500E8ACCA /* AppleLosslessSettingsViewController.m */; };
+		32F43E401062B54C0016D8F1 /* mp4v2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 32F43E3F1062B54C0016D8F1 /* mp4v2.framework */; };
+		32F43E441062B56F0016D8F1 /* mp4v2.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 32F43E3F1062B54C0016D8F1 /* mp4v2.framework */; };
 		8C3C195E0D73EAAB001BAC88 /* AppleLosslessEncoderInterface.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C3C195C0D73EAAB001BAC88 /* AppleLosslessEncoderInterface.m */; };
 		8C3C19970D73EC72001BAC88 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8C3C19960D73EC72001BAC88 /* AudioToolbox.framework */; };
 		8C3C19A70D73ECE9001BAC88 /* EncoderInterface.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8C3C19660D73EAB7001BAC88 /* EncoderInterface.framework */; };
@@ -38,6 +38,20 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		32F43E551062B5AB0016D8F1 /* Copy Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				32F43E441062B56F0016D8F1 /* mp4v2.framework in Copy Frameworks */,
+			);
+			name = "Copy Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		089C1672FE841209C02AAC07 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		089C167EFE841241C02AAC07 /* English */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -46,11 +60,8 @@
 		3200962D105D8C9C0055BE17 /* Base.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Base.xcconfig; path = ../../Configs/Base.xcconfig; sourceTree = SOURCE_ROOT; };
 		3200962E105D8C9C0055BE17 /* Debug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Debug.xcconfig; path = ../../Configs/Debug.xcconfig; sourceTree = SOURCE_ROOT; };
 		3200962F105D8C9C0055BE17 /* Release.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Release.xcconfig; path = ../../Configs/Release.xcconfig; sourceTree = SOURCE_ROOT; };
-		324529670F6A0D0600CC2341 /* FileUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FileUtilities.h; path = ../../Utilities/FileUtilities.h; sourceTree = SOURCE_ROOT; };
-		324529680F6A0D0600CC2341 /* FileUtilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FileUtilities.m; path = ../../Utilities/FileUtilities.m; sourceTree = SOURCE_ROOT; };
 		328378340EAEDEF50011EB44 /* AppleLosslessEncodeOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppleLosslessEncodeOperation.h; sourceTree = "<group>"; };
 		328378350EAEDEF50011EB44 /* AppleLosslessEncodeOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppleLosslessEncodeOperation.m; sourceTree = "<group>"; };
-		328378520EAEE2EB0011EB44 /* AtomicParsley */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = AtomicParsley; sourceTree = "<group>"; };
 		32A5FB770FA565C3009AD850 /* NSImage+BitmapRepresentationMethods.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSImage+BitmapRepresentationMethods.h"; path = "../../Utilities/NSImage+BitmapRepresentationMethods.h"; sourceTree = SOURCE_ROOT; };
 		32A5FB780FA565C3009AD850 /* NSImage+BitmapRepresentationMethods.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSImage+BitmapRepresentationMethods.m"; path = "../../Utilities/NSImage+BitmapRepresentationMethods.m"; sourceTree = SOURCE_ROOT; };
 		32C5ABCB0E6D1A27007C1E7A /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/AppleLosslessSettings.xib; sourceTree = "<group>"; };
@@ -59,6 +70,7 @@
 		32DBCF630370AF2F00C91783 /* CoreAudio_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CoreAudio_Prefix.pch; sourceTree = "<group>"; };
 		32E9F8F70DD7584500E8ACCA /* AppleLosslessSettingsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppleLosslessSettingsViewController.h; sourceTree = "<group>"; };
 		32E9F8F80DD7584500E8ACCA /* AppleLosslessSettingsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppleLosslessSettingsViewController.m; sourceTree = "<group>"; };
+		32F43E3F1062B54C0016D8F1 /* mp4v2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = mp4v2.framework; path = /Users/sbooth/Development/Rip/Frameworks/mp4v2.framework; sourceTree = "<absolute>"; };
 		8C3C195B0D73EAAB001BAC88 /* AppleLosslessEncoderInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppleLosslessEncoderInterface.h; sourceTree = "<group>"; };
 		8C3C195C0D73EAAB001BAC88 /* AppleLosslessEncoderInterface.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppleLosslessEncoderInterface.m; sourceTree = "<group>"; };
 		8C3C19610D73EAB7001BAC88 /* EncoderInterface.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = EncoderInterface.xcodeproj; path = ../EncoderInterface/EncoderInterface.xcodeproj; sourceTree = SOURCE_ROOT; };
@@ -76,6 +88,7 @@
 				8D5B49B4048680CD000E48DA /* Cocoa.framework in Frameworks */,
 				8C3C19970D73EC72001BAC88 /* AudioToolbox.framework in Frameworks */,
 				8C3C19A70D73ECE9001BAC88 /* EncoderInterface.framework in Frameworks */,
+				32F43E401062B54C0016D8F1 /* mp4v2.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -107,7 +120,6 @@
 		089C167CFE841241C02AAC07 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				328378520EAEE2EB0011EB44 /* AtomicParsley */,
 				32C5ABCA0E6D1A27007C1E7A /* AppleLosslessSettings.xib */,
 				8D5B49B7048680CD000E48DA /* Info.plist */,
 				089C167DFE841241C02AAC07 /* InfoPlist.strings */,
@@ -135,6 +147,7 @@
 			children = (
 				8C3C19960D73EC72001BAC88 /* AudioToolbox.framework */,
 				1058C7ADFEA557BF11CA2CBB /* Cocoa.framework */,
+				32F43E3F1062B54C0016D8F1 /* mp4v2.framework */,
 			);
 			name = "Linked Frameworks";
 			sourceTree = "<group>";
@@ -172,8 +185,6 @@
 			children = (
 				32A5FB770FA565C3009AD850 /* NSImage+BitmapRepresentationMethods.h */,
 				32A5FB780FA565C3009AD850 /* NSImage+BitmapRepresentationMethods.m */,
-				324529670F6A0D0600CC2341 /* FileUtilities.h */,
-				324529680F6A0D0600CC2341 /* FileUtilities.m */,
 				8C3C19610D73EAB7001BAC88 /* EncoderInterface.xcodeproj */,
 				32DBCF630370AF2F00C91783 /* CoreAudio_Prefix.pch */,
 			);
@@ -198,6 +209,7 @@
 				8D5B49AF048680CD000E48DA /* Resources */,
 				8D5B49B1048680CD000E48DA /* Sources */,
 				8D5B49B3048680CD000E48DA /* Frameworks */,
+				32F43E551062B5AB0016D8F1 /* Copy Frameworks */,
 			);
 			buildRules = (
 			);
@@ -253,7 +265,6 @@
 			files = (
 				8D5B49B0048680CD000E48DA /* InfoPlist.strings in Resources */,
 				32C5ABCC0E6D1A27007C1E7A /* AppleLosslessSettings.xib in Resources */,
-				328378530EAEE2EB0011EB44 /* AtomicParsley in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -268,7 +279,6 @@
 				32E9F8F90DD7584500E8ACCA /* AppleLosslessSettingsViewController.m in Sources */,
 				32C5ABD00E6D1A9B007C1E7A /* CoreAudioEncodeOperation.m in Sources */,
 				328378360EAEDEF50011EB44 /* AppleLosslessEncodeOperation.m in Sources */,
-				324529690F6A0D0600CC2341 /* FileUtilities.m in Sources */,
 				32A5FB790FA565C3009AD850 /* NSImage+BitmapRepresentationMethods.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -307,6 +317,10 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 3200962E105D8C9C0055BE17 /* Debug.xcconfig */;
 			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../../Frameworks\"",
+				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = AppleLossless_Prefix.pch;
 				INFOPLIST_FILE = Info.plist;
@@ -320,6 +334,10 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 3200962F105D8C9C0055BE17 /* Release.xcconfig */;
 			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../../Frameworks\"",
+				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = AppleLossless_Prefix.pch;
 				INFOPLIST_FILE = Info.plist;
