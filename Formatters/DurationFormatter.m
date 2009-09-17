@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2007 - 2008 Stephen F. Booth <me@sbooth.org>
+ *  Copyright (C) 2007 - 2009 Stephen F. Booth <me@sbooth.org>
  *  All Rights Reserved
  */
 
@@ -20,7 +20,7 @@
 	// Round to nearest second
 	if(37 < msf.frame) {
 		msf.second += 1;
-		if(60 < msf.second) {
+		if(60 <= msf.second) {
 			msf.minute += 1;
 			msf.second -= 60;
 		}
