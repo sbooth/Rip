@@ -142,7 +142,7 @@
 		uint32_t arFreeDBID = 0;
 		[accurateRipResponseData getBytes:&arFreeDBID range:NSMakeRange(pressingDataOffset + 9, 4)];
 		arFreeDBID = OSSwapLittleToHostInt32(arFreeDBID);
-		
+
 		if(arTrackCount != orderedTracks.count || arDiscID1 != accurateRipID1 || arDiscID2 != accurateRipID2 || arFreeDBID != compactDisc.freeDBDiscID) {
 			[[Logger sharedLogger] logMessageWithLevel:eLogMessageLevelDebug format:@"AccurateRip track count or disc IDs don't match."];
 			
@@ -202,12 +202,11 @@
 			if(arTrackConfidence)
 				accurateRipTrack.confidenceLevel = [NSNumber numberWithUnsignedChar:arTrackConfidence];
 
-			// Since Core Data only stores signed integers, cast the unsigned checksum to signed for storage
 			if(arTrackChecksum)
-				accurateRipTrack.checksum = [NSNumber numberWithInt:(int32_t)arTrackChecksum];
+				accurateRipTrack.checksum = [NSNumber numberWithUnsignedInt:arTrackChecksum];
 			
 			if(arOffsetChecksum)
-				accurateRipTrack.offsetChecksum = [NSNumber numberWithInt:(int32_t)arOffsetChecksum];
+				accurateRipTrack.offsetChecksum = [NSNumber numberWithUnsignedInt:arOffsetChecksum];
 		}
 		
 		pressingDataOffset += accurateRipDiscDataSize;
