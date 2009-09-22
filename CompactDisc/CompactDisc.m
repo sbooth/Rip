@@ -9,8 +9,12 @@
 #import "SessionDescriptor.h"
 #import "TrackDescriptor.h"
 
-#include <discid/discid.h>
+#include "base64.h"
+
+#include <stdio.h>
+
 #include <IOKit/storage/IOCDMedia.h>
+#include <CommonCrypto/CommonDigest.h>
 
 // ========================================
 // Calculates the sum of the digits in the given number
@@ -76,10 +80,6 @@ static NSString * calculateMusicBrainzDiscIDForCDTOC(CDTOC *toc)
 
 	NSString *musicBrainzDiscID = nil;
 	
-	DiscId *discID = discid_new();
-	if(NULL == discID)
-		return nil;
-	
 	int offsets[100];
 	int firstTrackNumber = 0, lastTrackNumber = 0;
 	
@@ -109,12 +109,34 @@ static NSString * calculateMusicBrainzDiscIDForCDTOC(CDTOC *toc)
 				offsets[0] = CDConvertMSFToLBA(desc->p) + 150;
 	}
 
-	int result = discid_put(discID, firstTrackNumber, lastTrackNumber, offsets);
-	if(result)
-		musicBrainzDiscID = [NSString stringWithCString:discid_get_id(discID) encoding:NSASCIIStringEncoding];
+	// First calculate the SHA-1 digest of the uppercase hex ASCII TOC information
+	CC_SHA1_CTX sha1;	
+	CC_SHA1_Init(&sha1);
 	
-	discid_free(discID);
+	char numberAsHexASCII [8 + 1];
+	snprintf(numberAsHexASCII, 2 + 1, "%02X", firstTrackNumber);
+	CC_SHA1_Update(&sha1, &numberAsHexASCII, 2);
 
+	snprintf(numberAsHexASCII, 2 + 1, "%02X", lastTrackNumber);
+	CC_SHA1_Update(&sha1, &numberAsHexASCII, 2);
+
+	for(int i = 0; i < 100; ++i) {
+		snprintf(numberAsHexASCII, 8 + 1, "%08X", offsets[i]);
+		CC_SHA1_Update(&sha1, &numberAsHexASCII, 8);
+	}
+	
+	unsigned char sha1Digest [CC_SHA1_DIGEST_LENGTH];
+	CC_SHA1_Final(sha1Digest, &sha1);
+
+	// Then encode the SHA-1 digest using a MusicBrainz-specific base 64 encoding
+	NSUInteger len = 0;
+	unsigned char *rawMusicBrainzDiscID = rfc822_binary(sha1Digest, CC_SHA1_DIGEST_LENGTH, &len);
+
+	// len is always 30, but the actual ID length is 28, so don't use initWithBytes:length:encoding:freeWhenDone
+	musicBrainzDiscID = [[NSString alloc] initWithCString:(const char *)rawMusicBrainzDiscID encoding:NSASCIIStringEncoding];
+	
+	free(rawMusicBrainzDiscID), rawMusicBrainzDiscID = NULL;
+	
 	return musicBrainzDiscID;
 }
 

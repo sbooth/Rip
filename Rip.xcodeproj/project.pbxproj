@@ -119,6 +119,7 @@
 		32CE93870F5657E900AB328A /* WavPack.bundle in Copy PlugIns */ = {isa = PBXBuildFile; fileRef = 32CE936D0F56579900AB328A /* WavPack.bundle */; };
 		32E622CC0F74189600DC1A15 /* DriveOffsets.plist in Resources */ = {isa = PBXBuildFile; fileRef = 32E622CB0F74189600DC1A15 /* DriveOffsets.plist */; };
 		32E9F8300DD6C0FF00E8ACCA /* EncoderSettingsSheet.xib in Resources */ = {isa = PBXBuildFile; fileRef = 32E9F82E0DD6C0FF00E8ACCA /* EncoderSettingsSheet.xib */; };
+		32EF021010688757008BAF8B /* base64.c in Sources */ = {isa = PBXBuildFile; fileRef = 32EF020A10688757008BAF8B /* base64.c */; };
 		32F602220FDCB24900F68EAA /* DriveOffsetQueryOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 32F602210FDCB24900F68EAA /* DriveOffsetQueryOperation.m */; };
 		32F602610FDCBAFA00F68EAA /* DiskUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 32F602600FDCBAFA00F68EAA /* DiskUtilities.m */; };
 		8C34BB0B0D761A99003F2953 /* ApplicationDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C34BB0A0D761A99003F2953 /* ApplicationDelegate.m */; };
@@ -156,8 +157,6 @@
 		8C8EFC400D706471009E9299 /* AlbumArtwork.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C8EFC3F0D706471009E9299 /* AlbumArtwork.m */; };
 		8C9817100CF7C6AB00F45B7F /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8C98170C0CF7C6AB00F45B7F /* MainMenu.xib */; };
 		8CA35EDF0D2F0AA100F89E3B /* MusicDatabaseMatchesSheet.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8CA35EDD0D2F0AA100F89E3B /* MusicDatabaseMatchesSheet.xib */; };
-		8CA35F920D2F42A800F89E3B /* discid.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8CA35F910D2F42A800F89E3B /* discid.framework */; };
-		8CA35F950D2F42B300F89E3B /* discid.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 8CA35F910D2F42A800F89E3B /* discid.framework */; };
 		8CB2094E0D0507F5003A90A6 /* Drive.m in Sources */ = {isa = PBXBuildFile; fileRef = 8CB2094D0D0507F5003A90A6 /* Drive.m */; };
 		8CB209750D050EE9003A90A6 /* DriveInformation.m in Sources */ = {isa = PBXBuildFile; fileRef = 8CB209740D050EE9003A90A6 /* DriveInformation.m */; };
 		8CD9C1FE0D0F6C4E00C974C9 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8CD9C1FD0D0F6C4E00C974C9 /* AudioToolbox.framework */; };
@@ -385,7 +384,6 @@
 				8C3C194A0D73EA35001BAC88 /* EncoderInterface.framework in Copy Frameworks */,
 				328DE5150E5FC69600F5BD13 /* MusicDatabaseInterface.framework in Copy Frameworks */,
 				328AB1DE0F807539001F1C78 /* MetadataSourceInterface.framework in Copy Frameworks */,
-				8CA35F950D2F42B300F89E3B /* discid.framework in Copy Frameworks */,
 				32C793F60E291B4B0079706C /* Sparkle.framework in Copy Frameworks */,
 			);
 			name = "Copy Frameworks";
@@ -564,6 +562,8 @@
 		32DBCF750370BD2300C91783 /* Rip_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Rip_Prefix.pch; sourceTree = "<group>"; };
 		32E622CB0F74189600DC1A15 /* DriveOffsets.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = DriveOffsets.plist; sourceTree = "<group>"; };
 		32E9F82F0DD6C0FF00E8ACCA /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/EncoderSettingsSheet.xib; sourceTree = SOURCE_ROOT; };
+		32EF020A10688757008BAF8B /* base64.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = base64.c; sourceTree = "<group>"; };
+		32EF0215106887AA008BAF8B /* base64.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = base64.h; sourceTree = "<group>"; };
 		32F602200FDCB24900F68EAA /* DriveOffsetQueryOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DriveOffsetQueryOperation.h; sourceTree = "<group>"; };
 		32F602210FDCB24900F68EAA /* DriveOffsetQueryOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DriveOffsetQueryOperation.m; sourceTree = "<group>"; };
 		32F6025F0FDCBAFA00F68EAA /* DiskUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DiskUtilities.h; sourceTree = "<group>"; };
@@ -631,7 +631,6 @@
 		8C8EFC3F0D706471009E9299 /* AlbumArtwork.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AlbumArtwork.m; sourceTree = "<group>"; };
 		8C98170D0CF7C6AB00F45B7F /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		8CA35EDE0D2F0AA100F89E3B /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/MusicDatabaseMatchesSheet.xib; sourceTree = "<group>"; };
-		8CA35F910D2F42A800F89E3B /* discid.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = discid.framework; path = Frameworks/discid.framework; sourceTree = "<group>"; };
 		8CB2094C0D0507F5003A90A6 /* Drive.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Drive.h; path = Drive/Drive.h; sourceTree = "<group>"; };
 		8CB2094D0D0507F5003A90A6 /* Drive.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Drive.m; path = Drive/Drive.m; sourceTree = "<group>"; };
 		8CB209730D050EE9003A90A6 /* DriveInformation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DriveInformation.h; path = Drive/DriveInformation.h; sourceTree = "<group>"; };
@@ -659,7 +658,6 @@
 				8C3EF7690CFE663A0086181E /* IOKit.framework in Frameworks */,
 				8CD9C1FE0D0F6C4E00C974C9 /* AudioToolbox.framework in Frameworks */,
 				8C8502D80D2C282A0081DB75 /* CoreData.framework in Frameworks */,
-				8CA35F920D2F42A800F89E3B /* discid.framework in Frameworks */,
 				8C3C19470D73EA12001BAC88 /* EncoderInterface.framework in Frameworks */,
 				32C793F30E291B3D0079706C /* Sparkle.framework in Frameworks */,
 				328DE5130E5FC67500F5BD13 /* MusicDatabaseInterface.framework in Frameworks */,
@@ -682,7 +680,6 @@
 				322EB4640F8C325B0081A563 /* AddressBook.framework */,
 				32C9F23A0F7973790050F4B2 /* QuartzCore.framework */,
 				32C793F20E291B3D0079706C /* Sparkle.framework */,
-				8CA35F910D2F42A800F89E3B /* discid.framework */,
 				32AB63A50E68B45800EA423A /* SystemConfiguration.framework */,
 				8C4C8D680D5D8BAE00DC0279 /* Quartz.framework */,
 				8CDBEE6C0CFA0A4A000EC553 /* DiskArbitration.framework */,
@@ -966,6 +963,7 @@
 		3295B4660F7F231100AF55EF /* ThirdParty */ = {
 			isa = PBXGroup;
 			children = (
+				32EF02091068873A008BAF8B /* discid */,
 				322EB43C0F8C30020081A563 /* AquaticPrime */,
 				322EB4400F8C30210081A563 /* ImageAndTextCell */,
 				32A5F8DB0FA4B862009AD850 /* replaygain_analysis */,
@@ -1028,6 +1026,15 @@
 				32CE936D0F56579900AB328A /* WavPack.bundle */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		32EF02091068873A008BAF8B /* discid */ = {
+			isa = PBXGroup;
+			children = (
+				32EF0215106887AA008BAF8B /* base64.h */,
+				32EF020A10688757008BAF8B /* base64.c */,
+			);
+			path = discid;
 			sourceTree = "<group>";
 		};
 		8C19B2EA0D729637002BE7BF /* Encoding */ = {
@@ -1684,6 +1691,7 @@
 				32BA15680FF3C07000AC695B /* ExtractionViewController+AudioExtraction.m in Sources */,
 				32BA15980FF3D97700AC695B /* ExtractionViewController+ExtractionRecordCreation.m in Sources */,
 				32495F2A0FFFE76800539E10 /* ManualReadOffsetSheetController.m in Sources */,
+				32EF021010688757008BAF8B /* base64.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -6,7 +6,7 @@
 #import "MusicBrainzSubmissionOperation.h"
 #import <IOKit/storage/IOCDTypes.h>
 
-#include <discid/discid.h>
+#include <musicbrainz3/discid.h>
 
 @interface MusicDatabaseSubmissionOperation ()
 @property (copy) NSError * error;
