@@ -162,6 +162,7 @@ static NSString * const kMusicDatabaseQueryKVOContext	= @"org.sbooth.Rip.Compact
 @end
 
 @interface CompactDiscWindowController (Private)
+- (void) managedObjectContextDidSave:(NSNotification *)notification;
 - (void) diskWasEjected;
 - (void) updateMetadataWithMusicDatabaseEntry:(id)musicDatabaseEntry;
 - (void) toggleTableColumnVisible:(id)sender;
@@ -381,16 +382,6 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 	}
 	else
 		[super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
-}
-
-- (void) managedObjectContextDidSave:(NSNotification *)notification
-{
-	NSParameterAssert(nil != notification);
-
-	// "Auto-refresh" objects changed in another MOC
-	NSManagedObjectContext *managedObjectContext = [notification object];
-	if(managedObjectContext != self.managedObjectContext)
-		[self.managedObjectContext mergeChangesFromContextDidSaveNotification:notification];
 }
 
 #pragma mark Core Data
@@ -1074,7 +1065,7 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 		NSError *error = nil;
 		NSArray *tracks = [self.managedObjectContext executeFetchRequest:trackFetchRequest error:&error];
 		if(!tracks) {
-			[self presentError:error modalForWindow:self.window delegate:self didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:NULL];
+			[self presentError:error modalForWindow:self.window delegate:self didPresentSelector:NULL contextInfo:NULL];
 			return;
 		}
 		
@@ -1189,6 +1180,16 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 @end
 
 @implementation CompactDiscWindowController (Private)
+
+- (void) managedObjectContextDidSave:(NSNotification *)notification
+{
+	NSParameterAssert(nil != notification);
+	
+	// "Auto-refresh" objects changed in another MOC
+	NSManagedObjectContext *managedObjectContext = [notification object];
+	if(managedObjectContext != self.managedObjectContext)
+		[self.managedObjectContext mergeChangesFromContextDidSaveNotification:notification];
+}
 
 // For now, this method does nothing, since unmounts are handled by the ApplicationDelegate
 - (void) diskWasEjected

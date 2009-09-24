@@ -129,7 +129,7 @@ static NSString * calculateMusicBrainzDiscIDForCDTOC(CDTOC *toc)
 	CC_SHA1_Final(sha1Digest, &sha1);
 
 	// Then encode the SHA-1 digest using a MusicBrainz-specific base 64 encoding
-	NSUInteger len = 0;
+	unsigned long len = 0;
 	unsigned char *rawMusicBrainzDiscID = rfc822_binary(sha1Digest, CC_SHA1_DIGEST_LENGTH, &len);
 
 	// len is always 30, but the actual ID length is 28, so don't use initWithBytes:length:encoding:freeWhenDone

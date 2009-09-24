@@ -108,22 +108,22 @@
 
 #pragma mark Bit Getting/Setting
 
-- (BOOL) valueAtIndex:(NSUInteger)index
+- (BOOL) valueAtIndex:(NSUInteger)desiredIndex
 {
-	NSParameterAssert(index < self.bitCount);
+	NSParameterAssert(desiredIndex < self.bitCount);
 	
-	NSUInteger arrayIndex = index / (8 * sizeof(NSUInteger));
-	NSUInteger bitIndex = index % (8 * sizeof(NSUInteger));
+	NSUInteger arrayIndex = desiredIndex / (8 * sizeof(NSUInteger));
+	NSUInteger bitIndex = desiredIndex % (8 * sizeof(NSUInteger));
 	
 	return (_bits[arrayIndex] & (1 << bitIndex) ? YES : NO);
 }
 
-- (void) setValue:(BOOL)value forIndex:(NSUInteger)index
+- (void) setValue:(BOOL)value forIndex:(NSUInteger)desiredIndex
 {
-	NSParameterAssert(index < self.bitCount);
+	NSParameterAssert(desiredIndex < self.bitCount);
 
-	NSUInteger arrayIndex = index / (8 * sizeof(NSUInteger));
-	NSUInteger bitIndex = index % (8 * sizeof(NSUInteger));
+	NSUInteger arrayIndex = desiredIndex / (8 * sizeof(NSUInteger));
+	NSUInteger bitIndex = desiredIndex % (8 * sizeof(NSUInteger));
 	uint32_t mask = value << bitIndex;
 	
 	if(value)

@@ -49,6 +49,7 @@ static NSString * const kCalculateOffsetsKVOContext		= @"org.sbooth.Rip.ReadOffs
 @end
 
 @interface ReadOffsetCalculatorSheetController (Private)
+- (void) managedObjectContextDidSave:(NSNotification *)notification;
 - (void) accurateRipQueryOperationDidFinish:(AccurateRipQueryOperation *)operation;
 - (void) readOffsetCalculationOperationDidFinish:(ReadOffsetCalculationOperation *)operation;
 @end
@@ -178,16 +179,6 @@ static NSString * const kCalculateOffsetsKVOContext		= @"org.sbooth.Rip.ReadOffs
 	}
 	else
 		[super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
-}
-
-- (void) managedObjectContextDidSave:(NSNotification *)notification
-{
-	NSParameterAssert(nil != notification);
-	
-	// "Auto-refresh" objects changed in another MOC
-	NSManagedObjectContext *managedObjectContext = [notification object];
-	if(managedObjectContext != self.managedObjectContext)
-		[self.managedObjectContext mergeChangesFromContextDidSaveNotification:notification];
 }
 
 #pragma mark NSWindow Delegate Methods
@@ -362,6 +353,16 @@ static NSString * const kCalculateOffsetsKVOContext		= @"org.sbooth.Rip.ReadOffs
 @end
 
 @implementation ReadOffsetCalculatorSheetController (Private)
+
+- (void) managedObjectContextDidSave:(NSNotification *)notification
+{
+	NSParameterAssert(nil != notification);
+	
+	// "Auto-refresh" objects changed in another MOC
+	NSManagedObjectContext *managedObjectContext = [notification object];
+	if(managedObjectContext != self.managedObjectContext)
+		[self.managedObjectContext mergeChangesFromContextDidSaveNotification:notification];
+}
 
 - (void) accurateRipQueryOperationDidFinish:(AccurateRipQueryOperation *)operation
 {

@@ -134,12 +134,12 @@
 	return [_images count];
 }
 
-- (id) imageBrowser:(IKImageBrowserView *)aBrowser itemAtIndex:(NSUInteger)index
+- (id) imageBrowser:(IKImageBrowserView *)aBrowser itemAtIndex:(NSUInteger)itemIndex
 {
 
 #pragma unused(aBrowser)
 
-	return [_images objectAtIndex:index];
+	return [_images objectAtIndex:itemIndex];
 }
 
 #pragma mark IKImageBrowserDelegate Protocol Methods
@@ -150,10 +150,10 @@
 	[_useSelectedButton setEnabled:(0 != [selectionIndexes count])];
 }
 
-- (void) imageBrowser:(IKImageBrowserView *)aBrowser cellWasDoubleClickedAtIndex:(NSUInteger)index
+- (void) imageBrowser:(IKImageBrowserView *)aBrowser cellWasDoubleClickedAtIndex:(NSUInteger)itemIndex
 {
 	
-#pragma unused(index)
+#pragma unused(itemIndex)
 
 	[self useSelected:aBrowser];
 }

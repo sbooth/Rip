@@ -104,6 +104,8 @@ NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.ExtractionViewCo
 // The real work is done here
 // ========================================
 @interface ExtractionViewController (Private)
+- (void) managedObjectContextDidSave:(NSNotification *)notification;
+
 - (void) removeTemporaryFiles;
 - (void) resetExtractionState;
 
@@ -305,16 +307,6 @@ NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.ExtractionViewCo
 		return YES;
 	else
 		return NO;
-}
-
-- (void) managedObjectContextDidSave:(NSNotification *)notification
-{
-	NSParameterAssert(nil != notification);
-	
-	// "Auto-refresh" objects changed in another MOC
-	NSManagedObjectContext *managedObjectContext = [notification object];
-	if(managedObjectContext != self.managedObjectContext)
-		[self.managedObjectContext mergeChangesFromContextDidSaveNotification:notification];
 }
 
 - (void) setDisk:(DADiskRef)disk
@@ -636,6 +628,16 @@ NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.ExtractionViewCo
 @end
 
 @implementation ExtractionViewController (Private)
+
+- (void) managedObjectContextDidSave:(NSNotification *)notification
+{
+	NSParameterAssert(nil != notification);
+	
+	// "Auto-refresh" objects changed in another MOC
+	NSManagedObjectContext *managedObjectContext = [notification object];
+	if(managedObjectContext != self.managedObjectContext)
+		[self.managedObjectContext mergeChangesFromContextDidSaveNotification:notification];
+}
 
 - (void) removeTemporaryFiles
 {

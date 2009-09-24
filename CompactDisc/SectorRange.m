@@ -121,7 +121,7 @@
 - (NSUInteger)		byteSize										{ return kCDSectorSizeCDDA * self.length; }
 
 - (NSUInteger)		indexForSector:(NSUInteger)sector				{ return ([self containsSector:sector] ? sector - self.firstSector : NSNotFound); }
-- (NSUInteger)		sectorForIndex:(NSUInteger)index				{ return (self.length > index ? self.firstSector + index : NSNotFound); }
+- (NSUInteger)		sectorForIndex:(NSUInteger)sectorIndex			{ return (self.length > sectorIndex ? self.firstSector + sectorIndex : NSNotFound); }
 
 - (BOOL)			containsSector:(NSUInteger)sector				{ return (self.firstSector <= sector && self.lastSector >= sector); }
 - (BOOL)			containsSectorRange:(SectorRange *)range		{ return ([self containsSector:range.firstSector] && [self containsSector:range.lastSector]); }

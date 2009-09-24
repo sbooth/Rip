@@ -56,9 +56,9 @@ NSString * const	kTrackMetadataArrayKey					= @"tracks";
 	return [_queryResults count];
 }
 
-- (id) objectInQueryResultsAtIndex:(NSUInteger)index
+- (id) objectInQueryResultsAtIndex:(NSUInteger)resultIndex
 {
-	return [_queryResults objectAtIndex:index];
+	return [_queryResults objectAtIndex:resultIndex];
 }
 
 - (void) getQueryResults:(id *)buffer range:(NSRange)range
