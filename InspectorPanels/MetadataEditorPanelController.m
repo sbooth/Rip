@@ -5,6 +5,7 @@
 
 #import "MetadataEditorPanelController.h"
 #import "CompactDiscWindowController.h"
+#import "ApplicationDelegate.h"
 
 #import <SFBInspectors/SFBViewSelector.h>
 #import <SFBInspectors/SFBViewSelectorBar.h>
@@ -137,12 +138,12 @@
 // All instances of this class share the application's ManagedObjectContext and ManagedObjectModel
 - (NSManagedObjectContext *) managedObjectContext
 {
-	return [[[NSApplication sharedApplication] delegate] managedObjectContext];
+	return [(ApplicationDelegate *)[[NSApplication sharedApplication] delegate] managedObjectContext];
 }
 
 - (id) managedObjectModel
 {
-	return [[[NSApplication sharedApplication] delegate] managedObjectModel];
+	return [(ApplicationDelegate *)[[NSApplication sharedApplication] delegate] managedObjectModel];
 }
 
 - (IBAction) toggleMetadataEditorPanel:(id)sender

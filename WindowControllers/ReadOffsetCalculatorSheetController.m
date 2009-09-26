@@ -21,6 +21,8 @@
 #import "ExtractionOperation.h"
 #import "ReadOffsetCalculationOperation.h"
 
+#import "ApplicationDelegate.h"
+
 #import "CDDAUtilities.h"
 #import "FileUtilities.h"
 
@@ -70,7 +72,7 @@ static NSString * const kCalculateOffsetsKVOContext		= @"org.sbooth.Rip.ReadOffs
 	if((self = [super initWithWindowNibName:@"ReadOffsetCalculatorSheet"])) {
 		// Create our own context for accessing the store
 		self.managedObjectContext = [[NSManagedObjectContext alloc] init];
-		[self.managedObjectContext setPersistentStoreCoordinator:[[[NSApplication sharedApplication] delegate] persistentStoreCoordinator]];
+		[self.managedObjectContext setPersistentStoreCoordinator:[(ApplicationDelegate *)[[NSApplication sharedApplication] delegate] persistentStoreCoordinator]];
 
 		// Register to receive NSManagedObjectContextDidSaveNotification to keep our MOC in sync
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(managedObjectContextDidSave:) name:NSManagedObjectContextDidSaveNotification object:nil];

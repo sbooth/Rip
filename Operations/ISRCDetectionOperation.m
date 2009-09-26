@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2008 Stephen F. Booth <me@sbooth.org>
+ *  Copyright (C) 2008 - 2009 Stephen F. Booth <me@sbooth.org>
  *  All Rights Reserved
  */
 
@@ -7,6 +7,7 @@
 #import "TrackDescriptor.h"
 #import "TrackMetadata.h"
 #import "Drive.h"
+#import "ApplicationDelegate.h"
 
 @interface ISRCDetectionOperation ()
 @property (copy) NSError * error;
@@ -34,7 +35,7 @@
 	
 	// Create our own context for accessing the store
 	NSManagedObjectContext *managedObjectContext = [[NSManagedObjectContext alloc] init];
-	[managedObjectContext setPersistentStoreCoordinator:[[[NSApplication sharedApplication] delegate] persistentStoreCoordinator]];
+	[managedObjectContext setPersistentStoreCoordinator:[(ApplicationDelegate *)[[NSApplication sharedApplication] delegate] persistentStoreCoordinator]];
 	
 	// Fetch the TrackDescriptor object from the context and ensure it is the correct class
 	NSManagedObject *managedObject = [managedObjectContext objectWithID:self.trackID];

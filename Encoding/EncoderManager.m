@@ -704,7 +704,7 @@ static EncoderManager *sSharedEncoderManager				= nil;
 				backupPath = [[baseURL path] stringByAppendingPathComponent:backupPathname];
 			} while([[NSFileManager defaultManager] fileExistsAtPath:backupPath]);
 			
-			if(![[NSFileManager defaultManager] movePath:outputPath toPath:backupPath handler:nil])
+			if(![[NSFileManager defaultManager] moveItemAtPath:outputPath toPath:backupPath error:error])
 				return nil;
 		}
 		else if(eExistingOutputFileHandlingAsk == existingOutputFileBehavior) {
@@ -724,7 +724,7 @@ static EncoderManager *sSharedEncoderManager				= nil;
 					backupPath = [[baseURL path] stringByAppendingPathComponent:backupPathname];
 				} while([[NSFileManager defaultManager] fileExistsAtPath:backupPath]);
 				
-				if(![[NSFileManager defaultManager] movePath:outputPath toPath:backupPath handler:nil])
+				if(![[NSFileManager defaultManager] moveItemAtPath:outputPath toPath:backupPath error:error])
 					return nil;
 			}
 			else if(NSAlertAlternateReturn == alertReturn) {

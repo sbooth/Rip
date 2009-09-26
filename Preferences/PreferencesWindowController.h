@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2008 Stephen F. Booth <me@sbooth.org>
+ *  Copyright (C) 2008 - 2009 Stephen F. Booth <me@sbooth.org>
  *  All Rights Reserved
  */
 
@@ -16,7 +16,7 @@ extern NSString * const		AdvancedPreferencesToolbarItemIdentifier;
 // ========================================
 // This class manages the preference window
 // ========================================
-@interface PreferencesWindowController : NSWindowController
+@interface PreferencesWindowController : NSWindowController <NSToolbarDelegate>
 {
 	IBOutlet NSView *_preferencesView;
 

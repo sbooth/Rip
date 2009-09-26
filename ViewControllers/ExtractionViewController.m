@@ -47,6 +47,7 @@
 #import "NSIndexSet+SetMethods.h"
 
 #import "Logger.h"
+#import "ApplicationDelegate.h"
 
 #include <AudioToolbox/AudioFile.h>
 
@@ -180,7 +181,7 @@ NSString * const kAudioExtractionKVOContext		= @"org.sbooth.Rip.ExtractionViewCo
 	if((self = [super initWithNibName:@"ExtractionView" bundle:nil])) {
 		// Create our own context for accessing the store
 		self.managedObjectContext = [[NSManagedObjectContext alloc] init];
-		[self.managedObjectContext setPersistentStoreCoordinator:[[[NSApplication sharedApplication] delegate] persistentStoreCoordinator]];
+		[self.managedObjectContext setPersistentStoreCoordinator:[(ApplicationDelegate *)[[NSApplication sharedApplication] delegate] persistentStoreCoordinator]];
 		
 		// Register to receive NSManagedObjectContextDidSaveNotification to keep our MOC in sync
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(managedObjectContextDidSave:) name:NSManagedObjectContextDidSaveNotification object:nil];

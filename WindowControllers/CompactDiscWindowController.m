@@ -43,6 +43,8 @@
 #import "AccurateRipDiscRecord.h"
 #import "AccurateRipTrackRecord.h"
 
+#import "ApplicationDelegate.h"
+
 #import "NSString+PathSanitizationMethods.h"
 #import "NSImage+BitmapRepresentationMethods.h"
 
@@ -389,12 +391,12 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 // All instances of this class share the application's ManagedObjectContext and ManagedObjectModel
 - (NSManagedObjectContext *) managedObjectContext
 {
-	return [[[NSApplication sharedApplication] delegate] managedObjectContext];
+	return [(ApplicationDelegate *)[[NSApplication sharedApplication] delegate] managedObjectContext];
 }
 
 - (id) managedObjectModel
 {
-	return [[[NSApplication sharedApplication] delegate] managedObjectModel];
+	return [(ApplicationDelegate *)[[NSApplication sharedApplication] delegate] managedObjectModel];
 }
 
 #pragma mark NSWindow Delegate Methods
@@ -1108,6 +1110,7 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 	NSURL *logFileURL = [NSURL fileURLWithPath:outputPath];
 	
 	// Don't overwrite existing log files
+	NSError *error = nil;
 	if([[NSFileManager defaultManager] fileExistsAtPath:[logFileURL path]]) {
 		
 		NSString *backupFilename = [filename copy];
@@ -1120,10 +1123,9 @@ void ejectCallback(DADiskRef disk, DADissenterRef dissenter, void *context)
 			backupPath = [[baseURL path] stringByAppendingPathComponent:backupPathname];
 		} while([[NSFileManager defaultManager] fileExistsAtPath:backupPath]);
 		
-		[[NSFileManager defaultManager] movePath:[logFileURL path] toPath:backupPath handler:nil];
+		[[NSFileManager defaultManager] moveItemAtPath:[logFileURL path] toPath:backupPath error:&error];
 	}
 	
-	NSError *error = nil;
 	if(eExtractionModeImage == _extractionViewController.extractionMode) {
 		if(![self writeLogFileToURL:logFileURL imageExtractionRecord:_extractionViewController.imageExtractionRecord error:&error])
 			[self presentError:error modalForWindow:self.window delegate:nil didPresentSelector:NULL contextInfo:NULL];

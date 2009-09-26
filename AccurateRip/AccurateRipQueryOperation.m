@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2008 Stephen F. Booth <me@sbooth.org>
+ *  Copyright (C) 2008 - 2009 Stephen F. Booth <me@sbooth.org>
  *  All Rights Reserved
  */
 
@@ -12,6 +12,7 @@
 #import "AccurateRipDiscRecord.h"
 #import "AccurateRipTrackRecord.h"
 #import "Logger.h"
+#import "ApplicationDelegate.h"
 
 #include <SystemConfiguration/SCNetwork.h>
 
@@ -47,7 +48,7 @@
 	
 	// Create our own context for accessing the store
 	NSManagedObjectContext *managedObjectContext = [[NSManagedObjectContext alloc] init];
-	[managedObjectContext setPersistentStoreCoordinator:[[[NSApplication sharedApplication] delegate] persistentStoreCoordinator]];
+	[managedObjectContext setPersistentStoreCoordinator:[(ApplicationDelegate *)[[NSApplication sharedApplication] delegate] persistentStoreCoordinator]];
 	
 	// Fetch the CompactDisc object from the context and ensure it is the correct class
 	NSManagedObject *managedObject = [managedObjectContext objectWithID:self.compactDiscID];

@@ -5,6 +5,7 @@
 
 #import "ManualReadOffsetSheetController.h"
 #import "DriveInformation.h"
+#import "ApplicationDelegate.h"
 
 @interface ManualReadOffsetSheetController ()
 @property (assign) DriveInformation * driveInformation;
@@ -26,7 +27,7 @@
 	if((self = [super initWithWindowNibName:@"ManualReadOffsetSheet"])) {
 		// Create our own context for accessing the store
 		self.managedObjectContext = [[NSManagedObjectContext alloc] init];
-		[self.managedObjectContext setPersistentStoreCoordinator:[[[NSApplication sharedApplication] delegate] persistentStoreCoordinator]];		
+		[self.managedObjectContext setPersistentStoreCoordinator:[(ApplicationDelegate *)[[NSApplication sharedApplication] delegate] persistentStoreCoordinator]];		
 	}
 	return self;
 }

@@ -13,7 +13,7 @@
 // Allows searching based on a specified search term as well as
 // setting the disc's front cover image
 // ========================================
-@interface AlbumArtExchangeViewController : NSViewController
+@interface AlbumArtExchangeViewController : NSViewController <NSXMLParserDelegate>
 {
 	IBOutlet IKImageBrowserView *_imageBrowser;
 	IBOutlet NSProgressIndicator *_progressIndicator;

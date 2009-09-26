@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2007 - 2008 Stephen F. Booth <me@sbooth.org>
+ *  Copyright (C) 2007 - 2009 Stephen F. Booth <me@sbooth.org>
  *  All Rights Reserved
  */
 
@@ -9,6 +9,7 @@
 #import "CompactDisc.h"
 #import "SessionDescriptor.h"
 #import "TrackDescriptor.h"
+#import "ApplicationDelegate.h"
 
 // The typical pregap is 2 seconds, or 150 sectors
 #define BUFFER_SIZE_IN_SECTORS 150u
@@ -99,7 +100,7 @@ convertQSubChannelDataFromBCDToDecimal(struct QSubChannelData *qData)
 	
 	// Create our own context for accessing the store
 	NSManagedObjectContext *managedObjectContext = [[NSManagedObjectContext alloc] init];
-	[managedObjectContext setPersistentStoreCoordinator:[[[NSApplication sharedApplication] delegate] persistentStoreCoordinator]];
+	[managedObjectContext setPersistentStoreCoordinator:[(ApplicationDelegate *)[[NSApplication sharedApplication] delegate] persistentStoreCoordinator]];
 	
 	// Fetch the TrackDescriptor object from the context and ensure it is the correct class
 	NSManagedObject *managedObject = [managedObjectContext objectWithID:self.trackID];

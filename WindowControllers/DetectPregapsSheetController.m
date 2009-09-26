@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2008 Stephen F. Booth <me@sbooth.org>
+ *  Copyright (C) 2008 - 2009 Stephen F. Booth <me@sbooth.org>
  *  All Rights Reserved
  */
 
@@ -8,6 +8,8 @@
 
 #import "TrackDescriptor.h"
 #import "TrackMetadata.h"
+
+#import "ApplicationDelegate.h"
 
 // ========================================
 // Context objects for observeValueForKeyPath:ofObject:change:context:
@@ -166,7 +168,7 @@ static NSString * const kOperationQueueKVOContext		= @"org.sbooth.Rip.DetectPreg
 	// Create our own context for accessing the store
 	if(!_managedObjectContext) {
 		_managedObjectContext = [[NSManagedObjectContext alloc] init];
-		[_managedObjectContext setPersistentStoreCoordinator:[[[NSApplication sharedApplication] delegate] persistentStoreCoordinator]];
+		[_managedObjectContext setPersistentStoreCoordinator:[(ApplicationDelegate *)[[NSApplication sharedApplication] delegate] persistentStoreCoordinator]];
 	}
 	
 	return _managedObjectContext;

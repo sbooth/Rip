@@ -18,7 +18,7 @@
 
 - (NSManagedObjectContext *) managedObjectContext
 {
-	return [[[NSApplication sharedApplication] delegate] managedObjectContext];
+	return [(ApplicationDelegate *)[[NSApplication sharedApplication] delegate] managedObjectContext];
 }
 
 @end

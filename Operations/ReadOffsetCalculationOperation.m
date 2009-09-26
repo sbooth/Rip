@@ -15,6 +15,7 @@
 
 #import "SectorRange.h"
 
+#import "ApplicationDelegate.h"
 #import "CDDAUtilities.h"
 
 // ========================================
@@ -47,7 +48,7 @@ NSString * const	kAccurateRipTrackIDKey					= @"accurateRipTrackID";
 	
 	// Create our own context for accessing the store
 	NSManagedObjectContext *managedObjectContext = [[NSManagedObjectContext alloc] init];
-	[managedObjectContext setPersistentStoreCoordinator:[[[NSApplication sharedApplication] delegate] persistentStoreCoordinator]];
+	[managedObjectContext setPersistentStoreCoordinator:[(ApplicationDelegate *)[[NSApplication sharedApplication] delegate] persistentStoreCoordinator]];
 	
 	// Fetch the TrackDescriptor object from the context and ensure it is the correct class
 	NSManagedObject *managedObject = [managedObjectContext objectWithID:self.trackID];
