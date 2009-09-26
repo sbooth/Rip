@@ -249,7 +249,7 @@
 	
 	// Decrypt the signature - should get 20 bytes back
 	unsigned char checkDigest[20];
-	if(20 != RSA_public_decrypt([signature length], [signature bytes], checkDigest, _rsaKey, RSA_PKCS1_PADDING))
+	if(20 != RSA_public_decrypt((int)[signature length], [signature bytes], checkDigest, _rsaKey, RSA_PKCS1_PADDING))
 		return nil;
 	
 	// Make sure the license hash isn't on the blacklist

@@ -15,7 +15,7 @@
 		return nil;
 	
 	NSUInteger offset = [anObject integerValue];
-	CDMSF msf = CDConvertLBAToMSF(offset - 150);
+	CDMSF msf = CDConvertLBAToMSF((UInt32)(offset - 150));
 	
 	return [NSString stringWithFormat:@"%02i:%02i.%02i", msf.minute, msf.second, msf.frame];
 }

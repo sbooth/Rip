@@ -334,7 +334,7 @@
 	cd_read.sectorArea		= sectorAreas;
 	cd_read.sectorType		= kCDSectorTypeCDDA;
 	cd_read.buffer			= buffer;
-	cd_read.bufferLength	= blockSize * sectorCount;
+	cd_read.bufferLength	= (uint32_t)(blockSize * sectorCount);
 
 	if(-1 == ioctl(self.fd, DKIOCCDREAD, &cd_read)) {
 		self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:nil];

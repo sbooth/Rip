@@ -206,7 +206,7 @@ calculateAccurateRipChecksumForBlock(const void *block, NSUInteger blockNumber, 
 	else {
 		const uint32_t *buffer = (const uint32_t *)block;
 		uint32_t checksum = 0;
-		NSUInteger blockOffset = AUDIO_FRAMES_PER_CDDA_SECTOR * blockNumber;
+		uint32_t blockOffset = (uint32_t)(AUDIO_FRAMES_PER_CDDA_SECTOR * blockNumber);
 		
 		for(NSUInteger i = 0; i < AUDIO_FRAMES_PER_CDDA_SECTOR; ++i)
 			checksum += OSSwapHostToLittleInt32(*buffer++) * ++blockOffset;
@@ -354,11 +354,11 @@ calculateAccurateRipChecksumsForTrackInFile(NSURL *fileURL, NSRange trackSectors
 				uint32_t sample = OSSwapHostToLittleInt32(*sampleBuffer++);
 				
 				sumOfSamples += sample;
-				sumOfSamplesAndPositions += sample * (frameIndex + 1);
+				sumOfSamplesAndPositions += (uint32_t)(sample * (frameIndex + 1));
 			}
 			
 			for(NSInteger offsetIndex = -maximumOffsetInFrames; offsetIndex <= (NSInteger)maximumOffsetInFrames; ++offsetIndex)
-				checksums[offsetIndex + maximumOffsetInFrames] += sumOfSamplesAndPositions + ((trackFrameNumber - offsetIndex) * sumOfSamples);
+				checksums[offsetIndex + maximumOffsetInFrames] += sumOfSamplesAndPositions + (uint32_t)(((trackFrameNumber - offsetIndex) * sumOfSamples));
 		}
 		// Sectors at the beginning or end of the track or disc must be handled specially
 		// This could be optimized but for now it uses the normal method of Accurate Rip checksum calculation

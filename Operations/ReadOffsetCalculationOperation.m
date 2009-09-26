@@ -112,7 +112,7 @@ NSString * const	kAccurateRipTrackIDKey					= @"accurateRipTrackID";
 		}
 
 		// Update progress
-		self.fractionComplete = fabsf(firstOffsetToTry - currentOffset) / (float)(lastOffsetToTry - firstOffsetToTry);
+		self.fractionComplete = fabsf((float)(firstOffsetToTry - currentOffset)) / (float)(lastOffsetToTry - firstOffsetToTry);
 	}
 	
 	// Sort the possible read offsets by confidence level

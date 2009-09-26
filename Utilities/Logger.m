@@ -34,7 +34,7 @@ static Logger *sSharedLogger				= nil;
 - (id) init
 {
 	if((self = [super init])) {
-		self.logMessageLevel = [[NSUserDefaults standardUserDefaults] integerForKey:@"logMessageLevel"];
+		self.logMessageLevel = (eLogMessageLevel)[[NSUserDefaults standardUserDefaults] integerForKey:@"logMessageLevel"];
 		if(![self openLogFile])
 			return nil;
 	}

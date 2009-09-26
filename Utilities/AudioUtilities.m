@@ -146,7 +146,7 @@ copySectorsFromURLToURL(NSURL *inputURL, NSRange sectorsToCopy, NSURL *outputURL
 		
 		// Read a chunk of input
 		UInt32 byteCount = 0;
-		UInt32 numPacketsRead = sectorCount * AUDIO_FRAMES_PER_CDDA_SECTOR;
+		UInt32 numPacketsRead = (UInt32)(sectorCount * AUDIO_FRAMES_PER_CDDA_SECTOR);
 		status = AudioFileReadPackets(inputFile, false, &byteCount, NULL, inputFilePacket, &numPacketsRead, buffer);
 		if(noErr != status || 0 == numPacketsRead)
 			goto cleanup;

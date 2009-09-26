@@ -264,8 +264,8 @@ zeroTrailingBitsOfBufferInPlace(void *buffer,
 										   freeWhenDone:NO];
 
 		// Write the silence to the output file
-		UInt32 packetCount = audioData.length / cddaASBD.mBytesPerPacket;
-		status = AudioFileWritePackets(file, false, audioData.length, NULL, packetNumber, &packetCount, audioData.bytes);
+		UInt32 packetCount = (UInt32)(audioData.length / cddaASBD.mBytesPerPacket);
+		status = AudioFileWritePackets(file, false, (UInt32)audioData.length, NULL, packetNumber, &packetCount, audioData.bytes);
 		if(noErr != status) {
 			self.error = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
 			goto cleanup;
@@ -274,8 +274,8 @@ zeroTrailingBitsOfBufferInPlace(void *buffer,
 		self.sectorsOfSilencePrepended = sectorsOfSilenceToPrepend;
 		
 		// Update the MD5 and SHA1 digests
-		CC_MD5_Update(&md5, audioData.bytes, audioData.length);
-		CC_SHA1_Update(&sha1, audioData.bytes, audioData.length);
+		CC_MD5_Update(&md5, audioData.bytes, (CC_LONG)audioData.length);
+		CC_SHA1_Update(&sha1, audioData.bytes, (CC_LONG)audioData.length);
 		
 		// Housekeeping
 		packetNumber += packetCount;
@@ -362,21 +362,21 @@ zeroTrailingBitsOfBufferInPlace(void *buffer,
 		}
 
 		// Write the data to the output file
-		UInt32 packetCount = audioData.length / cddaASBD.mBytesPerPacket;
-		status = AudioFileWritePackets(file, false, audioData.length, NULL, packetNumber, &packetCount, audioData.bytes);
+		UInt32 packetCount = (UInt32)(audioData.length / cddaASBD.mBytesPerPacket);
+		status = AudioFileWritePackets(file, false, (UInt32)audioData.length, NULL, packetNumber, &packetCount, audioData.bytes);
 		if(noErr != status) {
 			self.error = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
 			goto cleanup;
 		}
 		
 		// Update the MD5 and SHA1 digests
-		CC_MD5_Update(&md5, audioData.bytes, audioData.length);
-		CC_SHA1_Update(&sha1, audioData.bytes, audioData.length);
+		CC_MD5_Update(&md5, audioData.bytes, (CC_LONG)audioData.length);
+		CC_SHA1_Update(&sha1, audioData.bytes, (CC_LONG)audioData.length);
 		
 		// Housekeeping
 		sectorsRemaining -= sectorsRead;
 		packetNumber += packetCount;
-		self.fractionComplete = (1.f - (sectorsRemaining / (float)self.sectorsRead.length));
+		self.fractionComplete = (1.f - ((float)sectorsRemaining / (float)self.sectorsRead.length));
 		
 		// Stop if requested
 		if(self.isCancelled)
@@ -395,8 +395,8 @@ zeroTrailingBitsOfBufferInPlace(void *buffer,
 										   freeWhenDone:NO];
 		
 		// Write the silence to the output file
-		UInt32 packetCount = audioData.length / cddaASBD.mBytesPerPacket;
-		status = AudioFileWritePackets(file, false, audioData.length, NULL, packetNumber, &packetCount, audioData.bytes);
+		UInt32 packetCount = (UInt32)(audioData.length / cddaASBD.mBytesPerPacket);
+		status = AudioFileWritePackets(file, false, (UInt32)audioData.length, NULL, packetNumber, &packetCount, audioData.bytes);
 		if(noErr != status) {
 			self.error = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
 			goto cleanup;
@@ -405,8 +405,8 @@ zeroTrailingBitsOfBufferInPlace(void *buffer,
 		self.sectorsOfSilenceAppended = sectorsOfSilenceToAppend;
 
 		// Update the MD5 and SHA1 digests
-		CC_MD5_Update(&md5, audioData.bytes, audioData.length);
-		CC_SHA1_Update(&sha1, audioData.bytes, audioData.length);
+		CC_MD5_Update(&md5, audioData.bytes, (CC_LONG)audioData.length);
+		CC_SHA1_Update(&sha1, audioData.bytes, (CC_LONG)audioData.length);
 	}
 
 	// ========================================

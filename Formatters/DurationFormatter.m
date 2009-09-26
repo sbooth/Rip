@@ -15,7 +15,7 @@
 		return nil;
 	
 	NSUInteger offset = [anObject integerValue];
-	CDMSF msf = CDConvertLBAToMSF(offset - 150);
+	CDMSF msf = CDConvertLBAToMSF((UInt32)(offset - 150));
 	
 	// Round to nearest second
 	if(37 < msf.frame) {

@@ -26,7 +26,7 @@
 	
 	NSUInteger sectorCount = [anObject integerValue];
 	NSUInteger byteSize = kCDSectorSizeCDDA * sectorCount;
-	float size = byteSize;
+	float size = (float)byteSize;
 	NSUInteger divisions = 1;
 	
 	while(1024 < size) {

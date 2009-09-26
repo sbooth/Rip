@@ -462,7 +462,7 @@ static EncoderManager *sSharedEncoderManager				= nil;
 
 - (eExistingOutputFileHandling) existingOutputFileHandling
 {
-	return [[NSUserDefaults standardUserDefaults] integerForKey:@"existingOutputFileHandling"];
+	return (eExistingOutputFileHandling)[[NSUserDefaults standardUserDefaults] integerForKey:@"existingOutputFileHandling"];
 }
 
 - (void) setExistingOutputFileHandling:(eExistingOutputFileHandling)outputFileHandling

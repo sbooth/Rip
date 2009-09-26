@@ -175,7 +175,7 @@ diskDisappearedCallback(DADiskRef disk, void *context)
 	[SFBCrashReporter checkForNewCrashes];
 	
 	// Seed the random number generator
-	srandom(time(NULL));
+	srandom((unsigned)time(NULL));
 	
 	// Set up logging
 	NSString *appName = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleName"];

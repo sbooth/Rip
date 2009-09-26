@@ -153,8 +153,8 @@
 {
 	NSParameterAssert(NULL != buffer);
 
-	UInt32 byteCount = kCDSectorSizeCDDA * sectors.length;		
-	UInt32 packetCount = AUDIO_FRAMES_PER_CDDA_SECTOR * sectors.length;
+	UInt32 byteCount = (UInt32)(kCDSectorSizeCDDA * sectors.length);
+	UInt32 packetCount = (UInt32)(AUDIO_FRAMES_PER_CDDA_SECTOR * sectors.length);
 	SInt64 startingPacket = AUDIO_FRAMES_PER_CDDA_SECTOR * sectors.location;
 	
 	// Read the requested sectors
@@ -200,8 +200,8 @@
 {
 	NSParameterAssert(NULL != buffer);
 	
-	UInt32 byteCount = kCDSectorSizeCDDA * sectors.length;		
-	UInt32 packetCount = AUDIO_FRAMES_PER_CDDA_SECTOR * sectors.length;
+	UInt32 byteCount = (UInt32)(kCDSectorSizeCDDA * sectors.length);
+	UInt32 packetCount = (UInt32)(AUDIO_FRAMES_PER_CDDA_SECTOR * sectors.length);
 	SInt64 startingPacket = AUDIO_FRAMES_PER_CDDA_SECTOR * sectors.location;
 	
 	// Write the requested sectors

@@ -35,9 +35,9 @@ NSString * const	kFreeDBServiceName						= @"FreeDB";
 	
 	// Search for the item in the keychain
 	OSStatus status = SecKeychainFindGenericPassword(NULL,
-													 strlen(serviceNameUTF8),
+													 (UInt32)strlen(serviceNameUTF8),
 													 serviceNameUTF8,
-													 strlen(usernameUTF8),
+													 (UInt32)strlen(usernameUTF8),
 													 usernameUTF8,
 													 &passwordLength,
 													 &passwordData,
@@ -79,9 +79,9 @@ NSString * const	kFreeDBServiceName						= @"FreeDB";
 	
 	// Search for the item in the keychain
 	OSStatus status = SecKeychainFindGenericPassword(NULL,
-													 strlen(serviceNameUTF8),
+													 (UInt32)strlen(serviceNameUTF8),
 													 serviceNameUTF8,
-													 strlen(usernameUTF8),
+													 (UInt32)strlen(usernameUTF8),
 													 usernameUTF8,
 													 NULL,
 													 NULL,
@@ -90,11 +90,11 @@ NSString * const	kFreeDBServiceName						= @"FreeDB";
 	// If the item wasn't found, store it
 	if(errSecItemNotFound == status) {		
 		/*status = */SecKeychainAddGenericPassword(NULL,
-												   strlen(serviceNameUTF8),
+												   (UInt32)strlen(serviceNameUTF8),
 												   serviceNameUTF8,
-												   strlen(usernameUTF8),
+												   (UInt32)strlen(usernameUTF8),
 												   usernameUTF8,
-												   strlen(passwordUTF8), 
+												   (UInt32)strlen(passwordUTF8), 
 												   passwordUTF8, 
 												   &keychainItemRef);
 	}
@@ -102,7 +102,7 @@ NSString * const	kFreeDBServiceName						= @"FreeDB";
 	else if(noErr == status) {
 		/*status = */SecKeychainItemModifyAttributesAndData(keychainItemRef,
 															NULL,
-															strlen(passwordUTF8), 
+															(UInt32)strlen(passwordUTF8), 
 															passwordUTF8);
 	}
 	

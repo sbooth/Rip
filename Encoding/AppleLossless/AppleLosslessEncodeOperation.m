@@ -96,7 +96,7 @@
 		MP4TagArtwork artwork;
 		
 		artwork.data = (void *)[frontCoverPNGData bytes];
-		artwork.size = [frontCoverPNGData length];
+		artwork.size = (uint32_t)[frontCoverPNGData length];
 		artwork.type = MP4_ART_PNG;
 
 		MP4TagsAddArtwork(tags, &artwork);
