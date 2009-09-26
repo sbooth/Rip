@@ -163,13 +163,13 @@ NSString * const	kMagicCookieKey							= @"MagicCookie";
 	// Cleanup
 cleanup:
 	if(inputFile) {
-		status = ExtAudioFileDispose(inputFile);
+		status = ExtAudioFileDispose(inputFile), inputFile = NULL;
 		if(noErr != status)
 			self.error = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
 	}
 
 	if(outputFile) {
-		status = ExtAudioFileDispose(outputFile);
+		status = ExtAudioFileDispose(outputFile), outputFile = NULL;
 		if(noErr != status)
 			self.error = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
 	}
