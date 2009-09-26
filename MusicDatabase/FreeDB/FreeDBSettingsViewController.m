@@ -15,7 +15,7 @@ NSString * const	kFreeDBServiceName						= @"FreeDB";
 
 - (id) init
 {
-	return [super initWithNibName:@"FreeDBSettings" bundle:[NSBundle bundleForClass:[FreeDBDatabaseInterface class]]];
+	return [super initWithNibName:@"FreeDBSettings" bundle:[NSBundle bundleWithIdentifier:@"org.sbooth.Rip.MusicDatabase.FreeDB"]];
 }
 
 - (void) awakeFromNib

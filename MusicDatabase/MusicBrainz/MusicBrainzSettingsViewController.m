@@ -14,7 +14,7 @@ NSString * const	kMusicBrainzServiceName					= @"MusicBrainz";
 
 - (id) init
 {
-	return [super initWithNibName:@"MusicBrainzSettings" bundle:[NSBundle bundleForClass:[MusicBrainzDatabaseInterface class]]];
+	return [super initWithNibName:@"MusicBrainzSettings" bundle:[NSBundle bundleWithIdentifier:@"org.sbooth.Rip.MusicDatabase.MusicBrainz"]];
 }
 
 - (void) awakeFromNib

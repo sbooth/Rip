@@ -21,7 +21,7 @@
 
 - (id) init
 {
-	if((self = [super initWithNibName:@"AlbumArtExchangeView" bundle:[NSBundle bundleForClass:[AlbumArtExchangeInterface class]]]))
+	if((self = [super initWithNibName:@"AlbumArtExchangeView" bundle:[NSBundle bundleWithIdentifier:@"org.sbooth.Rip.MetadataSource.AlbumArtExchange"]]))
 		_images = [[NSMutableArray alloc] init];
 	return self;
 }

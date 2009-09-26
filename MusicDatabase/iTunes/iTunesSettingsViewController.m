@@ -10,7 +10,7 @@
 
 - (id) init
 {
-	return [super initWithNibName:@"iTunesSettings" bundle:[NSBundle bundleForClass:[iTunesDatabaseInterface class]]];
+	return [super initWithNibName:@"iTunesSettings" bundle:[NSBundle bundleWithIdentifier:@"org.sbooth.Rip.MusicDatabase.iTunes"]];
 }
 
 @end

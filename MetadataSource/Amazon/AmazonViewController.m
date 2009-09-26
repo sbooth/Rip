@@ -35,7 +35,7 @@ queryStringComponentFromPair(NSString *field, NSString *value)
 
 - (id) init
 {
-	if((self = [super initWithNibName:@"AmazonView" bundle:[NSBundle bundleForClass:[AmazonInterface class]]]))
+	if((self = [super initWithNibName:@"AmazonView" bundle:[NSBundle bundleWithIdentifier:@"org.sbooth.Rip.MetadataSource.Amazon"]]))
 		_items = [[NSMutableArray alloc] init];
 	return self;
 }
