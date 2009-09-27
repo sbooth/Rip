@@ -16,7 +16,7 @@ extern NSString * const		AdvancedPreferencesToolbarItemIdentifier;
 // ========================================
 // This class manages the preference window
 // ========================================
-@interface PreferencesWindowController : NSWindowController <NSToolbarDelegate>
+@interface PreferencesWindowController : NSWindowController //<NSToolbarDelegate>
 {
 	IBOutlet NSView *_preferencesView;
 

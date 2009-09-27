@@ -10,7 +10,7 @@
 // ========================================
 // A MusicDatabaseQueryOperation subclass providing access to the GraceNote online database (via iTunes)
 // ========================================
-@interface iTunesQueryOperation : MusicDatabaseQueryOperation <SBApplicationDelegate>
+@interface iTunesQueryOperation : MusicDatabaseQueryOperation //<SBApplicationDelegate>
 {
 }
 
