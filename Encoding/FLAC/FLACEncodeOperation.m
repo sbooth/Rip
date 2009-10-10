@@ -67,6 +67,9 @@ setArgumentForTag(NSMutableArray *arguments, NSDictionary *metadata, NSString *k
 
 	// Verify encoding
 	[arguments addObject:@"-V"];
+	
+	// Reserve 8 KiB for metadata
+	[arguments addObject:@"--padding=8192"];
 
 	// NSTask doesn't encode text as UTF8, which flac expects
 	[arguments addObject:@"--no-utf8-convert"];
