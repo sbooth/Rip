@@ -322,7 +322,6 @@
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = WAVE_Prefix.pch;
-				HEADER_SEARCH_PATHS = ../../Frameworks/taglib.framework/Headers;
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "@executable_path/../PlugIns";
 				PRODUCT_NAME = WAVE;
@@ -340,7 +339,6 @@
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = WAVE_Prefix.pch;
-				HEADER_SEARCH_PATHS = ../../Frameworks/taglib.framework/Headers;
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "@executable_path/../PlugIns";
 				PRODUCT_NAME = WAVE;
