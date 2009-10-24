@@ -118,5 +118,7 @@
 	<string>dsa_pub.pem</string>
 	<key>SFBCrashReporterCrashSubmissionURL</key>
 	<string>http://sbooth.org/Rip/handle_crash_report.php</string>
+	<key>LSMinimumSystemVersion</key>
+	<string>10.5.0</string>
 </dict>
 </plist>
