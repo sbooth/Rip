@@ -88,7 +88,11 @@ static PlugInManager *sSharedPlugInManager						= nil;
 		// Attempt to load the plug-in's executable code
 		// Don't return nil; just store the error so that one bad plug-in won't prevent others from being detected
 		if(![plugIn loadAndReturnError:error]) {
-			NSLog(@"Unable to load plugIn \"%@\": %@", [plugIn bundleIdentifier], *error);
+			if(error)
+				NSLog(@"Unable to load plugIn \"%@\": %@", [plugIn bundleIdentifier], *error);
+			else
+				NSLog(@"Unable to load plugIn \"%@\"", [plugIn bundleIdentifier]);
+
 			continue;
 		}
 
