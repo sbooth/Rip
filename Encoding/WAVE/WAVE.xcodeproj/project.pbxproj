@@ -324,6 +324,7 @@
 				GCC_PREFIX_HEADER = WAVE_Prefix.pch;
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "@executable_path/../PlugIns";
+				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
 				PRODUCT_NAME = WAVE;
 				WRAPPER_EXTENSION = bundle;
 			};
@@ -341,6 +342,7 @@
 				GCC_PREFIX_HEADER = WAVE_Prefix.pch;
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "@executable_path/../PlugIns";
+				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
 				PRODUCT_NAME = WAVE;
 				WRAPPER_EXTENSION = bundle;
 			};
