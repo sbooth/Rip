@@ -324,7 +324,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = AppleLossless_Prefix.pch;
 				INFOPLIST_FILE = Info.plist;
-				INSTALL_PATH = "@executable_path/../PlugIns";
+				INSTALL_PATH = "@rpath";
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
 				PRODUCT_NAME = AppleLossless;
 				WRAPPER_EXTENSION = bundle;
@@ -342,7 +342,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = AppleLossless_Prefix.pch;
 				INFOPLIST_FILE = Info.plist;
-				INSTALL_PATH = "@executable_path/../PlugIns";
+				INSTALL_PATH = "@rpath";
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
 				PRODUCT_NAME = AppleLossless;
 				WRAPPER_EXTENSION = bundle;

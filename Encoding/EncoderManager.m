@@ -367,8 +367,17 @@ static EncoderManager *sSharedEncoderManager				= nil;
 
 + (id) sharedEncoderManager
 {
+#if 0
+	// Is this necessary? Probably not...
+	if(!sSharedEncoderManager) {
+		id possiblySharedInstance = [[self alloc] init];
+		if(!objc_atomicCompareAndSwapGlobalBarrier(nil, possiblySharedInstance, &sSharedEncoderManager))
+			possiblySharedInstance = nil;
+	}
+#else
 	if(!sSharedEncoderManager)
 		sSharedEncoderManager = [[self alloc] init];
+#endif
 	return sSharedEncoderManager;
 }
 

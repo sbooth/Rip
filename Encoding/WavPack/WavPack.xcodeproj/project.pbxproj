@@ -292,7 +292,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = WavPack_Prefix.pch;
 				INFOPLIST_FILE = Info.plist;
-				INSTALL_PATH = "@executable_path/../PlugIns";
+				INSTALL_PATH = "@rpath";
 				PRODUCT_NAME = WavPack;
 				WRAPPER_EXTENSION = bundle;
 			};
@@ -305,7 +305,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = WavPack_Prefix.pch;
 				INFOPLIST_FILE = Info.plist;
-				INSTALL_PATH = "@executable_path/../PlugIns";
+				INSTALL_PATH = "@rpath";
 				PRODUCT_NAME = WavPack;
 				WRAPPER_EXTENSION = bundle;
 			};
